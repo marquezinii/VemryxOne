@@ -77,6 +77,9 @@ function Remove-SmokeDesktopShortcut {
 
     $prefix = $InstallDirectory.TrimEnd('\')
     $candidates = @(
+        (Join-Path ([Environment]::GetFolderPath('Desktop')) 'Vemryx One.lnk'),
+        (Join-Path $env:USERPROFILE 'OneDrive\Desktop\Vemryx One.lnk'),
+        (Join-Path $env:USERPROFILE 'Desktop\Vemryx One.lnk'),
         (Join-Path ([Environment]::GetFolderPath('Desktop')) 'FiveMCleaner.lnk'),
         (Join-Path $env:USERPROFILE 'OneDrive\Desktop\FiveMCleaner.lnk'),
         (Join-Path $env:USERPROFILE 'Desktop\FiveMCleaner.lnk')
@@ -137,7 +140,7 @@ try {
         '/LANG=en',
         '/TASKS=desktopicon',
         "/DIR=$installDirectory",
-        "/GROUP=FiveMCleaner Smoke $smokeId",
+        "/GROUP=Vemryx One Smoke $smokeId",
         "/LOG=$defaultTasksLog"
     )
     Write-Host '1/6 Install with desktopicon only...' -ForegroundColor Cyan
@@ -161,7 +164,7 @@ try {
         '/LANG=ptbr',
         '/TASKS=desktopicon,startup',
         "/DIR=$installDirectory",
-        "/GROUP=FiveMCleaner Smoke $smokeId",
+        "/GROUP=Vemryx One Smoke $smokeId",
         "/LOG=$installLog"
     )
     $installProcess = Start-Process -FilePath $resolvedInstaller -ArgumentList $installArguments -WindowStyle Hidden -Wait -PassThru
@@ -182,7 +185,7 @@ try {
     }
 
     $uninstallRegistration = Get-ItemProperty -LiteralPath $uninstallRegistryPath
-    if ($uninstallRegistration.DisplayName -ne 'FiveMCleaner') {
+    if ($uninstallRegistration.DisplayName -ne 'Vemryx One') {
         throw "Unexpected uninstall DisplayName: $($uninstallRegistration.DisplayName)"
     }
     if (-not [string]::IsNullOrWhiteSpace($ExpectedVersion) -and
@@ -229,7 +232,7 @@ try {
         '/LANG=en',
         '/TASKS=',
         "/DIR=$installDirectory",
-        "/GROUP=FiveMCleaner Smoke $smokeId",
+        "/GROUP=Vemryx One Smoke $smokeId",
         "/LOG=$upgradeLog"
     )
     $upgradeProcess = Start-Process -FilePath $resolvedInstaller -ArgumentList $upgradeArguments -WindowStyle Hidden -Wait -PassThru

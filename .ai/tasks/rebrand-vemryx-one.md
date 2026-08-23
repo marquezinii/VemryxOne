@@ -12,7 +12,7 @@ Fonte: `REBRANDING_VEMRYX_ONE.md`. O ícone oficial fornecido pelo usuário est�
 - [x] Aplicar tokens visuais Vemryx e validar contraste/capturas.
 - [x] Migrar identidade pública e localização para Vemryx One.
 - [x] Projetar e testar compatibilidade de caminhos, mutex, persistência e sessões.
-- [ ] Implementar release ponte do instalador/updater antes de renomear executáveis e IDs externos.
+- [x] Implementar release ponte do instalador/updater antes de renomear executáveis e IDs externos.
 - [ ] Renomear projetos, arquivos e namespaces internos após estabilizar a compatibilidade.
 - [ ] Atualizar backend, site, documentação, CI e allowlist de resíduos.
 - [ ] Executar matriz final de build, testes, instalação, atualização, rollback e acessibilidade.
@@ -73,3 +73,19 @@ Eles só mudam junto de aliases, migração idempotente, testes e rollback. O no
 - `scripts/Verify-Safety.ps1`: aprovado; recompilou a solução e executou os 998 testes.
 - `scripts/Verify-Installer.ps1 -ScriptOnly`: contrato legado do instalador aprovado.
 - `scripts/Install-DevelopmentShortcut.ps1 -Build`: build espelhado e atalho de desenvolvimento reconstruídos.
+
+## Release-ponte do instalador e updater
+
+- O instalador público passa a se chamar `Vemryx One` e gera `VemryxOne-Setup-<versão>-win-x64.exe`; instalações novas usam `{autopf}\Vemryx One`.
+- A mesma release gera `FiveMCleaner-Setup-<versão>-win-x64.exe` e o alias estável legado com os mesmos bytes e SHA-256. A atualização standalone antiga ainda encontra esse nome esperado e instala o produto renomeado in-place.
+- `AppId`, `SetupMutex`, launcher, runtime ZIP, executáveis, valor de inicialização, dados locais e políticas de assinatura continuam tecnicamente legados. Isso preserva atualização, rollback e downgrade até a migração controlada dos identificadores externos.
+- O workflow publica os dois aliases e atesta ambos; `Test-Installer.ps1` valida `Vemryx One` no registro de desinstalação, preservando a verificação do launcher e do valor de startup legado.
+
+## Validação da release-ponte
+
+- `InstallerBridgeContractTests` impede que o instalador público, o alias legado, o `AppId` estável ou o launcher técnico se desencontrem.
+- `scripts/Build-Installer.ps1 -Version 1.4.3`: aprovado; os dois instaladores produzidos têm 146.049.695 bytes e SHA-256 `2bbe3142160108b52932d779e827fd725d0b099b504a3934553de4843b0c7cd2`.
+- `scripts/Test-Installer.ps1`: aprovado; instalação, upgrade, hash de 721 arquivos, remoção das tasks e desinstalação silenciosa com preservação de dados locais.
+- `dotnet build FiveMCleaner.slnx --configuration Release --no-restore`: aprovado, 0 warnings e 0 erros.
+- `dotnet test FiveMCleaner.slnx --configuration Release --no-restore`: 999 testes aprovados.
+- `dotnet format FiveMCleaner.slnx --verify-no-changes --no-restore`, `scripts/Verify-Safety.ps1` e `scripts/Verify-Installer.ps1 -ScriptOnly`: aprovados.

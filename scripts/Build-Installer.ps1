@@ -241,7 +241,8 @@ try {
         throw "Inno Setup compilation failed with exit code $LASTEXITCODE."
     }
 
-    $baseName = "FiveMCleaner-Setup-$Version-win-x64"
+    $baseName = "VemryxOne-Setup-$Version-win-x64"
+    $legacyBaseName = "FiveMCleaner-Setup-$Version-win-x64"
     $stagedInstaller = Join-Path $stagingOutput "$baseName.exe"
     $stagedContents = Join-Path $stagingOutput "$baseName.contents.txt"
     if (-not (Test-Path -LiteralPath $stagedInstaller -PathType Leaf)) {
@@ -251,13 +252,17 @@ try {
     $finalInstaller = Join-Path $installerOutput "$baseName.exe"
     $finalContents = Join-Path $installerOutput "$baseName.contents.txt"
     $finalHash = "$finalInstaller.sha256"
-    $releaseManifest = Join-Path $installerOutput "FiveMCleaner-release-manifest-$Version.json"
+    $legacyInstaller = Join-Path $installerOutput "$legacyBaseName.exe"
+    $legacyHash = "$legacyInstaller.sha256"
+    $releaseManifest = Join-Path $installerOutput "VemryxOne-release-manifest-$Version.json"
     $stagedHash = "$stagedInstaller.sha256"
-    $stagedReleaseManifest = Join-Path $stagingOutput "FiveMCleaner-release-manifest-$Version.json"
+    $stagedReleaseManifest = Join-Path $stagingOutput "VemryxOne-release-manifest-$Version.json"
     foreach ($path in @(
         $finalInstaller,
         $finalContents,
         $finalHash,
+        $legacyInstaller,
+        $legacyHash,
         $releaseManifest,
         $stagedHash,
         $stagedReleaseManifest
@@ -288,7 +293,7 @@ try {
 
     $manifest = [ordered]@{
         schemaVersion = 1
-        product = 'FiveMCleaner'
+        product = 'Vemryx One'
         version = $Version
         runtime = 'win-x64'
         selfContained = $true
@@ -306,6 +311,11 @@ try {
         artifacts = @(
             [ordered]@{
                 name = [System.IO.Path]::GetFileName($finalInstaller)
+                sizeBytes = (Get-Item -LiteralPath $stagedInstaller).Length
+                sha256 = $installerHash
+            },
+            [ordered]@{
+                name = [System.IO.Path]::GetFileName($legacyInstaller)
                 sizeBytes = (Get-Item -LiteralPath $stagedInstaller).Length
                 sha256 = $installerHash
             },
@@ -339,13 +349,15 @@ try {
         if ($LASTEXITCODE -ne 0) { throw 'Fail-closed hardening verification failed for the installer.' }
     }
 
-    foreach ($path in @($finalInstaller, $finalContents, $finalHash, $releaseManifest)) {
+    foreach ($path in @($finalInstaller, $finalContents, $finalHash, $legacyInstaller, $legacyHash, $releaseManifest)) {
         if (Test-Path -LiteralPath $path) {
             Remove-Item -LiteralPath $path -Force
         }
     }
     Move-Item -LiteralPath $stagedInstaller -Destination $finalInstaller
     Move-Item -LiteralPath $stagedHash -Destination $finalHash
+    Copy-Item -LiteralPath $finalInstaller -Destination $legacyInstaller
+    Set-Content -LiteralPath $legacyHash -Value "$installerHash  $([System.IO.Path]::GetFileName($legacyInstaller))" -Encoding ascii
     Move-Item -LiteralPath $stagedReleaseManifest -Destination $releaseManifest
     if (Test-Path -LiteralPath $stagedContents -PathType Leaf) {
         Move-Item -LiteralPath $stagedContents -Destination $finalContents

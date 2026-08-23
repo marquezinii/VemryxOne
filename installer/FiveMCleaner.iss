@@ -1,4 +1,4 @@
-#define AppName "FiveMCleaner"
+#define AppName "Vemryx One"
 #define AppPublisher "Vemryx"
 #define AppPublisherUrl "https://vemryx.com/"
 #define AppUrl "https://github.com/marquezinii/FiveMCleaner"
@@ -34,7 +34,7 @@
   #define InstallerArtworkPathDark "..\artifacts\installer-artwork\FiveMCleaner-wizard-side-dark.png"
 #endif
 
-#define InstallerBaseName "FiveMCleaner-Setup-" + AppVersion + "-win-x64"
+#define InstallerBaseName "VemryxOne-Setup-" + AppVersion + "-win-x64"
 
 [Setup]
 AppId={#StableAppId}
@@ -118,16 +118,16 @@ ptbr.FinishedLabel=A instalação do [name] foi concluída.%n%nAtualizações fu
 [CustomMessages]
 en.AdditionalShortcuts=Shortcuts
 en.DesktopIcon=Create a desktop shortcut
-en.StartWithWindows=Start FiveMCleaner when I sign in to Windows
-en.LaunchProgram=Open FiveMCleaner
-en.UninstallShortcut=Uninstall FiveMCleaner
-en.RemoveUserDataQuestion=Remove local FiveMCleaner settings, logs, backups and downloaded updates too? Choosing No preserves this data for a future installation.
+en.StartWithWindows=Start Vemryx One when I sign in to Windows
+en.LaunchProgram=Open Vemryx One
+en.UninstallShortcut=Uninstall Vemryx One
+en.RemoveUserDataQuestion=Remove local Vemryx One settings, logs, backups and downloaded updates too? Choosing No preserves this data for a future installation.
 ptbr.AdditionalShortcuts=Atalhos
 ptbr.DesktopIcon=Criar um atalho na Área de Trabalho
-ptbr.StartWithWindows=Iniciar o FiveMCleaner ao entrar no Windows
-ptbr.LaunchProgram=Abrir o FiveMCleaner
-ptbr.UninstallShortcut=Desinstalar o FiveMCleaner
-ptbr.RemoveUserDataQuestion=Também remover configurações, logs, backups e atualizações baixadas do FiveMCleaner? Escolher Não preserva esses dados para uma instalação futura.
+ptbr.StartWithWindows=Iniciar o Vemryx One ao entrar no Windows
+ptbr.LaunchProgram=Abrir o Vemryx One
+ptbr.UninstallShortcut=Desinstalar o Vemryx One
+ptbr.RemoveUserDataQuestion=Também remover configurações, logs, backups e atualizações baixadas do Vemryx One? Escolher Não preserva esses dados para uma instalação futura.
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:DesktopIcon}"; GroupDescription: "{cm:AdditionalShortcuts}:"
