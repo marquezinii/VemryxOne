@@ -14,6 +14,7 @@ public interface IStartupRegistrationService
 public sealed class WindowsStartupRegistrationService : IStartupRegistrationService
 {
     internal const string RunSubKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
+    internal const string LegacyValueName = ProductIdentity.Name;
 
     private readonly string executablePath;
     private readonly Func<RegistryKey> currentUserFactory;
@@ -47,7 +48,7 @@ public sealed class WindowsStartupRegistrationService : IStartupRegistrationServ
     {
         using var currentUser = currentUserFactory();
         using var runKey = currentUser.OpenSubKey(RunSubKey, writable: false);
-        return runKey?.GetValue(ProductIdentity.Name, null, RegistryValueOptions.DoNotExpandEnvironmentNames)
+        return runKey?.GetValue(LegacyValueName, null, RegistryValueOptions.DoNotExpandEnvironmentNames)
             is string value
             && value.Equals(BuildCommand(), StringComparison.OrdinalIgnoreCase);
     }
@@ -59,12 +60,12 @@ public sealed class WindowsStartupRegistrationService : IStartupRegistrationServ
         {
             using var runKey = currentUser.CreateSubKey(RunSubKey, writable: true)
                 ?? throw new IOException("Não foi possível abrir a inicialização do usuário atual.");
-            runKey.SetValue(ProductIdentity.Name, BuildCommand(), RegistryValueKind.String);
+            runKey.SetValue(LegacyValueName, BuildCommand(), RegistryValueKind.String);
             return;
         }
 
         using var existing = currentUser.OpenSubKey(RunSubKey, writable: true);
-        existing?.DeleteValue(ProductIdentity.Name, throwOnMissingValue: false);
+        existing?.DeleteValue(LegacyValueName, throwOnMissingValue: false);
     }
 
     internal string BuildCommand() => $"\"{executablePath}\" --startup";

@@ -24,6 +24,14 @@ public sealed class SingleInstanceGuardTests
         Assert.NotEqual(developmentName, productionName);
     }
 
+    [Fact]
+    public void BuildMutexName_PreservesTheLegacyAliasUntilTheReleaseBridge()
+    {
+        Assert.Equal(
+            "Local\\FiveMCleaner.SingleInstance.Production",
+            SingleInstanceGuard.BuildMutexName(AppRuntimeEnvironment.Production));
+    }
+
     [Theory]
     [InlineData(AppRuntimeEnvironment.Development)]
     [InlineData(AppRuntimeEnvironment.Production)]
@@ -41,6 +49,14 @@ public sealed class SingleInstanceGuardTests
         var productionName = SingleInstanceGuard.BuildActivationEventName(AppRuntimeEnvironment.Production);
 
         Assert.NotEqual(developmentName, productionName);
+    }
+
+    [Fact]
+    public void BuildActivationEventName_PreservesTheLegacyAliasUntilTheReleaseBridge()
+    {
+        Assert.Equal(
+            "Local\\FiveMCleaner.SingleInstance.Production.Activate",
+            SingleInstanceGuard.BuildActivationEventName(AppRuntimeEnvironment.Production));
     }
 
     [Fact]

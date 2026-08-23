@@ -7,6 +7,12 @@ namespace FiveMCleaner.Tests.App;
 public sealed class StartupRegistrationServiceTests
 {
     [Fact]
+    public void WindowsStartupRegistration_PreservesTheLegacyValueUntilTheReleaseBridge()
+    {
+        Assert.Equal("FiveMCleaner", WindowsStartupRegistrationService.LegacyValueName);
+    }
+
+    [Fact]
     public void WindowsStartupRegistration_QuotesExecutableAndUsesFixedArgument()
     {
         var service = new WindowsStartupRegistrationService(

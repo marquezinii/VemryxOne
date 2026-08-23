@@ -77,6 +77,34 @@ public sealed class FirebaseAuthServiceTests
     }
 
     [Fact]
+    public async Task SecureSession_RemainsReadableAfterMovingToTheNewProductDirectory()
+    {
+        var root = Path.Combine(Path.GetTempPath(), $"firebase-migration-{Guid.NewGuid():N}");
+        var legacyPath = Path.Combine(root, "FiveMCleaner", "firebase.session");
+        var targetPath = Path.Combine(root, "Vemryx", "One", "firebase.session");
+
+        try
+        {
+            await new SecureFirebaseSessionStore(legacyPath)
+                .WriteAsync("refresh-1", global::Xunit.TestContext.Current.CancellationToken);
+            Directory.CreateDirectory(Path.GetDirectoryName(targetPath)!);
+            File.Move(legacyPath, targetPath);
+
+            var restored = await new SecureFirebaseSessionStore(targetPath)
+                .ReadAsync(global::Xunit.TestContext.Current.CancellationToken);
+
+            Assert.Equal("refresh-1", restored?.RefreshToken);
+        }
+        finally
+        {
+            if (Directory.Exists(root))
+            {
+                Directory.Delete(root, recursive: true);
+            }
+        }
+    }
+
+    [Fact]
     public async Task SignInAsync_VerifiedUserWithoutACompleteProfile_RequiresProfileCompletion()
     {
         using var client = new HttpClient(new StubHandler(request => request.RequestUri!.AbsolutePath switch

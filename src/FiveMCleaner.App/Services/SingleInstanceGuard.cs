@@ -21,7 +21,7 @@ namespace FiveMCleaner.App.Services;
 /// </summary>
 public sealed class SingleInstanceGuard : IDisposable
 {
-    private const string MutexNamePrefix = "Local\\FiveMCleaner.SingleInstance.";
+    internal const string LegacyMutexNamePrefix = "Local\\FiveMCleaner.SingleInstance.";
     private const string ActivationEventSuffix = ".Activate";
 
     private readonly Mutex mutex;
@@ -58,14 +58,14 @@ public sealed class SingleInstanceGuard : IDisposable
     /// actually acquire a system-wide Mutex.
     /// </summary>
     internal static string BuildMutexName(AppRuntimeEnvironment environment) =>
-        $"{MutexNamePrefix}{environment}";
+        $"{LegacyMutexNamePrefix}{environment}";
 
     /// <summary>
     /// Builds the name of the auto-reset event used to ask the running
     /// instance to bring its window to the foreground.
     /// </summary>
     internal static string BuildActivationEventName(AppRuntimeEnvironment environment) =>
-        $"{MutexNamePrefix}{environment}{ActivationEventSuffix}";
+        $"{LegacyMutexNamePrefix}{environment}{ActivationEventSuffix}";
 
     /// <summary>
     /// Attempts to become the sole running instance for this environment.
