@@ -8,7 +8,7 @@
         xmlns:pages="clr-namespace:FiveMCleaner.App.Views.Pages"
         mc:Ignorable="d"
         Title="FiveMCleaner"
-        Icon="Assets/FiveMCleaner.png"
+        Icon="Assets/VemryxOne.png"
         Width="1160"
         Height="680"
         MinWidth="1040"
@@ -73,7 +73,7 @@
         <ui:TitleBar Grid.Row="0" Height="52" Background="{DynamicResource CanvasBaseBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,0,0,1">
             <ui:TitleBar.Header>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0,0,0">
-                    <Image Source="Assets/FiveMCleaner.png" Width="24" Height="24" Stretch="Uniform" />
+                    <Image Source="Assets/VemryxOne.png" Width="24" Height="24" Stretch="Uniform" />
                     <TextBlock Margin="11,0,0,0" Style="{StaticResource BodyStrongText}" VerticalAlignment="Center" FontSize="15">
                         <Run Text="FiveM" /><Run Text="Cleaner" Foreground="{DynamicResource BrandInkBrush}" />
                     </TextBlock>
@@ -496,7 +496,7 @@
                                 <StackPanel x:Name="AboutSettingsPanel" Visibility="Collapsed">
                                     <TextBlock Text="{Binding [Settings.About.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SectionText}" Margin="0,0,0,20" />
                                     <StackPanel Orientation="Horizontal">
-                                        <Image Source="Assets/FiveMCleaner.png" Width="44" Height="44" Stretch="Uniform" VerticalAlignment="Top" />
+                                        <Image Source="Assets/VemryxOne.png" Width="44" Height="44" Stretch="Uniform" VerticalAlignment="Top" />
                                         <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
                                             <TextBlock Text="{Binding [Settings.About.AppName], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SubsectionText}" />
                                             <TextBlock Text="{Binding AboutVersionDeveloper}" Style="{StaticResource SecondaryText}" Margin="0,3,0,0" />

@@ -7,7 +7,7 @@
     <RootNamespace>FiveMCleaner.App</RootNamespace>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <ApplicationIcon>Assets/FiveMCleaner.ico</ApplicationIcon>
+    <ApplicationIcon>Assets/VemryxOne.ico</ApplicationIcon>
     <!--
       ApplicationHighDpiMode (a alternativa sugerida pelo aviso WFO0003) não
       tem efeito aqui: ela só é aplicada pelo Program.Main gerado pelo
@@ -31,7 +31,7 @@
     <ProjectReference Include="../FiveMCleaner.Broker/FiveMCleaner.Broker.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Assets/FiveMCleaner.png" />
+    <Resource Include="Assets/VemryxOne.png" />
     <EmbeddedResource Include="Assets/release-public-key.pem" />
   </ItemGroup>
   <ItemGroup>

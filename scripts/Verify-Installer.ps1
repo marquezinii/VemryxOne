@@ -23,7 +23,7 @@ $requiredPatterns = [ordered]@{
     'Windows 10 2004 minimum'       = 'MinVersion=10\.0\.19041'
     'x64-compatible runtime gate'   = 'ArchitecturesAllowed=x64compatible'
     'modern system-aware theme'     = 'WizardStyle=modern dynamic'
-    'official application icon'     = 'SetupIconFile=.*FiveMCleaner\.ico'
+    'official application icon'     = 'SetupIconFile=.*VemryxOne\.ico'
     'proportional wizard artwork'   = 'WizardImageFile=\{#InstallerArtworkPath\}'
     'dark wizard artwork'           = 'WizardImageFileDynamicDark=\{#InstallerArtworkPathDark\}'
     'ultra lzma compression'        = 'Compression=lzma2/ultra'

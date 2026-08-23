@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         Title="{Binding WindowTitleText}"
-        Icon="/FiveMCleaner;component/Assets/FiveMCleaner.png"
+        Icon="/FiveMCleaner;component/Assets/VemryxOne.png"
         Width="520"
         MinWidth="520"
         MaxHeight="640"

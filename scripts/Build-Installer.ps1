@@ -215,7 +215,7 @@ try {
     Write-Host "Compiling with $compiler" -ForegroundColor Cyan
 
     & (Join-Path $PSScriptRoot 'New-InstallerArtwork.ps1') `
-        -SourceIconPath (Join-Path $workspace 'src\FiveMCleaner.App\Assets\FiveMCleaner.png') `
+        -SourceIconPath (Join-Path $workspace 'src\FiveMCleaner.App\Assets\VemryxOne.png') `
         -OutputPath $installerArtworkLight `
         -OutputPathDark $installerArtworkDark
     foreach ($artwork in @($installerArtworkLight, $installerArtworkDark)) {

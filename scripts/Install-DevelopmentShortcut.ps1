@@ -41,7 +41,7 @@ if ($taskWorkspace -ne $stableWorkspace) {
 
 $workspace = $stableWorkspace
 $projectPath = Join-Path $workspace 'src\FiveMCleaner.App\FiveMCleaner.App.csproj'
-$iconPath = Join-Path $workspace 'src\FiveMCleaner.App\Assets\FiveMCleaner.ico'
+$iconPath = Join-Path $workspace 'src\FiveMCleaner.App\Assets\VemryxOne.ico'
 $launcherPath = Join-Path $workspace 'scripts\Start-DevelopmentApp.ps1'
 
 if (-not (Test-Path -LiteralPath $projectPath -PathType Leaf)) {
