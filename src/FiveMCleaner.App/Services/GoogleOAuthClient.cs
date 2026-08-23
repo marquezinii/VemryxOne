@@ -291,15 +291,15 @@ public sealed class GoogleOAuthClient : IGoogleOAuthClient
               <style>
                 :root {
                   color-scheme: dark;
-                  --canvas: #16151A;
-                  --canvas-deep: #131318;
-                  --text: #F3F1EE;
-                  --text-muted: #B5B2BA;
-                  --accent: #E8720F;
-                  --success: #4CBE8C;
-                  --success-surface: #14241D;
-                  --danger: #EC6B72;
-                  --danger-surface: #261619;
+                  --canvas: #0B0D12;
+                  --canvas-deep: #080A0E;
+                  --text: #F7F9FC;
+                  --text-muted: #97A0B3;
+                  --accent: #4B64F2;
+                  --success: #32D583;
+                  --success-surface: #10271F;
+                  --danger: #F04438;
+                  --danger-surface: #2B1518;
                 }
 
                 * { box-sizing: border-box; }
@@ -314,7 +314,7 @@ public sealed class GoogleOAuthClient : IGoogleOAuthClient
                   padding: 32px 24px;
                   overflow: hidden;
                   background:
-                    radial-gradient(circle at 10% 100%, rgba(232, 114, 15, .22) 0, rgba(232, 114, 15, .10) 28%, transparent 58%),
+                    radial-gradient(circle at 10% 100%, rgba(91, 124, 255, .20) 0, rgba(39, 200, 255, .08) 28%, transparent 58%),
                     linear-gradient(145deg, var(--canvas) 0, var(--canvas-deep) 72%);
                   color: var(--text);
                   font-family: "Segoe UI Variable Text", "Segoe UI", sans-serif;
@@ -338,7 +338,7 @@ public sealed class GoogleOAuthClient : IGoogleOAuthClient
                   width: 36px;
                   height: 36px;
                   border-radius: 10px;
-                  box-shadow: 0 8px 20px rgba(10, 6, 3, .34);
+                  box-shadow: 0 8px 20px rgba(3, 5, 10, .40);
                 }
 
                 .brand-reg {
@@ -410,7 +410,7 @@ public sealed class GoogleOAuthClient : IGoogleOAuthClient
 
                 ::selection {
                   background: var(--accent);
-                  color: #180D04;
+                  color: #FFFFFF;
                 }
 
                 @media (max-width: 520px) {

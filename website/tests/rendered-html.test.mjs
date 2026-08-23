@@ -72,4 +72,7 @@ test("keeps the exported download page aligned with the official release channel
     /property="og:image" content="https:\/\/marquezinii\.github\.io\/FiveMCleaner\/og\.png"/i,
   );
   assert.match(styles, /@media \(prefers-reduced-motion: reduce\)/i);
+  assert.match(styles, /--background:\s*#0B0D12/i);
+  assert.match(styles, /--brand:\s*#4B64F2/i);
+  assert.doesNotMatch(styles, /--orange|#ff6a00|rgba\(249,\s*115,\s*22/i);
 });

@@ -10,8 +10,8 @@
     </ResourceDictionary.MergedDictionaries>
 
     <!--
-        CONTROLES — DIREÇÃO "CÂMARA ÂMBAR"
-        ==================================
+        CONTROLES — DIREÇÃO VEMRYX ONE
+        ==============================
         Todo controle interativo declara os SETE estados: repouso, hover,
         pressionado, foco de teclado, desabilitado, e (onde existir) marcado
         e inválido. Um controle que não reage ao ponteiro e ao teclado é um
@@ -31,8 +31,7 @@
     <local:PercentWidthConverter x:Key="PercentWidthConverter" />
 
     <!-- Anel de foco compartilhado. Fica FORA do controle (margem negativa)
-         para nunca comer o conteúdo, e usa o âmbar: sob a luz da câmara, o
-         que está em foco é o que está aceso. -->
+         para nunca comer o conteúdo e usa o índigo interativo da marca. -->
     <Style x:Key="AccentFocusVisual">
         <Setter Property="Control.Template">
             <Setter.Value>
@@ -74,8 +73,8 @@
     <!-- ================= Botões ================= -->
 
     <!--
-        Ação primária. É o objeto mais aceso da câmara: preenchido com o
-        âmbar e erguido por uma sombra curta.
+        Ação primária preenchida com o índigo da marca e erguida por uma
+        sombra curta.
 
         O press aplica ScaleTransform 0.97 — a única exceção deliberada ao
         banimento de escala na interface (escala dentro de linha/lista já
@@ -87,7 +86,7 @@
     <Style x:Key="PrimaryButtonStyle" TargetType="Button">
         <Setter Property="Height" Value="40" />
         <Setter Property="Padding" Value="20,0" />
-        <Setter Property="Foreground" Value="{DynamicResource TextOnAccentBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppTextOnAccentBrush}" />
         <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="FontFamily" Value="{StaticResource AppFontBody}" />
@@ -106,7 +105,10 @@
                         <Border.RenderTransform>
                             <ScaleTransform ScaleX="1" ScaleY="1" />
                         </Border.RenderTransform>
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}" />
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Margin="{TemplateBinding Padding}"
+                                          TextBlock.Foreground="{TemplateBinding Foreground}" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
@@ -354,7 +356,7 @@
                                   Width="12" Height="12"
                                   Stretch="Uniform"
                                   Visibility="Collapsed"
-                                  Stroke="{DynamicResource TextOnAccentBrush}"
+                                  Stroke="{DynamicResource AppTextOnAccentBrush}"
                                   StrokeThickness="2.6"
                                   StrokeStartLineCap="Round"
                                   StrokeEndLineCap="Round"
@@ -396,7 +398,7 @@
 
     <!--
         Interruptor no padrão Fluent do Windows 11: trilho 40x20 vazado com
-        borda quando desligado, aceso pelo âmbar quando ligado, e um thumb de
+        borda quando desligado, aceso pelo índigo quando ligado, e um thumb de
         12px que DESLIZA em vez de saltar.
 
         Escolher o padrão do próprio sistema operacional aqui é deliberado:
@@ -675,7 +677,7 @@
     <!-- ================= Progresso ================= -->
 
     <!-- Trilho linear: sem easing, reflete o dado real. O indicador usa o
-         gradiente do âmbar, então a barra lê como luz avançando sobre o
+         gradiente índigo/ciano, então a barra lê como luz avançando sobre o
          trilho em vez de um bloco chapado. -->
     <Style x:Key="ProgressRailStyle" TargetType="ProgressBar">
         <Setter Property="Height" Value="6" />

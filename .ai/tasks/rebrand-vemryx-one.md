@@ -9,7 +9,7 @@ Fonte: `REBRANDING_VEMRYX_ONE.md`. O ícone oficial fornecido pelo usuário est�
 - [x] Briefing integral lido e incorporado ao repositório.
 - [x] Inventário inicial: 432 arquivos contêm o nome legado; cada ocorrência deve ser classificada, não substituída cegamente.
 - [x] Ativo 5M removido e exports do ícone V/1 criados para app, site, documentação e dashboard.
-- [ ] Aplicar tokens visuais Vemryx e validar contraste/capturas.
+- [x] Aplicar tokens visuais Vemryx e validar contraste/capturas.
 - [ ] Migrar identidade pública e localização para Vemryx One.
 - [ ] Projetar e testar compatibilidade de caminhos, mutex, persistência e sessões.
 - [ ] Implementar release ponte do instalador/updater antes de renomear executáveis e IDs externos.
@@ -35,3 +35,12 @@ Eles só mudam junto de aliases, migração idempotente, testes e rollback. O no
 - `scripts/Verify-Safety.ps1`: aprovado; recompilou a solução e executou os 979 testes.
 - `scripts/Install-DevelopmentShortcut.ps1 -Build`: build espelhado e atalho de desenvolvimento reconstruídos.
 - `BrandAssetTests` verifica fonte/PNG idênticos, alpha, tamanhos do ICO e ausência dos ativos 5M antigos.
+
+## Validação da fase visual
+
+- Paletas escura e clara do aplicativo, callback OAuth, site público e dashboard alinhados aos tokens Vemryx; laranja preservado apenas como acento da categoria de jogos.
+- `ThemeTokenContractTests` verifica os tokens centrais e contraste; 993 testes .NET aprovados.
+- `dotnet build FiveMCleaner.slnx --configuration Release --no-restore`: aprovado, 0 warnings e 0 erros.
+- Site: build estático Next.js e 3 testes aprovados. O ambiente tinha Node.js 26.7.0, acima do Node.js 24 declarado, mas a validação terminou sem falhas.
+- Dashboard: 48 testes aprovados, incluindo contrato da paleta e gráficos.
+- Oito capturas reais (`Overview`, `Optimizer`, `History`, `Settings`, nos temas claro e escuro) revisadas; foco, seleção, navegação, gradientes e texto de botões permanecem legíveis.

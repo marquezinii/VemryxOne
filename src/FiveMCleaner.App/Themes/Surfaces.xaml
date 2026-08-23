@@ -7,8 +7,8 @@
         <ResourceDictionary Source="Tokens/Radii.xaml" />
     </ResourceDictionary.MergedDictionaries>
     <!--
-        VOCABULÁRIO DE SUPERFÍCIES — DIREÇÃO "CÂMARA ÂMBAR"
-        ===================================================
+        VOCABULÁRIO DE SUPERFÍCIES — DIREÇÃO VEMRYX ONE
+        ===============================================
         A hierarquia agora tem TRÊS níveis, e o primeiro deles não é um
         objeto:
 
@@ -83,7 +83,7 @@
 
     <!--
         O bloco principal de uma página — onde mora a conclusão do
-        diagnóstico. Recebe a luz da câmara: um degrau de tom acima do
+        diagnóstico. Recebe a luz ambiente: um degrau de tom acima do
         painel, com a aresta de luz no topo.
     -->
     <Style x:Key="HeroSurface" TargetType="Border">
@@ -95,9 +95,9 @@
     </Style>
 
     <!--
-        A LINHA DE LUZ. Filete curto de âmbar que marca de onde a atenção
+        A LINHA DE LUZ. Filete curto de índigo que marca de onde a atenção
         parte: fica sob o título de cada página e à esquerda do bloco
-        principal. É o mesmo gesto do foco da lâmpada, reduzido a 3px, e é
+        principal. É o mesmo gesto do foco, reduzido a 3px, e é
         a única marcação decorativa permitida na interface.
     -->
     <Style x:Key="HeroAccentRule" TargetType="Rectangle">
@@ -131,7 +131,7 @@
     </Style>
 
     <!--
-        Cabeçalho de página. Fica direto sobre o chão da câmara: sem
+        Cabeçalho de página. Fica direto sobre o fundo da interface: sem
         preenchimento e sem borda, porque uma faixa emoldurada acima do
         conteúdo era a primeira das três molduras aninhadas do visual
         anterior. A separação vem do espaço abaixo dele e da linha de luz.

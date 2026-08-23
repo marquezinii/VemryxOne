@@ -8,7 +8,7 @@
         congeladas e não conseguem consultar MotionPolicy em runtime, então a
         política é aplicada na fonte.
 
-        As curvas mudaram na direção "Câmara Âmbar". As easings embutidas do
+        As curvas adotadas pelo Vemryx One evitam as easings embutidas do
         WPF (CubicEase) são fracas: elas gastam metade da duração perto do
         estado final, e uma transição fraca lê como lentidão, não como
         suavidade. Aqui todo movimento de entrada/reação usa PowerEase com

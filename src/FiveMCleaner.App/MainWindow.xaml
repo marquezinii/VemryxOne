@@ -27,21 +27,21 @@
 
     <!--
         =====================================================================
-        DIREÇÃO VISUAL: "CÂMARA ÂMBAR"
+        DIREÇÃO VISUAL: VEMRYX ONE
         =====================================================================
-        TESE  Uma sala escura com UMA lâmpada âmbar baixa, onde as únicas
-              coisas acesas são os números reais da máquina do usuário.
+        TESE  Uma interface escura, precisa e serena, onde os números reais
+              da máquina do usuário recebem prioridade visual.
               Recusa o padrão da categoria (laje de grafite + neon + medidor
               decorativo) e recusa a direção anterior (folha de papel técnico
               com moldura, retícula milimetrada e traço fino).
 
-        MUNDO Grafite QUENTE banhado por um único radial âmbar ancorado no
+        MUNDO Grafite azulado banhado por um radial índigo/ciano ancorado no
               canto inferior esquerdo — onde ficam o rail de navegação e a
               ação primária de cada página, então a luz cai sobre o que o
               usuário vai tocar. Superfícies em prata fotográfica, cantos de
               10–18px, uma única família tipográfica, e o mono reservado a
-              número medido. O laranja da marca voltou para a interface como
-              LUZ e como estado ativo, nunca como etiqueta de alerta.
+              número medido. Índigo comunica interação; ciano identifica a
+              marca; laranja fica restrito ao contexto de jogos.
 
         FORMA A janela NÃO emoldura a página. Cabeçalho direto sobre o chão,
               conteúdo em painéis que se erguem por sombra e tom. Nenhum
@@ -56,7 +56,7 @@
         </Grid.RowDefinitions>
 
         <!--
-            A LÂMPADA. Um Rectangle atrás de tudo, pintado com um único
+            A LUZ AMBIENTE. Um Rectangle atrás de tudo, pintado com um único
             RadialGradientBrush estático (a GPU o cacheia; não há animação e
             não há custo por quadro). É o gesto central da direção: sem ele o
             fundo volta a ser uma laje chapada.
@@ -69,7 +69,7 @@
              e uma barra transparente deixa o Mica do SISTEMA aparecer — então
              a barra continuava escura com o app em tema claro, porque o
              Windows do usuário estava em escuro. Pintá-la com o mesmo chão da
-             câmara também faz a barra e o conteúdo lerem como uma peça só. -->
+             interface também faz a barra e o conteúdo lerem como uma peça só. -->
         <ui:TitleBar Grid.Row="0" Height="52" Background="{DynamicResource CanvasBaseBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,0,0,1">
             <ui:TitleBar.Header>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0,0,0">
@@ -225,7 +225,7 @@
                              Esticar o painel até a borda de um monitor
                              ultrawide produzia 1000px de painel vazio à
                              direita do último campo; limitando-o, o que sobra
-                             é o chão iluminado da câmara, que é intencional. -->
+                             é o plano de fundo da interface, que é intencional. -->
                         <Border Grid.Row="1" Style="{StaticResource PanelSurface}" MaxWidth="1120" HorizontalAlignment="Left">
                             <Grid>
                                 <Grid.ColumnDefinitions>

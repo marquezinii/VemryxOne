@@ -123,22 +123,12 @@ public sealed class ThemeManager : IDisposable
             merged.Insert(0, replacement);
         }
 
-        // WPF UI deriva sua própria família de acento (indicador do rail de
-        // navegação, realce de seleção, chrome da FluentWindow) desta cor.
-        // Na direção "Câmara Âmbar" ela precisa ser o mesmo âmbar de
-        // AccentBrush nos tokens: se os dois divergirem, o indicador da
-        // navegação acende numa cor que não existe em nenhum outro lugar da
-        // interface. Os valores abaixo são exatamente AccentBrush de
-        // Colors.Dark.xaml e Colors.Light.xaml.
-        var accent = useLightTheme ? ParseColor("#C3540A") : ParseColor("#E8720F");
+        // WPF UI deriva sua família de acento para navegação e chrome. Leia o
+        // mesmo token aplicado ao restante da interface para impedir drift.
+        var accent = ((System.Windows.Media.SolidColorBrush)replacement["AccentBrush"]).Color;
         var wpfUiTheme = useLightTheme ? ApplicationTheme.Light : ApplicationTheme.Dark;
         ApplicationAccentColorManager.Apply(accent, wpfUiTheme, systemGlassColor: false, systemAccentColor: false);
         ApplicationThemeManager.Apply(wpfUiTheme, updateAccent: false);
-    }
-
-    private static System.Windows.Media.Color ParseColor(string value)
-    {
-        return (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(value);
     }
 
     private static bool IsSystemLightTheme()

@@ -5,7 +5,7 @@ using Xunit;
 namespace FiveMCleaner.Tests.App;
 
 /// <summary>
-/// Contrato dos dicionários de cor do redesign "prancheta técnica".
+/// Contrato dos dicionários de cor do Vemryx One.
 ///
 /// <para>
 /// O <c>ThemeManager</c> troca <c>Colors.Dark.xaml</c> por <c>Colors.Light.xaml</c>
@@ -49,8 +49,8 @@ public sealed class ThemeTokenContractTests
             // (PrimaryButtonStyle troca o fundo para AccentBrightBrush sob o
             // ponteiro — o estado em que o usuário está olhando para o botão
             // não pode ser o único que fica ilegível).
-            data.Add(theme, "TextOnAccentBrush", "AccentBrush", 4.5);
-            data.Add(theme, "TextOnAccentBrush", "AccentBrightBrush", 4.5);
+            data.Add(theme, "AppTextOnAccentBrush", "AccentBrush", 4.5);
+            data.Add(theme, "AppTextOnAccentBrush", "AccentBrightBrush", 4.5);
             // Preenchimento do acento contra a folha: componente não textual.
             data.Add(theme, "AccentBrush", "Surface1Color", 3.0);
         }
@@ -65,6 +65,26 @@ public sealed class ThemeTokenContractTests
         var light = ReadKeys("Colors.Light.xaml");
 
         Assert.Equal(dark, light);
+    }
+
+    [Theory]
+    [InlineData("Colors.Dark.xaml", "CanvasBaseColor", "#0B0D12")]
+    [InlineData("Colors.Dark.xaml", "Surface1Color", "#131722")]
+    [InlineData("Colors.Dark.xaml", "Surface2Color", "#1A2030")]
+    [InlineData("Colors.Dark.xaml", "TextPrimaryBrush", "#F7F9FC")]
+    [InlineData("Colors.Dark.xaml", "AccentBrush", "#4B64F2")]
+    [InlineData("Colors.Dark.xaml", "BrandInkBrush", "#27C8FF")]
+    [InlineData("Colors.Light.xaml", "CanvasBaseColor", "#F5F7FB")]
+    [InlineData("Colors.Light.xaml", "Surface1Color", "#FFFFFF")]
+    [InlineData("Colors.Light.xaml", "Surface2Color", "#EEF2F8")]
+    [InlineData("Colors.Light.xaml", "TextPrimaryBrush", "#11141B")]
+    [InlineData("Colors.Light.xaml", "AccentBrush", "#4057D6")]
+    [InlineData("Colors.Light.xaml", "BrandInkBrush", "#00769F")]
+    [InlineData("Colors.Dark.xaml", "GamingAccentBrush", "#FF8A1F")]
+    [InlineData("Colors.Light.xaml", "GamingAccentBrush", "#FF8A1F")]
+    public void ThemeDictionaries_UseApprovedVemryxTokens(string theme, string key, string expected)
+    {
+        Assert.Equal(expected, ReadColors(theme)[key]);
     }
 
     [Theory]
@@ -83,12 +103,10 @@ public sealed class ThemeTokenContractTests
     }
 
     [Fact]
-    public void BrandInk_StaysOutOfTheInterfacePalette()
+    public void BrandInk_RemainsReservedForTheWordmark()
     {
-        // O laranja da marca continua sendo compromisso de marca, mas o
-        // redesign o restringiu ao logotipo na barra de título: ele era a
-        // principal fonte de fadiga visual quando preenchia a interface.
-        // Só BrandInkBrush pode carregá-lo, e só MainWindow.xaml pode usá-lo.
+        // O ciano identifica o wordmark; controles interativos usam o índigo
+        // de AccentBrush. Isso evita que marca e estado pareçam equivalentes.
         var root = TestHelpers.FindRepositoryRoot();
         var appDirectory = Path.Combine(root, "src", "FiveMCleaner.App");
         var offenders = new List<string>();

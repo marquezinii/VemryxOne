@@ -7,11 +7,11 @@
              xmlns:primitives="clr-namespace:System.Windows.Controls.Primitives;assembly=PresentationFramework"
              mc:Ignorable="d" d:DesignWidth="1400" d:DesignHeight="820">
     <!--
-        VISÃO GERAL — direção "Câmara Âmbar".
+        VISÃO GERAL — direção Vemryx One.
 
         A página não é mais uma folha emoldurada contendo cabeçalho
         emoldurado contendo cartões. São TRÊS painéis irmãos sobre o chão da
-        câmara, e o cabeçalho fica direto sobre esse chão:
+        interface, e o cabeçalho fica direto sobre esse plano:
 
           diagnóstico  — a conclusão e a prontidão, com a faixa de
                          instrumentos que sustenta a recomendação;
@@ -60,7 +60,7 @@
         </Grid.RowDefinitions>
 
         <!-- ===================== Cabeçalho ===================== -->
-        <!-- Direto sobre o chão da câmara: sem faixa, sem borda, sem moldura. -->
+        <!-- Direto sobre o plano da interface: sem faixa, borda ou moldura. -->
         <Border Grid.Row="0" Style="{StaticResource TitleBlockSurface}">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -196,7 +196,7 @@
                                     <Button Style="{StaticResource PrimaryButtonStyle}" Click="OpenOptimizer_Click">
                                         <StackPanel Orientation="Horizontal">
                                             <Path Style="{StaticResource Icon16}" Data="{StaticResource IconBolt}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
-                                            <TextBlock Text="{Binding [Dashboard.OpenOptimizer], Source={StaticResource LocalizedStrings}}" Margin="10,0,0,0" VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding [Dashboard.OpenOptimizer], Source={StaticResource LocalizedStrings}}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Margin="10,0,0,0" VerticalAlignment="Center" />
                                         </StackPanel>
                                     </Button>
                                     <Button Style="{StaticResource SecondaryButtonStyle}" Margin="12,0,0,0" Click="OpenHistory_Click">

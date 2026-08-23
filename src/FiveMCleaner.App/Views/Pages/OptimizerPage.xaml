@@ -7,11 +7,11 @@
              xmlns:controls="clr-namespace:FiveMCleaner.App.Controls"
              mc:Ignorable="d" d:DesignWidth="1400" d:DesignHeight="820">
     <!--
-        OTIMIZADOR — direção "Câmara Âmbar".
+        OTIMIZADOR — direção Vemryx One.
 
-        A câmara trabalha em ESTAÇÕES, e a página é essa sequência:
+        O fluxo trabalha em ESTAÇÕES, e a página é essa sequência:
         preparar → executar → resultado. A espinha de estações no cabeçalho
-        mostra as três de uma vez, com a corrente acesa em âmbar — no visual
+        mostra as três de uma vez, com a corrente acesa em índigo — no visual
         anterior eram três traços soltos a 38% de opacidade, que não
         conectavam nada e não diziam qual vinha depois.
 
@@ -37,7 +37,7 @@
 
         <!--
             Marca de estação na espinha do cabeçalho. Apagada é um anel
-            vazado no tom do traço; acesa é um disco âmbar cheio. A diferença
+            vazado no tom do traço; acesa é um disco índigo cheio. A diferença
             é de FORMA (vazado/cheio) além de cor, então continua legível sem
             depender de percepção de cor.
         -->
