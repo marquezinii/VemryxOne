@@ -21,7 +21,7 @@ public sealed class WindowsStartupRegistrationService : IStartupRegistrationServ
     public WindowsStartupRegistrationService(string? executablePath = null)
         : this(
             executablePath ?? Environment.ProcessPath
-                ?? throw new InvalidOperationException("O caminho do FiveMCleaner não está disponível."),
+                ?? throw new InvalidOperationException("O caminho do aplicativo não está disponível."),
             () => Registry.CurrentUser)
     {
     }

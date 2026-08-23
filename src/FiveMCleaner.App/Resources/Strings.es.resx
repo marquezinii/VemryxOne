@@ -22,13 +22,13 @@
   <data name="Greeting.Evening.WithName" xml:space="preserve"><value>Buenas noches, {0}. ¿Qué haremos hoy?</value></data>
   <data name="Greeting.Evening.NoName" xml:space="preserve"><value>Buenas noches. ¿Qué haremos hoy?</value></data>
   <data name="Settings.About.Title" xml:space="preserve"><value>Acerca de</value></data>
-  <data name="Settings.About.Description" xml:space="preserve"><value>Qué es FiveMCleaner, quién lo desarrolla y dónde encontrar ayuda.</value></data>
-  <data name="Settings.About.AppName" xml:space="preserve"><value>FiveMCleaner</value></data>
-  <data name="Settings.About.Tagline" xml:space="preserve"><value>Optimización transparente y reversible para FiveM Legacy en Windows.</value></data>
+  <data name="Settings.About.Description" xml:space="preserve"><value>Qué es Vemryx One, quién lo desarrolla y dónde encontrar ayuda.</value></data>
+  <data name="Settings.About.AppName" xml:space="preserve"><value>Vemryx One</value></data>
+  <data name="Settings.About.Tagline" xml:space="preserve"><value>Tu PC, simplificado.</value></data>
   <data name="Settings.About.Repository" xml:space="preserve"><value>Código fuente en GitHub</value></data>
   <data name="Settings.About.Changelog" xml:space="preserve"><value>Historial de versiones</value></data>
   <data name="Settings.About.Discord.Title" xml:space="preserve"><value>Únete a nuestro Discord oficial</value></data>
-  <data name="Settings.About.Discord.Detail" xml:space="preserve"><value>Resuelve dudas, sigue las novedades y habla con otros usuarios de FiveMCleaner.</value></data>
+  <data name="Settings.About.Discord.Detail" xml:space="preserve"><value>Resuelve dudas, sigue las novedades y habla con otros usuarios de Vemryx One.</value></data>
   <data name="Settings.About.Discord.Action" xml:space="preserve"><value>Abrir Discord</value></data>
   <data name="Discord.TitleBarTooltip" xml:space="preserve"><value>Únete a nuestro Discord oficial</value></data>
   <data name="LiveAlert.Dismiss" xml:space="preserve"><value>Cerrar</value></data>
@@ -98,7 +98,7 @@
   <data name="History.Notes.Title" xml:space="preserve"><value>Qué registra cada ejecución</value></data>
   <data name="History.Notes.Recorded" xml:space="preserve"><value>Las acciones aplicadas, el resultado tipado de cada una y el snapshot necesario para deshacer.</value></data>
   <data name="History.Notes.Rollback" xml:space="preserve"><value>El rollback restaura solo lo que esa ejecución cambió y conserva lo que modificaste después.</value></data>
-  <data name="History.Notes.Local" xml:space="preserve"><value>Todo permanece en este equipo, en la carpeta local de FiveMCleaner.</value></data>
+  <data name="History.Notes.Local" xml:space="preserve"><value>Todo permanece en este equipo, en la carpeta local de datos de la aplicación.</value></data>
   <data name="Settings.Title" xml:space="preserve"><value>Configuración</value></data>
   <data name="Settings.Subtitle" xml:space="preserve"><value>Personaliza la aplicación sin debilitar el perfil de optimización seleccionado.</value></data>
   <data name="Settings.General.Title" xml:space="preserve"><value>General</value></data>
@@ -113,20 +113,20 @@
   <data name="Settings.Appearance.Dark" xml:space="preserve"><value>Oscuro</value></data>
   <data name="Settings.Appearance.Light" xml:space="preserve"><value>Claro</value></data>
   <data name="Settings.CloseBehavior.Title" xml:space="preserve"><value>Minimizar a la bandeja del sistema</value></data>
-  <data name="Settings.CloseBehavior.Close" xml:space="preserve"><value>Salir de FiveMCleaner</value></data>
+  <data name="Settings.CloseBehavior.Close" xml:space="preserve"><value>Salir de Vemryx One</value></data>
   <data name="Settings.CloseBehavior.Tray" xml:space="preserve"><value>Mantener en ejecución en el área de notificación</value></data>
   <data name="Settings.StartWithWindows.Title" xml:space="preserve"><value>Iniciar con Windows</value></data>
-  <data name="Settings.StartWithWindows.Description" xml:space="preserve"><value>Abrir FiveMCleaner después de iniciar sesión.</value></data>
+  <data name="Settings.StartWithWindows.Description" xml:space="preserve"><value>Abrir Vemryx One después de iniciar sesión.</value></data>
   <data name="Safety.Limits.Title" xml:space="preserve"><value>Límites de seguridad</value></data>
-  <data name="Safety.Limits.Description" xml:space="preserve"><value>FiveMCleaner nunca deshabilita Defender, el Firewall, UAC, Windows Update, el archivo de paginación o servicios críticos; no usa BCDEdit/HPET, inyección, hooks ni prioridad en tiempo real.</value></data>
+  <data name="Safety.Limits.Description" xml:space="preserve"><value>Vemryx One nunca deshabilita Defender, el Firewall, UAC, Windows Update, el archivo de paginación o servicios críticos; no usa BCDEdit/HPET, inyección, hooks ni prioridad en tiempo real.</value></data>
   <data name="Safety.EnhancedBlocked" xml:space="preserve"><value>FiveM Enhanced: bloqueado en esta versión hasta que se pruebe su diseño oficial.</value></data>
-  <data name="About.Title" xml:space="preserve"><value>Acerca de FiveMCleaner</value></data>
+  <data name="About.Title" xml:space="preserve"><value>Acerca de Vemryx One</value></data>
   <data name="About.VersionDeveloper" xml:space="preserve"><value>Versión {0}  •  Vemryx</value></data>
   <data name="About.Copyright" xml:space="preserve"><value>© 2026 Vemryx. Todos los derechos reservados.</value></data>
-  <data name="About.License" xml:space="preserve"><value>Código fuente disponible bajo la Licencia de Código Disponible de FiveMCleaner. Proyecto independiente, no afiliado a Cfx.re, Rockstar Games ni Microsoft.</value></data>
+  <data name="About.License" xml:space="preserve"><value>Código fuente disponible bajo la Licencia de Código Disponible de Vemryx One. Proyecto independiente, no afiliado a Cfx.re, Rockstar Games ni Microsoft.</value></data>
   <data name="About.OpenGitHub" xml:space="preserve"><value>Abrir GitHub</value></data>
   <data name="Sidebar.Version" xml:space="preserve"><value>VERSIÓN</value></data>
-  <data name="BugReport.WindowTitle" xml:space="preserve"><value>Reportar un error — FiveMCleaner</value></data>
+  <data name="BugReport.WindowTitle" xml:space="preserve"><value>Reportar un error — Vemryx One</value></data>
   <data name="BugReport.FormLanguage" xml:space="preserve"><value>Formulario de reporte de errores</value></data>
   <data name="BugReport.Heading" xml:space="preserve"><value>Cuéntanos qué pasó</value></data>
   <data name="BugReport.Intro" xml:space="preserve"><value>Los pasos claros nos ayudan a reproducir y solucionar el problema más rápido.</value></data>
@@ -235,12 +235,12 @@
   <data name="Dialog.Rollback.Message" xml:space="preserve"><value>¿Restaurar la configuración guardada por esta ejecución? La limpieza de caché y archivos temporales no se puede recuperar.</value></data>
   <data name="Dialog.Rollback.Title" xml:space="preserve"><value>Deshacer optimización</value></data>
   <data name="Dialog.CancelRunning.Message" xml:space="preserve"><value>Hay una optimización en progreso. ¿Solicitar cancelación segura después del paso actual?</value></data>
-  <data name="Dialog.CancelRunning.Title" xml:space="preserve"><value>FiveMCleaner está en ejecución</value></data>
+  <data name="Dialog.CancelRunning.Title" xml:space="preserve"><value>Vemryx One está en ejecución</value></data>
   <data name="Dialog.CancelOptimization.Title" xml:space="preserve"><value>¿Cancelar la optimización?</value></data>
-  <data name="Dialog.CancelOptimization.Message" xml:space="preserve"><value>FiveMCleaner completará o revertirá de forma segura el paso actual antes de detener el plan. ¿Solicitar cancelación?</value></data>
+  <data name="Dialog.CancelOptimization.Message" xml:space="preserve"><value>Vemryx One completará o revertirá de forma segura el paso actual antes de detener el plan. ¿Solicitar cancelación?</value></data>
   <data name="Dialog.CancelOptimization.Confirm" xml:space="preserve"><value>Cancelar optimización</value></data>
   <data name="Dialog.CloseOptimization.Title" xml:space="preserve"><value>Optimización en progreso</value></data>
-  <data name="Dialog.CloseOptimization.Message" xml:space="preserve"><value>Para cerrar FiveMCleaner, la optimización se cancelará de forma segura después del paso actual. La app permanecerá abierta hasta que eso termine.</value></data>
+  <data name="Dialog.CloseOptimization.Message" xml:space="preserve"><value>Para cerrar Vemryx One, la optimización se cancelará de forma segura después del paso actual. La app permanecerá abierta hasta que eso termine.</value></data>
   <data name="Dialog.CloseOptimization.Confirm" xml:space="preserve"><value>Cancelar y cerrar</value></data>
   <data name="Dialog.OptimizationInterruption.KeepWorking" xml:space="preserve"><value>Seguir optimizando</value></data>
   <data name="BugReport.Copy.Success" xml:space="preserve"><value>Reporte copiado. La imagen no se incluye en la copia de texto.</value></data>
@@ -265,36 +265,36 @@
   <data name="Runtime.PreparingRestore" xml:space="preserve"><value>Preparando restauración</value></data>
   <data name="Runtime.RestoreCompleted" xml:space="preserve"><value>Configuración restaurada</value></data>
   <data name="Runtime.RestoreCompletedDetail" xml:space="preserve"><value>La reversión respetó cambios más recientes y no intentó recuperar limpiezas permanentes.</value></data>
-  <data name="Tray.Open" xml:space="preserve"><value>Abrir FiveMCleaner</value></data>
+  <data name="Tray.Open" xml:space="preserve"><value>Abrir Vemryx One</value></data>
   <data name="Tray.Exit" xml:space="preserve"><value>Salir</value></data>
-  <data name="Tray.Title" xml:space="preserve"><value>FiveMCleaner sigue en ejecución</value></data>
+  <data name="Tray.Title" xml:space="preserve"><value>Vemryx One sigue en ejecución</value></data>
   <data name="Tray.Message" xml:space="preserve"><value>Haz doble clic en el icono de la bandeja para volver.</value></data>
-  <data name="Notification.UpdateAvailable.Title" xml:space="preserve"><value>Actualización de FiveMCleaner disponible</value></data>
-  <data name="Notification.UpdateAvailable.Message" xml:space="preserve"><value>La versión {0} está disponible. Haz clic para abrir FiveMCleaner.</value></data>
-  <data name="Settings.CloseBehavior.Description" xml:space="preserve"><value>Al hacer clic en X, FiveMCleaner se minimizará a la bandeja del sistema en lugar de cerrarse.</value></data>
-  <data name="Settings.Telemetry.Title" xml:space="preserve"><value>Ayuda a mejorar FiveMCleaner</value></data>
+  <data name="Notification.UpdateAvailable.Title" xml:space="preserve"><value>Actualización de Vemryx One disponible</value></data>
+  <data name="Notification.UpdateAvailable.Message" xml:space="preserve"><value>La versión {0} está disponible. Haz clic para abrir Vemryx One.</value></data>
+  <data name="Settings.CloseBehavior.Description" xml:space="preserve"><value>Al hacer clic en X, Vemryx One se minimizará a la bandeja del sistema en lugar de cerrarse.</value></data>
+  <data name="Settings.Telemetry.Title" xml:space="preserve"><value>Ayuda a mejorar Vemryx One</value></data>
   <data name="Settings.Telemetry.Description" xml:space="preserve"><value>Envía telemetría técnica anonimizada solo si lo eliges.</value></data>
   <data name="Settings.Telemetry.Sends" xml:space="preserve"><value>✓ Envía: errores categorizados, tiempo de ejecución y versión.</value></data>
   <data name="Settings.Telemetry.NeverSends" xml:space="preserve"><value>✕ Nunca envía: archivos, documentos, historial o datos personales.</value></data>
   <data name="Settings.Privacy.Title" xml:space="preserve"><value>Privacidad</value></data>
   <data name="Settings.CrashReports.Title" xml:space="preserve"><value>Enviar reportes de fallos automáticos</value></data>
-  <data name="Settings.CrashReports.Description" xml:space="preserve"><value>Envía trazas de pila depuradas cuando FiveMCleaner falla o encuentra un error inesperado.</value></data>
-  <data name="PrivacyConsent.WindowTitle" xml:space="preserve"><value>Privacidad y diagnósticos - FiveMCleaner</value></data>
+  <data name="Settings.CrashReports.Description" xml:space="preserve"><value>Envía trazas de pila depuradas cuando Vemryx One falla o encuentra un error inesperado.</value></data>
+  <data name="PrivacyConsent.WindowTitle" xml:space="preserve"><value>Privacidad y diagnósticos - Vemryx One</value></data>
   <data name="PrivacyConsent.Heading.FirstInstallation" xml:space="preserve"><value>Privacidad y diagnósticos</value></data>
   <data name="PrivacyConsent.Heading.Upgrade" xml:space="preserve"><value>Nueva opción de privacidad disponible</value></data>
   <data name="PrivacyConsent.Heading.Renewal" xml:space="preserve"><value>Actualizamos nuestra política de privacidad</value></data>
-  <data name="PrivacyConsent.Intro.FirstInstallation" xml:space="preserve"><value>Estos datos nos ayudan a encontrar errores y mejorar FiveMCleaner. Puedes ajustar cada opción a continuación antes de continuar.</value></data>
+  <data name="PrivacyConsent.Intro.FirstInstallation" xml:space="preserve"><value>Estos datos nos ayudan a encontrar errores y mejorar Vemryx One. Puedes ajustar cada opción a continuación antes de continuar.</value></data>
   <data name="PrivacyConsent.Intro.Upgrade" xml:space="preserve"><value>Tu instalación ya enviaba telemetría de uso. Ahora también puedes elegir enviar reportes de fallos automáticos. Revisa ambas opciones antes de continuar.</value></data>
   <data name="PrivacyConsent.Intro.Renewal" xml:space="preserve"><value>Cambiamos lo que se recopila o adónde van los datos. Revisa las opciones a continuación y confirma de nuevo antes de continuar.</value></data>
   <data name="PrivacyConsent.Essential.Title" xml:space="preserve"><value>Diagnósticos esenciales</value></data>
   <data name="PrivacyConsent.Essential.Description" xml:space="preserve"><value>Recopilamos el mínimo necesario para actualizaciones, seguridad, estabilidad y diagnóstico: versión de la app y Windows, arquitectura, fallos, eventos del actualizador y resultados técnicos de optimización. No se puede desactivar.</value></data>
-  <data name="PrivacyConsent.Telemetry.Title" xml:space="preserve"><value>Ayudar a mejorar FiveMCleaner</value></data>
+  <data name="PrivacyConsent.Telemetry.Title" xml:space="preserve"><value>Ayudar a mejorar Vemryx One</value></data>
   <data name="PrivacyConsent.Telemetry.Description" xml:space="preserve"><value>Comparte datos anónimos opcionales de hardware, perfil y uso de funciones para mejorar la aplicación. Puedes desactivarlo cuando quieras.</value></data>
   <data name="PrivacyConsent.CrashReports.Title" xml:space="preserve"><value>Enviar reportes automáticos de errores y fallos</value></data>
-  <data name="PrivacyConsent.CrashReports.Description" xml:space="preserve"><value>Trazas de pila depuradas y versión de la app cuando FiveMCleaner falla o encuentra un error inesperado.</value></data>
+  <data name="PrivacyConsent.CrashReports.Description" xml:space="preserve"><value>Trazas de pila depuradas y versión de la app cuando Vemryx One falla o encuentra un error inesperado.</value></data>
   <data name="PrivacyConsent.Continue" xml:space="preserve"><value>Continuar</value></data>
   <data name="Privacy.Collects.Title" xml:space="preserve"><value>RECOPILAMOS</value></data>
-  <data name="Privacy.Collects.Items" xml:space="preserve"><value>• Versión de FiveMCleaner
+  <data name="Privacy.Collects.Items" xml:space="preserve"><value>• Versión de Vemryx One
 • Versión y arquitectura general de Windows
 • Duración y resultado de las optimizaciones
 • Identificadores técnicos de acciones
@@ -314,7 +314,7 @@
 • Contenido de archivos
 • Lista completa de procesos o programas
 • Rutas personales sin depurar</value></data>
-  <data name="ReleaseNotes.WindowTitle" xml:space="preserve"><value>Novedades - FiveMCleaner</value></data>
+  <data name="ReleaseNotes.WindowTitle" xml:space="preserve"><value>Novedades - Vemryx One</value></data>
   <data name="ReleaseNotes.Heading" xml:space="preserve"><value>Novedades</value></data>
   <data name="ReleaseNotes.VersionLabel" xml:space="preserve"><value>Versión {0}</value></data>
   <data name="ReleaseNotes.VersionLabelWithDate" xml:space="preserve"><value>Versión {0} • {1}</value></data>
@@ -326,7 +326,7 @@
   <data name="ReleaseNotes.Category.Removed" xml:space="preserve"><value>Eliminado</value></data>
   <data name="ReleaseNotes.Category.Security" xml:space="preserve"><value>Seguridad</value></data>
   <data name="ReleaseNotes.Close" xml:space="preserve"><value>Cerrar</value></data>
-  <data name="Dialog.FatalError.Message" xml:space="preserve"><value>FiveMCleaner encontró un error inesperado. No se aplicará ningún cambio nuevo.
+  <data name="Dialog.FatalError.Message" xml:space="preserve"><value>Vemryx One encontró un error inesperado. No se aplicará ningún cambio nuevo.
 
 {0}</value></data>
   <data name="Brand.FooterCopyright" xml:space="preserve"><value>© 2026 Vemryx</value></data>
@@ -336,7 +336,7 @@
   <data name="Progress.Finishing" xml:space="preserve"><value>Finalizando...</value></data>
   <data name="Progress.CompletedInFormat" xml:space="preserve"><value>Completado en {0}</value></data>
   <data name="BugReport.Technical.Summary" xml:space="preserve"><value>{0}; edición: {1}; perfil: {2}</value></data>
-  <data name="BugReport.Clipboard.Title" xml:space="preserve"><value>REPORTE DE ERROR — FIVEMCLEANER</value></data>
+  <data name="BugReport.Clipboard.Title" xml:space="preserve"><value>REPORTE DE ERROR — VEMRYX ONE</value></data>
   <data name="BugReport.Clipboard.Id" xml:space="preserve"><value>ID: {0}</value></data>
   <data name="BugReport.Clipboard.Category" xml:space="preserve"><value>Tipo: {0}</value></data>
   <data name="BugReport.Clipboard.Summary" xml:space="preserve"><value>Resumen: {0}</value></data>
@@ -356,7 +356,7 @@
   <data name="BugReport.Validation.BugCode" xml:space="preserve"><value>Selecciona un código de error.</value></data>
   <data name="BugReport.Clipboard.BugCode" xml:space="preserve"><value>Código del error: {0}</value></data>
   <data name="Streaming.Readiness.Protected.Title" xml:space="preserve"><value>La protección de streaming está activa</value></data>
-  <data name="Streaming.Readiness.Protected.Detail" xml:space="preserve"><value>Hay una app de streaming abierta. FiveMCleaner la preserva; confirma tu estado de transmisión antes de optimizar.</value></data>
+  <data name="Streaming.Readiness.Protected.Detail" xml:space="preserve"><value>Hay una app de streaming abierta. Vemryx One la preserva; confirma tu estado de transmisión antes de optimizar.</value></data>
   <data name="Streaming.Readiness.Attention.Title" xml:space="preserve"><value>Haz una prueba antes de salir en vivo</value></data>
   <data name="Streaming.Readiness.Attention.Detail" xml:space="preserve"><value>El diagnóstico muestra presión de recursos o una sesión de juego abierta. Usa una escena privada para validar la estabilidad.</value></data>
   <data name="Streaming.Readiness.Ready.Title" xml:space="preserve"><value>La preparación para streaming está disponible</value></data>
@@ -536,7 +536,7 @@
   <data name="Results.GraphicsUpdated" xml:space="preserve"><value>Se creó un respaldo y se actualizaron {0} opción(es) gráfica(s).</value></data>
   <data name="Results.VisualEffectsAlreadyApplied" xml:space="preserve"><value>Los efectos visuales de Windows ya coincidían con el estado solicitado.</value></data>
   <data name="Results.VisualEffectsUpdated" xml:space="preserve"><value>Los efectos visuales de Windows se actualizaron a través de la API oficial.</value></data>
-  <data name="Update.Available.Title" xml:space="preserve"><value>FiveMCleaner {0} está disponible</value></data>
+  <data name="Update.Available.Title" xml:space="preserve"><value>Vemryx One {0} está disponible</value></data>
   <data name="Update.Available.Detail" xml:space="preserve"><value>Instalador oficial encontrado ({0}). Su tamaño y SHA-256 de GitHub se verificarán antes de que pueda abrirse.</value></data>
   <data name="Update.Downloading.Title" xml:space="preserve"><value>Descargando actualización verificada</value></data>
   <data name="Update.Downloading.Detail" xml:space="preserve"><value>{0:0}% descargado • el instalador no se ejecutará automáticamente</value></data>
@@ -544,15 +544,15 @@
   <data name="Update.Ready.Detail" xml:space="preserve"><value>SHA-256 verificado. Windows preguntará antes de que se abra el instalador.</value></data>
   <data name="Update.InstallNow" xml:space="preserve"><value>Actualizar ahora</value></data>
   <data name="Update.Installing.Title" xml:space="preserve"><value>Instalando la actualización {0}</value></data>
-  <data name="Update.Installing.Detail" xml:space="preserve"><value>FiveMCleaner se cerrará y volverá a abrirse solo en la nueva versión.</value></data>
-  <data name="Update.Completed.Title" xml:space="preserve"><value>FiveMCleaner actualizado a la versión {0}</value></data>
+  <data name="Update.Installing.Detail" xml:space="preserve"><value>Vemryx One se cerrará y volverá a abrirse solo en la nueva versión.</value></data>
+  <data name="Update.Completed.Title" xml:space="preserve"><value>Vemryx One actualizado a la versión {0}</value></data>
   <data name="Update.Completed.Detail" xml:space="preserve"><value>La actualización se instaló y verificó. No hace falta nada más.</value></data>
   <data name="Update.BlockedWhileBusy" xml:space="preserve"><value>Termina o cancela la optimización actual antes de actualizar.</value></data>
   <data name="Update.ReleaseNotes" xml:space="preserve"><value>Ver cambios</value></data>
   <data name="Update.Failed.Title" xml:space="preserve"><value>La actualización no se descargó</value></data>
   <data name="Update.Failed.Detail" xml:space="preserve"><value>No se instaló nada. {0}</value></data>
   <data name="Dialog.UpdateInstall.Title" xml:space="preserve"><value>Instalar actualización verificada</value></data>
-  <data name="Dialog.UpdateInstall.Message" xml:space="preserve"><value>¿Instalar ahora la actualización verificada de FiveMCleaner {0}? FiveMCleaner se cerrará, se actualizará solo y volverá a abrirse automáticamente — no hace falta ningún otro paso.</value></data>
+  <data name="Dialog.UpdateInstall.Message" xml:space="preserve"><value>¿Instalar ahora la actualización verificada de Vemryx One {0}? Vemryx One se cerrará, se actualizará solo y volverá a abrirse automáticamente — no hace falta ningún otro paso.</value></data>
   <data name="Dialog.UpdateInstall.Failed" xml:space="preserve"><value>No se pudo instalar la actualización verificada: {0}</value></data>
   <data name="Dialog.OpenExternal.Title" xml:space="preserve"><value>No se pudo abrir</value></data>
   <data name="Dialog.OpenExternal.Message" xml:space="preserve"><value>Windows no pudo abrir este elemento: {0}</value></data>
@@ -634,7 +634,7 @@
   <data name="Comparison.RevertButton" xml:space="preserve"><value>Revertir esta optimización</value></data>
   <data name="Comparison.HardwareProfile" xml:space="preserve"><value>Perfil de hardware</value></data>
   <data name="Settings.CheckForUpdates.Title" xml:space="preserve"><value>Buscar actualizaciones</value></data>
-  <data name="Settings.CheckForUpdates.Description" xml:space="preserve"><value>Verifica manualmente, ahora mismo, si hay disponible una versión pública más reciente de FiveMCleaner.</value></data>
+  <data name="Settings.CheckForUpdates.Description" xml:space="preserve"><value>Verifica manualmente, ahora mismo, si hay disponible una versión pública más reciente de Vemryx One.</value></data>
   <data name="Settings.CheckForUpdates.Button" xml:space="preserve"><value>Buscar actualizaciones</value></data>
   <data name="Update.ManualCheck.UpToDate" xml:space="preserve"><value>Ya tienes la última versión publicada.</value></data>
   <data name="Update.ManualCheck.Failed" xml:space="preserve"><value>No se pudo buscar actualizaciones: {0}</value></data>
@@ -730,7 +730,7 @@
   <data name="Optimizer.Stage.Run" xml:space="preserve"><value>EJECUTAR</value></data>
   <data name="Optimizer.Stage.Result" xml:space="preserve"><value>RESULTADO</value></data>
   <data name="Account.WindowTitle" xml:space="preserve"><value>Tu cuenta</value></data>
-  <data name="Account.TitleBarHeader" xml:space="preserve"><value>CUENTA FIVEMCLEANER</value></data>
+  <data name="Account.TitleBarHeader" xml:space="preserve"><value>CUENTA VEMRYX ONE</value></data>
   <data name="Account.Welcome.Title" xml:space="preserve"><value>Bienvenido de nuevo</value></data>
   <data name="Account.Welcome.Subtitle" xml:space="preserve"><value>Inicia sesión para sincronizar tus preferencias entre instalaciones.</value></data>
   <data name="Account.Register.Title" xml:space="preserve"><value>Crea tu cuenta</value></data>
@@ -836,16 +836,48 @@
   <data name="PasswordSecurity.Create.Action" xml:space="preserve"><value>Crear contraseña</value></data>
   <data name="PasswordSecurity.CurrentPasswordPlaceholder" xml:space="preserve"><value>Escribe tu contraseña actual</value></data>
   <data name="PasswordSecurity.ConfirmPasswordLabel" xml:space="preserve"><value>Confirma la nueva contraseña</value></data>
-  <data name="PasswordSecurity.GoogleConfirmation" xml:space="preserve"><value>Al continuar, Google te pedirá que confirmes tu identidad. Tu contraseña de Google nunca se comparte con FiveMCleaner.</value></data>
+  <data name="PasswordSecurity.GoogleConfirmation" xml:space="preserve"><value>Al continuar, Google te pedirá que confirmes tu identidad. Tu contraseña de Google nunca se comparte con Vemryx One.</value></data>
   <data name="PasswordSecurity.Cancel" xml:space="preserve"><value>Cancelar</value></data>
   <data name="PasswordSecurity.Validation.CurrentPasswordRequired" xml:space="preserve"><value>Introduce tu contraseña actual.</value></data>
   <data name="PasswordSecurity.Validation.CurrentPasswordInvalid" xml:space="preserve"><value>La contraseña actual es incorrecta.</value></data>
   <data name="PasswordSecurity.Validation.MinimumLength" xml:space="preserve"><value>La nueva contraseña debe tener al menos {0} caracteres.</value></data>
   <data name="PasswordSecurity.Validation.PasswordUnchanged" xml:space="preserve"><value>Elige una contraseña diferente de la actual.</value></data>
-  <data name="PasswordSecurity.Validation.GoogleAccountMismatch" xml:space="preserve"><value>Selecciona la misma cuenta de Google vinculada a FiveMCleaner.</value></data>
+  <data name="PasswordSecurity.Validation.GoogleAccountMismatch" xml:space="preserve"><value>Selecciona la misma cuenta de Google vinculada a Vemryx One.</value></data>
   <data name="PasswordSecurity.Validation.AlreadyHasPassword" xml:space="preserve"><value>Esta cuenta ya tiene contraseña. Vuelve a abrir la ventana para restablecerla.</value></data>
   <data name="PasswordSecurity.Validation.Failed" xml:space="preserve"><value>No se pudo actualizar tu contraseña. Inténtalo de nuevo.</value></data>
   <data name="PasswordSecurity.GoogleUnavailable" xml:space="preserve"><value>La confirmación de identidad con Google no está disponible en esta instalación.</value></data>
   <data name="PasswordSecurity.GoogleOpening" xml:space="preserve"><value>Abriendo Google para confirmar tu identidad…</value></data>
   <data name="PasswordSecurity.Success" xml:space="preserve"><value>Tu contraseña se ha actualizado.</value></data>
+  <data name="Brand.ProductName" xml:space="preserve"><value>Vemryx One</value></data>
+  <data name="Brand.CompanyName" xml:space="preserve"><value>Vemryx</value></data>
+  <data name="Brand.ProductSuffix" xml:space="preserve"><value> One</value></data>
+  <data name="Terms.WindowTitle" xml:space="preserve"><value>Términos de uso de Vemryx One</value></data>
+  <data name="Terms.Title" xml:space="preserve"><value>Términos de uso</value></data>
+  <data name="Terms.VersionLabel" xml:space="preserve"><value>Versión {0} · Vigente desde el 2 de agosto de 2026</value></data>
+  <data name="Terms.Close" xml:space="preserve"><value>Cerrar</value></data>
+  <data name="Terms.Intro" xml:space="preserve"><value>Estos Términos de uso regulan el acceso a la cuenta y el uso de la aplicación Vemryx One. Al crear una cuenta, confirmas que has leído, comprendido y aceptado este documento.</value></data>
+  <data name="Terms.Service.Body" xml:space="preserve"><value>Vemryx One es una aplicación independiente para diagnóstico, mantenimiento y optimizaciones controladas relacionadas con FiveM, GTA V y Windows. Vemryx es la titular indicada en la licencia del software. FiveM, Cfx.re, Rockstar Games y Microsoft son marcas de sus respectivos propietarios y no patrocinan este proyecto.</value></data>
+  <data name="Terms.Privacy.Contact" xml:space="preserve"><value>La telemetría opcional, los diagnósticos y los reportes de errores tienen controles separados en la aplicación y no se autorizan únicamente por crear una cuenta. Para solicitar acceso, corrección o eliminación de datos de la cuenta, usa los canales oficiales del proyecto.</value></data>
+  <data name="Terms.PermittedUse.Body" xml:space="preserve"><value>Usa el servicio solo con fines lícitos y de acuerdo con la licencia de Vemryx One. Está prohibido explotar vulnerabilidades, automatizar registros abusivos, interferir con el servicio, eludir límites de seguridad, distribuir malware, violar derechos de terceros o usar la cuenta para fraude. La cuenta no concede derechos sobre la marca, el código o los servicios de terceros.</value></data>
+  <data name="Terms.Warranty.Body" xml:space="preserve"><value>Vemryx One se proporciona tal cual, dentro de los límites permitidos por la legislación aplicable y la licencia del proyecto. Nada en estos términos excluye derechos que no puedan renunciarse por ley. Sigues siendo responsable de las decisiones tomadas después de revisar la información presentada por la aplicación.</value></data>
+  <data name="Terms.LawContact.Body" xml:space="preserve"><value>Se aplican las leyes de la República Federativa de Brasil, incluidas las normas de protección de datos y del consumidor cuando correspondan. Las preguntas, solicitudes sobre la cuenta o comunicaciones legales deben enviarse por los canales oficiales del proyecto.</value></data>
+  <data name="Terms.Section1.Title" xml:space="preserve"><value>1. Servicio y responsable</value></data>
+  <data name="Terms.Section2.Title" xml:space="preserve"><value>2. Elegibilidad e información correcta</value></data>
+  <data name="Terms.Section2.Body" xml:space="preserve"><value>Debes tener capacidad legal para aceptar estos términos o autorización de tu responsable legal. El nombre, apellido, nombre de usuario y correo electrónico deben ser verdaderos y actuales, y no pueden suplantar a terceros, violar derechos, contener contenido ilegal ni inducir a error a otros usuarios.</value></data>
+  <data name="Terms.Section3.Title" xml:space="preserve"><value>3. Cuenta, contraseña y seguridad</value></data>
+  <data name="Terms.Section3.Body" xml:space="preserve"><value>Eres responsable de mantener tu contraseña confidencial y de las actividades realizadas en tu cuenta. No compartas credenciales ni intentes acceder a cuentas de terceros. Informa cualquier sospecha de acceso no autorizado por los canales oficiales del proyecto. Podemos cerrar sesiones o restringir cuentas para proteger el servicio, investigar abusos o cumplir una obligación legal.</value></data>
+  <data name="Terms.Section4.Title" xml:space="preserve"><value>4. Datos de la cuenta y privacidad</value></data>
+  <data name="Terms.Section4.AccountData" xml:space="preserve"><value>Para crear y mantener tu cuenta, tratamos nombre, apellido, nombre de usuario, correo electrónico, hash criptográfico de la contraseña, identificadores de sesión y la fecha y versión de la aceptación de estos términos. La contraseña en texto plano no se almacena. Estos datos se usan para autenticación, seguridad, prevención de abusos, soporte de la cuenta y comprobación del consentimiento.</value></data>
+  <data name="Terms.Section4.Infrastructure" xml:space="preserve"><value>La infraestructura de la cuenta utiliza Cloudflare Workers y una base de datos D1. El procesamiento puede realizarse en infraestructura distribuida, incluso fuera de Brasil, con las protecciones aplicables del proveedor y de la legislación. Los datos de la cuenta no se venden.</value></data>
+  <data name="Terms.Section5.Title" xml:space="preserve"><value>5. Uso permitido</value></data>
+  <data name="Terms.Section6.Title" xml:space="preserve"><value>6. Operaciones en tu equipo</value></data>
+  <data name="Terms.Section6.Body" xml:space="preserve"><value>La aplicación explica y presenta las acciones antes de ejecutarlas, aplica límites de seguridad y ofrece reversión cuando es técnicamente posible. Aun así, los cambios del sistema pueden depender del estado de Windows, los permisos, el antivirus, los controladores y el software de terceros. Revisa el plan presentado, mantén copias de seguridad adecuadas y no interrumpas operaciones en curso.</value></data>
+  <data name="Terms.Section7.Title" xml:space="preserve"><value>7. Disponibilidad y actualizaciones</value></data>
+  <data name="Terms.Section7.Body" xml:space="preserve"><value>El servicio puede actualizarse, suspenderse o modificarse por mantenimiento, seguridad, compatibilidad o evolución del producto. No garantizamos disponibilidad ininterrumpida ni compatibilidad con todas las configuraciones de hardware, versiones de Windows, FiveM, GTA V o software de terceros.</value></data>
+  <data name="Terms.Section8.Title" xml:space="preserve"><value>8. Garantías y responsabilidad</value></data>
+  <data name="Terms.Section9.Title" xml:space="preserve"><value>9. Suspensión y cierre</value></data>
+  <data name="Terms.Section9.Body" xml:space="preserve"><value>Podemos suspender o cerrar cuentas involucradas en abuso, fraude, riesgos de seguridad o incumplimiento de estos términos, de acuerdo con la legislación aplicable. Puedes dejar de usar el servicio y solicitar la eliminación de tu cuenta por los canales oficiales. Las obligaciones que por su naturaleza deban sobrevivir seguirán siendo aplicables.</value></data>
+  <data name="Terms.Section10.Title" xml:space="preserve"><value>10. Cambios en estos términos</value></data>
+  <data name="Terms.Section10.Body" xml:space="preserve"><value>Los cambios materiales se identificarán mediante una nueva versión. Cuando sea necesario, solicitaremos una nueva aceptación antes de que continúes usando las funciones de la cuenta. La versión aceptada y la fecha de aceptación quedan registradas para mantener este proceso verificable.</value></data>
+  <data name="Terms.Section11.Title" xml:space="preserve"><value>11. Ley aplicable y contacto</value></data>
 </root>

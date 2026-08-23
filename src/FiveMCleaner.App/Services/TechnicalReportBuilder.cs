@@ -69,7 +69,7 @@ public static class TechnicalReportBuilder
         ArgumentNullException.ThrowIfNull(localization);
 
         var builder = new StringBuilder();
-        builder.AppendLine($"{ProductIdentity.Name} — {localization.GetString("Report.Title")}");
+        builder.AppendLine($"{ProductIdentity.DisplayName} — {localization.GetString("Report.Title")}");
         builder.AppendLine($"{localization.GetString("Report.Field.Transaction")}: {report.TransactionId:N}");
         builder.AppendLine(
             $"{localization.GetString("Report.Field.Date")}: {report.CreatedAtUtc.UtcDateTime:yyyy-MM-dd HH:mm} UTC");

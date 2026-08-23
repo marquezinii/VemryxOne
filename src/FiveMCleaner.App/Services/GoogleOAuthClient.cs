@@ -244,8 +244,8 @@ public sealed class GoogleOAuthClient : IGoogleOAuthClient
                     connection,
                     "200 OK",
                     succeeded
-                        ? "<section class=\"result result--success\"><span class=\"status-mark\" aria-hidden=\"true\"></span><h1>Tudo certo!</h1><p>Você já pode voltar para o FiveMCleaner.</p></section>"
-                        : "<section class=\"result result--error\"><span class=\"status-mark\" aria-hidden=\"true\"></span><h1>Login não concluído</h1><p>Volte ao FiveMCleaner e tente novamente.</p></section>",
+                        ? "<section class=\"result result--success\"><span class=\"status-mark\" aria-hidden=\"true\"></span><h1>Tudo certo!</h1><p>Você já pode voltar para o Vemryx One.</p></section>"
+                        : "<section class=\"result result--error\"><span class=\"status-mark\" aria-hidden=\"true\"></span><h1>Login não concluído</h1><p>Volte ao Vemryx One e tente novamente.</p></section>",
                     timeoutToken).ConfigureAwait(false);
 
                 return succeeded
@@ -287,7 +287,7 @@ public sealed class GoogleOAuthClient : IGoogleOAuthClient
               <meta charset="utf-8">
               <meta name="viewport" content="width=device-width, initial-scale=1">
               <meta name="color-scheme" content="dark">
-              <title>FiveMCleaner</title>
+              <title>Vemryx One</title>
               <style>
                 :root {
                   color-scheme: dark;
@@ -421,9 +421,9 @@ public sealed class GoogleOAuthClient : IGoogleOAuthClient
               </style>
             </head>
             <body>
-              <div class="brand" aria-label="FiveMCleaner">
+              <div class="brand" aria-label="Vemryx One">
                 {{iconMarkup}}
-                <span>FiveMCleaner<sup class="brand-reg" aria-hidden="true">®</sup></span>
+                <span>Vemryx One</span>
               </div>
               <main>{{body}}</main>
             </body>

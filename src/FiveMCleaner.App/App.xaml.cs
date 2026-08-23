@@ -214,7 +214,7 @@ public partial class App : System.Windows.Application
                 Services.LocalizationService.Current.Format(
                     "Dialog.FatalError.Message",
                     Services.LocalizationService.Current.DescribeException(exception)),
-                ProductIdentity.Name,
+                ProductIdentity.DisplayName,
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
         }

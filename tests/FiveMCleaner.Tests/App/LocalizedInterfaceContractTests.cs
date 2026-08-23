@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using FiveMCleaner.App.Services;
+using FiveMCleaner.Contracts;
 using FiveMCleaner.Core.Catalog;
 using Xunit;
 
@@ -20,6 +21,8 @@ public sealed partial class LocalizedInterfaceContractTests
             Path.Combine(root, "src", "FiveMCleaner.App", "Views", "PrivacyConsentWindow.xaml"),
             Path.Combine(root, "src", "FiveMCleaner.App", "Views", "ReleaseNotesWindow.xaml"),
             Path.Combine(root, "src", "FiveMCleaner.App", "Views", "PasswordSecurityWindow.xaml"),
+            Path.Combine(root, "src", "FiveMCleaner.App", "Views", "TermsOfUseWindow.xaml"),
+            Path.Combine(root, "src", "FiveMCleaner.App", "Views", "OptimizationConfirmationWindow.xaml"),
             Path.Combine(root, "src", "FiveMCleaner.App", "Views", "Pages", "OptimizerPage.xaml")
         };
         var keys = sources
@@ -381,6 +384,38 @@ public sealed partial class LocalizedInterfaceContractTests
 
             Assert.Empty(duplicateKeys);
         }
+    }
+
+    [Fact]
+    public void PublicBrandName_IsLocalizedWithoutChangingTheLegacyProtocolIdentity()
+    {
+        Assert.Equal("Vemryx One", ProductIdentity.DisplayName);
+        Assert.Equal("FiveMCleaner", ProductIdentity.Name);
+
+        var root = TestHelpers.FindRepositoryRoot();
+        foreach (var fileName in new[] { "Strings.resx", "Strings.pt-BR.resx", "Strings.es.resx" })
+        {
+            var document = XDocument.Load(Path.Combine(
+                root,
+                "src",
+                "FiveMCleaner.App",
+                "Resources",
+                fileName));
+            var values = document.Descendants("value").Select(element => element.Value);
+
+            Assert.DoesNotContain(values, value => value.Contains("FiveMCleaner", StringComparison.Ordinal));
+            Assert.Contains(values, value => value == ProductIdentity.DisplayName);
+        }
+
+        var oauth = File.ReadAllText(Path.Combine(
+            root,
+            "src",
+            "FiveMCleaner.App",
+            "Services",
+            "GoogleOAuthClient.cs"));
+        Assert.DoesNotContain("<title>FiveMCleaner</title>", oauth, StringComparison.Ordinal);
+        Assert.DoesNotContain("aria-label=\"FiveMCleaner\"", oauth, StringComparison.Ordinal);
+        Assert.Contains("<title>Vemryx One</title>", oauth, StringComparison.Ordinal);
     }
 
     [Fact]

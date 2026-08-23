@@ -2,6 +2,7 @@ namespace FiveMCleaner.Contracts;
 
 public static class ProductIdentity
 {
+    public const string DisplayName = "Vemryx One";
     public const string Name = "FiveMCleaner";
     public const string Subtitle = "optimizer for FiveM";
     public const string RepositoryUrl = "https://github.com/marquezinii/FiveMCleaner";

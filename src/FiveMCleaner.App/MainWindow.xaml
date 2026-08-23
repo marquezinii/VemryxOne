@@ -7,7 +7,7 @@
         xmlns:controls="clr-namespace:FiveMCleaner.App.Controls"
         xmlns:pages="clr-namespace:FiveMCleaner.App.Views.Pages"
         mc:Ignorable="d"
-        Title="FiveMCleaner"
+        Title="{Binding [Brand.ProductName], Source={StaticResource LocalizedStrings}}"
         Icon="Assets/VemryxOne.png"
         Width="1160"
         Height="680"
@@ -75,7 +75,7 @@
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0,0,0">
                     <Image Source="Assets/VemryxOne.png" Width="24" Height="24" Stretch="Uniform" />
                     <TextBlock Margin="11,0,0,0" Style="{StaticResource BodyStrongText}" VerticalAlignment="Center" FontSize="15">
-                        <Run Text="FiveM" /><Run Text="Cleaner" Foreground="{DynamicResource BrandInkBrush}" />
+                        <Run Text="{Binding [Brand.CompanyName], Source={StaticResource LocalizedStrings}}" /><Run Text="{Binding [Brand.ProductSuffix], Source={StaticResource LocalizedStrings}}" Foreground="{DynamicResource BrandInkBrush}" />
                     </TextBlock>
 
                     <!--

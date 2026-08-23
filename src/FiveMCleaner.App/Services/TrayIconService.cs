@@ -1,4 +1,5 @@
 using Forms = System.Windows.Forms;
+using FiveMCleaner.Contracts;
 
 namespace FiveMCleaner.App.Services;
 
@@ -27,7 +28,7 @@ public sealed class TrayIconService : IDisposable
         {
             ContextMenuStrip = menu,
             Icon = LoadApplicationIcon(),
-            Text = "FiveMCleaner",
+            Text = ProductIdentity.DisplayName,
             Visible = false
         };
         notifyIcon.DoubleClick += (_, _) => ShowRequested?.Invoke(this, EventArgs.Empty);

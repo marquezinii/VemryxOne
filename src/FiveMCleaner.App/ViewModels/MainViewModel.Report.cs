@@ -170,8 +170,8 @@ public sealed partial class MainViewModel
     public bool CanShareReport => lastReport is not null;
 
     public string SuggestedReportFileName => lastReport is null
-        ? "FiveMCleaner-Report.txt"
-        : $"FiveMCleaner-Report-{lastReport.TransactionId:N}.txt";
+        ? "Vemryx-One-Report.txt"
+        : $"Vemryx-One-Report-{lastReport.TransactionId:N}.txt";
 
     public void CopyTechnicalReport()
     {

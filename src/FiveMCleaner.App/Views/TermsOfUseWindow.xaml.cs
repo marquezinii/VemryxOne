@@ -10,5 +10,5 @@ public partial class TermsOfUseWindow : Wpf.Ui.Controls.FluentWindow
         DataContext = this;
     }
 
-    public string VersionLabel => $"Versão {AccountTerms.CurrentVersion} · Vigente desde 2 de agosto de 2026";
+    public string VersionLabel => LocalizationService.Current.Format("Terms.VersionLabel", AccountTerms.CurrentVersion);
 }

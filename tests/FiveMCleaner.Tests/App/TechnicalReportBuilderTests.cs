@@ -76,6 +76,7 @@ public sealed class TechnicalReportBuilderTests
 
         var text = TechnicalReportBuilder.Build(report, diagnostic: null, localization);
 
+        Assert.StartsWith("Vemryx One —", text, StringComparison.Ordinal);
         Assert.DoesNotContain("joao.silva", text, StringComparison.OrdinalIgnoreCase);
         Assert.Contains(report.TransactionId.ToString("N"), text);
         Assert.Contains("1", text); // contagens presentes
