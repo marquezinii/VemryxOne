@@ -7,8 +7,8 @@
 
 - **Produto:** Vemryx One, aplicativo desktop Windows para otimização transparente, reversível e orientada por diagnóstico do FiveM para **GTAV Legacy**.
 - **Integração:** `dev/proxima-versao` é a branch de integração da próxima versão; `main` representa a linha pública/estável. O fluxo de branches, worktrees, Pull Requests, integração e release é definido em `AI_RULES.md`.
-- **Último estado consolidado neste documento-fonte:** 22/08/2026, após integrar as mudanças de autenticação, dashboard e identidade institucional na próxima versão. Antes de qualquer trabalho, confirme o estado real com Git e os testes atuais.
-- **Release pública atual:** `v1.4.3`, publicada em 20/08/2026 a partir do commit `aadf755` em `main`. O runtime assinado, instalador, hashes, manifesto e feed estável do updater foram publicados e validados.
+- **Último estado consolidado neste documento-fonte:** 24/08/2026, após a publicação estável da identidade Vemryx One. Antes de qualquer trabalho, confirme o estado real com Git e os testes atuais.
+- **Release pública atual:** `v1.5.0`, publicada em 24/08/2026 a partir do commit integrado em `main`. O runtime assinado, instalador, hashes, manifesto e feed estável do updater foram publicados e validados.
 - **Atalho de desenvolvimento:** `Vemryx One - Desenvolvimento` usa `scripts\Start-DevelopmentApp.ps1`. Conforme `AI_RULES.md`, deve ser reconstruído com `scripts\Install-DevelopmentShortcut.ps1 -Build` (executado a partir do checkout/worktree da própria tarefa) ao final de toda tarefa que gerar mudanças no app — isolada ou de integração —, exceto tarefas de instalador/updater. O script espelha a árvore de trabalho atual para a pasta irmã fixa `VemryxOne-dev-shortcut` e aponta o atalho para essa cópia estável, então ele nunca fica órfão quando um worktree de tarefa é removido após o merge.
 
 ## 2. Objetivo e invariantes de segurança
@@ -133,7 +133,7 @@ Somente itens ainda relevantes devem permanecer aqui. Quando resolvidos e integr
 
 Estes números são **referência do último estado validado**, não substituem testes da branch atual.
 
-- **20/08/2026 — release pública v1.4.3:** build Release sem warnings, **972 testes .NET**, `dotnet format --verify-no-changes`, verificação de segurança, smoke pós-ofuscação do Otimizador e da Visão geral e checks remotos de .NET, site, Worker, dashboard, SBOM e CodeQL aprovados. O workflow estável também aprovou empacotamento endurecido, assinatura do broker, smoke pós-ofuscação, instalação/desinstalação, proveniência, criação da release e publicação do feed estável assinado do updater.
+- **24/08/2026 — release pública v1.5.0:** build Release sem warnings, **1.000 testes .NET**, `dotnet format --verify-no-changes`, verificação de segurança, contrato do instalador, smoke pós-ofuscação e instalação/upgrade/desinstalação aprovados. Worker (**199 testes**), dashboard (**49 testes**) e site (lint, typecheck, build e **3 testes**) também passaram sem vulnerabilidades. A CI remota e o workflow estável aprovaram SBOM, empacotamento endurecido, assinatura, proveniência, GitHub Release e publicação do feed estável assinado do updater.
 
 - **24/08/2026 — integração atual:** build Release sem warnings, **1.000 testes .NET**, `dotnet format --verify-no-changes`, `scripts/Verify-Safety.ps1`, `scripts/Verify-Installer.ps1 -ScriptOnly` e `git diff --check` aprovados; Worker com **199 testes** e `npm audit` sem vulnerabilidades; dashboard com **49 testes** e `npm audit` sem vulnerabilidades; site com typecheck, lint, build estático, **3 testes** e `npm audit` sem vulnerabilidades. O CI da branch de integração é a confirmação remota complementar deste baseline.
 
