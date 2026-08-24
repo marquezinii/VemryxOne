@@ -19,9 +19,9 @@ Atualizações futuras são oferecidas dentro do aplicativo, com a sua confirma�
 Em geral não é necessário baixar este instalador de novo.
 
 Baixe o instalador somente em:
-https://marquezinii.github.io/FiveMCleaner/
+https://marquezinii.github.io/VemryxOne/
 ou na release oficial:
-https://github.com/marquezinii/FiveMCleaner/releases
+https://github.com/marquezinii/VemryxOne/releases
 
 Antes de executar, confira o arquivo .sha256 publicado junto do instalador:
   (Get-FileHash .\VemryxOne-Setup-*-win-x64.exe -Algorithm SHA256).Hash
