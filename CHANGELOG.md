@@ -5,6 +5,37 @@ segue [Semantic Versioning](https://semver.org/lang/pt-BR/): correções usam
 `patch`, melhorias compatíveis usam `minor` e mudanças incompatíveis usam
 `major`.
 
+## [1.5.0] - 2026-08-24
+
+### Adicionado
+
+- Nova identidade pública Vemryx One no aplicativo, instalador, dashboard e
+  site, preservando a atualização para instalações existentes do FiveMCleaner.
+- Reforçado o fluxo de conta com perfil obrigatório, aceite de termos e suporte
+  a senha para contas compatíveis autenticadas pelo Google.
+
+### Melhorado
+
+- Renovados os recursos visuais, ícone e textos públicos para a identidade
+  Vemryx One.
+
+### Corrigido
+
+- Corrigidos bindings de textos localizados que podiam exibir conteúdo incorreto
+  em partes da interface.
+
+### Segurança
+
+- A sessão do aplicativo agora exige e-mail verificado, perfil válido e termos
+  aceitos; mutações administrativas remotas validam a origem do dashboard.
+
+### Alterações técnicas
+
+- Mantida a ponte de distribuição: os instaladores Vemryx One e FiveMCleaner
+  são o mesmo binário assinado por hash, e o updater continua consumindo o
+  runtime compatível.
+- Atualizado o Wrangler usado pelo Worker de infraestrutura.
+
 ## [1.4.3] - 2026-08-20
 
 ### Corrigido

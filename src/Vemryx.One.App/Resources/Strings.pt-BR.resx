@@ -323,6 +323,11 @@
   <data name="ReleaseNotes.Category.Fixed" xml:space="preserve"><value>Corrigido</value></data>
   <data name="ReleaseNotes.1_4_3.Fixed" xml:space="preserve"><value>• Corrigido erro que podia impedir a abertura do Otimizador quando o plano não tem ações.
 • Corrigida a exibição das quebras de linha em mensagens de erro inesperado.</value></data>
+  <data name="ReleaseNotes.1_5_0.Added" xml:space="preserve"><value>• Adicionada a identidade pública Vemryx One, preservando a atualização para instalações existentes.
+• Reforçado o fluxo de conta com perfil obrigatório, aceite de termos e suporte a senha para contas compatíveis autenticadas pelo Google.</value></data>
+  <data name="ReleaseNotes.1_5_0.Improved" xml:space="preserve"><value>• Renovados os recursos visuais, ícone e textos públicos para a identidade Vemryx One.</value></data>
+  <data name="ReleaseNotes.1_5_0.Fixed" xml:space="preserve"><value>• Corrigidos bindings de textos localizados que podiam exibir conteúdo incorreto em partes da interface.</value></data>
+  <data name="ReleaseNotes.1_5_0.Security" xml:space="preserve"><value>• A sessão agora exige e-mail verificado, perfil válido e termos aceitos; mudanças administrativas remotas validam a origem do dashboard.</value></data>
   <data name="ReleaseNotes.Category.Removed" xml:space="preserve"><value>Removido</value></data>
   <data name="ReleaseNotes.Category.Security" xml:space="preserve"><value>Segurança</value></data>
   <data name="ReleaseNotes.Close" xml:space="preserve"><value>Fechar</value></data>

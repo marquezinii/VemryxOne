@@ -323,6 +323,11 @@
   <data name="ReleaseNotes.Category.Fixed" xml:space="preserve"><value>Fixed</value></data>
   <data name="ReleaseNotes.1_4_3.Fixed" xml:space="preserve"><value>• Fixed an error that could prevent the Optimizer from opening when the plan has no actions.
 • Fixed line-break rendering in unexpected-error messages.</value></data>
+  <data name="ReleaseNotes.1_5_0.Added" xml:space="preserve"><value>• Introduced the Vemryx One public identity while keeping updates compatible with existing installations.
+• Strengthened accounts with a required profile, terms acceptance, and password support for compatible Google-authenticated accounts.</value></data>
+  <data name="ReleaseNotes.1_5_0.Improved" xml:space="preserve"><value>• Refined the visual resources, icon, and public text for the Vemryx One identity.</value></data>
+  <data name="ReleaseNotes.1_5_0.Fixed" xml:space="preserve"><value>• Fixed localized-text bindings that could display incorrect content in parts of the interface.</value></data>
+  <data name="ReleaseNotes.1_5_0.Security" xml:space="preserve"><value>• Sessions now require a verified email, valid profile, and accepted terms; administrative remote changes validate the dashboard origin.</value></data>
   <data name="ReleaseNotes.Category.Removed" xml:space="preserve"><value>Removed</value></data>
   <data name="ReleaseNotes.Category.Security" xml:space="preserve"><value>Security</value></data>
   <data name="ReleaseNotes.Close" xml:space="preserve"><value>Close</value></data>
