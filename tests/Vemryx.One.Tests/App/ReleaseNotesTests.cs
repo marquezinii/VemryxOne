@@ -13,8 +13,8 @@ public sealed class ReleaseNotesCatalogTests
     {
         var entry = Assert.Single(ReleaseNotesCatalog.Versions);
 
-        Assert.Equal("1.5.0", entry.Version);
-        Assert.Equal([ReleaseNoteCategory.Added, ReleaseNoteCategory.Improved, ReleaseNoteCategory.Fixed, ReleaseNoteCategory.Security], entry.Categories);
+        Assert.Equal("1.5.1", entry.Version);
+        Assert.Equal([ReleaseNoteCategory.Fixed], entry.Categories);
     }
 
     [Fact]
@@ -26,10 +26,10 @@ public sealed class ReleaseNotesCatalogTests
     [Fact]
     public void Find_KnownVersion_ReturnsTheMatchingEntry()
     {
-        var entry = ReleaseNotesCatalog.Find("1.5.0");
+        var entry = ReleaseNotesCatalog.Find("1.5.1");
 
         Assert.NotNull(entry);
-        Assert.Equal("1.5.0", entry!.Version);
+        Assert.Equal("1.5.1", entry!.Version);
     }
 }
 

@@ -328,6 +328,7 @@
   <data name="ReleaseNotes.1_5_0.Improved" xml:space="preserve"><value>• Se renovaron los recursos visuales, el icono y los textos públicos para la identidad Vemryx One.</value></data>
   <data name="ReleaseNotes.1_5_0.Fixed" xml:space="preserve"><value>• Se corrigieron bindings de textos localizados que podían mostrar contenido incorrecto en partes de la interfaz.</value></data>
   <data name="ReleaseNotes.1_5_0.Security" xml:space="preserve"><value>• La sesión ahora exige correo verificado, perfil válido y términos aceptados; los cambios administrativos remotos validan el origen del dashboard.</value></data>
+  <data name="ReleaseNotes.1_5_1.Fixed" xml:space="preserve"><value>• Se actualizaron los enlaces públicos de descarga y actualización a la dirección de Vemryx One, preservando las actualizaciones para instalaciones existentes.</value></data>
   <data name="ReleaseNotes.Category.Removed" xml:space="preserve"><value>Eliminado</value></data>
   <data name="ReleaseNotes.Category.Security" xml:space="preserve"><value>Seguridad</value></data>
   <data name="ReleaseNotes.Close" xml:space="preserve"><value>Cerrar</value></data>

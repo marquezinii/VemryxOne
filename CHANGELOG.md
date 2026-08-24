@@ -5,6 +5,20 @@ segue [Semantic Versioning](https://semver.org/lang/pt-BR/): correções usam
 `patch`, melhorias compatíveis usam `minor` e mudanças incompatíveis usam
 `major`.
 
+## [1.5.1] - 2026-08-24
+
+### Corrigido
+
+- Corrigida a identidade pública na página de download, no instalador e nos
+  links oficiais para Vemryx One.
+- Corrigida a consulta de atualizações após a migração do repositório, mantendo
+  a ponte estrita para instalações existentes.
+
+### Alterações técnicas
+
+- O repositório público passou a usar `marquezinii/VemryxOne`; o GitHub Pages
+  passa a ser publicado em `marquezinii.github.io/VemryxOne`.
+
 ## [1.5.0] - 2026-08-24
 
 ### Adicionado

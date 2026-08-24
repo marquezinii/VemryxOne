@@ -11,8 +11,8 @@
     <Company>Vemryx</Company>
     <Copyright>Copyright (c) 2026 Vemryx. All rights reserved.</Copyright>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/marquezinii/FiveMCleaner</RepositoryUrl>
+    <RepositoryUrl>https://github.com/marquezinii/VemryxOne</RepositoryUrl>
     <Product>Vemryx One</Product>
-    <Version>1.5.0</Version>
+    <Version>1.5.1</Version>
   </PropertyGroup>
 </Project>
