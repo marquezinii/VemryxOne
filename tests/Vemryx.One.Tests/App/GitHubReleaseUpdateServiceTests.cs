@@ -55,7 +55,7 @@ public sealed class GitHubReleaseUpdateServiceTests
         var handler = new StubHttpMessageHandler((request, _) =>
         {
             Assert.Equal(
-                "https://api.github.com/repos/marquezinii/FiveMCleaner/releases/latest",
+                "https://api.github.com/repos/marquezinii/VemryxOne/releases/latest",
                 request.RequestUri?.AbsoluteUri);
             Assert.Contains("VemryxOne-Updater/1.0", request.Headers.UserAgent.ToString());
             Assert.Contains(
@@ -75,6 +75,23 @@ public sealed class GitHubReleaseUpdateServiceTests
         Assert.Equal(installer.Length, update.SizeBytes);
         Assert.Equal(Sha256Hex(installer), update.Sha256Hex);
         Assert.Equal(OfficialReleaseNotesUrl("v1.2.3"), update.ReleaseNotesUri?.AbsoluteUri);
+    }
+
+    [Fact]
+    public async Task CheckForUpdate_AcceptsLegacyRepositoryLinksDuringTransition()
+    {
+        using var scope = new TemporaryDirectory();
+        var installer = Encoding.UTF8.GetBytes("setup");
+        var manifest = CreateManifest(
+            "v1.2.3",
+            installer,
+            downloadUrl: "https://github.com/marquezinii/FiveMCleaner/releases/download/v1.2.3/FiveMCleaner-Setup-1.2.3-win-x64.exe",
+            releaseNotesUrl: "https://github.com/marquezinii/FiveMCleaner/releases/tag/v1.2.3");
+        using var service = CreateService(ManifestOnlyHandler(manifest), scope.Path);
+
+        Assert.NotNull(await service.CheckForUpdateAsync(
+            "1.2.2",
+            cancellationToken: global::Xunit.TestContext.Current.CancellationToken));
     }
 
     [Theory]
@@ -624,10 +641,10 @@ public sealed class GitHubReleaseUpdateServiceTests
     });
 
     private static string OfficialDownloadUrl(string tag) =>
-        $"https://github.com/marquezinii/FiveMCleaner/releases/download/{tag}/{AssetName(tag)}";
+        $"https://github.com/marquezinii/VemryxOne/releases/download/{tag}/{AssetName(tag)}";
 
     private static string OfficialReleaseNotesUrl(string tag) =>
-        $"https://github.com/marquezinii/FiveMCleaner/releases/tag/{tag}";
+        $"https://github.com/marquezinii/VemryxOne/releases/tag/{tag}";
 
     private static string AssetName(string tag)
     {

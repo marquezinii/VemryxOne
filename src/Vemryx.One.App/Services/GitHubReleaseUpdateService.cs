@@ -17,9 +17,12 @@ namespace Vemryx.One.App.Services;
 public sealed class GitHubReleaseUpdateService : IReleaseUpdateService, IDisposable
 {
     internal static readonly Uri LatestReleaseEndpoint = new(
-        "https://api.github.com/repos/marquezinii/FiveMCleaner/releases/latest");
+        "https://api.github.com/repos/marquezinii/VemryxOne/releases/latest");
 
     private const string RepositoryReleasePrefix =
+        "/marquezinii/VemryxOne/releases/download/";
+
+    private const string LegacyRepositoryReleasePrefix =
         "/marquezinii/FiveMCleaner/releases/download/";
 
     private static readonly Regex Sha256DigestPattern = new(
@@ -714,7 +717,9 @@ public sealed class GitHubReleaseUpdateService : IReleaseUpdateService, IDisposa
         }
 
         var expectedPath = $"{RepositoryReleasePrefix}{tagName}/{assetName}";
-        if (!decodedPath.Equals(expectedPath, StringComparison.Ordinal))
+        var legacyExpectedPath = $"{LegacyRepositoryReleasePrefix}{tagName}/{assetName}";
+        if (!decodedPath.Equals(expectedPath, StringComparison.Ordinal)
+            && !decodedPath.Equals(legacyExpectedPath, StringComparison.Ordinal))
         {
             throw new UpdateSecurityException("A URL do instalador nao aponta para o asset esperado da release.");
         }
@@ -728,9 +733,12 @@ public sealed class GitHubReleaseUpdateService : IReleaseUpdateService, IDisposa
             || !uri.Scheme.Equals(Uri.UriSchemeHttps, StringComparison.Ordinal)
             || !uri.Host.Equals("github.com", StringComparison.OrdinalIgnoreCase)
             || !uri.IsDefaultPort
-            || !uri.AbsolutePath.Equals(
-                $"/marquezinii/FiveMCleaner/releases/tag/{tagName}",
-                StringComparison.Ordinal)
+            || !(uri.AbsolutePath.Equals(
+                    $"/marquezinii/VemryxOne/releases/tag/{tagName}",
+                    StringComparison.Ordinal)
+                || uri.AbsolutePath.Equals(
+                    $"/marquezinii/FiveMCleaner/releases/tag/{tagName}",
+                    StringComparison.Ordinal))
             || !string.IsNullOrEmpty(uri.Query)
             || !string.IsNullOrEmpty(uri.Fragment))
         {

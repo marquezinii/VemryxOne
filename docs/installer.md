@@ -147,7 +147,7 @@ Fontes oficiais usadas no desenho:
 
 O workflow nunca publica por `push`; a etapa de criação de release exige o
 disparo manual com `publish=true`. A página pública de download é
-`https://marquezinii.github.io/FiveMCleaner/`, gratuita e sem login para
+`https://marquezinii.github.io/VemryxOne/`, gratuita e sem login para
 visitantes. O botão da página usa `VemryxOne-Setup-latest-win-x64.exe`; a mesma
 release também publica os aliases `FiveMCleaner-Setup-<versão>-win-x64.exe` e
 `FiveMCleaner-Setup-latest-win-x64.exe` para que instalações antigas encontrem

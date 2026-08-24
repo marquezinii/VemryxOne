@@ -55,7 +55,7 @@ para a descrição quanto para o trecho de log opcional.
 O botão **Copiar relato** cria texto no clipboard com todos os campos
 preenchidos, incluindo e-mail e log quando fornecidos. O conteúdo pode
 então ser revisado e publicado manualmente no
-[formulário de bug do GitHub](https://github.com/marquezinii/FiveMCleaner/issues/new?template=bug_report.yml).
+[formulário de bug do GitHub](https://github.com/marquezinii/VemryxOne/issues/new?template=bug_report.yml).
 
 ## Estado da entrega
 

@@ -10,7 +10,7 @@ export function SiteFooter({ text }: { text: Copy }) {
           <div>
             <a className="brand footer-brand" href="#top" aria-label="Vemryx One">
               <Image src={ICON_URL} width={42} height={42} alt="" unoptimized />
-              <span>FiveM<span>Cleaner</span></span>
+              <span>Vemryx<span> One</span></span>
             </a>
             <p>{text.footer.tagline}</p>
           </div>
