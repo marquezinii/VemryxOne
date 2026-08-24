@@ -15,7 +15,7 @@ Fonte: `REBRANDING_VEMRYX_ONE.md`. O ícone oficial fornecido pelo usuário est�
 - [x] Implementar release ponte do instalador/updater antes de renomear executáveis e IDs externos.
 - [x] Renomear projetos, arquivos e namespaces internos após estabilizar a compatibilidade.
 - [x] Atualizar backend, site, documentação, CI e allowlist de resíduos.
-- [ ] Executar matriz final de build, testes, instalação, atualização, rollback e acessibilidade.
+- [x] Executar matriz final de build, testes, instalação, atualização, rollback e acessibilidade.
 
 ## Identificadores deliberadamente preservados nesta fase
 
@@ -119,3 +119,11 @@ Eles só mudam junto de aliases, migração idempotente, testes e rollback. O no
 - `scripts/Verify-Installer.ps1 -ScriptOnly`, `dotnet format Vemryx.One.slnx --verify-no-changes --no-restore` e `git diff --check`: aprovados.
 - `scripts/Verify-Safety.ps1`: aprovado; build Release sem avisos/erros e 999 testes .NET aprovados.
 - `scripts/Install-DevelopmentShortcut.ps1 -Build`: reconstruiu `Vemryx One - Desenvolvimento.lnk`; atalhos legados são preservados em backup recuperável quando encontrados.
+
+## Matriz final
+
+- `scripts/Build-Installer.ps1 -Version 1.4.3 -Harden`: aprovado. Gerou `VemryxOne-Setup-1.4.3-win-x64.exe` e o alias legado byte a byte idêntico (146.097.461 bytes; SHA-256 `ec46fc751d83a4202c02cc77808c83b5b35248196815b090ada4b376696c3b79`).
+- `scripts/Test-Installer.ps1`: aprovado. Instalou, atualizou, conferiu 722 arquivos, validou o contrato `/AUTOUPDATE` sem abrir o app e desinstalou preservando os dados locais.
+- `dotnet build Vemryx.One.slnx --configuration Release --no-restore`: aprovado, 0 avisos e 0 erros. `dotnet test Vemryx.One.slnx --configuration Release --no-build`: 999 aprovados, incluindo os contratos de update e rollback.
+- `dotnet format Vemryx.One.slnx --verify-no-changes --no-restore` e `git diff --check`: aprovados. O build hardened também validou a ausência de PDB/mapas e de cópias não ofuscadas nos artefatos públicos.
+- Acessibilidade: `ThemeTokenContractTests` cobre o contraste mínimo WCAG AA nos temas claro e escuro; site (3 testes), dashboard (49) e Worker (199) passaram. A checagem direta do payload do instalador por 7-Zip foi pulada porque a ferramenta não está instalada; o contrato do instalador confirma que ele empacota a árvore já verificada.
