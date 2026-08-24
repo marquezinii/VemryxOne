@@ -11,6 +11,20 @@ namespace Vemryx.One.Tests.App;
 public sealed partial class LocalizedInterfaceContractTests
 {
     [Fact]
+    public void LocalizedRunBindings_AreOneWay()
+    {
+        var root = TestHelpers.FindRepositoryRoot();
+        var appDirectory = Path.Combine(root, "src", "Vemryx.One.App");
+        var violations = Directory
+            .EnumerateFiles(appDirectory, "*.xaml", SearchOption.AllDirectories)
+            .SelectMany(path => LocalizedRunWithoutOneWayPattern().Matches(File.ReadAllText(path)))
+            .Select(match => match.Value)
+            .ToArray();
+
+        Assert.Empty(violations);
+    }
+
+    [Fact]
     public void LocalizedXamlBindings_ResolveInEnglishAndPortuguese()
     {
         var root = TestHelpers.FindRepositoryRoot();
@@ -679,6 +693,9 @@ public sealed partial class LocalizedInterfaceContractTests
 
     [GeneratedRegex(@"<!--.*?-->", RegexOptions.Singleline | RegexOptions.CultureInvariant)]
     private static partial Regex XmlCommentPattern();
+
+    [GeneratedRegex(@"<Run\b[^>]*\bText=""\{Binding \[[^]]+\], Source=\{StaticResource LocalizedStrings\}(?![^""]*\bMode=OneWay)", RegexOptions.CultureInvariant)]
+    private static partial Regex LocalizedRunWithoutOneWayPattern();
 
     [GeneratedRegex(@"\[\s*(?<key>[A-Za-z0-9_.-]+)\s*\]", RegexOptions.CultureInvariant)]
     private static partial Regex LocalizedKeyPattern();

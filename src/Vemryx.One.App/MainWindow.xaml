@@ -75,7 +75,7 @@
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0,0,0">
                     <Image Source="Assets/VemryxOne.png" Width="24" Height="24" Stretch="Uniform" />
                     <TextBlock Margin="11,0,0,0" Style="{StaticResource BodyStrongText}" VerticalAlignment="Center" FontSize="15">
-                        <Run Text="{Binding [Brand.CompanyName], Source={StaticResource LocalizedStrings}}" /><Run Text="{Binding [Brand.ProductSuffix], Source={StaticResource LocalizedStrings}}" Foreground="{DynamicResource BrandInkBrush}" />
+                        <Run Text="{Binding [Brand.CompanyName], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /><Run Text="{Binding [Brand.ProductSuffix], Source={StaticResource LocalizedStrings}, Mode=OneWay}" Foreground="{DynamicResource BrandInkBrush}" />
                     </TextBlock>
 
                     <!--

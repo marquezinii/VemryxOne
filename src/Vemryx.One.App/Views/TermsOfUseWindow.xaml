@@ -32,42 +32,42 @@
         <Border Grid.Row="1" Background="{DynamicResource Surface1Brush}" BorderBrush="{DynamicResource BorderDefaultBrush}" BorderThickness="1" CornerRadius="{StaticResource RadiusXl}" Padding="4">
             <FlowDocumentScrollViewer VerticalScrollBarVisibility="Auto" IsToolBarVisible="False" Zoom="100">
                 <FlowDocument PagePadding="24,20" FontFamily="{StaticResource AppFontBody}" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}" LineHeight="18">
-                    <Paragraph Margin="0,0,0,14"><Run Text="{Binding [Terms.Intro], Source={StaticResource LocalizedStrings}}" /></Paragraph>
+                    <Paragraph Margin="0,0,0,14"><Run Text="{Binding [Terms.Intro], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
 
-                    <Paragraph FontSize="16" FontWeight="SemiBold" Margin="0,8,0,6"><Run Text="{Binding [Terms.Section1.Title], Source={StaticResource LocalizedStrings}}" /></Paragraph>
-                    <Paragraph Margin="0,0,0,14"><Run Text="{Binding [Terms.Service.Body], Source={StaticResource LocalizedStrings}}" /></Paragraph>
+                    <Paragraph FontSize="16" FontWeight="SemiBold" Margin="0,8,0,6"><Run Text="{Binding [Terms.Section1.Title], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
+                    <Paragraph Margin="0,0,0,14"><Run Text="{Binding [Terms.Service.Body], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
 
-                    <Paragraph FontSize="16" FontWeight="SemiBold" Margin="0,8,0,6"><Run Text="{Binding [Terms.Section2.Title], Source={StaticResource LocalizedStrings}}" /></Paragraph>
-                    <Paragraph Margin="0,0,0,14"><Run Text="{Binding [Terms.Section2.Body], Source={StaticResource LocalizedStrings}}" /></Paragraph>
+                    <Paragraph FontSize="16" FontWeight="SemiBold" Margin="0,8,0,6"><Run Text="{Binding [Terms.Section2.Title], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
+                    <Paragraph Margin="0,0,0,14"><Run Text="{Binding [Terms.Section2.Body], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
 
-                    <Paragraph FontSize="16" FontWeight="SemiBold" Margin="0,8,0,6"><Run Text="{Binding [Terms.Section3.Title], Source={StaticResource LocalizedStrings}}" /></Paragraph>
-                    <Paragraph Margin="0,0,0,14"><Run Text="{Binding [Terms.Section3.Body], Source={StaticResource LocalizedStrings}}" /></Paragraph>
+                    <Paragraph FontSize="16" FontWeight="SemiBold" Margin="0,8,0,6"><Run Text="{Binding [Terms.Section3.Title], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
+                    <Paragraph Margin="0,0,0,14"><Run Text="{Binding [Terms.Section3.Body], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
 
-                    <Paragraph FontSize="16" FontWeight="SemiBold" Margin="0,8,0,6"><Run Text="{Binding [Terms.Section4.Title], Source={StaticResource LocalizedStrings}}" /></Paragraph>
-                    <Paragraph Margin="0,0,0,8"><Run Text="{Binding [Terms.Section4.AccountData], Source={StaticResource LocalizedStrings}}" /></Paragraph>
-                    <Paragraph Margin="0,0,0,8"><Run Text="{Binding [Terms.Section4.Infrastructure], Source={StaticResource LocalizedStrings}}" /></Paragraph>
-                    <Paragraph Margin="0,0,0,14"><Run Text="{Binding [Terms.Privacy.Contact], Source={StaticResource LocalizedStrings}}" /></Paragraph>
+                    <Paragraph FontSize="16" FontWeight="SemiBold" Margin="0,8,0,6"><Run Text="{Binding [Terms.Section4.Title], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
+                    <Paragraph Margin="0,0,0,8"><Run Text="{Binding [Terms.Section4.AccountData], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
+                    <Paragraph Margin="0,0,0,8"><Run Text="{Binding [Terms.Section4.Infrastructure], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
+                    <Paragraph Margin="0,0,0,14"><Run Text="{Binding [Terms.Privacy.Contact], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
 
-                    <Paragraph FontSize="16" FontWeight="SemiBold" Margin="0,8,0,6"><Run Text="{Binding [Terms.Section5.Title], Source={StaticResource LocalizedStrings}}" /></Paragraph>
-                    <Paragraph Margin="0,0,0,14"><Run Text="{Binding [Terms.PermittedUse.Body], Source={StaticResource LocalizedStrings}}" /></Paragraph>
+                    <Paragraph FontSize="16" FontWeight="SemiBold" Margin="0,8,0,6"><Run Text="{Binding [Terms.Section5.Title], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
+                    <Paragraph Margin="0,0,0,14"><Run Text="{Binding [Terms.PermittedUse.Body], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
 
-                    <Paragraph FontSize="16" FontWeight="SemiBold" Margin="0,8,0,6"><Run Text="{Binding [Terms.Section6.Title], Source={StaticResource LocalizedStrings}}" /></Paragraph>
-                    <Paragraph Margin="0,0,0,14"><Run Text="{Binding [Terms.Section6.Body], Source={StaticResource LocalizedStrings}}" /></Paragraph>
+                    <Paragraph FontSize="16" FontWeight="SemiBold" Margin="0,8,0,6"><Run Text="{Binding [Terms.Section6.Title], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
+                    <Paragraph Margin="0,0,0,14"><Run Text="{Binding [Terms.Section6.Body], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
 
-                    <Paragraph FontSize="16" FontWeight="SemiBold" Margin="0,8,0,6"><Run Text="{Binding [Terms.Section7.Title], Source={StaticResource LocalizedStrings}}" /></Paragraph>
-                    <Paragraph Margin="0,0,0,14"><Run Text="{Binding [Terms.Section7.Body], Source={StaticResource LocalizedStrings}}" /></Paragraph>
+                    <Paragraph FontSize="16" FontWeight="SemiBold" Margin="0,8,0,6"><Run Text="{Binding [Terms.Section7.Title], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
+                    <Paragraph Margin="0,0,0,14"><Run Text="{Binding [Terms.Section7.Body], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
 
-                    <Paragraph FontSize="16" FontWeight="SemiBold" Margin="0,8,0,6"><Run Text="{Binding [Terms.Section8.Title], Source={StaticResource LocalizedStrings}}" /></Paragraph>
-                    <Paragraph Margin="0,0,0,14"><Run Text="{Binding [Terms.Warranty.Body], Source={StaticResource LocalizedStrings}}" /></Paragraph>
+                    <Paragraph FontSize="16" FontWeight="SemiBold" Margin="0,8,0,6"><Run Text="{Binding [Terms.Section8.Title], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
+                    <Paragraph Margin="0,0,0,14"><Run Text="{Binding [Terms.Warranty.Body], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
 
-                    <Paragraph FontSize="16" FontWeight="SemiBold" Margin="0,8,0,6"><Run Text="{Binding [Terms.Section9.Title], Source={StaticResource LocalizedStrings}}" /></Paragraph>
-                    <Paragraph Margin="0,0,0,14"><Run Text="{Binding [Terms.Section9.Body], Source={StaticResource LocalizedStrings}}" /></Paragraph>
+                    <Paragraph FontSize="16" FontWeight="SemiBold" Margin="0,8,0,6"><Run Text="{Binding [Terms.Section9.Title], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
+                    <Paragraph Margin="0,0,0,14"><Run Text="{Binding [Terms.Section9.Body], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
 
-                    <Paragraph FontSize="16" FontWeight="SemiBold" Margin="0,8,0,6"><Run Text="{Binding [Terms.Section10.Title], Source={StaticResource LocalizedStrings}}" /></Paragraph>
-                    <Paragraph Margin="0,0,0,14"><Run Text="{Binding [Terms.Section10.Body], Source={StaticResource LocalizedStrings}}" /></Paragraph>
+                    <Paragraph FontSize="16" FontWeight="SemiBold" Margin="0,8,0,6"><Run Text="{Binding [Terms.Section10.Title], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
+                    <Paragraph Margin="0,0,0,14"><Run Text="{Binding [Terms.Section10.Body], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
 
-                    <Paragraph FontSize="16" FontWeight="SemiBold" Margin="0,8,0,6"><Run Text="{Binding [Terms.Section11.Title], Source={StaticResource LocalizedStrings}}" /></Paragraph>
-                    <Paragraph Margin="0,0,0,0"><Run Text="{Binding [Terms.LawContact.Body], Source={StaticResource LocalizedStrings}}" /></Paragraph>
+                    <Paragraph FontSize="16" FontWeight="SemiBold" Margin="0,8,0,6"><Run Text="{Binding [Terms.Section11.Title], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
+                    <Paragraph Margin="0,0,0,0"><Run Text="{Binding [Terms.LawContact.Body], Source={StaticResource LocalizedStrings}, Mode=OneWay}" /></Paragraph>
                 </FlowDocument>
             </FlowDocumentScrollViewer>
         </Border>
