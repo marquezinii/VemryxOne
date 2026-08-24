@@ -135,7 +135,7 @@ Estes números são **referência do último estado validado**, não substituem 
 
 - **20/08/2026 — release pública v1.4.3:** build Release sem warnings, **972 testes .NET**, `dotnet format --verify-no-changes`, verificação de segurança, smoke pós-ofuscação do Otimizador e da Visão geral e checks remotos de .NET, site, Worker, dashboard, SBOM e CodeQL aprovados. O workflow estável também aprovou empacotamento endurecido, assinatura do broker, smoke pós-ofuscação, instalação/desinstalação, proveniência, criação da release e publicação do feed estável assinado do updater.
 
-- **22/08/2026 — integração atual:** build Release sem warnings, **978 testes .NET**, `dotnet format --verify-no-changes`, `scripts/Verify-Safety.ps1` e `git diff --check` aprovados; Worker com **199 testes** e `npm audit` sem vulnerabilidades; dashboard com **47 testes** e `npm audit` sem vulnerabilidades; site com typecheck, lint, build estático, **3 testes** e `npm audit` sem vulnerabilidades. O CI da branch de integração é a confirmação remota complementar deste baseline.
+- **24/08/2026 — integração atual:** build Release sem warnings, **1.000 testes .NET**, `dotnet format --verify-no-changes`, `scripts/Verify-Safety.ps1`, `scripts/Verify-Installer.ps1 -ScriptOnly` e `git diff --check` aprovados; Worker com **199 testes** e `npm audit` sem vulnerabilidades; dashboard com **49 testes** e `npm audit` sem vulnerabilidades; site com typecheck, lint, build estático, **3 testes** e `npm audit` sem vulnerabilidades. O CI da branch de integração é a confirmação remota complementar deste baseline.
 
 Ao alterar uma superfície, execute a validação aplicável novamente e use os resultados atuais no PR. Nunca use estes números para afirmar que código posterior foi testado.
 
