@@ -1,10 +1,10 @@
-# Design System: FiveMCleaner
+# Design System: Vemryx One
 
 <!--
 Adaptado do formato DESIGN.md (Google Labs) para um app WPF nativo: sem
 frontmatter YAML nem sidecar .impeccable/design.json (ambos pertencem ao
 painel/linter web da Stitch, sem equivalente aqui). Tokens reais vivem em
-XAML — `src/FiveMCleaner.App/Themes/` — este arquivo documenta o sistema
+XAML — `src/Vemryx.One.App/Themes/` — este arquivo documenta o sistema
 construído, não o substitui.
 -->
 

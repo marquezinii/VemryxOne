@@ -1,10 +1,10 @@
-O FiveMCleaner inclui o runtime do .NET e todas as dependências necessárias para
+O Vemryx One inclui o runtime do .NET e todas as dependências necessárias para
 executar o aplicativo no Windows 10 versão 2004 (build 19041) ou mais recente e
 no Windows 11, em sistemas compatíveis com x64. Nenhum runtime, script ou pacote
 adicional será baixado durante a instalação.
 
 O instalador é executado por usuário e não pede acesso administrativo. O
-FiveMCleaner solicita elevação somente quando uma otimização escolhida realmente
+Vemryx One solicita elevação somente quando uma otimização escolhida realmente
 precisa alterar uma configuração protegida do Windows.
 
 Configurações, logs, backups e atualizações baixadas ficam em
@@ -24,4 +24,4 @@ ou na release oficial:
 https://github.com/marquezinii/FiveMCleaner/releases
 
 Antes de executar, confira o arquivo .sha256 publicado junto do instalador:
-  (Get-FileHash .\FiveMCleaner-Setup-*-win-x64.exe -Algorithm SHA256).Hash
+  (Get-FileHash .\VemryxOne-Setup-*-win-x64.exe -Algorithm SHA256).Hash

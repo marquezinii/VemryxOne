@@ -14,7 +14,7 @@ $taskWorkspace = [System.IO.Path]::GetFullPath((Split-Path -Parent $PSScriptRoot
 # always reflects whichever checkout ran the install script most recently.
 $git = Get-Command git -ErrorAction SilentlyContinue
 if ($null -eq $git) {
-    throw 'Git is required to install the FiveMCleaner development shortcut.'
+    throw 'Git is required to install the Vemryx One development shortcut.'
 }
 
 $gitCommonDir = (& $git.Source -C $taskWorkspace rev-parse --git-common-dir 2>&1)
@@ -27,7 +27,7 @@ if (-not [System.IO.Path]::IsPathRooted($gitCommonDir)) {
 }
 $gitCommonDir = [System.IO.Path]::GetFullPath($gitCommonDir)
 $repositoryRoot = Split-Path -Parent $gitCommonDir
-$stableWorkspace = Join-Path (Split-Path -Parent $repositoryRoot) 'FiveMCleaner-dev-shortcut'
+$stableWorkspace = Join-Path (Split-Path -Parent $repositoryRoot) 'VemryxOne-dev-shortcut'
 
 if ($taskWorkspace -ne $stableWorkspace) {
     New-Item -ItemType Directory -Path $stableWorkspace -Force | Out-Null
@@ -40,17 +40,17 @@ if ($taskWorkspace -ne $stableWorkspace) {
 }
 
 $workspace = $stableWorkspace
-$projectPath = Join-Path $workspace 'src\FiveMCleaner.App\FiveMCleaner.App.csproj'
-$iconPath = Join-Path $workspace 'src\FiveMCleaner.App\Assets\FiveMCleaner.ico'
+$projectPath = Join-Path $workspace 'src\Vemryx.One.App\Vemryx.One.App.csproj'
+$iconPath = Join-Path $workspace 'src\Vemryx.One.App\Assets\VemryxOne.ico'
 $launcherPath = Join-Path $workspace 'scripts\Start-DevelopmentApp.ps1'
 
 if (-not (Test-Path -LiteralPath $projectPath -PathType Leaf)) {
-    throw "FiveMCleaner.App.csproj was not found under the expected workspace: $workspace"
+    throw "Vemryx.One.App.csproj was not found under the expected workspace: $workspace"
 }
 
 $dotnet = Get-Command dotnet -ErrorAction SilentlyContinue
 if ($null -eq $dotnet) {
-    throw 'The .NET SDK is required to install the FiveMCleaner development shortcut.'
+    throw 'The .NET SDK is required to install the Vemryx One development shortcut.'
 }
 
 $propertyOutput = @(& $dotnet.Source msbuild $projectPath -nologo `
@@ -106,17 +106,24 @@ if ([string]::IsNullOrWhiteSpace($desktopDirectory) -or
     throw 'Windows did not return a valid Desktop directory.'
 }
 
-$shortcutPath = Join-Path $desktopDirectory 'FiveMCleaner - Desenvolvimento.lnk'
+$shortcutPath = Join-Path $desktopDirectory 'Vemryx One - Desenvolvimento.lnk'
 if (-not $PSCmdlet.ShouldProcess($shortcutPath, 'Create or update the real development shortcut')) {
     Write-Host "Target: $launcherPath"
     return
 }
 
-$legacyShortcutPath = Join-Path $desktopDirectory 'FiveMCleaner - Simulacao.lnk'
-if (Test-Path -LiteralPath $legacyShortcutPath -PathType Leaf) {
+$legacyShortcutPaths = @(
+    (Join-Path $desktopDirectory 'FiveMCleaner - Desenvolvimento.lnk'),
+    (Join-Path $desktopDirectory 'FiveMCleaner - Simulacao.lnk')
+)
+foreach ($legacyShortcutPath in $legacyShortcutPaths) {
+    if (-not (Test-Path -LiteralPath $legacyShortcutPath -PathType Leaf)) {
+        continue
+    }
+
     $shortcutBackupDirectory = Join-Path $workspace 'artifacts\desktop-shortcut-backup'
     New-Item -ItemType Directory -Path $shortcutBackupDirectory -Force | Out-Null
-    $legacyBackupPath = Join-Path $shortcutBackupDirectory 'FiveMCleaner - Simulacao.lnk'
+    $legacyBackupPath = Join-Path $shortcutBackupDirectory (Split-Path -Leaf $legacyShortcutPath)
     Move-Item -LiteralPath $legacyShortcutPath -Destination $legacyBackupPath -Force
 }
 
@@ -134,7 +141,7 @@ try {
     $shortcut.Arguments = "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$launcherPath`""
     $shortcut.WorkingDirectory = $workspace
     $shortcut.IconLocation = "$iconPath,0"
-    $shortcut.Description = 'FiveMCleaner - desenvolvimento local com build Release atualizado'
+    $shortcut.Description = 'Vemryx One - desenvolvimento local com build Release atualizado'
     $shortcut.WindowStyle = 7
     $shortcut.Save()
 }

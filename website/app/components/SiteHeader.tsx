@@ -16,7 +16,7 @@ export function SiteHeader({
   return (
       <header className="site-header">
         <div className="header-inner">
-          <a className="brand" href="#top" aria-label="FiveMCleaner">
+          <a className="brand" href="#top" aria-label="Vemryx One">
             <Image src={ICON_URL} width={38} height={38} alt="" unoptimized priority />
             <span>FiveM<span>Cleaner</span></span>
           </a>

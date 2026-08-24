@@ -5,11 +5,11 @@
 
 ## 1. Snapshot
 
-- **Produto:** FiveMCleaner, aplicativo desktop Windows para otimização transparente, reversível e orientada por diagnóstico do FiveM para **GTAV Legacy**.
+- **Produto:** Vemryx One, aplicativo desktop Windows para otimização transparente, reversível e orientada por diagnóstico do FiveM para **GTAV Legacy**.
 - **Integração:** `dev/proxima-versao` é a branch de integração da próxima versão; `main` representa a linha pública/estável. O fluxo de branches, worktrees, Pull Requests, integração e release é definido em `AI_RULES.md`.
 - **Último estado consolidado neste documento-fonte:** 22/08/2026, após integrar as mudanças de autenticação, dashboard e identidade institucional na próxima versão. Antes de qualquer trabalho, confirme o estado real com Git e os testes atuais.
 - **Release pública atual:** `v1.4.3`, publicada em 20/08/2026 a partir do commit `aadf755` em `main`. O runtime assinado, instalador, hashes, manifesto e feed estável do updater foram publicados e validados.
-- **Atalho de desenvolvimento:** `FiveMCleaner - Desenvolvimento` usa `scripts\Start-DevelopmentApp.ps1`. Conforme `AI_RULES.md`, deve ser reconstruído com `scripts\Install-DevelopmentShortcut.ps1 -Build` (executado a partir do checkout/worktree da própria tarefa) ao final de toda tarefa que gerar mudanças no app — isolada ou de integração —, exceto tarefas de instalador/updater. O script espelha a árvore de trabalho atual para a pasta irmã fixa `FiveMCleaner-dev-shortcut` e aponta o atalho para essa cópia estável, então ele nunca fica órfão quando um worktree de tarefa é removido após o merge.
+- **Atalho de desenvolvimento:** `Vemryx One - Desenvolvimento` usa `scripts\Start-DevelopmentApp.ps1`. Conforme `AI_RULES.md`, deve ser reconstruído com `scripts\Install-DevelopmentShortcut.ps1 -Build` (executado a partir do checkout/worktree da própria tarefa) ao final de toda tarefa que gerar mudanças no app — isolada ou de integração —, exceto tarefas de instalador/updater. O script espelha a árvore de trabalho atual para a pasta irmã fixa `VemryxOne-dev-shortcut` e aponta o atalho para essa cópia estável, então ele nunca fica órfão quando um worktree de tarefa é removido após o merge.
 
 ## 2. Objetivo e invariantes de segurança
 
@@ -30,19 +30,19 @@ Documentos normativos: `docs/safety.md` e `docs/architecture.md`.
 
 ### Solução .NET
 
-`FiveMCleaner.slnx` separa responsabilidades. A árvore de `src/` possui nove projetos principais:
+`Vemryx.One.slnx` separa responsabilidades. A árvore de `src/` possui nove projetos principais:
 
-- `FiveMCleaner.App` — WPF, navegação, localização, tema, conta, apresentação, progresso e interação.
-- `FiveMCleaner.Contracts` — DTOs, IDs, enums e contratos compartilhados; os estados persistidos de transação e journal são contratos duráveis append-only.
-- `FiveMCleaner.Core` — catálogo de ações, perfis, planejamento e regras independentes de Windows/UI; o planejamento é puro e recebe explicitamente suas entradas variáveis.
-- `FiveMCleaner.Windows` — descoberta e adaptadores Windows, filesystem, registro, diagnósticos e ações permitidas.
-- `FiveMCleaner.Broker` — processo administrativo efêmero e allowlisted; sem shell/comandos arbitrários.
-- `FiveMCleaner.Launcher` — inicialização/ativação do runtime e coordenação do fluxo de atualização.
-- `FiveMCleaner.Updater` — atualização independente e staging/aplicação da atualização.
-- `FiveMCleaner.UpdateRuntime` — contratos/estado durável usados pela cadeia de atualização e recuperação.
-- `FiveMCleaner.ReleaseTool` — suporte à preparação/validação de artefatos de release.
+- `Vemryx.One.App` — WPF, navegação, localização, tema, conta, apresentação, progresso e interação.
+- `Vemryx.One.Contracts` — DTOs, IDs, enums e contratos compartilhados; os estados persistidos de transação e journal são contratos duráveis append-only.
+- `Vemryx.One.Core` — catálogo de ações, perfis, planejamento e regras independentes de Windows/UI; o planejamento é puro e recebe explicitamente suas entradas variáveis.
+- `Vemryx.One.Windows` — descoberta e adaptadores Windows, filesystem, registro, diagnósticos e ações permitidas.
+- `Vemryx.One.Broker` — processo administrativo efêmero e allowlisted; sem shell/comandos arbitrários.
+- `Vemryx.One.Launcher` — inicialização/ativação do runtime e coordenação do fluxo de atualização.
+- `Vemryx.One.Updater` — atualização independente e staging/aplicação da atualização.
+- `Vemryx.One.UpdateRuntime` — contratos/estado durável usados pela cadeia de atualização e recuperação.
+- `Vemryx.One.ReleaseTool` — suporte à preparação/validação de artefatos de release.
 
-Testes .NET ficam em `tests/FiveMCleaner.Tests/`.
+Testes .NET ficam em `tests/Vemryx.One.Tests/`.
 
 A toolchain integrada usa .NET 10 LTS com SDK 10.0.303, C# 14 fixo e NuGet Central Package Management em `Directory.Packages.props`. Os testes usam xUnit v3 sobre Microsoft Testing Platform, com cobertura via `coverlet.MTP`.
 
@@ -115,14 +115,14 @@ Preferências, journals, solicitações efêmeras, filas e logs locais ficam sob
 - Cadeia de atualização é independente/transacional, com staging, validações de origem/integridade, estado durável, health receipt, recuperação/rollback e proteção contra downgrade conforme documentação específica.
 - Launcher/Updater tratam locks transitórios e corridas de processo; broker e fluxos elevados possuem timeouts para evitar bloqueio indefinido. Espera pelo processo pai é compartilhada entre Launcher e Updater via `ParentProcessWait` (UpdateRuntime); hashing/extração/verificação de pacote roda fora da UI thread com `CancellationToken` propagado; comparação de hash do manifesto é em tempo constante; `RecoveryCoordinator` completa journals órfãos quando o piso anti-downgrade já avançou por outro caminho.
 - Instalador Inno Setup 7 é self-contained `win-x64`, usa setup x64 e mantém tarefas como atalho e startup configuráveis no modo interativo.
-- Pipeline de endurecimento por ofuscação da release (`scripts/Invoke-Obfuscation.ps1`, config em `build/obfuscation/FiveMCleaner.Obfuscar.xml`): ofusca Core/Windows embutidos no bundle single-file do Launcher; `scripts/Test-HardenedRuntime.ps1`/`scripts/Test-NoUnobfuscatedAssemblies.ps1` validam determinismo e ausência de assemblies não ofuscados; gate fail-closed integrado a `scripts/Build-Portable.ps1`/`Build-Installer.ps1` e ao workflow de release. Ver `docs/release-hardening.md`.
+- Pipeline de endurecimento por ofuscação da release (`scripts/Invoke-Obfuscation.ps1`, config em `build/obfuscation/VemryxOne.Obfuscar.xml`): ofusca Core/Windows embutidos no bundle single-file do Launcher; `scripts/Test-HardenedRuntime.ps1`/`scripts/Test-NoUnobfuscatedAssemblies.ps1` validam determinismo e ausência de assemblies não ofuscados; gate fail-closed integrado a `scripts/Build-Portable.ps1`/`Build-Installer.ps1` e ao workflow de release. Ver `docs/release-hardening.md`.
 - Site público, README, instalador, manifesto/checksums e release devem permanecer coerentes com a versão realmente publicada.
 
 ## 5. Pendências e decisões abertas
 
 Somente itens ainda relevantes devem permanecer aqui. Quando resolvidos e integrados, remova-os em vez de criar uma cronologia.
 
-1. **Ideia futura — watcher de sessão FiveM/GTA** (não é uma decisão bloqueada, é backlog de funcionalidade): ajustes que precisariam ser aplicados/restaurados durante o ciclo de vida do jogo (prioridade, afinidade, core parking, timer resolution e semelhantes) são um candidato de funcionalidade futura. Continuam fora do catálogo até existir uma arquitetura segura de monitoramento e reversão mesmo se o FiveMCleaner for encerrado. Ver `docs/graphics-optimizations-backlog.md` para o design ainda a amadurecer.
+1. **Ideia futura — watcher de sessão FiveM/GTA** (não é uma decisão bloqueada, é backlog de funcionalidade): ajustes que precisariam ser aplicados/restaurados durante o ciclo de vida do jogo (prioridade, afinidade, core parking, timer resolution e semelhantes) são um candidato de funcionalidade futura. Continuam fora do catálogo até existir uma arquitetura segura de monitoramento e reversão mesmo se o Vemryx One for encerrado. Ver `docs/graphics-optimizations-backlog.md` para o design ainda a amadurecer.
 2. **GTAV Enhanced** — sem suporte operacional; requer adaptador/projeto específico antes de habilitar qualquer ação.
 3. **Authenticode público** — executáveis e instalador ainda não possuem assinatura de publisher confiável; a implementação depende de certificado/conta externa e deve assinar antes dos hashes e manifestos finais.
 4. **Próximas majors do frontend** — TypeScript 7 ainda excede o peer range suportado pelo `typescript-eslint` vigente, e ESLint 10 ainda não é aceito por plugins do stack Next. O estado suportado permanece TypeScript 6 e ESLint 9 até os peers oficiais convergirem.
@@ -144,10 +144,10 @@ Ao alterar uma superfície, execute a validação aplicável novamente e use os 
 Na raiz:
 
 ```powershell
-dotnet restore FiveMCleaner.slnx
-dotnet build FiveMCleaner.slnx --configuration Release --no-restore
-dotnet test FiveMCleaner.slnx --configuration Release --no-build
-dotnet format FiveMCleaner.slnx --verify-no-changes
+dotnet restore Vemryx.One.slnx
+dotnet build Vemryx.One.slnx --configuration Release --no-restore
+dotnet test Vemryx.One.slnx --configuration Release --no-build
+dotnet format Vemryx.One.slnx --verify-no-changes
 .\scripts\Verify-Safety.ps1
 git diff --check
 .\scripts\Start-DevelopmentApp.ps1

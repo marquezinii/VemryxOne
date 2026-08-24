@@ -22,8 +22,8 @@ export default function Home() {
   useEffect(() => {
     document.documentElement.lang = language === "pt" ? "pt-BR" : "en";
     document.title = language === "pt"
-      ? "FiveMCleaner — Otimização transparente para FiveM"
-      : "FiveMCleaner — Transparent optimization for FiveM";
+      ? "Vemryx One — Otimização transparente para FiveM"
+      : "Vemryx One — Transparent optimization for FiveM";
   }, [language]);
 
   return (

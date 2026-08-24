@@ -18,7 +18,7 @@ planos gratuitos, sujeitos aos limites documentados desses provedores.
 Não usar pinning de certificado TLS da Cloudflare ou do GitHub. Certificados
 de borda podem ser rotacionados legitimamente. A cadeia de confiança terá dois
 controles independentes: TLS padrão do Windows, com validação e revogação, e
-assinatura de código/manifesto com chave pública fixa do FiveMCleaner.
+assinatura de código/manifesto com chave pública fixa do Vemryx One.
 
 ## Cadeia de confiança
 

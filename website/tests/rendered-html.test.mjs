@@ -4,12 +4,12 @@ import test from "node:test";
 
 const outputRoot = new URL("../out/", import.meta.url);
 
-test("exports the Portuguese FiveMCleaner landing page", async () => {
+test("exports the Portuguese Vemryx One landing page", async () => {
   const html = await readFile(new URL("index.html", outputRoot), "utf8");
 
   assert.match(
     html,
-    /<title>FiveMCleaner — Otimização transparente para FiveM<\/title>/i,
+    /<title>Vemryx One — Otimização transparente para FiveM<\/title>/i,
   );
   assert.match(html, /lang="pt-BR"/i);
   assert.match(html, /Seu FiveM mais fluido\./i);
@@ -43,7 +43,7 @@ test("uses native Next static export as the only website build", async () => {
     copy,
     /https:\/\/github\.com\/marquezinii\/FiveMCleaner\/releases\/latest/,
   );
-  assert.match(layout, /title: "FiveMCleaner/);
+  assert.match(layout, /title: "Vemryx One/);
   assert.match(nextConfig, /output: "export"/);
   assert.match(nextConfig, /basePath/);
   assert.doesNotMatch(packageJson, /vinext|vite|wrangler|cloudflare/i);
@@ -63,7 +63,7 @@ test("keeps the exported download page aligned with the official release channel
 
   assert.match(
     html,
-    /https:\/\/github\.com\/marquezinii\/FiveMCleaner\/releases\/latest\/download\/FiveMCleaner-Setup-latest-win-x64\.exe/i,
+    /https:\/\/github\.com\/marquezinii\/FiveMCleaner\/releases\/latest\/download\/VemryxOne-Setup-latest-win-x64\.exe/i,
   );
   assert.match(html, /GitHub Releases · sem cadastro/i);
   assert.match(html, /Rollback disponível/i);
@@ -72,4 +72,7 @@ test("keeps the exported download page aligned with the official release channel
     /property="og:image" content="https:\/\/marquezinii\.github\.io\/FiveMCleaner\/og\.png"/i,
   );
   assert.match(styles, /@media \(prefers-reduced-motion: reduce\)/i);
+  assert.match(styles, /--background:\s*#0B0D12/i);
+  assert.match(styles, /--brand:\s*#4B64F2/i);
+  assert.doesNotMatch(styles, /--orange|#ff6a00|rgba\(249,\s*115,\s*22/i);
 });

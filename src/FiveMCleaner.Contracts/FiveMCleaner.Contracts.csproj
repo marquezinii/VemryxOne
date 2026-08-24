@@ -1,6 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>$(FiveMCleanerTargetFramework)</TargetFramework>
-    <RootNamespace>FiveMCleaner.Contracts</RootNamespace>
-  </PropertyGroup>
-</Project>

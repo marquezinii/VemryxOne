@@ -8,7 +8,7 @@ export function SiteFooter({ text }: { text: Copy }) {
       <footer className="site-footer">
         <div className="section-shell footer-top">
           <div>
-            <a className="brand footer-brand" href="#top" aria-label="FiveMCleaner">
+            <a className="brand footer-brand" href="#top" aria-label="Vemryx One">
               <Image src={ICON_URL} width={42} height={42} alt="" unoptimized />
               <span>FiveM<span>Cleaner</span></span>
             </a>

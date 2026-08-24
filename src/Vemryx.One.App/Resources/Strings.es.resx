@@ -1,0 +1,883 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="Navigation.Section" xml:space="preserve"><value>NAVEGACIÓN</value></data>
+  <data name="Navigation.Overview" xml:space="preserve"><value>Resumen</value></data>
+  <data name="Navigation.Optimizer" xml:space="preserve"><value>Optimizador</value></data>
+  <data name="Navigation.History" xml:space="preserve"><value>Historial</value></data>
+  <data name="Navigation.Settings" xml:space="preserve"><value>Configuración</value></data>
+  <data name="Safety.Active" xml:space="preserve"><value>Protección activa</value></data>
+  <data name="Safety.SnapshotRollback" xml:space="preserve"><value>Instantánea y reversión antes de los cambios.</value></data>
+  <data name="BugReport.Link" xml:space="preserve"><value>Reportar un error</value></data>
+  <data name="BugReport.LinkTooltip" xml:space="preserve"><value>Abrir formulario de reporte de errores</value></data>
+  <data name="Dashboard.Title" xml:space="preserve"><value>Resumen</value></data>
+  <data name="Dashboard.Subtitle" xml:space="preserve"><value>Estado de la PC, compatibilidad y el próximo paso recomendado.</value></data>
+  <data name="Greeting.Morning.WithName" xml:space="preserve"><value>Buenos días, {0}. ¿Qué haremos hoy?</value></data>
+  <data name="Greeting.Morning.NoName" xml:space="preserve"><value>Buenos días. ¿Qué haremos hoy?</value></data>
+  <data name="Greeting.Afternoon.WithName" xml:space="preserve"><value>Buenas tardes, {0}. ¿Qué haremos hoy?</value></data>
+  <data name="Greeting.Afternoon.NoName" xml:space="preserve"><value>Buenas tardes. ¿Qué haremos hoy?</value></data>
+  <data name="Greeting.Evening.WithName" xml:space="preserve"><value>Buenas noches, {0}. ¿Qué haremos hoy?</value></data>
+  <data name="Greeting.Evening.NoName" xml:space="preserve"><value>Buenas noches. ¿Qué haremos hoy?</value></data>
+  <data name="Settings.About.Title" xml:space="preserve"><value>Acerca de</value></data>
+  <data name="Settings.About.Description" xml:space="preserve"><value>Qué es Vemryx One, quién lo desarrolla y dónde encontrar ayuda.</value></data>
+  <data name="Settings.About.AppName" xml:space="preserve"><value>Vemryx One</value></data>
+  <data name="Settings.About.Tagline" xml:space="preserve"><value>Tu PC, simplificado.</value></data>
+  <data name="Settings.About.Repository" xml:space="preserve"><value>Código fuente en GitHub</value></data>
+  <data name="Settings.About.Changelog" xml:space="preserve"><value>Historial de versiones</value></data>
+  <data name="Settings.About.Discord.Title" xml:space="preserve"><value>Únete a nuestro Discord oficial</value></data>
+  <data name="Settings.About.Discord.Detail" xml:space="preserve"><value>Resuelve dudas, sigue las novedades y habla con otros usuarios de Vemryx One.</value></data>
+  <data name="Settings.About.Discord.Action" xml:space="preserve"><value>Abrir Discord</value></data>
+  <data name="Discord.TitleBarTooltip" xml:space="preserve"><value>Únete a nuestro Discord oficial</value></data>
+  <data name="LiveAlert.Dismiss" xml:space="preserve"><value>Cerrar</value></data>
+  <data name="Account.TitleBar.SignInPrompt" xml:space="preserve"><value>Iniciar sesión / Registrarse</value></data>
+  <data name="Dashboard.Refresh" xml:space="preserve"><value>Escanear PC de nuevo</value></data>
+  <data name="Dashboard.OpenOptimizer" xml:space="preserve"><value>Abrir optimizador</value></data>
+  <data name="Dashboard.SystemOverview" xml:space="preserve"><value>Tu computadora</value></data>
+  <data name="Dashboard.Readiness" xml:space="preserve"><value>PREPARACIÓN</value></data>
+  <data name="Dashboard.Processor" xml:space="preserve"><value>PROCESADOR</value></data>
+  <data name="Dashboard.GraphicsCard" xml:space="preserve"><value>TARJETA GRÁFICA</value></data>
+  <data name="Dashboard.Memory" xml:space="preserve"><value>MEMORIA</value></data>
+  <data name="Dashboard.Storage" xml:space="preserve"><value>ALMACENAMIENTO</value></data>
+  <data name="Dashboard.Windows" xml:space="preserve"><value>WINDOWS</value></data>
+  <data name="Dashboard.Architecture" xml:space="preserve"><value>ARQUITECTURA DEL SISTEMA</value></data>
+  <data name="Dashboard.ReadinessExplanation" xml:space="preserve"><value>Basado en la memoria libre, el procesador, el espacio en disco y lo que se encontró del FiveM en esta máquina. No es una promesa de FPS.</value></data>
+  <data name="Profiles.Choose" xml:space="preserve"><value>Elige un nivel</value></data>
+  <data name="Profiles.RecommendedHint" xml:space="preserve"><value>Se recomienda Equilibrado para la mayoría de las PC.</value></data>
+  <data name="Profiles.Light.Name" xml:space="preserve"><value>Ligero</value></data>
+  <data name="Profiles.Light.Badge" xml:space="preserve"><value>VISUALES PRESERVADOS</value></data>
+  <data name="Profiles.Light.Description" xml:space="preserve"><value>Ajustes suaves con reducciones limitadas a efectos visuales costosos.</value></data>
+  <data name="Profiles.Balanced.Name" xml:space="preserve"><value>Equilibrado</value></data>
+  <data name="Profiles.RecommendedBadge" xml:space="preserve"><value>RECOMENDADO</value></data>
+  <data name="Profiles.MayRequireElevation" xml:space="preserve"><value>Puede solicitar confirmación de Administrador de Windows (UAC)</value></data>
+  <data name="Profiles.Balanced.Description" xml:space="preserve"><value>Un equilibrio entre calidad de imagen, potencia, captura y capacidad de respuesta.</value></data>
+  <data name="Profiles.Aggressive.Name" xml:space="preserve"><value>Agresivo</value></data>
+  <data name="Profiles.Aggressive.Badge" xml:space="preserve"><value>FPS PRIMERO</value></data>
+  <data name="Profiles.Aggressive.Description" xml:space="preserve"><value>Reduce efectos y configuraciones costosas para PC limitadas.</value></data>
+  <data name="Plan.VerifiedActions" xml:space="preserve"><value>{0} acciones verificadas  •  {1}</value></data>
+  <data name="Plan.Review" xml:space="preserve"><value>Revisar plan</value></data>
+  <data name="Plan.OptimizeNow" xml:space="preserve"><value>Optimizar ahora</value></data>
+  <data name="Optimizer.Title" xml:space="preserve"><value>Optimizador de FiveM</value></data>
+  <data name="Optimizer.Subtitle" xml:space="preserve"><value>Prepara tu equipo para jugar con menos interrupciones, procesos innecesarios y problemas de caché.</value></data>
+  <data name="Optimizer.NoRemoteScripts" xml:space="preserve"><value>100% LOCAL</value></data>
+  <data name="Optimizer.SystemReady" xml:space="preserve"><value>Sistema listo</value></data>
+  <data name="Optimizer.Recommended" xml:space="preserve"><value>OPTIMIZACIÓN RECOMENDADA</value></data>
+  <data name="Optimizer.Computer" xml:space="preserve"><value>Tu equipo</value></data>
+  <data name="Optimizer.Impact" xml:space="preserve"><value>IMPACTO ESPERADO</value></data>
+  <data name="Optimizer.Execution" xml:space="preserve"><value>EJECUCIÓN</value></data>
+  <data name="Optimizer.ChangeMode" xml:space="preserve"><value>Cambiar modo</value></data>
+  <data name="Optimizer.RunningTitle" xml:space="preserve"><value>Optimizando tu equipo</value></data>
+  <data name="Optimizer.ShowDetails" xml:space="preserve"><value>Mostrar detalles</value></data>
+  <data name="Optimizer.CompletedTitle" xml:space="preserve"><value>Optimización completada</value></data>
+  <data name="Optimizer.Result.Failed" xml:space="preserve"><value>La optimización no se completó</value></data>
+  <data name="Optimizer.Result.PartialTitle" xml:space="preserve"><value>Completado con errores</value></data>
+  <data name="Optimizer.NextStep" xml:space="preserve"><value>SIGUIENTE PASO RECOMENDADO</value></data>
+  <data name="Optimizer.PlanTitle" xml:space="preserve"><value>Plan de optimización</value></data>
+  <data name="Optimizer.Table.Action" xml:space="preserve"><value>ACCIÓN</value></data>
+  <data name="Optimizer.Table.Description" xml:space="preserve"><value>QUÉ HACE</value></data>
+  <data name="Optimizer.Table.Risk" xml:space="preserve"><value>RIESGO</value></data>
+  <data name="Optimizer.Table.Privilege" xml:space="preserve"><value>EJECUCIÓN</value></data>
+  <data name="Optimizer.CurrentPlan" xml:space="preserve"><value>Plan actual</value></data>
+  <data name="Optimizer.RunPlan" xml:space="preserve"><value>Ejecutar plan</value></data>
+  <data name="Progress.Title" xml:space="preserve"><value>Progreso</value></data>
+  <data name="Progress.CancelAfterStep" xml:space="preserve"><value>Cancelar después de este paso</value></data>
+  <data name="Progress.Elapsed" xml:space="preserve"><value>Transcurrido: {0}</value></data>
+  <data name="Progress.Remaining" xml:space="preserve"><value>Quedan aproximadamente {0}</value></data>
+  <data name="Progress.Calculating" xml:space="preserve"><value>Calculando estimación...</value></data>
+  <data name="History.Title" xml:space="preserve"><value>Historial</value></data>
+  <data name="History.Subtitle" xml:space="preserve"><value>Cada ejecución registra acciones, resultados y el estado necesario para revertir.</value></data>
+  <data name="History.OpenLogs" xml:space="preserve"><value>Abrir carpeta de registros</value></data>
+  <data name="History.LocalRuns" xml:space="preserve"><value>Ejecuciones locales</value></data>
+  <data name="History.Undo" xml:space="preserve"><value>Deshacer</value></data>
+  <data name="History.Table.Date" xml:space="preserve"><value>FECHA</value></data>
+  <data name="History.Table.Run" xml:space="preserve"><value>EJECUCIÓN</value></data>
+  <data name="History.Table.Summary" xml:space="preserve"><value>RESULTADO</value></data>
+  <data name="History.Table.Action" xml:space="preserve"><value>ROLLBACK</value></data>
+  <data name="History.Notes.Title" xml:space="preserve"><value>Qué registra cada ejecución</value></data>
+  <data name="History.Notes.Recorded" xml:space="preserve"><value>Las acciones aplicadas, el resultado tipado de cada una y el snapshot necesario para deshacer.</value></data>
+  <data name="History.Notes.Rollback" xml:space="preserve"><value>El rollback restaura solo lo que esa ejecución cambió y conserva lo que modificaste después.</value></data>
+  <data name="History.Notes.Local" xml:space="preserve"><value>Todo permanece en este equipo, en la carpeta local de datos de la aplicación.</value></data>
+  <data name="Settings.Title" xml:space="preserve"><value>Configuración</value></data>
+  <data name="Settings.Subtitle" xml:space="preserve"><value>Personaliza la aplicación sin debilitar el perfil de optimización seleccionado.</value></data>
+  <data name="Settings.General.Title" xml:space="preserve"><value>General</value></data>
+  <data name="Settings.Language.Title" xml:space="preserve"><value>Idioma</value></data>
+  <data name="Settings.Language.Description" xml:space="preserve"><value>Detectado desde Windows en el primer inicio. Puedes cambiarlo en cualquier momento.</value></data>
+  <data name="Settings.Language.English" xml:space="preserve"><value>English</value></data>
+  <data name="Settings.Language.PortugueseBrazil" xml:space="preserve"><value>Português (Brasil)</value></data>
+  <data name="Settings.Language.Spanish" xml:space="preserve"><value>Español</value></data>
+  <data name="Settings.Appearance.Title" xml:space="preserve"><value>Apariencia</value></data>
+  <data name="Settings.Appearance.Description" xml:space="preserve"><value>Elige un tema o sigue automáticamente a Windows.</value></data>
+  <data name="Settings.Appearance.System" xml:space="preserve"><value>Sistema</value></data>
+  <data name="Settings.Appearance.Dark" xml:space="preserve"><value>Oscuro</value></data>
+  <data name="Settings.Appearance.Light" xml:space="preserve"><value>Claro</value></data>
+  <data name="Settings.CloseBehavior.Title" xml:space="preserve"><value>Minimizar a la bandeja del sistema</value></data>
+  <data name="Settings.CloseBehavior.Close" xml:space="preserve"><value>Salir de Vemryx One</value></data>
+  <data name="Settings.CloseBehavior.Tray" xml:space="preserve"><value>Mantener en ejecución en el área de notificación</value></data>
+  <data name="Settings.StartWithWindows.Title" xml:space="preserve"><value>Iniciar con Windows</value></data>
+  <data name="Settings.StartWithWindows.Description" xml:space="preserve"><value>Abrir Vemryx One después de iniciar sesión.</value></data>
+  <data name="Safety.Limits.Title" xml:space="preserve"><value>Límites de seguridad</value></data>
+  <data name="Safety.Limits.Description" xml:space="preserve"><value>Vemryx One nunca deshabilita Defender, el Firewall, UAC, Windows Update, el archivo de paginación o servicios críticos; no usa BCDEdit/HPET, inyección, hooks ni prioridad en tiempo real.</value></data>
+  <data name="Safety.EnhancedBlocked" xml:space="preserve"><value>FiveM Enhanced: bloqueado en esta versión hasta que se pruebe su diseño oficial.</value></data>
+  <data name="About.Title" xml:space="preserve"><value>Acerca de Vemryx One</value></data>
+  <data name="About.VersionDeveloper" xml:space="preserve"><value>Versión {0}  •  Vemryx</value></data>
+  <data name="About.Copyright" xml:space="preserve"><value>© 2026 Vemryx. Todos los derechos reservados.</value></data>
+  <data name="About.License" xml:space="preserve"><value>Código fuente disponible bajo la Licencia de Código Disponible de Vemryx One. Proyecto independiente, no afiliado a Cfx.re, Rockstar Games ni Microsoft.</value></data>
+  <data name="About.OpenGitHub" xml:space="preserve"><value>Abrir GitHub</value></data>
+  <data name="Sidebar.Version" xml:space="preserve"><value>VERSIÓN</value></data>
+  <data name="BugReport.WindowTitle" xml:space="preserve"><value>Reportar un error — Vemryx One</value></data>
+  <data name="BugReport.FormLanguage" xml:space="preserve"><value>Formulario de reporte de errores</value></data>
+  <data name="BugReport.Heading" xml:space="preserve"><value>Cuéntanos qué pasó</value></data>
+  <data name="BugReport.Intro" xml:space="preserve"><value>Los pasos claros nos ayudan a reproducir y solucionar el problema más rápido.</value></data>
+  <data name="BugReport.Privacy" xml:space="preserve"><value>No pedimos nombre ni correo electrónico. El servicio de entrega puede registrar la dirección IP y datos técnicos de conexión por seguridad. Elimina la información personal de la imagen antes de enviarla.</value></data>
+  <data name="BugReport.Category.Label" xml:space="preserve"><value>Tipo de problema *</value></data>
+  <data name="BugReport.Category.Optimization" xml:space="preserve"><value>Optimización</value></data>
+  <data name="BugReport.Category.Games" xml:space="preserve"><value>FiveM / GTA V</value></data>
+  <data name="BugReport.Category.Windows" xml:space="preserve"><value>Windows / UAC</value></data>
+  <data name="BugReport.Category.Interface" xml:space="preserve"><value>Interfaz</value></data>
+  <data name="BugReport.Category.Crash" xml:space="preserve"><value>Falla / cierre inesperado</value></data>
+  <data name="BugReport.Category.Other" xml:space="preserve"><value>Otro</value></data>
+  <data name="BugReport.Summary.Label" xml:space="preserve"><value>Resumen *</value></data>
+  <data name="BugReport.Summary.Tooltip" xml:space="preserve"><value>Entre 5 y 120 caracteres</value></data>
+  <data name="BugReport.Summary.Example" xml:space="preserve"><value>Ejemplo: el perfil Equilibrado se detuvo en el paso de energía</value></data>
+  <data name="BugReport.Description.Label" xml:space="preserve"><value>Descripción, pasos y resultado esperado *</value></data>
+  <data name="BugReport.Description.Tooltip" xml:space="preserve"><value>Entre 20 y 8000 caracteres</value></data>
+  <data name="BugReport.Description.Help" xml:space="preserve"><value>Explica qué hiciste, qué apareció y qué debería haber pasado.</value></data>
+  <data name="BugReport.Log.Label" xml:space="preserve"><value>Fragmento de registro (opcional)</value></data>
+  <data name="BugReport.Log.Tooltip" xml:space="preserve"><value>Hasta 100 KB de texto plano</value></data>
+  <data name="BugReport.Log.Help" xml:space="preserve"><value>Pega un fragmento de registro relevante si lo tienes. Elimina primero cualquier dato personal — ya no hay soporte para adjuntos o capturas de pantalla.</value></data>
+  <data name="BugReport.Email.Label" xml:space="preserve"><value>Correo electrónico (opcional)</value></data>
+  <data name="BugReport.Email.Tooltip" xml:space="preserve"><value>Solo si quieres que te contactemos</value></data>
+  <data name="BugReport.Email.Help" xml:space="preserve"><value>Nunca es obligatorio. Solo se usa si necesitamos hacer una pregunta de seguimiento sobre este reporte.</value></data>
+  <data name="BugReport.Technical.Title" xml:space="preserve"><value>Incluir información técnica básica</value></data>
+  <data name="BugReport.Technical.Help" xml:space="preserve"><value>Solo versión de la app, Windows, edición detectada y perfil. Sin nombre, usuario, nombre de equipo, rutas o servidor.</value></data>
+  <data name="BugReport.Copy" xml:space="preserve"><value>Copiar reporte</value></data>
+  <data name="BugReport.Cancel" xml:space="preserve"><value>Cancelar</value></data>
+  <data name="BugReport.Send" xml:space="preserve"><value>Enviar reporte</value></data>
+  <data name="BugReport.Sending" xml:space="preserve"><value>Enviando…</value></data>
+  <data name="BugReport.Sent" xml:space="preserve"><value>Enviado</value></data>
+  <data name="BugReport.TryAgain" xml:space="preserve"><value>Intentar de nuevo</value></data>
+  <data name="BugReport.Validation.Category" xml:space="preserve"><value>Elige el tipo de problema.</value></data>
+  <data name="BugReport.Validation.Summary" xml:space="preserve"><value>El resumen debe tener entre 5 y 120 caracteres.</value></data>
+  <data name="BugReport.Validation.Description" xml:space="preserve"><value>La descripción debe tener entre 20 y 8000 caracteres.</value></data>
+  <data name="BugReport.Validation.Email" xml:space="preserve"><value>Ingresa un correo electrónico válido o déjalo en blanco.</value></data>
+  <data name="BugReport.Validation.Log" xml:space="preserve"><value>El fragmento de registro supera el límite de 100 KB.</value></data>
+  <data name="Common.Retry" xml:space="preserve"><value>Intentar de nuevo</value></data>
+  <data name="Common.Unknown" xml:space="preserve"><value>Desconocido</value></data>
+  <data name="Status.Ready.Headline" xml:space="preserve"><value>Listo para optimizar</value></data>
+  <data name="Status.Waiting" xml:space="preserve"><value>ESPERANDO</value></data>
+  <data name="Status.Analyzing" xml:space="preserve"><value>Analizando…</value></data>
+  <data name="Status.SearchingFiveM" xml:space="preserve"><value>BUSCANDO FIVEM</value></data>
+  <data name="Status.SearchingGtaV" xml:space="preserve"><value>BUSCANDO GTA V</value></data>
+  <data name="Status.AnalyzingComputer" xml:space="preserve"><value>Analizando tu computadora</value></data>
+  <data name="Status.LocalOnly" xml:space="preserve"><value>Los diagnósticos se ejecutan localmente y no envían datos.</value></data>
+  <data name="Status.Preparing" xml:space="preserve"><value>PREPARANDO</value></data>
+  <data name="Status.Optimizing" xml:space="preserve"><value>OPTIMIZANDO</value></data>
+  <data name="Status.Verifying" xml:space="preserve"><value>VERIFICANDO</value></data>
+  <data name="Status.Restoring" xml:space="preserve"><value>RESTAURANDO</value></data>
+  <data name="Status.Completed" xml:space="preserve"><value>COMPLETADO</value></data>
+  <data name="Status.Cancelled" xml:space="preserve"><value>CANCELADO</value></data>
+  <data name="Status.Warning" xml:space="preserve"><value>ATENCIÓN</value></data>
+  <data name="Status.SafeFailure" xml:space="preserve"><value>FALLO SEGURO</value></data>
+  <data name="Status.InProgress" xml:space="preserve"><value>EN PROGRESO</value></data>
+  <data name="Status.OptimizationCompleted" xml:space="preserve"><value>Optimización completa</value></data>
+  <data name="Status.SafeCancellation.Headline" xml:space="preserve"><value>Operación cancelada de forma segura</value></data>
+  <data name="Status.CouldNotComplete" xml:space="preserve"><value>No se pudo completar</value></data>
+  <data name="Status.CouldNotRestore" xml:space="preserve"><value>No se pudo restaurar</value></data>
+  <data name="Plan.CloseFiveM" xml:space="preserve"><value>Cierra FiveM primero</value></data>
+  <data name="Plan.CloseGtaV" xml:space="preserve"><value>Cierra GTA V primero</value></data>
+  <data name="Plan.Unavailable" xml:space="preserve"><value>Plan no disponible</value></data>
+  <data name="Plan.RunDiagnosisAgain" xml:space="preserve"><value>Ejecuta el diagnóstico de nuevo.</value></data>
+  <data name="Plan.Elevation.UacAtRun" xml:space="preserve"><value>UAC solo al ejecutar</value></data>
+  <data name="Plan.Elevation.None" xml:space="preserve"><value>sin elevación</value></data>
+  <data name="Plan.Elevation.OnePrompt" xml:space="preserve"><value>Windows mostrará una sola solicitud de UAC.</value></data>
+  <data name="Plan.Elevation.CurrentUser" xml:space="preserve"><value>Se ejecuta como el usuario actual.</value></data>
+  <data name="Plan.Safety.Mixed" xml:space="preserve"><value>Las limpiezas permanentes se identifican en el plan. Las configuraciones tienen reversión.</value></data>
+  <data name="Plan.Safety.Reversible" xml:space="preserve"><value>Todos los cambios de este plan pueden deshacerse.</value></data>
+  <data name="Plan.NoAdditionalWarnings" xml:space="preserve"><value>No hay advertencias adicionales para este plan.</value></data>
+  <data name="Plan.Empty.Title" xml:space="preserve"><value>No hay acciones disponibles para este diagnóstico</value></data>
+  <data name="Plan.Empty.Summary" xml:space="preserve"><value>No se realizará ningún cambio hasta que el diagnóstico encuentre acciones seguras.</value></data>
+  <data name="Plan.Empty.LegacyRequired" xml:space="preserve"><value>Selecciona una instalación válida de FiveM Legacy o instala FiveM y vuelve a analizar tu PC para preparar acciones seguras.</value></data>
+  <data name="Plan.Empty.NoSafeActions" xml:space="preserve"><value>No se requiere ninguna acción segura para el diagnóstico actual.</value></data>
+  <data name="Plan.Empty.DiagnosticInProgress" xml:space="preserve"><value>Espera a que termine el diagnóstico antes de preparar acciones.</value></data>
+  <data name="Plan.Empty.DiagnosticUnavailable" xml:space="preserve"><value>No se pudo completar el diagnóstico. Vuelve a analizar tu computadora antes de preparar acciones.</value></data>
+  <data name="Plan.ActionsCatalog" xml:space="preserve"><value>{0} acciones • catálogo v{1}</value></data>
+  <data name="Plan.ActionsCompletedSummary" xml:space="preserve"><value>{0} acciones completadas. {1}</value></data>
+  <data name="Diagnosis.Partial" xml:space="preserve"><value>Diagnóstico parcial</value></data>
+  <data name="Diagnosis.CouldNotScanAgain" xml:space="preserve"><value>No se pudo escanear de nuevo en este momento</value></data>
+  <data name="Diagnosis.FiveMLegacyDetected" xml:space="preserve"><value>FIVEM LEGACY DETECTADO</value></data>
+  <data name="Diagnosis.FiveMEnhancedBlocked" xml:space="preserve"><value>ENHANCED • ACTUALMENTE BLOQUEADO</value></data>
+  <data name="Diagnosis.FiveMNotFound" xml:space="preserve"><value>FIVEM LEGACY NO DETECTADO</value></data>
+  <data name="Diagnosis.GtaVOpen" xml:space="preserve"><value>GTA V ABIERTO • CIERRA PARA OPTIMIZAR</value></data>
+  <data name="Diagnosis.GtaVLegacyDetected" xml:space="preserve"><value>GTA V LEGACY DETECTADO</value></data>
+  <data name="Diagnosis.GtaVSettingsDetected" xml:space="preserve"><value>CONFIGURACIÓN DE GTA V DETECTADA</value></data>
+  <data name="Diagnosis.GtaVNotFound" xml:space="preserve"><value>GTA V LEGACY NO DETECTADO</value></data>
+  <data name="Diagnosis.CloseFiveMSafely" xml:space="preserve"><value>Cierra FiveM para optimizar de forma segura</value></data>
+  <data name="Diagnosis.CloseGtaVSafely" xml:space="preserve"><value>Cierra GTA V para optimizar de forma segura</value></data>
+  <data name="Diagnosis.RecommendedProfile" xml:space="preserve"><value>Perfil {0} recomendado para esta PC</value></data>
+  <data name="Diagnosis.LegacyReady" xml:space="preserve"><value>El diagnóstico encontró el diseño Legacy conocido y preparó acciones compatibles.</value></data>
+  <data name="Diagnosis.EnhancedUnsupported" xml:space="preserve"><value>La edición Enhanced usa un nuevo launcher y una caché configurable. Esta versión no le aplicará reglas de Legacy.</value></data>
+  <data name="Diagnosis.InstallLegacy" xml:space="preserve"><value>Selecciona una instalación válida de Legacy o instala FiveM para habilitar la optimización.</value></data>
+  <data name="Diagnosis.FreeDisk" xml:space="preserve"><value>{0} GB libres</value></data>
+  <data name="History.ProfileTitle" xml:space="preserve"><value>Perfil {0}</value></data>
+  <data name="History.AdjustmentsState" xml:space="preserve"><value>{0} ajustes • {1}</value></data>
+  <data name="History.Empty.Title" xml:space="preserve"><value>Aún no hay optimizaciones</value></data>
+  <data name="History.Empty.Date" xml:space="preserve"><value>Historial local</value></data>
+  <data name="History.Empty.Summary" xml:space="preserve"><value>Tu primera ejecución aparecerá aquí</value></data>
+  <data name="Risk.Informational" xml:space="preserve"><value>INFORMATIVO</value></data>
+  <data name="Risk.Low" xml:space="preserve"><value>RIESGO BAJO</value></data>
+  <data name="Risk.Moderate" xml:space="preserve"><value>MODERADO</value></data>
+  <data name="Risk.HighReversible" xml:space="preserve"><value>ALTO • REVERSIBLE</value></data>
+  <data name="Privilege.RequiresUac" xml:space="preserve"><value>Requiere UAC</value></data>
+  <data name="Privilege.PermanentCleanup" xml:space="preserve"><value>Limpieza permanente</value></data>
+  <data name="Privilege.Reversible" xml:space="preserve"><value>Reversible</value></data>
+  <data name="Dialog.Rollback.Message" xml:space="preserve"><value>¿Restaurar la configuración guardada por esta ejecución? La limpieza de caché y archivos temporales no se puede recuperar.</value></data>
+  <data name="Dialog.Rollback.Title" xml:space="preserve"><value>Deshacer optimización</value></data>
+  <data name="Dialog.CancelRunning.Message" xml:space="preserve"><value>Hay una optimización en progreso. ¿Solicitar cancelación segura después del paso actual?</value></data>
+  <data name="Dialog.CancelRunning.Title" xml:space="preserve"><value>Vemryx One está en ejecución</value></data>
+  <data name="Dialog.CancelOptimization.Title" xml:space="preserve"><value>¿Cancelar la optimización?</value></data>
+  <data name="Dialog.CancelOptimization.Message" xml:space="preserve"><value>Vemryx One completará o revertirá de forma segura el paso actual antes de detener el plan. ¿Solicitar cancelación?</value></data>
+  <data name="Dialog.CancelOptimization.Confirm" xml:space="preserve"><value>Cancelar optimización</value></data>
+  <data name="Dialog.CloseOptimization.Title" xml:space="preserve"><value>Optimización en progreso</value></data>
+  <data name="Dialog.CloseOptimization.Message" xml:space="preserve"><value>Para cerrar Vemryx One, la optimización se cancelará de forma segura después del paso actual. La app permanecerá abierta hasta que eso termine.</value></data>
+  <data name="Dialog.CloseOptimization.Confirm" xml:space="preserve"><value>Cancelar y cerrar</value></data>
+  <data name="Dialog.OptimizationInterruption.KeepWorking" xml:space="preserve"><value>Seguir optimizando</value></data>
+  <data name="BugReport.Copy.Success" xml:space="preserve"><value>Reporte copiado. La imagen no se incluye en la copia de texto.</value></data>
+  <data name="BugReport.Copy.Failed" xml:space="preserve"><value>No se pudo copiar en este momento: {0}</value></data>
+  <data name="BugReport.Send.Cancelled" xml:space="preserve"><value>Envío cancelado. Es posible que el servicio ya haya recibido el reporte; no reintentamos automáticamente.</value></data>
+  <data name="BugReport.Send.Unconfirmed" xml:space="preserve"><value>No se pudo confirmar la entrega: {0}</value></data>
+  <data name="Runtime.PreparingSimulation" xml:space="preserve"><value>Preparando simulación</value></data>
+  <data name="Runtime.SimulationSafe" xml:space="preserve"><value>Modo seguro: no se cambiará ninguna configuración, archivo o valor del registro.</value></data>
+  <data name="Runtime.SimulatingPlan" xml:space="preserve"><value>Simulando el plan</value></data>
+  <data name="Runtime.SimulationAction" xml:space="preserve"><value>{0} — solo demostración, sin cambios.</value></data>
+  <data name="Runtime.ValidatingSimulation" xml:space="preserve"><value>Validando simulación</value></data>
+  <data name="Runtime.SimulationNoWrites" xml:space="preserve"><value>Confirmando que el modo de demostración no escribió datos en el sistema.</value></data>
+  <data name="Runtime.SimulationCompleted" xml:space="preserve"><value>Simulación completa</value></data>
+  <data name="Runtime.NoChangesApplied" xml:space="preserve"><value>No se aplicó ningún cambio en la computadora.</value></data>
+  <data name="Runtime.ValidatingPlan" xml:space="preserve"><value>Validando el plan</value></data>
+  <data name="Runtime.ValidatingPlanDetail" xml:space="preserve"><value>Verificando versión, edición y acciones permitidas.</value></data>
+  <data name="Runtime.OptimizingSafely" xml:space="preserve"><value>Optimizando de forma segura</value></data>
+  <data name="Runtime.WindowsConfirmation" xml:space="preserve"><value>Se requiere confirmación de Windows</value></data>
+  <data name="Runtime.WindowsConfirmationDetail" xml:space="preserve"><value>El intermediario limitado solicita UAC solo para el plan de energía permitido.</value></data>
+  <data name="Runtime.PlanCompleted" xml:space="preserve"><value>Plan completo</value></data>
+  <data name="Runtime.PlanCompletedDetail" xml:space="preserve"><value>Cambios verificados y registrados para reversión.</value></data>
+  <data name="Runtime.PreparingRestore" xml:space="preserve"><value>Preparando restauración</value></data>
+  <data name="Runtime.RestoreCompleted" xml:space="preserve"><value>Configuración restaurada</value></data>
+  <data name="Runtime.RestoreCompletedDetail" xml:space="preserve"><value>La reversión respetó cambios más recientes y no intentó recuperar limpiezas permanentes.</value></data>
+  <data name="Tray.Open" xml:space="preserve"><value>Abrir Vemryx One</value></data>
+  <data name="Tray.Exit" xml:space="preserve"><value>Salir</value></data>
+  <data name="Tray.Title" xml:space="preserve"><value>Vemryx One sigue en ejecución</value></data>
+  <data name="Tray.Message" xml:space="preserve"><value>Haz doble clic en el icono de la bandeja para volver.</value></data>
+  <data name="Notification.UpdateAvailable.Title" xml:space="preserve"><value>Actualización de Vemryx One disponible</value></data>
+  <data name="Notification.UpdateAvailable.Message" xml:space="preserve"><value>La versión {0} está disponible. Haz clic para abrir Vemryx One.</value></data>
+  <data name="Settings.CloseBehavior.Description" xml:space="preserve"><value>Al hacer clic en X, Vemryx One se minimizará a la bandeja del sistema en lugar de cerrarse.</value></data>
+  <data name="Settings.Telemetry.Title" xml:space="preserve"><value>Ayuda a mejorar Vemryx One</value></data>
+  <data name="Settings.Telemetry.Description" xml:space="preserve"><value>Envía telemetría técnica anonimizada solo si lo eliges.</value></data>
+  <data name="Settings.Telemetry.Sends" xml:space="preserve"><value>✓ Envía: errores categorizados, tiempo de ejecución y versión.</value></data>
+  <data name="Settings.Telemetry.NeverSends" xml:space="preserve"><value>✕ Nunca envía: archivos, documentos, historial o datos personales.</value></data>
+  <data name="Settings.Privacy.Title" xml:space="preserve"><value>Privacidad</value></data>
+  <data name="Settings.CrashReports.Title" xml:space="preserve"><value>Enviar reportes de fallos automáticos</value></data>
+  <data name="Settings.CrashReports.Description" xml:space="preserve"><value>Envía trazas de pila depuradas cuando Vemryx One falla o encuentra un error inesperado.</value></data>
+  <data name="PrivacyConsent.WindowTitle" xml:space="preserve"><value>Privacidad y diagnósticos - Vemryx One</value></data>
+  <data name="PrivacyConsent.Heading.FirstInstallation" xml:space="preserve"><value>Privacidad y diagnósticos</value></data>
+  <data name="PrivacyConsent.Heading.Upgrade" xml:space="preserve"><value>Nueva opción de privacidad disponible</value></data>
+  <data name="PrivacyConsent.Heading.Renewal" xml:space="preserve"><value>Actualizamos nuestra política de privacidad</value></data>
+  <data name="PrivacyConsent.Intro.FirstInstallation" xml:space="preserve"><value>Estos datos nos ayudan a encontrar errores y mejorar Vemryx One. Puedes ajustar cada opción a continuación antes de continuar.</value></data>
+  <data name="PrivacyConsent.Intro.Upgrade" xml:space="preserve"><value>Tu instalación ya enviaba telemetría de uso. Ahora también puedes elegir enviar reportes de fallos automáticos. Revisa ambas opciones antes de continuar.</value></data>
+  <data name="PrivacyConsent.Intro.Renewal" xml:space="preserve"><value>Cambiamos lo que se recopila o adónde van los datos. Revisa las opciones a continuación y confirma de nuevo antes de continuar.</value></data>
+  <data name="PrivacyConsent.Essential.Title" xml:space="preserve"><value>Diagnósticos esenciales</value></data>
+  <data name="PrivacyConsent.Essential.Description" xml:space="preserve"><value>Recopilamos el mínimo necesario para actualizaciones, seguridad, estabilidad y diagnóstico: versión de la app y Windows, arquitectura, fallos, eventos del actualizador y resultados técnicos de optimización. No se puede desactivar.</value></data>
+  <data name="PrivacyConsent.Telemetry.Title" xml:space="preserve"><value>Ayudar a mejorar Vemryx One</value></data>
+  <data name="PrivacyConsent.Telemetry.Description" xml:space="preserve"><value>Comparte datos anónimos opcionales de hardware, perfil y uso de funciones para mejorar la aplicación. Puedes desactivarlo cuando quieras.</value></data>
+  <data name="PrivacyConsent.CrashReports.Title" xml:space="preserve"><value>Enviar reportes automáticos de errores y fallos</value></data>
+  <data name="PrivacyConsent.CrashReports.Description" xml:space="preserve"><value>Trazas de pila depuradas y versión de la app cuando Vemryx One falla o encuentra un error inesperado.</value></data>
+  <data name="PrivacyConsent.Continue" xml:space="preserve"><value>Continuar</value></data>
+  <data name="Privacy.Collects.Title" xml:space="preserve"><value>RECOPILAMOS</value></data>
+  <data name="Privacy.Collects.Items" xml:space="preserve"><value>• Versión de Vemryx One
+• Versión y arquitectura general de Windows
+• Duración y resultado de las optimizaciones
+• Identificadores técnicos de acciones
+• Modelo de CPU y GPU (sin número de serie)
+• Rango aproximado de RAM
+• Códigos de error depurados
+• Trazas de pila depuradas en reportes de fallos
+• Versión de la app donde ocurrió el error</value></data>
+  <data name="Privacy.DoesNotCollect.Title" xml:space="preserve"><value>NO RECOPILAMOS</value></data>
+  <data name="Privacy.DoesNotCollect.Items" xml:space="preserve"><value>• Nombre de usuario
+• Nombre de la computadora
+• Archivos personales
+• Historial de navegación
+• Contraseñas o tokens
+• Dirección MAC
+• Números de serie de hardware
+• Contenido de archivos
+• Lista completa de procesos o programas
+• Rutas personales sin depurar</value></data>
+  <data name="ReleaseNotes.WindowTitle" xml:space="preserve"><value>Novedades - Vemryx One</value></data>
+  <data name="ReleaseNotes.Heading" xml:space="preserve"><value>Novedades</value></data>
+  <data name="ReleaseNotes.VersionLabel" xml:space="preserve"><value>Versión {0}</value></data>
+  <data name="ReleaseNotes.VersionLabelWithDate" xml:space="preserve"><value>Versión {0} • {1}</value></data>
+  <data name="ReleaseNotes.Category.Added" xml:space="preserve"><value>Añadido</value></data>
+  <data name="ReleaseNotes.Category.Improved" xml:space="preserve"><value>Mejorado</value></data>
+  <data name="ReleaseNotes.Category.Fixed" xml:space="preserve"><value>Corregido</value></data>
+  <data name="ReleaseNotes.1_4_3.Fixed" xml:space="preserve"><value>• Se corrigió un error que podía impedir abrir el Optimizador cuando el plan no tiene acciones.
+• Se corrigió la representación de los saltos de línea en mensajes de error inesperado.</value></data>
+  <data name="ReleaseNotes.Category.Removed" xml:space="preserve"><value>Eliminado</value></data>
+  <data name="ReleaseNotes.Category.Security" xml:space="preserve"><value>Seguridad</value></data>
+  <data name="ReleaseNotes.Close" xml:space="preserve"><value>Cerrar</value></data>
+  <data name="Dialog.FatalError.Message" xml:space="preserve"><value>Vemryx One encontró un error inesperado. No se aplicará ningún cambio nuevo.
+
+{0}</value></data>
+  <data name="Brand.FooterCopyright" xml:space="preserve"><value>© 2026 Vemryx</value></data>
+  <data name="Plan.VerifiedActions.Label" xml:space="preserve"><value>ACCIONES VERIFICADAS</value></data>
+  <data name="Progress.ElapsedFormat" xml:space="preserve"><value>Transcurrido {0}</value></data>
+  <data name="Progress.RemainingFormat" xml:space="preserve"><value>Quedan aproximadamente {0}</value></data>
+  <data name="Progress.Finishing" xml:space="preserve"><value>Finalizando...</value></data>
+  <data name="Progress.CompletedInFormat" xml:space="preserve"><value>Completado en {0}</value></data>
+  <data name="BugReport.Technical.Summary" xml:space="preserve"><value>{0}; edición: {1}; perfil: {2}</value></data>
+  <data name="BugReport.Clipboard.Title" xml:space="preserve"><value>REPORTE DE ERROR — VEMRYX ONE</value></data>
+  <data name="BugReport.Clipboard.Id" xml:space="preserve"><value>ID: {0}</value></data>
+  <data name="BugReport.Clipboard.Category" xml:space="preserve"><value>Tipo: {0}</value></data>
+  <data name="BugReport.Clipboard.Summary" xml:space="preserve"><value>Resumen: {0}</value></data>
+  <data name="BugReport.Clipboard.Version" xml:space="preserve"><value>Versión: {0}</value></data>
+  <data name="BugReport.Clipboard.Profile" xml:space="preserve"><value>Perfil: {0}</value></data>
+  <data name="BugReport.Clipboard.Technical" xml:space="preserve"><value>Información técnica: {0}</value></data>
+  <data name="BugReport.Clipboard.Email" xml:space="preserve"><value>Correo electrónico: {0}</value></data>
+  <data name="BugReport.Clipboard.Description" xml:space="preserve"><value>Descripción y pasos:</value></data>
+  <data name="BugReport.Clipboard.Log" xml:space="preserve"><value>Fragmento de registro:</value></data>
+  <data name="BugReport.Send.RateLimited" xml:space="preserve"><value>El servicio recibió demasiados reportes. Espera unos minutos e intenta de nuevo.</value></data>
+  <data name="BugReport.Send.ActivationRequired" xml:space="preserve"><value>El canal de reportes está esperando activación del desarrollador. Usa Copiar reporte mientras tanto.</value></data>
+  <data name="BugReport.Send.NotConfirmed" xml:space="preserve"><value>El servicio de entrega no confirmó la recepción. Copia el reporte e intenta de nuevo más tarde.</value></data>
+  <data name="BugReport.Send.UnexpectedResponse" xml:space="preserve"><value>El servicio devolvió una respuesta inesperada. Copia el reporte e intenta de nuevo más tarde.</value></data>
+  <data name="BugReport.Send.Accepted" xml:space="preserve"><value>El servicio de entrega recibió el reporte.</value></data>
+  <data name="BugReport.BugCode.Label" xml:space="preserve"><value>Código del error *</value></data>
+  <data name="BugReport.BugCode.Tooltip" xml:space="preserve"><value>Selecciona la categoría de error que mejor coincida con el problema</value></data>
+  <data name="BugReport.Validation.BugCode" xml:space="preserve"><value>Selecciona un código de error.</value></data>
+  <data name="BugReport.Clipboard.BugCode" xml:space="preserve"><value>Código del error: {0}</value></data>
+  <data name="Streaming.Readiness.Protected.Title" xml:space="preserve"><value>La protección de streaming está activa</value></data>
+  <data name="Streaming.Readiness.Protected.Detail" xml:space="preserve"><value>Hay una app de streaming abierta. Vemryx One la preserva; confirma tu estado de transmisión antes de optimizar.</value></data>
+  <data name="Streaming.Readiness.Attention.Title" xml:space="preserve"><value>Haz una prueba antes de salir en vivo</value></data>
+  <data name="Streaming.Readiness.Attention.Detail" xml:space="preserve"><value>El diagnóstico muestra presión de recursos o una sesión de juego abierta. Usa una escena privada para validar la estabilidad.</value></data>
+  <data name="Streaming.Readiness.Ready.Title" xml:space="preserve"><value>La preparación para streaming está disponible</value></data>
+  <data name="Streaming.Readiness.Ready.Detail" xml:space="preserve"><value>Se detectó tu software de streaming. El plan preserva su configuración y archivos.</value></data>
+  <data name="Streaming.Readiness.Partial.Title" xml:space="preserve"><value>El escaneo de streaming estuvo incompleto</value></data>
+  <data name="Streaming.Readiness.Partial.Detail" xml:space="preserve"><value>Parte de la verificación local no terminó. No se cambiará ninguna configuración de streaming.</value></data>
+  <data name="Streaming.Readiness.NotDetected.Title" xml:space="preserve"><value>Un espacio seguro para creadores</value></data>
+  <data name="Streaming.Readiness.NotDetected.Detail" xml:space="preserve"><value>Cuando uses OBS, Streamlabs o TikTok LIVE Studio, este panel ayuda a revisar la PC sin tocar tus escenas.</value></data>
+  <data name="Streaming.Check.Software.Protected.Title" xml:space="preserve"><value>Software preservado</value></data>
+  <data name="Streaming.Check.Software.Protected.DetailWithNames" xml:space="preserve"><value>{0} está en ejecución. Esto no confirma que una transmisión esté en vivo.</value></data>
+  <data name="Streaming.Check.Software.Partial.Title" xml:space="preserve"><value>Detección parcial</value></data>
+  <data name="Streaming.Check.Software.Partial.Detail" xml:space="preserve"><value>No se pudo completar el escaneo local completo del software de streaming.</value></data>
+  <data name="Streaming.Check.Software.Partial.DetailWithNames" xml:space="preserve"><value>Se detectó {0}; parte del escaneo local no estuvo disponible.</value></data>
+  <data name="Streaming.Check.Software.Detected.Title" xml:space="preserve"><value>Software detectado</value></data>
+  <data name="Streaming.Check.Software.Detected.DetailWithNames" xml:space="preserve"><value>Se detectó {0}. Las escenas, perfiles y grabaciones permanecen intactos.</value></data>
+  <data name="Streaming.Check.Software.NotDetected.Title" xml:space="preserve"><value>No se detectó software</value></data>
+  <data name="Streaming.Check.Software.NotDetected.Detail" xml:space="preserve"><value>No se encontró ninguna aplicación reconocida en este escaneo local.</value></data>
+  <data name="Streaming.Check.Resources.Ready.Title" xml:space="preserve"><value>Margen de recursos</value></data>
+  <data name="Streaming.Check.Resources.Ready.Detail" xml:space="preserve"><value>Hay memoria disponible y este diagnóstico muestra baja presión.</value></data>
+  <data name="Streaming.Check.Resources.Attention.Title" xml:space="preserve"><value>Los recursos necesitan revisión</value></data>
+  <data name="Streaming.Check.Resources.Attention.Detail" xml:space="preserve"><value>Prioriza una prueba del codificador y reduce la carga antes de iniciar una transmisión.</value></data>
+  <data name="Streaming.Check.Resources.Review.Title" xml:space="preserve"><value>Recursos bajo observación</value></data>
+  <data name="Streaming.Check.Resources.Review.Detail" xml:space="preserve"><value>El margen parece moderado. Prueba la escena y monitorea los fotogramas perdidos en la plataforma.</value></data>
+  <data name="Streaming.Check.GameSession.Open.Title" xml:space="preserve"><value>La sesión de juego está abierta</value></data>
+  <data name="Streaming.Check.GameSession.Open.Detail" xml:space="preserve"><value>Cierra FiveM y GTA V antes de aplicar optimizaciones que puedan modificar la configuración.</value></data>
+  <data name="Streaming.Check.GameSession.Closed.Title" xml:space="preserve"><value>La sesión de juego está cerrada</value></data>
+  <data name="Streaming.Check.GameSession.Closed.Detail" xml:space="preserve"><value>La PC está en un estado seguro para planear optimizaciones antes de jugar o transmitir.</value></data>
+  <data name="Actions.safety.fivem-stopped.verify.Name" xml:space="preserve"><value>Verificar estado de FiveM</value></data>
+  <data name="Actions.safety.fivem-stopped.verify.Description" xml:space="preserve"><value>Confirma que los procesos de FiveM estén cerrados antes de cualquier cambio de caché o gráficos.</value></data>
+  <data name="Actions.safety.gtav-stopped.verify.Name" xml:space="preserve"><value>Verificar estado de GTA V</value></data>
+  <data name="Actions.safety.gtav-stopped.verify.Description" xml:space="preserve"><value>Confirma que GTA V Legacy esté cerrado antes de cambiar su settings.xml.</value></data>
+  <data name="Actions.safety.bottleneck.diagnose.Name" xml:space="preserve"><value>Diagnosticar el probable cuello de botella</value></data>
+  <data name="Actions.safety.bottleneck.diagnose.Description" xml:space="preserve"><value>Analiza la memoria disponible, los procesadores lógicos y el espacio libre en disco para señalar el recurso más limitante, sin cambiar nada.</value></data>
+  <data name="Actions.windows.gaming.overlays.detect.Name" xml:space="preserve"><value>Detectar overlays y captura en segundo plano</value></data>
+  <data name="Actions.windows.gaming.overlays.detect.Description" xml:space="preserve"><value>Verifica si hay overlays conocidos de terceros y software de captura (NVIDIA, RTSS, Discord, Xbox Game Bar) en ejecución, sin cerrarlos.</value></data>
+  <data name="Actions.fivem.legacy.logs.read.Name" xml:space="preserve"><value>Leer registro reciente de FiveM</value></data>
+  <data name="Actions.fivem.legacy.logs.read.Description" xml:space="preserve"><value>Localiza el registro más reciente de FiveM Legacy y resume su antigüedad y posibles ocurrencias de errores, sin cambiar nada.</value></data>
+  <data name="Actions.safety.performance-diagnostics.guide.Name" xml:space="preserve"><value>Guiar diagnóstico de rendimiento</value></data>
+  <data name="Actions.safety.performance-diagnostics.guide.Description" xml:space="preserve"><value>Indica los comandos oficiales de FiveM (cl_drawfps, cl_drawperf, netgraph) para medir FPS y red dentro del propio juego.</value></data>
+  <data name="Actions.safety.network-health.diagnose.Name" xml:space="preserve"><value>Diagnosticar salud de la red local</value></data>
+  <data name="Actions.safety.network-health.diagnose.Description" xml:space="preserve"><value>Lee los contadores de paquetes descartados y con error de los adaptadores de red activos, sin enviar tráfico a ningún servidor.</value></data>
+  <data name="Actions.safety.thermal.diagnose.Name" xml:space="preserve"><value>Diagnosticar temperatura y throttling</value></data>
+  <data name="Actions.safety.thermal.diagnose.Description" xml:space="preserve"><value>Intenta leer la zona térmica ACPI expuesta por Windows; la mayoría de las placas base no la exponen sin software del fabricante, y esto se informa honestamente.</value></data>
+  <data name="Actions.safety.pagefile-commit.diagnose.Name" xml:space="preserve"><value>Diagnosticar archivo de paginación y memoria comprometida</value></data>
+  <data name="Actions.safety.pagefile-commit.diagnose.Description" xml:space="preserve"><value>Lee el tamaño total y disponible del archivo de paginación para advertir cuando el sistema esté cerca del límite de compromiso, sin redimensionar nada.</value></data>
+  <data name="Actions.fivem.legacy.cache-integrity.diagnose.Name" xml:space="preserve"><value>Diagnosticar integridad del índice de caché</value></data>
+  <data name="Actions.fivem.legacy.cache-integrity.diagnose.Description" xml:space="preserve"><value>Verifica si el índice de caché de FiveM (content_index.xml) existe y está bien formado, recomendando la reparación existente cuando sea necesario.</value></data>
+  <data name="Actions.windows.gaming.gpu-vendor.detect.Name" xml:space="preserve"><value>Detectar fabricante de GPU</value></data>
+  <data name="Actions.windows.gaming.gpu-vendor.detect.Description" xml:space="preserve"><value>Identifica el fabricante (NVIDIA, AMD o Intel) de las GPU detectadas y señala el panel oficial del fabricante, sin escribir ningún perfil de controlador.</value></data>
+  <data name="Actions.safety.cpu-details.diagnose.Name" xml:space="preserve"><value>Diagnosticar núcleos, hilos y frecuencia de la CPU</value></data>
+  <data name="Actions.safety.cpu-details.diagnose.Description" xml:space="preserve"><value>Lee núcleos físicos, hilos lógicos y la velocidad de reloj actual/máxima de la CPU a través de WMI estándar.</value></data>
+  <data name="Actions.windows.gaming.gpu-details.diagnose.Name" xml:space="preserve"><value>Diagnosticar VRAM y tipo de GPU</value></data>
+  <data name="Actions.windows.gaming.gpu-details.diagnose.Description" xml:space="preserve"><value>Lee la VRAM informada por el controlador y estima si cada GPU detectada es integrada o dedicada, sin escribir ningún perfil.</value></data>
+  <data name="Actions.safety.ram-details.diagnose.Name" xml:space="preserve"><value>Diagnosticar frecuencia, canales y XMP/EXPO de la RAM</value></data>
+  <data name="Actions.safety.ram-details.diagnose.Description" xml:space="preserve"><value>Lee la velocidad de reloj configurada y nominal de cada módulo de RAM, estimando el estado de canal único y si XMP/EXPO parece deshabilitado.</value></data>
+  <data name="Actions.fivem.legacy.storage-health.diagnose.Name" xml:space="preserve"><value>Diagnosticar tipo y estado de la unidad</value></data>
+  <data name="Actions.fivem.legacy.storage-health.diagnose.Description" xml:space="preserve"><value>Identifica HDD, SSD o NVMe para cada unidad física y lee el estado de salud predictivo (SMART/NVMe Health), sin reparar nada.</value></data>
+  <data name="Actions.windows.system.driver-versions.diagnose.Name" xml:space="preserve"><value>Diagnosticar compilación de Windows y versiones de controladores</value></data>
+  <data name="Actions.windows.system.driver-versions.diagnose.Description" xml:space="preserve"><value>Lee la compilación exacta de Windows y las versiones de los controladores de video, red, audio y chipset, cuando son identificables.</value></data>
+  <data name="Actions.windows.gaming.display-configuration.diagnose.Name" xml:space="preserve"><value>Diagnosticar resolución, frecuencia de actualización y HAGS</value></data>
+  <data name="Actions.windows.gaming.display-configuration.diagnose.Description" xml:space="preserve"><value>Compara la frecuencia de actualización configurada con el máximo soportado en la resolución actual y lee el estado de HAGS.</value></data>
+  <data name="Actions.windows.gaming.session-settings.diagnose.Name" xml:space="preserve"><value>Diagnosticar Modo Juego, pantalla completa y plan de energía</value></data>
+  <data name="Actions.windows.gaming.session-settings.diagnose.Description" xml:space="preserve"><value>Lee el estado actual del Modo Juego, las optimizaciones de pantalla completa y el plan de energía activo, sin cambiar nada.</value></data>
+  <data name="Actions.safety.throttling-signal.diagnose.Name" xml:space="preserve"><value>Diagnosticar señales combinadas de throttling</value></data>
+  <data name="Actions.safety.throttling-signal.diagnose.Description" xml:space="preserve"><value>Combina la caída de frecuencia bajo carga, eventos de error de hardware (WHEA) y la temperatura disponible para señalar "posible throttling", sin un sensor directo por núcleo.</value></data>
+  <data name="Actions.safety.resource-usage.diagnose.Name" xml:space="preserve"><value>Diagnosticar uso actual de CPU, disco, GPU y red</value></data>
+  <data name="Actions.safety.resource-usage.diagnose.Description" xml:space="preserve"><value>Toma una lectura instantánea (no promediada) del rendimiento de CPU, disco, GPU (cuando está disponible) y red.</value></data>
+  <data name="Actions.windows.gaming.pcie-link.diagnose.Name" xml:space="preserve"><value>Diagnosticar enlace PCIe de la GPU</value></data>
+  <data name="Actions.windows.gaming.pcie-link.diagnose.Description" xml:space="preserve"><value>Intenta leer el ancho y la velocidad actuales/máximos del enlace PCIe de cada GPU mediante las propiedades de dispositivo de Windows, sin controladores de terceros.</value></data>
+  <data name="Actions.safety.hardware-stability.diagnose.Name" xml:space="preserve"><value>Diagnosticar antigüedad del BIOS y estabilidad del hardware</value></data>
+  <data name="Actions.safety.hardware-stability.diagnose.Description" xml:space="preserve"><value>Lee la fecha de lanzamiento del BIOS y eventos recientes de error de hardware (WHEA) del registro de eventos de Windows.</value></data>
+  <data name="Actions.safety.bottleneck-classification.diagnose.Name" xml:space="preserve"><value>Clasificar el tipo probable de cuello de botella</value></data>
+  <data name="Actions.safety.bottleneck-classification.diagnose.Description" xml:space="preserve"><value>Combina el uso de CPU/GPU/disco/red, memoria, temperatura y el proceso que más consume CPU para señalar el recurso más limitante en este momento.</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.diagnose.Name" xml:space="preserve"><value>Diagnosticar parámetros de inicio de GTA V</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.diagnose.Description" xml:space="preserve"><value>Lee el commandline.txt de GTA V Legacy independiente (nunca FiveM, que ignora este archivo) y advierte cuando se dejaron parámetros de reparación activos permanentemente.</value></data>
+  <data name="Actions.safety.graphics-preset-recommendation.diagnose.Name" xml:space="preserve"><value>Recomendar preset gráfico</value></data>
+  <data name="Actions.safety.graphics-preset-recommendation.diagnose.Description" xml:space="preserve"><value>Analiza GPU, VRAM, CPU, RAM y frecuencia de actualización del monitor para sugerir qué preset gráfico (FPS, Equilibrado o Calidad) se adapta mejor al hardware, sin aplicar nada por sí mismo.</value></data>
+  <data name="Actions.windows.gaming.texture-vram-fit.diagnose.Name" xml:space="preserve"><value>Diagnosticar calidad de texturas configurada frente a la VRAM disponible</value></data>
+  <data name="Actions.windows.gaming.texture-vram-fit.diagnose.Description" xml:space="preserve"><value>Compara la calidad de texturas configurada en FiveM/GTA V con la VRAM de GPU detectada y advierte cuando la configuración probablemente supera la VRAM disponible.</value></data>
+  <data name="Actions.fivem.legacy.cache-storage.diagnose.Name" xml:space="preserve"><value>Diagnosticar tamaño e integridad de la caché de FiveM</value></data>
+  <data name="Actions.fivem.legacy.cache-storage.diagnose.Description" xml:space="preserve"><value>Mide el tamaño total y por categoría de la caché de FiveM Legacy (server-cache, server-cache-priv, almacenamiento NUI, registros, diagnósticos) y señala archivos bloqueados por otro proceso, sin eliminar nada.</value></data>
+  <data name="Actions.fivem.legacy.installation-health.diagnose.Name" xml:space="preserve"><value>Diagnosticar estado de la instalación de FiveM</value></data>
+  <data name="Actions.fivem.legacy.installation-health.diagnose.Description" xml:space="preserve"><value>Verifica instalaciones duplicadas, permisos de escritura en la carpeta de datos, sincronización con OneDrive y espacio libre en disco, sin cambiar nada.</value></data>
+  <data name="Actions.fivem.legacy.crash-patterns.diagnose.Name" xml:space="preserve"><value>Diagnosticar patrones recurrentes de fallos y errores de streaming</value></data>
+  <data name="Actions.fivem.legacy.crash-patterns.diagnose.Description" xml:space="preserve"><value>Busca códigos de error reconocibles en nombres de volcados de fallos recientes y palabras clave de errores de streaming (texturas, modelos, mapas) en el último registro, sin eliminar nada.</value></data>
+  <data name="Actions.storage.user-temporary-files.clean.Name" xml:space="preserve"><value>Limpiar archivos temporales antiguos</value></data>
+  <data name="Actions.storage.user-temporary-files.clean.Description" xml:space="preserve"><value>Elimina solo los archivos temporales del usuario más antiguos que el período de retención seleccionado por el perfil.</value></data>
+  <data name="Actions.fivem.legacy.crash-dumps.prune.Name" xml:space="preserve"><value>Eliminar archivos de diagnóstico antiguos</value></data>
+  <data name="Actions.fivem.legacy.crash-dumps.prune.Description" xml:space="preserve"><value>Elimina volcados y registros antiguos de FiveM Legacy mientras conserva los diagnósticos recientes.</value></data>
+  <data name="Actions.fivem.legacy.server-cache.repair.Name" xml:space="preserve"><value>Reparar caché del servidor</value></data>
+  <data name="Actions.fivem.legacy.server-cache.repair.Description" xml:space="preserve"><value>Elimina solo las cachés de contenido del servidor de FiveM Legacy que se pueden regenerar cuando se necesita una reparación.</value></data>
+  <data name="Actions.fivem.legacy.stuck-process.terminate.Name" xml:space="preserve"><value>Terminar un proceso de FiveM bloqueado</value></data>
+  <data name="Actions.fivem.legacy.stuck-process.terminate.Description" xml:space="preserve"><value>Termina un proceso de FiveM demostrablemente bloqueado (sin responder, reteniendo un archivo de caché bloqueado) para permitir la limpieza. Nunca forma parte de perfiles automáticos.</value></data>
+  <data name="Actions.fivem.legacy.local-data.recreate.Name" xml:space="preserve"><value>Recrear datos locales de FiveM</value></data>
+  <data name="Actions.fivem.legacy.local-data.recreate.Description" xml:space="preserve"><value>Elimina y recrea las carpetas de datos regenerables de FiveM Legacy (server-cache, server-cache-priv, registros, fallos) mientras conserva game-storage, almacenamiento NUI, ipfs, CitizenFX.ini y plugins, con respaldo en cuarentena.</value></data>
+  <data name="Actions.fivem.legacy.auth-data.repair.Name" xml:space="preserve"><value>Reparar datos de titularidad corruptos</value></data>
+  <data name="Actions.fivem.legacy.auth-data.repair.Description" xml:space="preserve"><value>Elimina ros_id.dat y la carpeta de titularidades digitales solo cuando se detecta un patrón de error de titularidad de inicio en el último registro, con respaldo en cuarentena y confirmación por ejecución.</value></data>
+  <data name="Actions.windows.gaming.game-mode.enable.Name" xml:space="preserve"><value>Habilitar Modo Juego</value></data>
+  <data name="Actions.windows.gaming.game-mode.enable.Description" xml:space="preserve"><value>Habilita la función de juegos de Windows que prioriza los recursos mientras los juegos se ejecutan.</value></data>
+  <data name="Actions.windows.gaming.high-performance-gpu.prefer.Name" xml:space="preserve"><value>Preferir la GPU de alto rendimiento</value></data>
+  <data name="Actions.windows.gaming.high-performance-gpu.prefer.Description" xml:space="preserve"><value>Establece la preferencia gráfica de Windows para los launchers y renderizadores de FiveM Legacy detectados.</value></data>
+  <data name="Actions.windows.gaming.background-capture.disable.Name" xml:space="preserve"><value>Deshabilitar captura en segundo plano</value></data>
+  <data name="Actions.windows.gaming.background-capture.disable.Description" xml:space="preserve"><value>Deshabilita la grabación continua en segundo plano de Windows sin eliminar Game Bar.</value></data>
+  <data name="Actions.windows.power.performance-session.enable.Name" xml:space="preserve"><value>Activar un plan de energía de alto rendimiento</value></data>
+  <data name="Actions.windows.power.performance-session.enable.Description" xml:space="preserve"><value>Usa un plan de energía de rendimiento mientras está conectado y registra el estado anterior para reversión.</value></data>
+  <data name="Actions.fivem.legacy.graphics.light.apply.Name" xml:space="preserve"><value>Ajustar gráficos ligeros de FiveM</value></data>
+  <data name="Actions.fivem.legacy.graphics.light.apply.Description" xml:space="preserve"><value>Deshabilita solo el antialiasing más costoso en el archivo existente de FiveM, con respaldo.</value></data>
+  <data name="Actions.fivem.legacy.graphics.balanced.apply.Name" xml:space="preserve"><value>Aplicar gráficos equilibrados de FiveM</value></data>
+  <data name="Actions.fivem.legacy.graphics.balanced.apply.Description" xml:space="preserve"><value>Ajusta solo las opciones gráficas existentes de FiveM Legacy y crea un respaldo antes de escribir.</value></data>
+  <data name="Actions.fivem.legacy.graphics.aggressive.apply.Name" xml:space="preserve"><value>Aplicar gráficos agresivos de FiveM</value></data>
+  <data name="Actions.fivem.legacy.graphics.aggressive.apply.Description" xml:space="preserve"><value>Reduce las opciones gráficas más costosas de FiveM Legacy y crea un respaldo primero.</value></data>
+  <data name="Actions.gtav.legacy.graphics.light.apply.Name" xml:space="preserve"><value>Ajustar gráficos ligeros de GTA V</value></data>
+  <data name="Actions.gtav.legacy.graphics.light.apply.Description" xml:space="preserve"><value>Encuentra el settings.xml de GTA V Legacy, reduce solo las opciones costosas existentes y crea un respaldo.</value></data>
+  <data name="Actions.gtav.legacy.graphics.balanced.apply.Name" xml:space="preserve"><value>Equilibrar gráficos de GTA V</value></data>
+  <data name="Actions.gtav.legacy.graphics.balanced.apply.Description" xml:space="preserve"><value>Aplica límites equilibrados solo a las opciones existentes del settings.xml de GTA V Legacy, con respaldo.</value></data>
+  <data name="Actions.gtav.legacy.graphics.aggressive.apply.Name" xml:space="preserve"><value>Priorizar FPS en GTA V</value></data>
+  <data name="Actions.gtav.legacy.graphics.aggressive.apply.Description" xml:space="preserve"><value>Reduce las opciones gráficas costosas de GTA V Legacy sin cambiar resolución, modo de pantalla o adaptador.</value></data>
+  <data name="Actions.fivem.legacy.graphics.quality.apply.Name" xml:space="preserve"><value>Aplicar preset de calidad a FiveM</value></data>
+  <data name="Actions.fivem.legacy.graphics.quality.apply.Description" xml:space="preserve"><value>Aumenta solo las opciones gráficas existentes de FiveM Legacy hasta un límite seguro, priorizando la calidad visual sin afectar el 1% bajo. Nunca forma parte de perfiles automáticos.</value></data>
+  <data name="Actions.gtav.legacy.graphics.quality.apply.Name" xml:space="preserve"><value>Aplicar preset de calidad a GTA V</value></data>
+  <data name="Actions.gtav.legacy.graphics.quality.apply.Description" xml:space="preserve"><value>Aumenta solo las opciones gráficas existentes de GTA V Legacy hasta un límite seguro, priorizando la calidad visual sin afectar el 1% bajo. Nunca forma parte de perfiles automáticos.</value></data>
+  <data name="Actions.fivem.legacy.display-preferences.apply.Name" xml:space="preserve"><value>Ajustar modo de ventana y VSync de FiveM</value></data>
+  <data name="Actions.fivem.legacy.display-preferences.apply.Description" xml:space="preserve"><value>Establece solo el modo ventana/pantalla completa y VSync para FiveM Legacy, sin tocar resolución, adaptador de video o relación de aspecto. Nunca forma parte de perfiles automáticos.</value></data>
+  <data name="Actions.gtav.legacy.display-preferences.apply.Name" xml:space="preserve"><value>Ajustar modo de ventana y VSync de GTA V</value></data>
+  <data name="Actions.gtav.legacy.display-preferences.apply.Description" xml:space="preserve"><value>Establece solo el modo ventana/pantalla completa y VSync para GTA V Legacy, sin tocar resolución, adaptador de video o relación de aspecto. Nunca forma parte de perfiles automáticos.</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.graphics.apply.Name" xml:space="preserve"><value>Aplicar parámetros gráficos de inicio de GTA V</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.graphics.apply.Description" xml:space="preserve"><value>Escribe los parámetros oficiales -cityDensity, -anisotropicQualityLevel, -fxaa, -grassQuality, -lodScale y -frameLimit en el commandline.txt de GTA V independiente, preservando cualquier otra línea existente. Nunca forma parte de perfiles automáticos.</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.display.apply.Name" xml:space="preserve"><value>Aplicar parámetros de pantalla de inicio de GTA V</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.display.apply.Description" xml:space="preserve"><value>Escribe el modo de pantalla (-fullscreen/-windowed/-borderless) y, cuando se elige, la versión de DirectX (-DX10/-DX10_1/-DX11) en el commandline.txt de GTA V independiente. Nunca cambia la resolución. Nunca forma parte de perfiles automáticos.</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.repair.apply.Name" xml:space="preserve"><value>Aplicar parámetros de reparación de inicio de GTA V</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.repair.apply.Description" xml:space="preserve"><value>Escribe parámetros de reparación temporales (-safemode, -useMinimumSettings, -UseAutoSettings) en el commandline.txt de GTA V independiente para diagnosticar un problema específico. Nunca forma parte de perfiles automáticos y no debe permanecer activo permanentemente.</value></data>
+  <data name="Actions.windows.gaming.gpu-preference-mismatch.diagnose.Name" xml:space="preserve"><value>Diagnosticar preferencia de GPU en laptops de doble GPU</value></data>
+  <data name="Actions.windows.gaming.gpu-preference-mismatch.diagnose.Description" xml:space="preserve"><value>Compara la GPU integrada + dedicada detectada con la preferencia de GPU ya configurada en la configuración de Gráficos de Windows para FiveM, sin cambiar nada.</value></data>
+  <data name="Actions.windows.gaming.fullscreen-optimizations.toggle.Name" xml:space="preserve"><value>Probar deshabilitar optimizaciones de pantalla completa</value></data>
+  <data name="Actions.windows.gaming.fullscreen-optimizations.toggle.Description" xml:space="preserve"><value>Alterna el indicador de compatibilidad "Deshabilitar optimizaciones de pantalla completa" para FiveM y GTA V como una prueba de compatibilidad opcional. Nunca forma parte de perfiles automáticos más allá de Agresivo.</value></data>
+  <data name="Actions.windows.gaming.hags.toggle.Name" xml:space="preserve"><value>Probar la Programación de GPU Acelerada por Hardware (HAGS)</value></data>
+  <data name="Actions.windows.gaming.hags.toggle.Description" xml:space="preserve"><value>Alterna HAGS entre habilitado y el predeterminado de Windows como una prueba de compatibilidad opcional. Nunca forma parte de perfiles automáticos más allá de Agresivo.</value></data>
+  <data name="Actions.windows.gaming.gsync.guide.Name" xml:space="preserve"><value>Guiar configuración de G-SYNC/FreeSync/VRR</value></data>
+  <data name="Actions.windows.gaming.gsync.guide.Description" xml:space="preserve"><value>Guía la verificación y activación de G-SYNC (NVIDIA) o FreeSync (AMD) a través del panel oficial del fabricante o del propio monitor, y sugiere un límite de FPS compatible con el rango variable, sin cambiar nada.</value></data>
+  <data name="Actions.windows.system.driver-reinstall.guide.Name" xml:space="preserve"><value>Guiar reinstalación limpia del controlador de video</value></data>
+  <data name="Actions.windows.system.driver-reinstall.guide.Description" xml:space="preserve"><value>Muestra los pasos oficiales de reinstalación limpia del controlador de video (DDU + instalador oficial) cuando se sospecha corrupción. Nunca descarga, instala ni elimina nada por sí mismo. Nunca forma parte de perfiles automáticos.</value></data>
+  <data name="Actions.windows.gaming.hybrid-laptop.diagnose.Name" xml:space="preserve"><value>Diagnosticar laptop híbrida/gaming</value></data>
+  <data name="Actions.windows.gaming.hybrid-laptop.diagnose.Description" xml:space="preserve"><value>Verifica si la laptop está en batería o tiene el Ahorrador de batería activo, y detecta utilidades conocidas del fabricante de cambio de GPU/rendimiento (Armoury Crate, MSI Center, Lenovo Vantage, etc.), sin cambiar nada.</value></data>
+  <data name="Actions.windows.power.pcie-aspm.adjust.Name" xml:space="preserve"><value>Ajustar la administración de energía del estado de enlace PCI Express</value></data>
+  <data name="Actions.windows.power.pcie-aspm.adjust.Description" xml:space="preserve"><value>Deshabilita la administración de energía del estado de enlace PCI Express (ASPM) en el esquema de energía activo, reduciendo picos de latencia a cambio de un consumo ligeramente mayor.</value></data>
+  <data name="Actions.windows.gaming.mouse-polling-rate.guide.Name" xml:space="preserve"><value>Guiar tasa de sondeo del mouse</value></data>
+  <data name="Actions.windows.gaming.mouse-polling-rate.guide.Description" xml:space="preserve"><value>Cuando la CPU está bajo mucha carga, sugiere probar mouses de 4000/8000 Hz a 1000 Hz en su lugar, sin cambiar nada.</value></data>
+  <data name="Actions.windows.appearance.visual-effects.reduce.Name" xml:space="preserve"><value>Reducir efectos visuales de Windows</value></data>
+  <data name="Actions.windows.appearance.visual-effects.reduce.Description" xml:space="preserve"><value>Reduce animaciones y transparencia mientras conserva la legibilidad y el suavizado de fuentes.</value></data>
+  <data name="Runtime.ApplyingAction" xml:space="preserve"><value>Aplicando {0}</value></data>
+  <data name="Runtime.ActionCompleted" xml:space="preserve"><value>Completado: {0}</value></data>
+  <data name="Runtime.ValidatingTransaction" xml:space="preserve"><value>Validando transacción {0}.</value></data>
+  <data name="Runtime.ConfirmRestore" xml:space="preserve"><value>Confirmar restauración en Windows</value></data>
+  <data name="Runtime.ConfirmRestoreDetail" xml:space="preserve"><value>El plan de energía anterior requiere que el intermediario elevado sea restaurado.</value></data>
+  <data name="Runtime.AdminRestorePending" xml:space="preserve"><value>Restauración administrativa pendiente</value></data>
+  <data name="Runtime.AdminRestorePendingDetail" xml:space="preserve"><value>Confirma UAC desde Historial cuando quieras completar la reversión.</value></data>
+  <data name="Runtime.BrokerApplying" xml:space="preserve"><value>Aplicando ajustes administrativos</value></data>
+  <data name="Runtime.BrokerRestoring" xml:space="preserve"><value>Restaurando configuración administrativa</value></data>
+  <data name="Plan.Notice.DiagnosticsRetention" xml:space="preserve"><value>Los diagnósticos con más de {0} días serán eliminados permanentemente.</value></data>
+  <data name="Plan.Notice.ServerCacheRepair" xml:space="preserve"><value>Las cachés del servidor se reconstruirán y la primera carga puede ser más lenta; limpiar server-cache-priv también puede hacer que clips más antiguos del Editor de Rockstar no estén disponibles.</value></data>
+  <data name="Plan.Notice.AcPower" xml:space="preserve"><value>El modo de energía de rendimiento se aplica solo mientras la computadora está conectada.</value></data>
+  <data name="Plan.Notice.AggressiveVisual" xml:space="preserve"><value>El perfil Agresivo prioriza el FPS y la capacidad de respuesta sobre la calidad visual.</value></data>
+  <data name="Results.FiveMStopped" xml:space="preserve"><value>FiveM está cerrado; es seguro continuar.</value></data>
+  <data name="Results.GtaVStopped" xml:space="preserve"><value>GTA V está cerrado; es seguro continuar.</value></data>
+  <data name="Results.NoAllowlistedFiles" xml:space="preserve"><value>Ningún archivo permitido coincidió con los criterios de limpieza.</value></data>
+  <data name="Results.CleanupPrepared" xml:space="preserve"><value>{0} archivo(s) preparados para limpieza ({1} bytes).</value></data>
+  <data name="Results.RegistryNoChange" xml:space="preserve"><value>Ningún valor compatible necesitó ser cambiado.</value></data>
+  <data name="Results.RegistryUpdated" xml:space="preserve"><value>{0} configuración(es) permitidas actualizadas.</value></data>
+  <data name="Results.PowerOnBattery" xml:space="preserve"><value>El modo de alto rendimiento no se habilitó porque la computadora está en batería.</value></data>
+  <data name="Results.PowerUnsupported" xml:space="preserve"><value>Esta computadora no expone un plan de energía de alto rendimiento compatible.</value></data>
+  <data name="Results.PowerAlreadyActive" xml:space="preserve"><value>El plan de energía de alto rendimiento ya estaba activo.</value></data>
+  <data name="Results.PowerActivated" xml:space="preserve"><value>El plan de energía de alto rendimiento se activó; el estado anterior se guardó para reversión.</value></data>
+  <data name="Results.GraphicsGtaNotConfirmed" xml:space="preserve"><value>No se confirmó la instalación de GTA V Legacy; settings.xml no se cambiará.</value></data>
+  <data name="Results.GraphicsFiveMSettingsMissing" xml:space="preserve"><value>gta5_settings.xml aún no existe; abre FiveM una vez antes de aplicar el preset.</value></data>
+  <data name="Results.GraphicsGtaSettingsMissing" xml:space="preserve"><value>settings.xml aún no existe; abre GTA V Legacy una vez antes de aplicar el preset.</value></data>
+  <data name="Results.GraphicsAlreadyApplied" xml:space="preserve"><value>La configuración gráfica permitida ya coincidía con el preset solicitado.</value></data>
+  <data name="Results.GraphicsUpdated" xml:space="preserve"><value>Se creó un respaldo y se actualizaron {0} opción(es) gráfica(s).</value></data>
+  <data name="Results.VisualEffectsAlreadyApplied" xml:space="preserve"><value>Los efectos visuales de Windows ya coincidían con el estado solicitado.</value></data>
+  <data name="Results.VisualEffectsUpdated" xml:space="preserve"><value>Los efectos visuales de Windows se actualizaron a través de la API oficial.</value></data>
+  <data name="Update.Available.Title" xml:space="preserve"><value>Vemryx One {0} está disponible</value></data>
+  <data name="Update.Available.Detail" xml:space="preserve"><value>Instalador oficial encontrado ({0}). Su tamaño y SHA-256 de GitHub se verificarán antes de que pueda abrirse.</value></data>
+  <data name="Update.Downloading.Title" xml:space="preserve"><value>Descargando actualización verificada</value></data>
+  <data name="Update.Downloading.Detail" xml:space="preserve"><value>{0:0}% descargado • el instalador no se ejecutará automáticamente</value></data>
+  <data name="Update.Ready.Title" xml:space="preserve"><value>La actualización {0} está lista</value></data>
+  <data name="Update.Ready.Detail" xml:space="preserve"><value>SHA-256 verificado. Windows preguntará antes de que se abra el instalador.</value></data>
+  <data name="Update.InstallNow" xml:space="preserve"><value>Actualizar ahora</value></data>
+  <data name="Update.Installing.Title" xml:space="preserve"><value>Instalando la actualización {0}</value></data>
+  <data name="Update.Installing.Detail" xml:space="preserve"><value>Vemryx One se cerrará y volverá a abrirse solo en la nueva versión.</value></data>
+  <data name="Update.Completed.Title" xml:space="preserve"><value>Vemryx One actualizado a la versión {0}</value></data>
+  <data name="Update.Completed.Detail" xml:space="preserve"><value>La actualización se instaló y verificó. No hace falta nada más.</value></data>
+  <data name="Update.BlockedWhileBusy" xml:space="preserve"><value>Termina o cancela la optimización actual antes de actualizar.</value></data>
+  <data name="Update.ReleaseNotes" xml:space="preserve"><value>Ver cambios</value></data>
+  <data name="Update.Failed.Title" xml:space="preserve"><value>La actualización no se descargó</value></data>
+  <data name="Update.Failed.Detail" xml:space="preserve"><value>No se instaló nada. {0}</value></data>
+  <data name="Dialog.UpdateInstall.Title" xml:space="preserve"><value>Instalar actualización verificada</value></data>
+  <data name="Dialog.UpdateInstall.Message" xml:space="preserve"><value>¿Instalar ahora la actualización verificada de Vemryx One {0}? Vemryx One se cerrará, se actualizará solo y volverá a abrirse automáticamente — no hace falta ningún otro paso.</value></data>
+  <data name="Dialog.UpdateInstall.Failed" xml:space="preserve"><value>No se pudo instalar la actualización verificada: {0}</value></data>
+  <data name="Dialog.OpenExternal.Title" xml:space="preserve"><value>No se pudo abrir</value></data>
+  <data name="Dialog.OpenExternal.Message" xml:space="preserve"><value>Windows no pudo abrir este elemento: {0}</value></data>
+  <data name="Diagnosis.MemoryAvailable" xml:space="preserve"><value>{0:0.#} GB • {1:0.#} GB disponibles</value></data>
+  <data name="Diagnosis.MemoryTotal" xml:space="preserve"><value>{0:0} GB</value></data>
+  <data name="Diagnosis.MemoryModules" xml:space="preserve"><value>{0:0} GB · {1}</value></data>
+  <data name="Diagnosis.DiskCapacity" xml:space="preserve"><value>{0:0} GB</value></data>
+  <data name="Demo.Cpu" xml:space="preserve"><value>Procesador de 6 núcleos</value></data>
+  <data name="Demo.Gpu" xml:space="preserve"><value>GPU dedicada • 8 GB</value></data>
+  <data name="Demo.Notice" xml:space="preserve"><value>Configuración equilibrada; el perfil recomendado conserva la calidad y prioriza la consistencia.</value></data>
+  <data name="Diagnosis.CpuUnknown" xml:space="preserve"><value>Procesador no identificado</value></data>
+  <data name="Diagnosis.GpuFallback" xml:space="preserve"><value>GPU informada por Windows</value></data>
+  <data name="Diagnosis.MemoryUnavailable" xml:space="preserve"><value>Windows no devolvió el estado de la memoria física.</value></data>
+  <data name="Runtime.DemoHistoryDisabled" xml:space="preserve"><value>El modo de demostración no accede al historial real de la computadora.</value></data>
+  <data name="Runtime.LocalChangesReverted" xml:space="preserve"><value>Los cambios locales no se confirmaron y se revirtieron.</value></data>
+  <data name="Runtime.AdminConfirmationCancelled" xml:space="preserve"><value>La confirmación administrativa se canceló antes de comenzar.</value></data>
+  <data name="Runtime.BrokerResultUnconfirmed" xml:space="preserve"><value>El componente administrativo no confirmó su resultado: {0}</value></data>
+  <data name="Runtime.UacCancelledRestored" xml:space="preserve"><value>UAC se canceló. Las configuraciones reversibles se restauraron; las limpiezas completadas permanecen registradas.</value></data>
+  <data name="Runtime.AdminPhaseFailed" xml:space="preserve"><value>La fase administrativa falló de forma segura: {0}</value></data>
+  <data name="Runtime.UacCancelledPreserved" xml:space="preserve"><value>La optimización se completó, pero se canceló la confirmación de Windows para el plan de energía de alto rendimiento. Todos los demás cambios se conservaron.</value></data>
+  <data name="Runtime.AdminPhaseFailedPreserved" xml:space="preserve"><value>La optimización se completó, pero Windows no permitió habilitar el plan de energía de alto rendimiento: {0} Todos los demás cambios se conservaron.</value></data>
+  <data name="Runtime.RollbackJournalError" xml:space="preserve"><value>El diario conservó un error de reversión para diagnósticos.</value></data>
+  <data name="Runtime.RollbackConflict" xml:space="preserve"><value>La reversión local encontró un conflicto y conservó el estado más reciente del usuario.</value></data>
+  <data name="Runtime.Interrupted.RolledBack" xml:space="preserve"><value>{0} Las configuraciones locales reversibles se restauraron; las limpiezas confirmadas permanecen en Historial.</value></data>
+  <data name="Runtime.Interrupted.AdminPending" xml:space="preserve"><value>{0} El Historial muestra una restauración administrativa pendiente; usa Deshacer para completarla con UAC.</value></data>
+  <data name="Runtime.Interrupted.RollbackFailed" xml:space="preserve"><value>{0} La reversión local encontró un conflicto y conservó el diario para diagnósticos.</value></data>
+  <data name="Runtime.Interrupted.Unconfirmed" xml:space="preserve"><value>{0} No se pudo confirmar el estado final; revisa el Historial antes de volver a intentarlo.</value></data>
+  <data name="Runtime.Interrupted.CheckHistory" xml:space="preserve"><value>{0} Revisa el Historial local para confirmar el estado final de la transacción.</value></data>
+  <data name="History.State.Committed" xml:space="preserve"><value>Completado</value></data>
+  <data name="History.State.AwaitingUac" xml:space="preserve"><value>Esperando confirmación de UAC</value></data>
+  <data name="History.State.AdminRollbackPending" xml:space="preserve"><value>Reversión administrativa pendiente</value></data>
+  <data name="History.State.LocalRollbackPending" xml:space="preserve"><value>Reversión local pendiente</value></data>
+  <data name="History.State.RolledBack" xml:space="preserve"><value>Restaurado</value></data>
+  <data name="History.State.RollbackFailed" xml:space="preserve"><value>Error de reversión</value></data>
+  <data name="History.State.FailedSafely" xml:space="preserve"><value>Falló de forma segura</value></data>
+  <data name="History.State.Interrupted" xml:space="preserve"><value>Interrumpido</value></data>
+  <data name="BugReport.Service.RateLimited" xml:space="preserve"><value>El servicio recibió demasiados reportes. Espera unos minutos e intenta de nuevo.</value></data>
+  <data name="BugReport.Service.HttpError" xml:space="preserve"><value>El servicio de entrega devolvió HTTP {0}.</value></data>
+  <data name="BugReport.Service.ActivationRequired" xml:space="preserve"><value>El canal de reportes está esperando activación del desarrollador. Copia el reporte mientras tanto.</value></data>
+  <data name="BugReport.Service.Unconfirmed" xml:space="preserve"><value>El servicio de entrega no confirmó la recepción. Copia el reporte e intenta de nuevo más tarde.</value></data>
+  <data name="BugReport.Service.UnexpectedResponse" xml:space="preserve"><value>El servicio devolvió una respuesta inesperada. Copia el reporte e intenta de nuevo más tarde.</value></data>
+  <data name="BugReport.Service.Accepted" xml:space="preserve"><value>Reporte aceptado por el servicio de entrega.</value></data>
+  <data name="Runtime.PlanCompletedWithErrors" xml:space="preserve"><value>Optimización terminada con problemas</value></data>
+  <data name="Runtime.PlanCompletedWithErrorsDetail" xml:space="preserve"><value>Una o más acciones fallaron o no se pudieron confirmar. Revisa el reporte a continuación.</value></data>
+  <data name="Runtime.ActionVerified" xml:space="preserve"><value>Ya configurado: {0}</value></data>
+  <data name="Runtime.ActionSkipped" xml:space="preserve"><value>Omitido: {0}</value></data>
+  <data name="Runtime.ActionFailed" xml:space="preserve"><value>Falló: {0}</value></data>
+  <data name="Runtime.ActionRolledBack" xml:space="preserve"><value>Revertido después del fallo: {0}</value></data>
+  <data name="Outcome.Verified" xml:space="preserve"><value>Verificado</value></data>
+  <data name="Outcome.Applied" xml:space="preserve"><value>Cambiado</value></data>
+  <data name="Outcome.Skipped" xml:space="preserve"><value>Omitido</value></data>
+  <data name="Outcome.Warning" xml:space="preserve"><value>Advertencia</value></data>
+  <data name="Outcome.Failed" xml:space="preserve"><value>Falló</value></data>
+  <data name="Outcome.RolledBack" xml:space="preserve"><value>Revertido</value></data>
+  <data name="Outcome.RollbackFailed" xml:space="preserve"><value>Error de reversión</value></data>
+  <data name="Outcome.NotRun" xml:space="preserve"><value>No ejecutado</value></data>
+  <data name="Outcome.Running" xml:space="preserve"><value>Ejecutando</value></data>
+  <data name="Report.Title" xml:space="preserve"><value>Reporte técnico</value></data>
+  <data name="Report.Field.Transaction" xml:space="preserve"><value>Transacción</value></data>
+  <data name="Report.Field.Date" xml:space="preserve"><value>Fecha</value></data>
+  <data name="Report.Field.Profile" xml:space="preserve"><value>Modo</value></data>
+  <data name="Report.Field.System" xml:space="preserve"><value>Sistema</value></data>
+  <data name="Report.Verified" xml:space="preserve"><value>Verificado</value></data>
+  <data name="Report.Changed" xml:space="preserve"><value>Cambiado</value></data>
+  <data name="Report.Skipped" xml:space="preserve"><value>Omitido</value></data>
+  <data name="Report.Warnings" xml:space="preserve"><value>Advertencias</value></data>
+  <data name="Report.Failed" xml:space="preserve"><value>Falló</value></data>
+  <data name="Report.RequiresRestart" xml:space="preserve"><value>Se necesita reiniciar</value></data>
+  <data name="Report.RestorePossible" xml:space="preserve"><value>Restauración posible</value></data>
+  <data name="Report.SummaryFormat" xml:space="preserve"><value>Verificado {0} · Cambiado {1} · Omitido {2} · Advertencias {3} · Falló {4}</value></data>
+  <data name="Report.RestartNeeded" xml:space="preserve"><value>Se recomienda reiniciar Windows para aplicar completamente los cambios.</value></data>
+  <data name="Report.RestartNotNeeded" xml:space="preserve"><value>No se requiere reiniciar.</value></data>
+  <data name="Report.CopyButton" xml:space="preserve"><value>Copiar reporte técnico</value></data>
+  <data name="Comparison.Reason.NewThermalSignal" xml:space="preserve"><value>Apareció una nueva señal de temperatura elevada que no estaba presente antes.</value></data>
+  <data name="Comparison.Reason.MemoryDropped" xml:space="preserve"><value>La memoria disponible cayó bruscamente en comparación con antes.</value></data>
+  <data name="Comparison.Title" xml:space="preserve"><value>Comparación antes/después</value></data>
+  <data name="Comparison.RegressionSuspected" xml:space="preserve"><value>El resultado parece peor que antes. Esto no es una medición de FPS — es una señal local aproximada.</value></data>
+  <data name="Comparison.NoRegression" xml:space="preserve"><value>No se detectó localmente ninguna señal de empeoramiento después de la optimización.</value></data>
+  <data name="Comparison.RevertButton" xml:space="preserve"><value>Revertir esta optimización</value></data>
+  <data name="Comparison.HardwareProfile" xml:space="preserve"><value>Perfil de hardware</value></data>
+  <data name="Settings.CheckForUpdates.Title" xml:space="preserve"><value>Buscar actualizaciones</value></data>
+  <data name="Settings.CheckForUpdates.Description" xml:space="preserve"><value>Verifica manualmente, ahora mismo, si hay disponible una versión pública más reciente de Vemryx One.</value></data>
+  <data name="Settings.CheckForUpdates.Button" xml:space="preserve"><value>Buscar actualizaciones</value></data>
+  <data name="Update.ManualCheck.UpToDate" xml:space="preserve"><value>Ya tienes la última versión publicada.</value></data>
+  <data name="Update.ManualCheck.Failed" xml:space="preserve"><value>No se pudo buscar actualizaciones: {0}</value></data>
+  <data name="GtaVBenchmark.Title" xml:space="preserve"><value>Benchmark oficial de GTA V</value></data>
+  <data name="GtaVBenchmark.Description" xml:space="preserve"><value>Inicia GTA V independiente (nunca dentro de FiveM) con la propia bandera -benchmark de Rockstar, ejecuta 3 rondas e informa la mediana. GTA V debe estar cerrado primero.</value></data>
+  <data name="GtaVBenchmark.RunButton" xml:space="preserve"><value>Ejecutar benchmark oficial</value></data>
+  <data name="GtaVBenchmark.Running" xml:space="preserve"><value>Ejecutando el benchmark oficial de GTA V (3 rondas)... esto puede tardar varios minutos.</value></data>
+  <data name="GtaVBenchmark.Result" xml:space="preserve"><value>Mediana de {4} ronda(s) — FPS promedio: {0:0.#}, FPS mínimo: {1:0.#}, 1% bajo: {2:0.#}, 0.1% bajo: {3:0.#}.</value></data>
+  <data name="GtaVBenchmark.Error" xml:space="preserve"><value>No se pudo ejecutar el benchmark oficial: {0}</value></data>
+  <data name="GtaVBenchmark.Failure.NotDetected" xml:space="preserve"><value>No se detectó GTA V en esta computadora.</value></data>
+  <data name="GtaVBenchmark.Failure.StillRunning" xml:space="preserve"><value>GTA V sigue en ejecución. Ciérralo antes de ejecutar el benchmark oficial.</value></data>
+  <data name="GtaVBenchmark.Failure.OutputNotFound" xml:space="preserve"><value>El benchmark oficial se ejecutó, pero su archivo de resultado no se pudo localizar en la carpeta de perfil de GTA V.</value></data>
+  <data name="GtaVBenchmark.Failure.OutputNotRecognized" xml:space="preserve"><value>Se encontró un archivo de salida del benchmark, pero su formato no se pudo reconocer de forma segura.</value></data>
+  <data name="GtaVBenchmark.Failure.Timeout" xml:space="preserve"><value>GTA V no se cerró dentro del tiempo esperado; el benchmark se canceló.</value></data>
+  <data name="GtaVBenchmark.Failure.Generic" xml:space="preserve"><value>No se pudo completar el benchmark oficial.</value></data>
+  <data name="Report.SaveButton" xml:space="preserve"><value>Guardar reporte en archivo</value></data>
+  <data name="Common.Yes" xml:space="preserve"><value>Sí</value></data>
+  <data name="Common.No" xml:space="preserve"><value>No</value></data>
+  <data name="Profiles.Presentation.Light.Benefits" xml:space="preserve"><value>Libera espacio y aplica ajustes ligeros con impacto mínimo, manteniendo la calidad visual casi intacta.</value></data>
+  <data name="Profiles.Presentation.Balanced.Benefits" xml:space="preserve"><value>Equilibra la calidad visual, el uso de GPU y la estabilidad de fotogramas con ajustes moderados y totalmente reversibles.</value></data>
+  <data name="Profiles.Presentation.Aggressive.Benefits" xml:space="preserve"><value>Prioriza el FPS y la capacidad de respuesta sobre la calidad visual, aplicando todos los ajustes seguros disponibles.</value></data>
+  <data name="Profiles.Presentation.Impact.Low" xml:space="preserve"><value>Impacto bajo</value></data>
+  <data name="Profiles.Presentation.Impact.Moderate" xml:space="preserve"><value>Impacto moderado</value></data>
+  <data name="Profiles.Presentation.Impact.High" xml:space="preserve"><value>Impacto alto</value></data>
+  <data name="Category.Safety" xml:space="preserve"><value>Seguridad</value></data>
+  <data name="Category.Storage" xml:space="preserve"><value>Almacenamiento</value></data>
+  <data name="Category.WindowsGaming" xml:space="preserve"><value>Juegos en Windows</value></data>
+  <data name="Category.Power" xml:space="preserve"><value>Energía</value></data>
+  <data name="Category.Appearance" xml:space="preserve"><value>Apariencia</value></data>
+  <data name="Category.FiveMGraphics" xml:space="preserve"><value>Gráficos de FiveM/GTA V</value></data>
+  <data name="Optimizer.StepLedger.Title" xml:space="preserve"><value>Resultados de pasos</value></data>
+  <data name="Dashboard.Readiness.Excellent" xml:space="preserve"><value>Excelente</value></data>
+  <data name="Dashboard.Readiness.Good" xml:space="preserve"><value>Bueno</value></data>
+  <data name="Dashboard.Readiness.Average" xml:space="preserve"><value>Medio</value></data>
+  <data name="Dashboard.Readiness.Poor" xml:space="preserve"><value>Malo</value></data>
+  <data name="Dashboard.Readiness.VeryPoor" xml:space="preserve"><value>Muy malo</value></data>
+  <data name="Dashboard.Readiness.LocalAnalysis" xml:space="preserve"><value>Análisis local de capacidad y compatibilidad</value></data>
+  <data name="Dashboard.LivePerformance.Title" xml:space="preserve"><value>Rendimiento en vivo</value></data>
+  <data name="Dashboard.LivePerformance.Description" xml:space="preserve"><value>Uso real de los recursos, actualizado mientras esta página esté abierta.</value></data>
+  <data name="Dashboard.LivePerformance.Live" xml:space="preserve"><value>EN VIVO</value></data>
+  <data name="Dashboard.LivePerformance.Updated" xml:space="preserve"><value>Actualizado a las {0}</value></data>
+  <data name="Dashboard.LivePerformance.Unavailable" xml:space="preserve"><value>Lectura no disponible</value></data>
+  <data name="Dashboard.LivePerformance.Waiting" xml:space="preserve"><value>Leyendo…</value></data>
+  <data name="Dashboard.LivePerformance.NotAvailable" xml:space="preserve"><value>No disponible</value></data>
+  <data name="Dashboard.LivePerformance.PercentValue" xml:space="preserve"><value>{0:0}%</value></data>
+  <data name="Dashboard.LivePerformance.NetworkValue" xml:space="preserve"><value>{0:0.0} MB/s</value></data>
+  <data name="Dashboard.LivePerformance.Cpu" xml:space="preserve"><value>CPU</value></data>
+  <data name="Dashboard.LivePerformance.Gpu" xml:space="preserve"><value>GPU</value></data>
+  <data name="Dashboard.LivePerformance.Memory" xml:space="preserve"><value>MEMORIA</value></data>
+  <data name="Dashboard.LivePerformance.Disk" xml:space="preserve"><value>DISCO</value></data>
+  <data name="Dashboard.LivePerformance.Network" xml:space="preserve"><value>RED</value></data>
+  <data name="Dashboard.LivePerformance.ChartDescription" xml:space="preserve"><value>Historial de uso de CPU y GPU durante el último minuto.</value></data>
+  <data name="Dashboard.LivePerformance.LocalOnly" xml:space="preserve"><value>Lectura local. No se envía nada por internet.</value></data>
+  <data name="Dashboard.SystemOverview.Description" xml:space="preserve"><value>Hardware detectado y disponible para FiveM y GTA V.</value></data>
+  <data name="Dashboard.Eyebrow" xml:space="preserve"><value>DIAGNÓSTICO LOCAL</value></data>
+  <data name="Dashboard.LastScan" xml:space="preserve"><value>Último análisis a las {0}</value></data>
+  <data name="Dashboard.LastScan.Pending" xml:space="preserve"><value>Analizando…</value></data>
+  <data name="Dashboard.OpenHistory" xml:space="preserve"><value>Ver historial</value></data>
+  <data name="Dashboard.Kpi.GigabyteValue" xml:space="preserve"><value>{0:0.0} GB</value></data>
+  <data name="Dashboard.Kpi.MegabyteValue" xml:space="preserve"><value>{0:0} MB</value></data>
+  <data name="Dashboard.Kpi.Pressure.Title" xml:space="preserve"><value>CARGA DEL PC</value></data>
+  <data name="Dashboard.Kpi.Cores.Title" xml:space="preserve"><value>NÚCLEOS LÓGICOS</value></data>
+  <data name="Dashboard.Kpi.Cores.Detail" xml:space="preserve"><value>Informados por Windows</value></data>
+  <data name="Dashboard.Kpi.Memory.Title" xml:space="preserve"><value>MEMORIA LIBRE</value></data>
+  <data name="Dashboard.Kpi.Memory.Detail" xml:space="preserve"><value>de {0:0.0} GB en total</value></data>
+  <data name="Dashboard.Kpi.Cache.Title" xml:space="preserve"><value>CACHÉ DE FIVEM</value></data>
+  <data name="Dashboard.Kpi.Cache.Detail" xml:space="preserve"><value>Revisada por el optimizador</value></data>
+  <data name="Dashboard.Kpi.Cache.None" xml:space="preserve"><value>Ninguna</value></data>
+  <data name="Dashboard.Kpi.Cache.NoneDetail" xml:space="preserve"><value>No se encontró caché en el disco</value></data>
+  <data name="Dashboard.Pressure.Low" xml:space="preserve"><value>Baja</value></data>
+  <data name="Dashboard.Pressure.Moderate" xml:space="preserve"><value>Moderada</value></data>
+  <data name="Dashboard.Pressure.High" xml:space="preserve"><value>Alta</value></data>
+  <data name="Dashboard.LivePerformance.MemoryDetail" xml:space="preserve"><value>{0:0.0} / {1:0.0} GB</value></data>
+  <data name="Dashboard.LivePerformance.TrendValue" xml:space="preserve"><value>media {0:0}% · pico {1:0}%</value></data>
+  <data name="Dashboard.LivePerformance.Trend" xml:space="preserve"><value>MEDIA Y PICO</value></data>
+  <data name="Dashboard.LivePerformance.Window" xml:space="preserve"><value>Último minuto</value></data>
+  <data name="Dashboard.LivePerformance.Now" xml:space="preserve"><value>ahora</value></data>
+  <data name="Dashboard.LastRun.Title" xml:space="preserve"><value>ÚLTIMA OPTIMIZACIÓN</value></data>
+  <data name="Dashboard.LastRun.None.Title" xml:space="preserve"><value>Aún sin optimizaciones</value></data>
+  <data name="Dashboard.LastRun.None.Detail" xml:space="preserve"><value>Ejecuta el optimizador para crear un punto de restauración y un informe que podrás consultar aquí.</value></data>
+  <data name="Dashboard.Detection.Title" xml:space="preserve"><value>DETECCIÓN</value></data>
+  <data name="Error.Network" xml:space="preserve"><value>No se pudo conectar ahora. Comprueba tu conexión a Internet e inténtalo de nuevo.</value></data>
+  <data name="Error.Timeout" xml:space="preserve"><value>Esta acción tardó más de lo esperado. Inténtalo de nuevo en unos instantes.</value></data>
+  <data name="Error.AccessDenied" xml:space="preserve"><value>Windows no permitió esta acción. Comprueba el permiso necesario e inténtalo de nuevo.</value></data>
+  <data name="Error.FileUnavailable" xml:space="preserve"><value>Un archivo necesario no está disponible o está en uso. Cierra las aplicaciones relacionadas e inténtalo de nuevo.</value></data>
+  <data name="Error.SecurityCheck" xml:space="preserve"><value>La comprobación de seguridad no se aprobó. No se cambió nada.</value></data>
+  <data name="Error.InvalidData" xml:space="preserve"><value>No se pudo verificar la información recibida de forma segura. No se cambió nada.</value></data>
+  <data name="Error.Unexpected" xml:space="preserve"><value>Ocurrió un problema inesperado. Inténtalo de nuevo; si continúa, envía un informe de error.</value></data>
+  <data name="Optimizer.Level" xml:space="preserve"><value>NIVEL</value></data>
+  <data name="Optimizer.Safety" xml:space="preserve"><value>Seguridad</value></data>
+  <data name="Optimizer.Detected" xml:space="preserve"><value>Detectado en esta computadora</value></data>
+  <data name="Optimizer.Stage.Prepare" xml:space="preserve"><value>PREPARAR</value></data>
+  <data name="Optimizer.Stage.Run" xml:space="preserve"><value>EJECUTAR</value></data>
+  <data name="Optimizer.Stage.Result" xml:space="preserve"><value>RESULTADO</value></data>
+  <data name="Account.WindowTitle" xml:space="preserve"><value>Tu cuenta</value></data>
+  <data name="Account.TitleBarHeader" xml:space="preserve"><value>CUENTA VEMRYX ONE</value></data>
+  <data name="Account.Welcome.Title" xml:space="preserve"><value>Bienvenido de nuevo</value></data>
+  <data name="Account.Welcome.Subtitle" xml:space="preserve"><value>Inicia sesión para sincronizar tus preferencias entre instalaciones.</value></data>
+  <data name="Account.Register.Title" xml:space="preserve"><value>Crea tu cuenta</value></data>
+  <data name="Account.Register.Subtitle" xml:space="preserve"><value>Toma menos de un minuto. Después solo confirma tu correo.</value></data>
+  <data name="Account.ProfileSetup.Title" xml:space="preserve"><value>Ya casi</value></data>
+  <data name="Account.ProfileSetup.Subtitle" xml:space="preserve"><value>Elige un nombre de usuario disponible para terminar tu registro.</value></data>
+  <data name="Account.Verification.Title" xml:space="preserve"><value>Confirma tu correo</value></data>
+  <data name="Account.Verification.Subtitle" xml:space="preserve"><value>Solo falta un clic en el enlace que enviamos.</value></data>
+  <data name="Account.Verification.Detail" xml:space="preserve"><value>Enviamos un enlace de confirmación a {0}. Abre el correo y haz clic en el enlace — si no llega en unos minutos, revisa el spam o reenvíalo abajo.</value></data>
+  <data name="Account.Provider.ContinueWithGoogle" xml:space="preserve"><value>Continuar con Google</value></data>
+  <data name="Account.Provider.SignUpWithGoogle" xml:space="preserve"><value>Registrarse con Google</value></data>
+  <data name="Account.Provider.DividerSignIn" xml:space="preserve"><value>O USA TU CORREO</value></data>
+  <data name="Account.Provider.DividerRegister" xml:space="preserve"><value>O REGÍSTRATE CON CORREO</value></data>
+  <data name="Account.Profile.SectionLabel" xml:space="preserve"><value>QUIÉN ERES</value></data>
+  <data name="Account.Profile.FirstNameLabel" xml:space="preserve"><value>Nombre</value></data>
+  <data name="Account.Profile.LastNameLabel" xml:space="preserve"><value>Apellido</value></data>
+  <data name="Account.Profile.UsernameLabel" xml:space="preserve"><value>Nombre de usuario</value></data>
+  <data name="Account.Profile.UsernameHint" xml:space="preserve"><value>De 3 a 24 caracteres. Empieza con una letra y usa solo letras, números y "_".</value></data>
+  <data name="Account.Credentials.SectionLabel" xml:space="preserve"><value>DATOS DE ACCESO</value></data>
+  <data name="Account.Credentials.EmailLabel" xml:space="preserve"><value>Correo electrónico</value></data>
+  <data name="Account.Credentials.PasswordLabel" xml:space="preserve"><value>Contraseña</value></data>
+  <data name="Account.Credentials.PasswordPlaceholder" xml:space="preserve"><value>Tu contraseña</value></data>
+  <data name="Account.Credentials.PasswordPlaceholderRegister" xml:space="preserve"><value>Crea una contraseña segura</value></data>
+  <data name="Account.Credentials.ConfirmPasswordLabel" xml:space="preserve"><value>Repetir contraseña</value></data>
+  <data name="Account.Credentials.ConfirmPasswordPlaceholder" xml:space="preserve"><value>Escribe la contraseña de nuevo</value></data>
+  <data name="Account.Options.KeepSignedIn" xml:space="preserve"><value>Mantener la sesión iniciada en esta computadora</value></data>
+  <data name="Account.Actions.ForgotPassword" xml:space="preserve"><value>Olvidé mi contraseña</value></data>
+  <data name="Account.Terms.AgreementPrefix" xml:space="preserve"><value>He leído y acepto los</value></data>
+  <data name="Account.Terms.TermsOfUseLink" xml:space="preserve"><value>Términos de Uso</value></data>
+  <data name="Account.Terms.ReadLink" xml:space="preserve"><value>Leer los Términos de Uso</value></data>
+  <data name="Account.Actions.SignIn" xml:space="preserve"><value>Iniciar sesión</value></data>
+  <data name="Account.Actions.CreateAccount" xml:space="preserve"><value>Crear mi cuenta</value></data>
+  <data name="Account.Actions.FinishRegistration" xml:space="preserve"><value>Completar registro</value></data>
+  <data name="Account.Switch.ToRegister" xml:space="preserve"><value>¿Aún no tienes cuenta? Crear cuenta</value></data>
+  <data name="Account.Switch.ToSignIn" xml:space="preserve"><value>¿Ya tienes una cuenta? Iniciar sesión</value></data>
+  <data name="Account.Actions.SignOut" xml:space="preserve"><value>Cerrar sesión</value></data>
+  <data name="Account.Verification.Resend" xml:space="preserve"><value>Reenviar correo de verificación</value></data>
+  <data name="Account.Verification.Refresh" xml:space="preserve"><value>Ya confirmé, verificar ahora</value></data>
+  <data name="Account.Username.Checking" xml:space="preserve"><value>Comprobando disponibilidad…</value></data>
+  <data name="Account.Username.Available" xml:space="preserve"><value>Este nombre de usuario está disponible.</value></data>
+  <data name="Account.Username.Taken" xml:space="preserve"><value>Este nombre de usuario ya está en uso.</value></data>
+  <data name="Account.Password.PolicyMinimum" xml:space="preserve"><value>Usa al menos {0} caracteres.</value></data>
+  <data name="Account.Password.PolicyRemaining" xml:space="preserve"><value>Faltan {0} carácter(es) para el mínimo de {1}.</value></data>
+  <data name="Account.Password.PolicyMet" xml:space="preserve"><value>¡Bien! Tu contraseña cumple el mínimo requerido.</value></data>
+  <data name="Account.Password.ConfirmMatch" xml:space="preserve"><value>Las contraseñas coinciden.</value></data>
+  <data name="Account.Password.ConfirmMismatch" xml:space="preserve"><value>Las contraseñas no coinciden.</value></data>
+  <data name="Account.Validation.InvalidEmail" xml:space="preserve"><value>Ingresa una dirección de correo válida.</value></data>
+  <data name="Account.Validation.PasswordRequired" xml:space="preserve"><value>Escribe tu contraseña para iniciar sesión.</value></data>
+  <data name="Account.Validation.FirstNameRequired" xml:space="preserve"><value>Ingresa tu nombre.</value></data>
+  <data name="Account.Validation.LastNameRequired" xml:space="preserve"><value>Ingresa tu apellido.</value></data>
+  <data name="Account.Validation.UsernameFormat" xml:space="preserve"><value>El nombre de usuario debe tener de 3 a 24 caracteres, empezar con una letra y usar solo letras, números y "_".</value></data>
+  <data name="Account.Validation.PasswordMinLength" xml:space="preserve"><value>Tu contraseña necesita al menos 12 caracteres.</value></data>
+  <data name="Account.Validation.PasswordsMustMatch" xml:space="preserve"><value>Las dos contraseñas deben coincidir.</value></data>
+  <data name="Account.Validation.TermsRequired" xml:space="preserve"><value>Acepta los Términos de Uso para crear tu cuenta.</value></data>
+  <data name="Account.Validation.EmailRequiredForReset" xml:space="preserve"><value>Ingresa tu correo para recibir las instrucciones de recuperación.</value></data>
+  <data name="Account.Session.Expired" xml:space="preserve"><value>Tu sesión expiró. Inicia sesión de nuevo para completar tu registro.</value></data>
+  <data name="Account.Profile.SaveFailed" xml:space="preserve"><value>No se pudo guardar tu perfil.</value></data>
+  <data name="Account.Profile.DeleteFailed" xml:space="preserve"><value>No se pudo eliminar el perfil de tu cuenta. Tu cuenta no se eliminó.</value></data>
+  <data name="Account.Google.SigningIn" xml:space="preserve"><value>Completando el inicio de sesión en la ventana de tu navegador…</value></data>
+  <data name="Account.Google.Failed" xml:space="preserve"><value>No se pudo iniciar sesión con Google.</value></data>
+  <data name="Account.PasswordReset.Sent" xml:space="preserve"><value>Si existe una cuenta para este correo, enviamos las instrucciones de recuperación.</value></data>
+  <data name="Account.Verification.ResentConfirmation" xml:space="preserve"><value>Reenviamos el correo de confirmación.</value></data>
+  <data name="Account.Verification.PleaseConfirm" xml:space="preserve"><value>Confirma tu correo para continuar.</value></data>
+  <data name="Settings.Account.ChangePassword" xml:space="preserve"><value>Cambiar contraseña</value></data>
+  <data name="Settings.Account.SignInButton" xml:space="preserve"><value>Iniciar sesión / Crear cuenta</value></data>
+  <data name="Settings.Account.NewEmailLabel" xml:space="preserve"><value>Nuevo correo</value></data>
+  <data name="History.Empty.Detail" xml:space="preserve"><value>Tus ejecuciones, resultados y opciones para deshacer aparecerán aquí después de la primera optimización.</value></data>
+  <data name="Settings.Tools.ReportIssue.Title" xml:space="preserve"><value>Informar un problema</value></data>
+  <data name="Account.ViewTooltip" xml:space="preserve"><value>Ver mi cuenta</value></data>
+  <data name="Settings.Account.SignedOutDescription" xml:space="preserve"><value>Inicia sesión o crea una cuenta para sincronizar tus preferencias.</value></data>
+  <data name="Settings.Tools.ReportIssue.Button" xml:space="preserve"><value>Informar un error</value></data>
+  <data name="Account.SignInButton" xml:space="preserve"><value>Iniciar sesión / Crear cuenta</value></data>
+  <data name="Account.SignInTooltip" xml:space="preserve"><value>Iniciar sesión o crear una cuenta</value></data>
+  <data name="History.Empty.Action" xml:space="preserve"><value>Abrir optimizador</value></data>
+  <data name="Settings.Account.ChangeEmail" xml:space="preserve"><value>Cambiar correo</value></data>
+  <data name="Settings.Account.SignOut" xml:space="preserve"><value>Cerrar sesión</value></data>
+  <data name="Settings.Account.NewPasswordLabel" xml:space="preserve"><value>Nueva contraseña</value></data>
+  <data name="Settings.Account.Title" xml:space="preserve"><value>Cuenta</value></data>
+  <data name="Settings.Account.ChangePhoto" xml:space="preserve"><value>Cambiar foto</value></data>
+  <data name="Settings.Account.Unavailable" xml:space="preserve"><value>El acceso a la cuenta no está disponible en esta instalación.</value></data>
+  <data name="Report.ViewHistoryButton" xml:space="preserve"><value>Ver historial</value></data>
+  <data name="Settings.Account.CurrentPasswordPlaceholder" xml:space="preserve"><value>Confirma para cambiar tu contraseña, correo o eliminar la cuenta</value></data>
+  <data name="Settings.Account.Delete" xml:space="preserve"><value>Eliminar cuenta</value></data>
+  <data name="Settings.Tools.Title" xml:space="preserve"><value>Herramientas</value></data>
+  <data name="Settings.Account.CurrentPasswordLabel" xml:space="preserve"><value>Contraseña actual</value></data>
+  <data name="Settings.Account.RemovePhoto" xml:space="preserve"><value>Quitar</value></data>
+  <data name="Progress.CancelHelp" xml:space="preserve"><value>La cancelación se solicita de forma segura después de la acción actual.</value></data>
+  <data name="Settings.Account.NewPasswordPlaceholder" xml:space="preserve"><value>Mínimo de 8 caracteres</value></data>
+  <data name="Settings.Account.Security.Title" xml:space="preserve"><value>Seguridad</value></data>
+  <data name="Settings.Account.Security.Description" xml:space="preserve"><value>Administra la credencial utilizada para acceder a tu cuenta.</value></data>
+  <data name="Settings.Account.PasswordLabel" xml:space="preserve"><value>Contraseña</value></data>
+  <data name="Settings.Account.PasswordNotConfigured" xml:space="preserve"><value>No configurada</value></data>
+  <data name="Settings.Account.ResetPasswordTooltip" xml:space="preserve"><value>Restablecer contraseña</value></data>
+  <data name="Settings.Account.CreatePasswordTooltip" xml:space="preserve"><value>Crear contraseña</value></data>
+  <data name="Settings.Account.Details.Title" xml:space="preserve"><value>Datos de la cuenta</value></data>
+  <data name="Settings.Account.PasswordRequiredForSensitiveActions" xml:space="preserve"><value>Crea una contraseña antes de cambiar el correo o eliminar tu cuenta.</value></data>
+  <data name="PasswordSecurity.WindowTitle" xml:space="preserve"><value>Seguridad de la cuenta</value></data>
+  <data name="PasswordSecurity.Reset.Title" xml:space="preserve"><value>Restablecer contraseña</value></data>
+  <data name="PasswordSecurity.Reset.Subtitle" xml:space="preserve"><value>Confirma tu contraseña actual y elige una nueva para tu cuenta.</value></data>
+  <data name="PasswordSecurity.Reset.Action" xml:space="preserve"><value>Guardar nueva contraseña</value></data>
+  <data name="PasswordSecurity.Create.Title" xml:space="preserve"><value>Crear contraseña</value></data>
+  <data name="PasswordSecurity.Create.Subtitle" xml:space="preserve"><value>Añade una contraseña para poder iniciar sesión también sin Google.</value></data>
+  <data name="PasswordSecurity.Create.Action" xml:space="preserve"><value>Crear contraseña</value></data>
+  <data name="PasswordSecurity.CurrentPasswordPlaceholder" xml:space="preserve"><value>Escribe tu contraseña actual</value></data>
+  <data name="PasswordSecurity.ConfirmPasswordLabel" xml:space="preserve"><value>Confirma la nueva contraseña</value></data>
+  <data name="PasswordSecurity.GoogleConfirmation" xml:space="preserve"><value>Al continuar, Google te pedirá que confirmes tu identidad. Tu contraseña de Google nunca se comparte con Vemryx One.</value></data>
+  <data name="PasswordSecurity.Cancel" xml:space="preserve"><value>Cancelar</value></data>
+  <data name="PasswordSecurity.Validation.CurrentPasswordRequired" xml:space="preserve"><value>Introduce tu contraseña actual.</value></data>
+  <data name="PasswordSecurity.Validation.CurrentPasswordInvalid" xml:space="preserve"><value>La contraseña actual es incorrecta.</value></data>
+  <data name="PasswordSecurity.Validation.MinimumLength" xml:space="preserve"><value>La nueva contraseña debe tener al menos {0} caracteres.</value></data>
+  <data name="PasswordSecurity.Validation.PasswordUnchanged" xml:space="preserve"><value>Elige una contraseña diferente de la actual.</value></data>
+  <data name="PasswordSecurity.Validation.GoogleAccountMismatch" xml:space="preserve"><value>Selecciona la misma cuenta de Google vinculada a Vemryx One.</value></data>
+  <data name="PasswordSecurity.Validation.AlreadyHasPassword" xml:space="preserve"><value>Esta cuenta ya tiene contraseña. Vuelve a abrir la ventana para restablecerla.</value></data>
+  <data name="PasswordSecurity.Validation.Failed" xml:space="preserve"><value>No se pudo actualizar tu contraseña. Inténtalo de nuevo.</value></data>
+  <data name="PasswordSecurity.GoogleUnavailable" xml:space="preserve"><value>La confirmación de identidad con Google no está disponible en esta instalación.</value></data>
+  <data name="PasswordSecurity.GoogleOpening" xml:space="preserve"><value>Abriendo Google para confirmar tu identidad…</value></data>
+  <data name="PasswordSecurity.Success" xml:space="preserve"><value>Tu contraseña se ha actualizado.</value></data>
+  <data name="Brand.ProductName" xml:space="preserve"><value>Vemryx One</value></data>
+  <data name="Brand.CompanyName" xml:space="preserve"><value>Vemryx</value></data>
+  <data name="Brand.ProductSuffix" xml:space="preserve"><value> One</value></data>
+  <data name="Terms.WindowTitle" xml:space="preserve"><value>Términos de uso de Vemryx One</value></data>
+  <data name="Terms.Title" xml:space="preserve"><value>Términos de uso</value></data>
+  <data name="Terms.VersionLabel" xml:space="preserve"><value>Versión {0} · Vigente desde el 2 de agosto de 2026</value></data>
+  <data name="Terms.Close" xml:space="preserve"><value>Cerrar</value></data>
+  <data name="Terms.Intro" xml:space="preserve"><value>Estos Términos de uso regulan el acceso a la cuenta y el uso de la aplicación Vemryx One. Al crear una cuenta, confirmas que has leído, comprendido y aceptado este documento.</value></data>
+  <data name="Terms.Service.Body" xml:space="preserve"><value>Vemryx One es una aplicación independiente para diagnóstico, mantenimiento y optimizaciones controladas relacionadas con FiveM, GTA V y Windows. Vemryx es la titular indicada en la licencia del software. FiveM, Cfx.re, Rockstar Games y Microsoft son marcas de sus respectivos propietarios y no patrocinan este proyecto.</value></data>
+  <data name="Terms.Privacy.Contact" xml:space="preserve"><value>La telemetría opcional, los diagnósticos y los reportes de errores tienen controles separados en la aplicación y no se autorizan únicamente por crear una cuenta. Para solicitar acceso, corrección o eliminación de datos de la cuenta, usa los canales oficiales del proyecto.</value></data>
+  <data name="Terms.PermittedUse.Body" xml:space="preserve"><value>Usa el servicio solo con fines lícitos y de acuerdo con la licencia de Vemryx One. Está prohibido explotar vulnerabilidades, automatizar registros abusivos, interferir con el servicio, eludir límites de seguridad, distribuir malware, violar derechos de terceros o usar la cuenta para fraude. La cuenta no concede derechos sobre la marca, el código o los servicios de terceros.</value></data>
+  <data name="Terms.Warranty.Body" xml:space="preserve"><value>Vemryx One se proporciona tal cual, dentro de los límites permitidos por la legislación aplicable y la licencia del proyecto. Nada en estos términos excluye derechos que no puedan renunciarse por ley. Sigues siendo responsable de las decisiones tomadas después de revisar la información presentada por la aplicación.</value></data>
+  <data name="Terms.LawContact.Body" xml:space="preserve"><value>Se aplican las leyes de la República Federativa de Brasil, incluidas las normas de protección de datos y del consumidor cuando correspondan. Las preguntas, solicitudes sobre la cuenta o comunicaciones legales deben enviarse por los canales oficiales del proyecto.</value></data>
+  <data name="Terms.Section1.Title" xml:space="preserve"><value>1. Servicio y responsable</value></data>
+  <data name="Terms.Section2.Title" xml:space="preserve"><value>2. Elegibilidad e información correcta</value></data>
+  <data name="Terms.Section2.Body" xml:space="preserve"><value>Debes tener capacidad legal para aceptar estos términos o autorización de tu responsable legal. El nombre, apellido, nombre de usuario y correo electrónico deben ser verdaderos y actuales, y no pueden suplantar a terceros, violar derechos, contener contenido ilegal ni inducir a error a otros usuarios.</value></data>
+  <data name="Terms.Section3.Title" xml:space="preserve"><value>3. Cuenta, contraseña y seguridad</value></data>
+  <data name="Terms.Section3.Body" xml:space="preserve"><value>Eres responsable de mantener tu contraseña confidencial y de las actividades realizadas en tu cuenta. No compartas credenciales ni intentes acceder a cuentas de terceros. Informa cualquier sospecha de acceso no autorizado por los canales oficiales del proyecto. Podemos cerrar sesiones o restringir cuentas para proteger el servicio, investigar abusos o cumplir una obligación legal.</value></data>
+  <data name="Terms.Section4.Title" xml:space="preserve"><value>4. Datos de la cuenta y privacidad</value></data>
+  <data name="Terms.Section4.AccountData" xml:space="preserve"><value>Para crear y mantener tu cuenta, tratamos nombre, apellido, nombre de usuario, correo electrónico, hash criptográfico de la contraseña, identificadores de sesión y la fecha y versión de la aceptación de estos términos. La contraseña en texto plano no se almacena. Estos datos se usan para autenticación, seguridad, prevención de abusos, soporte de la cuenta y comprobación del consentimiento.</value></data>
+  <data name="Terms.Section4.Infrastructure" xml:space="preserve"><value>La infraestructura de la cuenta utiliza Cloudflare Workers y una base de datos D1. El procesamiento puede realizarse en infraestructura distribuida, incluso fuera de Brasil, con las protecciones aplicables del proveedor y de la legislación. Los datos de la cuenta no se venden.</value></data>
+  <data name="Terms.Section5.Title" xml:space="preserve"><value>5. Uso permitido</value></data>
+  <data name="Terms.Section6.Title" xml:space="preserve"><value>6. Operaciones en tu equipo</value></data>
+  <data name="Terms.Section6.Body" xml:space="preserve"><value>La aplicación explica y presenta las acciones antes de ejecutarlas, aplica límites de seguridad y ofrece reversión cuando es técnicamente posible. Aun así, los cambios del sistema pueden depender del estado de Windows, los permisos, el antivirus, los controladores y el software de terceros. Revisa el plan presentado, mantén copias de seguridad adecuadas y no interrumpas operaciones en curso.</value></data>
+  <data name="Terms.Section7.Title" xml:space="preserve"><value>7. Disponibilidad y actualizaciones</value></data>
+  <data name="Terms.Section7.Body" xml:space="preserve"><value>El servicio puede actualizarse, suspenderse o modificarse por mantenimiento, seguridad, compatibilidad o evolución del producto. No garantizamos disponibilidad ininterrumpida ni compatibilidad con todas las configuraciones de hardware, versiones de Windows, FiveM, GTA V o software de terceros.</value></data>
+  <data name="Terms.Section8.Title" xml:space="preserve"><value>8. Garantías y responsabilidad</value></data>
+  <data name="Terms.Section9.Title" xml:space="preserve"><value>9. Suspensión y cierre</value></data>
+  <data name="Terms.Section9.Body" xml:space="preserve"><value>Podemos suspender o cerrar cuentas involucradas en abuso, fraude, riesgos de seguridad o incumplimiento de estos términos, de acuerdo con la legislación aplicable. Puedes dejar de usar el servicio y solicitar la eliminación de tu cuenta por los canales oficiales. Las obligaciones que por su naturaleza deban sobrevivir seguirán siendo aplicables.</value></data>
+  <data name="Terms.Section10.Title" xml:space="preserve"><value>10. Cambios en estos términos</value></data>
+  <data name="Terms.Section10.Body" xml:space="preserve"><value>Los cambios materiales se identificarán mediante una nueva versión. Cuando sea necesario, solicitaremos una nueva aceptación antes de que continúes usando las funciones de la cuenta. La versión aceptada y la fecha de aceptación quedan registradas para mantener este proceso verificable.</value></data>
+  <data name="Terms.Section11.Title" xml:space="preserve"><value>11. Ley aplicable y contacto</value></data>
+</root>

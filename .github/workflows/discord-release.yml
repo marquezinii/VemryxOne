@@ -41,7 +41,7 @@ jobs:
           EVENT_NAME = os.environ.get("GITHUB_EVENT_NAME", "")
           REPOSITORY = os.environ.get("GITHUB_REPOSITORY", "FiveMCleaner")
 
-          # Cor laranja da identidade visual do FiveMCleaner.
+          # Cor laranja da identidade visual do Vemryx One.
           COLOR = 0xFF8A00
 
           if not WEBHOOK_URL:
@@ -87,7 +87,7 @@ jobs:
                   data=data,
                   headers={
                       "Content-Type": "application/json; charset=utf-8",
-                      "User-Agent": "FiveMCleaner-GitHub-Actions/1.0",
+                      "User-Agent": "VemryxOne-GitHub-Actions/1.0",
                   },
                   method="POST",
               )
@@ -107,7 +107,7 @@ jobs:
               # Teste manual: simula uma release para validar o webhook sem publicar uma de verdade.
               release = {
                   "tag_name": "v0.0.0-teste",
-                  "name": "FiveMCleaner v0.0.0-teste",
+                  "name": "Vemryx One v0.0.0-teste",
                   "html_url": f"https://github.com/{REPOSITORY}/releases",
                   "published_at": None,
                   "body": (
@@ -151,9 +151,9 @@ jobs:
               header_title = "🧪 TESTE • Notificação de atualização"
               header_description = "O sistema automático de atualizações está funcionando corretamente."
           else:
-              header_title = f"🚀 FiveMCleaner {version} está disponível!"
+              header_title = f"🚀 Vemryx One {version} está disponível!"
               header_description = (
-                  "Uma nova versão estável do **FiveMCleaner** acaba de ser publicada. "
+                  "Uma nova versão estável do **Vemryx One** acaba de ser publicada. "
                   "Confira abaixo tudo o que mudou."
               )
 
@@ -166,7 +166,7 @@ jobs:
                   {"name": "📦 Versão", "value": f"`{version}`", "inline": True},
                   {"name": "⬇️ Download", "value": download_text, "inline": True},
               ],
-              "footer": {"text": "FiveMCleaner • Atualizações oficiais"},
+              "footer": {"text": "Vemryx One • Atualizações oficiais"},
           }
           if published_at:
               header_embed["timestamp"] = published_at
@@ -179,7 +179,7 @@ jobs:
 
           # Impede que texto vindo das release notes consiga disparar @everyone, @here etc.
           post({
-              "username": "FiveMCleaner Updates",
+              "username": "Vemryx One Updates",
               "allowed_mentions": {"parse": []},
               "embeds": [header_embed, notes_embed],
           })
@@ -187,13 +187,13 @@ jobs:
           # Continuações, caso o changelog seja muito grande.
           for index, chunk in enumerate(notes_chunks[1:], start=2):
               post({
-                  "username": "FiveMCleaner Updates",
+                  "username": "Vemryx One Updates",
                   "allowed_mentions": {"parse": []},
                   "embeds": [{
                       "title": f"📝 Notas da versão • continuação {index}",
                       "description": chunk,
                       "color": COLOR,
-                      "footer": {"text": f"FiveMCleaner • {version}"},
+                      "footer": {"text": f"Vemryx One • {version}"},
                   }],
               })
 

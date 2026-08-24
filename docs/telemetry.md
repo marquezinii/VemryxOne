@@ -14,7 +14,7 @@ arquitetura, crashes, eventos do atualizador e resultado técnico das
 otimizações. Não incluem HWID, MAC, serial, nome do PC, usuário do Windows ou
 caminhos locais.
 
-A opção **Ajudar a melhorar o FiveMCleaner** fica em **Configurações**, vem
+A opção **Ajudar a melhorar o Vemryx One** fica em **Configurações**, vem
 habilitada por padrão em instalações novas e pode ser desligada a qualquer
 momento. Ela controla apenas hardware, perfil e recursos usados.
 
@@ -81,7 +81,7 @@ sem crescer indefinidamente.
 A telemetria é enviada ao endpoint HTTPS do Worker Cloudflare (rota
 `/telemetry`, ver abaixo) — esse é o único transporte, o FormSubmit não é
 mais usado para nada relacionado a telemetria de uso. O payload do
-FiveMCleaner não contém dados pessoais. Como em qualquer conexão HTTPS, a
+Vemryx One não contém dados pessoais. Como em qualquer conexão HTTPS, a
 infraestrutura de rede pode processar metadados de conexão, como endereço
 IP, conforme suas próprias políticas; isso não é controlado nem incluído
 como campo pelo aplicativo.
@@ -117,7 +117,7 @@ identificador de usuário são sempre sobrescritos/limpos, nunca enviados.
 ### Configuração centralizada e ambientes
 
 O DSN do Sentry não é um literal espalhado pelo código: fica em
-`src/FiveMCleaner.App/Config/appsettings.Development.json` e
+`src/Vemryx.One.App/Config/appsettings.Development.json` e
 `appsettings.Production.json` (com `appsettings.json` como base/fallback
 seguro, sem DSN). `AppEnvironment.Resolve()` decide qual arquivo usar: a
 variável de ambiente `FIVEMCLEANER_ENVIRONMENT` tem prioridade (é isso que

@@ -1,5 +1,5 @@
 // Pure, dependency-free validation for one bug report submission. Mirrors
-// FiveMCleaner.App.Services.CloudflareBugReportService's client-side rules --
+// Vemryx One.App.Services.CloudflareBugReportService's client-side rules --
 // the Worker never trusts the client alone, every field is re-checked here.
 //
 // No attachment/screenshot support: reports are text-only (D1 only, no R2).

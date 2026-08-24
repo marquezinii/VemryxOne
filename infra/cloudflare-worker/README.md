@@ -1,4 +1,4 @@
-# FiveMCleaner telemetry + dashboard API Worker
+# Vemryx One telemetry + dashboard API Worker
 
 **Deployed** at `https://fivemcleaner-telemetry.felipemarquesini10.workers.dev`.
 
@@ -214,7 +214,7 @@ manifest against the embedded public key and publishes it automatically with
 `wrangler secret put RELEASE_MANIFEST_JSON` immediately before deploying this
 Worker. Do not hand-author, truncate, or commit that value. A manual repair is
 part of the authorized release procedure only and must pipe the generated
-`release/FiveMCleaner-signed-update-manifest.json` file unchanged into the same
+`release/Vemryx One-signed-update-manifest.json` file unchanged into the same
 Wrangler command. Preview releases do not update this stable feed.
 
 The real deployment uses plain `wrangler deploy`/`npm run deploy` with no

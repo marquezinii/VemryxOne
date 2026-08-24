@@ -1,5 +1,5 @@
 name: Relatar um bug
-description: Informe um comportamento reproduzível do FiveMCleaner.
+description: Informe um comportamento reproduzível do Vemryx One.
 title: "[Bug] "
 labels:
   - bug
@@ -7,7 +7,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Obrigado pelo relato. Este formulário é para o **FiveMCleaner**, não para bugs do FiveM ou de servidores.
+        Obrigado pelo relato. Este formulário é para o **Vemryx One**, não para bugs do FiveM ou de servidores.
         Remova nomes de usuário, tokens, caminhos pessoais e endereços de servidor dos logs. Vulnerabilidades seguem `SECURITY.md`.
 
   - type: checkboxes

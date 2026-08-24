@@ -10,7 +10,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $workspace = [System.IO.Path]::GetFullPath((Split-Path -Parent $PSScriptRoot))
-$installerScript = Join-Path $workspace 'installer\FiveMCleaner.iss'
+$installerScript = Join-Path $workspace 'installer\VemryxOne.iss'
 
 if (-not (Test-Path -LiteralPath $installerScript -PathType Leaf)) {
     throw "Installer script not found: $installerScript"
@@ -18,12 +18,15 @@ if (-not (Test-Path -LiteralPath $installerScript -PathType Leaf)) {
 
 $scriptText = Get-Content -LiteralPath $installerScript -Raw
 $requiredPatterns = [ordered]@{
+    'public Vemryx One product name' = '#define AppName "Vemryx One"'
+    'public Vemryx One installer name' = '#define InstallerBaseName "VemryxOne-Setup-"'
     'stable AppId'                  = 'AppId=\{#StableAppId\}'
+    'legacy launcher bridge'        = '#define AppExeName "FiveMCleaner\.Launcher\.exe"'
     'per-user install'              = 'PrivilegesRequired=lowest'
     'Windows 10 2004 minimum'       = 'MinVersion=10\.0\.19041'
     'x64-compatible runtime gate'   = 'ArchitecturesAllowed=x64compatible'
     'modern system-aware theme'     = 'WizardStyle=modern dynamic'
-    'official application icon'     = 'SetupIconFile=.*FiveMCleaner\.ico'
+    'official application icon'     = 'SetupIconFile=.*VemryxOne\.ico'
     'proportional wizard artwork'   = 'WizardImageFile=\{#InstallerArtworkPath\}'
     'dark wizard artwork'           = 'WizardImageFileDynamicDark=\{#InstallerArtworkPathDark\}'
     'ultra lzma compression'        = 'Compression=lzma2/ultra'

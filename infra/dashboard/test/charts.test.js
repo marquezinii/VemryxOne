@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import {
   toBarSeries,
   toCombinedBarSeries,
@@ -16,6 +17,16 @@ import {
   formatAppVersion,
   toDistributionRows,
 } from '../assets/charts.js';
+import { DONUT_COLORS } from '../assets/rendering.js';
+
+test('dashboard uses the Vemryx visual tokens', () => {
+  const styles = readFileSync(new URL('../assets/styles.css', import.meta.url), 'utf8');
+
+  assert.deepEqual(DONUT_COLORS.slice(0, 3), ['#5B7CFF', '#27C8FF', '#32D583']);
+  assert.match(styles, /--bg:#0B0D12/);
+  assert.match(styles, /--accent:#4B64F2/);
+  assert.doesNotMatch(styles, /--orange|#ff7a18/i);
+});
 
 test('toBarSeries maps arbitrary label/value keys into a uniform shape', () => {
   const series = toBarSeries([{ os_version: 'Windows 11', runs: 78 }], 'os_version', 'runs');

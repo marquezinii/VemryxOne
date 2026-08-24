@@ -41,7 +41,7 @@ jobs:
       - name: Restore with NuGet vulnerability gate
         shell: pwsh
         run: >-
-          dotnet restore FiveMCleaner.slnx
+          dotnet restore Vemryx.One.slnx
           -p:NuGetAudit=true
           -p:NuGetAuditMode=all
           -p:WarningsAsErrors=NU1901%3BNU1902%3BNU1903%3BNU1904
@@ -52,7 +52,7 @@ jobs:
 
       - name: Test
         run: >-
-          dotnet test tests/FiveMCleaner.Tests/FiveMCleaner.Tests.csproj
+          dotnet test tests/Vemryx.One.Tests/Vemryx.One.Tests.csproj
           --configuration Release
           --no-build
           --results-directory TestResults
@@ -63,7 +63,7 @@ jobs:
           --coverlet-file-prefix coverage
 
       - name: Check NuGet vulnerabilities
-        run: dotnet list FiveMCleaner.slnx package --vulnerable --include-transitive
+        run: dotnet list Vemryx.One.slnx package --vulnerable --include-transitive
 
       - name: Upload test results
         if: always()
@@ -104,7 +104,7 @@ jobs:
           dotnet tool run sbom-tool generate `
             -b ./artifacts/FiveMCleaner-win-x64 `
             -bc . `
-            -pn FiveMCleaner `
+            -pn "Vemryx One" `
             -pv $version `
             -ps "Vemryx" `
             -nsb https://github.com/marquezinii/FiveMCleaner

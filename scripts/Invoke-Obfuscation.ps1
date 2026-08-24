@@ -18,7 +18,7 @@ $ErrorActionPreference = 'Stop'
 
 $scriptRoot = $PSScriptRoot
 $workspace = Split-Path -Parent $scriptRoot
-$template = Join-Path $workspace 'build\obfuscation\FiveMCleaner.Obfuscar.xml'
+$template = Join-Path $workspace 'build\obfuscation\VemryxOne.Obfuscar.xml'
 
 if (-not (Test-Path -LiteralPath $template -PathType Leaf)) {
     throw "Obfuscar project template not found: $template"

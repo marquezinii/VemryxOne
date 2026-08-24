@@ -7,7 +7,7 @@ param(
     [string]$Configuration = 'Release',
 
     # Public release hardening. When set, the internal-logic assemblies
-    # (FiveMCleaner.Core / FiveMCleaner.Windows) are obfuscated in the published
+    # (Vemryx.One.Core / Vemryx.One.Windows) are obfuscated in the published
     # output BEFORE any checksum, so the runtime ZIP, broker SHA256SUMS, release
     # manifest and signed update manifest all cover the hardened binaries.
     # Off by default: development and CI test builds stay un-obfuscated.
@@ -42,14 +42,14 @@ try {
     $brokerOutput = Join-Path $stagingRoot 'broker'
     $launcherOutput = Join-Path $stagingRoot 'launcher'
     $appOutput = Join-Path $stagingRoot 'app'
-    $pathMap = "$workspace=/_/FiveMCleaner"
+    $pathMap = "$workspace=/_/VemryxOne"
     $version = Get-ProjectVersion -Workspace $workspace
     if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "Invalid stable version: $version" }
 
     $publishTargets = @(
-        @{ Name = 'Broker'; Project = '.\src\FiveMCleaner.Broker\FiveMCleaner.Broker.csproj'; SingleFile = 'false'; SkipProjectReferences = $false; Output = $brokerOutput }
-        @{ Name = 'Launcher'; Project = '.\src\FiveMCleaner.Launcher\FiveMCleaner.Launcher.csproj'; SingleFile = 'true'; SkipProjectReferences = $false; Output = $launcherOutput }
-        @{ Name = 'App'; Project = '.\src\FiveMCleaner.App\FiveMCleaner.App.csproj'; SingleFile = 'false'; SkipProjectReferences = $true; Output = $appOutput }
+        @{ Name = 'Broker'; Project = '.\src\Vemryx.One.Broker\Vemryx.One.Broker.csproj'; SingleFile = 'false'; SkipProjectReferences = $false; Output = $brokerOutput }
+        @{ Name = 'Launcher'; Project = '.\src\Vemryx.One.Launcher\Vemryx.One.Launcher.csproj'; SingleFile = 'true'; SkipProjectReferences = $false; Output = $launcherOutput }
+        @{ Name = 'App'; Project = '.\src\Vemryx.One.App\Vemryx.One.App.csproj'; SingleFile = 'false'; SkipProjectReferences = $true; Output = $appOutput }
     )
     foreach ($target in $publishTargets) {
         $publishArguments = @(
@@ -75,10 +75,10 @@ try {
         if ($Harden) {
             # For Broker/App this is unused (harmless) - only the Launcher
             # project defines the HardenBundledAssemblies target this
-            # property gates. See FiveMCleaner.Launcher.csproj for why the
+            # property gates. See Vemryx.One.Launcher.csproj for why the
             # single-file bundle needs its own in-MSBuild hardening hook
             # instead of the publish-then-harden-in-place used below.
-            $publishArguments += '-p:FiveMCleanerHarden=true'
+            $publishArguments += '-p:VemryxOneHarden=true'
         }
         & dotnet @publishArguments
         if ($LASTEXITCODE -ne 0) { throw "$($target.Name) publish failed." }
@@ -91,7 +91,7 @@ try {
         # release workflow signs) derives from these files, so obfuscating
         # here is what makes the signed, shipped runtime the obfuscated one.
         # The Launcher's single-file bundle was already hardened during its
-        # own publish above, via FiveMCleaner.Launcher.csproj's
+        # own publish above, via Vemryx.One.Launcher.csproj's
         # HardenBundledAssemblies target.
         $mappingRoot = Join-Path $artifactsRoot 'obfuscation-maps'
         & (Join-Path $PSScriptRoot 'Invoke-Obfuscation.ps1') -PublishDirectory $brokerOutput -MappingOutputDirectory $mappingRoot
