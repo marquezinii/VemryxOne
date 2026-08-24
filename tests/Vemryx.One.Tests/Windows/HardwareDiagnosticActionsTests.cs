@@ -1,0 +1,756 @@
+using Vemryx.One.Windows.Actions;
+using Vemryx.One.Windows.Infrastructure;
+using Xunit;
+
+namespace Vemryx.One.Tests.Windows;
+
+public sealed class HardwareDiagnosticActionsTests
+{
+    [Fact]
+    public void CpuDetails_ReportsHonestlyWhenUnavailable()
+    {
+        Assert.Contains("Não foi possível ler", CpuDetailsDiagnosisAction.Classify(null), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void CpuDetails_FlagsSignificantClockDrop()
+    {
+        var message = CpuDetailsDiagnosisAction.Classify(new CpuSnapshot(8, 16, 1000, 4800));
+
+        Assert.Contains("núcleo(s)", message, StringComparison.Ordinal);
+        Assert.Contains("bem abaixo do máximo", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void CpuDetails_DoesNotFlagNormalClock()
+    {
+        var message = CpuDetailsDiagnosisAction.Classify(new CpuSnapshot(8, 16, 4200, 4800));
+
+        Assert.DoesNotContain("bem abaixo do máximo", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GpuDetails_ReportsWhenNothingFound()
+    {
+        Assert.Contains("Não foi possível detectar", GpuDetailsDiagnosisAction.Classify([]), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GpuDetails_ReportsVramAndKindGuess()
+    {
+        var message = GpuDetailsDiagnosisAction.Classify(
+        [
+            new GpuAdapterDetails("NVIDIA GeForce RTX 4070", 12L * 1024 * 1024 * 1024, GpuKindGuess.LikelyDiscrete),
+            new GpuAdapterDetails("Intel(R) UHD Graphics 770", null, GpuKindGuess.LikelyIntegrated)
+        ]);
+
+        Assert.Contains("12 GB de VRAM", message, StringComparison.Ordinal);
+        Assert.Contains("provavelmente dedicada", message, StringComparison.Ordinal);
+        Assert.Contains("VRAM não detectada", message, StringComparison.Ordinal);
+        Assert.Contains("provavelmente integrada", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void RamDetails_ReportsHonestlyWhenNoModulesFound()
+    {
+        Assert.Contains("Não foi possível ler", RamDetailsDiagnosisAction.Classify(new RamDetailsSnapshot([])), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void RamDetails_FlagsSingleChannelWithOneModule()
+    {
+        var snapshot = new RamDetailsSnapshot(
+        [
+            new RamModuleInfo(16L * 1024 * 1024 * 1024, 3200, 3200)
+        ]);
+
+        var message = RamDetailsDiagnosisAction.Classify(snapshot);
+
+        Assert.Contains("single-channel", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void RamDetails_FlagsLikelyDisabledXmpWhenConfiguredIsBelowRated()
+    {
+        var snapshot = new RamDetailsSnapshot(
+        [
+            new RamModuleInfo(16L * 1024 * 1024 * 1024, 2133, 3600),
+            new RamModuleInfo(16L * 1024 * 1024 * 1024, 2133, 3600)
+        ]);
+
+        var message = RamDetailsDiagnosisAction.Classify(snapshot);
+
+        Assert.Contains("multi-channel", message, StringComparison.Ordinal);
+        Assert.Contains("possivelmente desativado", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void RamDetails_ReportsXmpLikelyActiveWhenConfiguredMeetsRated()
+    {
+        var snapshot = new RamDetailsSnapshot(
+        [
+            new RamModuleInfo(16L * 1024 * 1024 * 1024, 3600, 3600),
+            new RamModuleInfo(16L * 1024 * 1024 * 1024, 3600, 3600)
+        ]);
+
+        var message = RamDetailsDiagnosisAction.Classify(snapshot);
+
+        Assert.Contains("provavelmente ativo", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void StorageHealth_ReportsHonestlyWhenNoDisksFound()
+    {
+        Assert.Contains("Não foi possível ler", StorageHealthDiagnosisAction.Classify(new StorageHealthSnapshot([])), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void StorageHealth_FlagsUnhealthyDisks()
+    {
+        var snapshot = new StorageHealthSnapshot(
+        [
+            new PhysicalDiskInfo("NVMe SSD 1TB", "SSD/NVMe", true, "Saudável"),
+            new PhysicalDiskInfo("Old HDD", "HDD", false, "Aviso")
+        ]);
+
+        var message = StorageHealthDiagnosisAction.Classify(snapshot);
+
+        Assert.Contains("Atenção: 1 unidade(s)", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void StorageHealth_ReportsAllHealthyWhenNoIssues()
+    {
+        var snapshot = new StorageHealthSnapshot(
+        [
+            new PhysicalDiskInfo("NVMe SSD 1TB", "SSD/NVMe", true, "Saudável")
+        ]);
+
+        var message = StorageHealthDiagnosisAction.Classify(snapshot);
+
+        Assert.Contains("saúde normal", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void DriverVersions_ReportsHonestlyWhenNothingFound()
+    {
+        var message = DriverVersionsDiagnosisAction.Classify(new DriverVersionSnapshot([], [], [], []));
+
+        Assert.Contains("Não foi possível ler", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void DriverVersions_GroupsByDeviceClass()
+    {
+        var snapshot = new DriverVersionSnapshot(
+            Video: [new DriverVersionInfo("NVIDIA GeForce RTX 4070", "32.0.15.6094")],
+            Network: [new DriverVersionInfo("Realtek Ethernet", "10.55.0.1")],
+            Audio: [],
+            Chipset: []);
+
+        var message = DriverVersionsDiagnosisAction.Classify(snapshot);
+
+        Assert.Contains("Vídeo:", message, StringComparison.Ordinal);
+        Assert.Contains("Rede:", message, StringComparison.Ordinal);
+        Assert.DoesNotContain("Áudio:", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void DisplayConfiguration_ReportsHonestlyWhenUnavailable()
+    {
+        Assert.Contains("Não foi possível ler", DisplayConfigurationDiagnosisAction.Classify(null), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void DisplayConfiguration_FlagsBelowMaximumRefreshRate()
+    {
+        var snapshot = new DisplayConfigurationSnapshot(1920, 1080, 60, 144, HardwareGpuSchedulingState.Enabled);
+
+        var message = DisplayConfigurationDiagnosisAction.Classify(snapshot);
+
+        Assert.Contains("abaixo da máxima suportada", message, StringComparison.Ordinal);
+        Assert.Contains("HAGS", message, StringComparison.Ordinal);
+        Assert.Contains("ativado", message, StringComparison.Ordinal);
+        Assert.Contains("G-SYNC/FreeSync/VRR não podem ser", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void DisplayConfiguration_DoesNotFlagWhenAtMaximum()
+    {
+        var snapshot = new DisplayConfigurationSnapshot(1920, 1080, 144, 144, HardwareGpuSchedulingState.Disabled);
+
+        var message = DisplayConfigurationDiagnosisAction.Classify(snapshot);
+
+        Assert.DoesNotContain("abaixo da máxima suportada", message, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData(true, "ativado")]
+    [InlineData(false, "desativado")]
+    public void SessionSettings_ClassifiesGameModeState(bool enabled, string expectedSubstring)
+    {
+        var gameMode = enabled ? RegistryValueState.FromDword(1) : RegistryValueState.FromDword(0);
+        var message = SessionSettingsDiagnosisAction.Classify(
+            gameMode, RegistryValueState.Missing, "Balanceado");
+
+        Assert.Contains(expectedSubstring, message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void SessionSettings_ClassifiesFullscreenOptimizationsDisabled()
+    {
+        var message = SessionSettingsDiagnosisAction.Classify(
+            RegistryValueState.Missing, RegistryValueState.FromDword(2), "Alto desempenho");
+
+        Assert.Contains("desativadas", message, StringComparison.Ordinal);
+        Assert.Contains("Alto desempenho", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ThrottlingSignal_CombinesClockDropAndTemperature()
+    {
+        var cpu = new CpuSnapshot(8, 16, 1000, 4800);
+        var usage = new ResourceUsageSnapshot(80, null, null, 0);
+        var stability = new HardwareStabilitySnapshot(0, 0, null);
+        var thermal = new ThermalSnapshot(true, 92);
+
+        var message = ThrottlingSignalDiagnosisAction.Classify(cpu, usage, stability, thermal);
+
+        Assert.Contains("Possível throttling detectado", message, StringComparison.Ordinal);
+        Assert.Contains("temperatura elevada", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ThrottlingSignal_CombinesClockDropAndWheaWhenNoThermalData()
+    {
+        var cpu = new CpuSnapshot(8, 16, 1000, 4800);
+        var usage = new ResourceUsageSnapshot(80, null, null, 0);
+        var stability = new HardwareStabilitySnapshot(3, 0, null);
+        var thermal = new ThermalSnapshot(false, null);
+
+        var message = ThrottlingSignalDiagnosisAction.Classify(cpu, usage, stability, thermal);
+
+        Assert.Contains("Possível throttling detectado", message, StringComparison.Ordinal);
+        Assert.Contains("WHEA", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ThrottlingSignal_ReportsUnconfirmedClockDropAlone()
+    {
+        var cpu = new CpuSnapshot(8, 16, 1000, 4800);
+        var usage = new ResourceUsageSnapshot(80, null, null, 0);
+        var stability = new HardwareStabilitySnapshot(0, 0, null);
+        var thermal = new ThermalSnapshot(false, null);
+
+        var message = ThrottlingSignalDiagnosisAction.Classify(cpu, usage, stability, thermal);
+
+        Assert.Contains("Queda de frequência sob carga detectada", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ThrottlingSignal_ReportsNoSignalWhenHealthy()
+    {
+        var cpu = new CpuSnapshot(8, 16, 4700, 4800);
+        var usage = new ResourceUsageSnapshot(20, null, null, 0);
+        var stability = new HardwareStabilitySnapshot(0, 0, null);
+        var thermal = new ThermalSnapshot(true, 55);
+
+        var message = ThrottlingSignalDiagnosisAction.Classify(cpu, usage, stability, thermal);
+
+        Assert.Contains("Nenhum sinal de throttling", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ResourceUsage_ReportsUnavailableCountersHonestly()
+    {
+        var message = ResourceUsageDiagnosisAction.Classify(new ResourceUsageSnapshot(null, null, null, 0));
+
+        Assert.Contains("CPU: não disponível", message, StringComparison.Ordinal);
+        Assert.Contains("GPU: não disponível", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ResourceUsage_FormatsAvailableValues()
+    {
+        var message = ResourceUsageDiagnosisAction.Classify(new ResourceUsageSnapshot(42, 10, 5, 3.25));
+
+        Assert.Contains("CPU: 42%", message, StringComparison.Ordinal);
+        Assert.Contains("3.25 MB/s", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void PciLink_ReportsHonestlyWhenNoDataAvailable()
+    {
+        Assert.Contains("não pôde ser lida", PciLinkDiagnosisAction.Classify([]), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void PciLink_FormatsAvailableWidthAndSpeed()
+    {
+        var snapshot = new PciLinkSnapshot("NVIDIA GeForce RTX 4070", 16, 80, 16, 160);
+
+        var message = PciLinkDiagnosisAction.Classify([snapshot]);
+
+        Assert.Contains("x16", message, StringComparison.Ordinal);
+        Assert.Contains("8 GT/s", message, StringComparison.Ordinal);
+        Assert.Contains("16 GT/s", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void HardwareStability_FlagsOldBios()
+    {
+        var snapshot = new HardwareStabilitySnapshot(0, 0, new DateTime(2018, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+
+        var message = HardwareStabilityDiagnosisAction.Classify(
+            snapshot, new DateTimeOffset(2026, 7, 23, 0, 0, 0, TimeSpan.Zero));
+
+        Assert.Contains("com mais de 3 anos", message, StringComparison.Ordinal);
+        Assert.Contains("Resizable BAR", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void HardwareStability_ReportsRecentBiosAsFine()
+    {
+        var snapshot = new HardwareStabilitySnapshot(0, 0, new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+
+        var message = HardwareStabilityDiagnosisAction.Classify(
+            snapshot, new DateTimeOffset(2026, 7, 23, 0, 0, 0, TimeSpan.Zero));
+
+        Assert.Contains("relativamente recente", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void HardwareStability_FlagsMemoryFlavoredWheaEvents()
+    {
+        var snapshot = new HardwareStabilitySnapshot(5, 2, null);
+
+        var message = HardwareStabilityDiagnosisAction.Classify(snapshot, DateTimeOffset.UtcNow);
+
+        Assert.Contains("2 evento(s)", message, StringComparison.Ordinal);
+    }
+}
+
+public sealed class BottleneckClassificationActionTests
+{
+    private static readonly SystemResourceSnapshot HealthyResources = new(
+        TotalMemoryBytes: 16L * 1024 * 1024 * 1024,
+        AvailableMemoryBytes: 8L * 1024 * 1024 * 1024,
+        LogicalProcessorCount: 12,
+        SystemDriveFreeBytes: 100L * 1024 * 1024 * 1024,
+        TotalPageFileBytes: 20L * 1024 * 1024 * 1024,
+        AvailablePageFileBytes: 16L * 1024 * 1024 * 1024);
+
+    private static readonly ResourceUsageSnapshot HealthyUsage = new(30, 10, 40, 1.0);
+    private static readonly ThermalSnapshot NoThermalData = new(false, null);
+    private static readonly NetworkHealthSnapshot HealthyNetwork = new(true, 0, 0);
+    private static readonly IReadOnlyList<GpuAdapterDetails> BigVramGpu =
+        [new GpuAdapterDetails("NVIDIA GeForce RTX 4070", 12L * 1024 * 1024 * 1024, GpuKindGuess.LikelyDiscrete)];
+
+    [Fact]
+    public void Classify_PrioritizesThermalWhenTemperatureIsElevated()
+    {
+        var input = new BottleneckClassificationInput(
+            HealthyResources, HealthyUsage, new ThermalSnapshot(true, 90), HealthyNetwork, BigVramGpu, null);
+
+        var message = BottleneckClassificationAction.Classify(input);
+
+        Assert.Contains("térmico", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Classify_FlagsBackgroundProcessConsumingCpu()
+    {
+        var input = new BottleneckClassificationInput(
+            HealthyResources, HealthyUsage, NoThermalData, HealthyNetwork, BigVramGpu,
+            new BackgroundProcessUsage("chrome", 400)); // 400% / 12 cores ≈ 33%, above threshold
+
+        var message = BottleneckClassificationAction.Classify(input);
+
+        Assert.Contains("processo em segundo plano", message, StringComparison.Ordinal);
+        Assert.Contains("chrome", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Classify_FlagsNetworkWhenPacketsAreDiscarded()
+    {
+        var input = new BottleneckClassificationInput(
+            HealthyResources, HealthyUsage, NoThermalData, new NetworkHealthSnapshot(true, 5, 0), BigVramGpu, null);
+
+        var message = BottleneckClassificationAction.Classify(input);
+
+        Assert.Contains("rede", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Classify_FlagsDiskWhenDiskTimeIsHigh()
+    {
+        var input = new BottleneckClassificationInput(
+            HealthyResources, HealthyUsage with { DiskPercent = 95 }, NoThermalData, HealthyNetwork, BigVramGpu, null);
+
+        var message = BottleneckClassificationAction.Classify(input);
+
+        Assert.Contains("disco", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Classify_FlagsRamWhenAvailableIsLow()
+    {
+        var lowMemory = HealthyResources with { AvailableMemoryBytes = 512L * 1024 * 1024 };
+        var input = new BottleneckClassificationInput(
+            lowMemory, HealthyUsage, NoThermalData, HealthyNetwork, BigVramGpu, null);
+
+        var message = BottleneckClassificationAction.Classify(input);
+
+        Assert.Contains("memória RAM", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Classify_FlagsVramWhenGpuIsSaturatedAndVramIsSmall()
+    {
+        IReadOnlyList<GpuAdapterDetails> smallVramGpu =
+            [new GpuAdapterDetails("Old GPU", 2L * 1024 * 1024 * 1024, GpuKindGuess.LikelyDiscrete)];
+        var input = new BottleneckClassificationInput(
+            HealthyResources, HealthyUsage with { GpuPercent = 98 }, NoThermalData, HealthyNetwork, smallVramGpu, null);
+
+        var message = BottleneckClassificationAction.Classify(input);
+
+        Assert.Contains("VRAM", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Classify_FlagsGpuWhenSaturatedWithCpuHeadroom()
+    {
+        var input = new BottleneckClassificationInput(
+            HealthyResources, HealthyUsage with { GpuPercent = 98, CpuPercent = 40 }, NoThermalData, HealthyNetwork, BigVramGpu, null);
+
+        var message = BottleneckClassificationAction.Classify(input);
+
+        Assert.Contains("Gargalo provável: GPU", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Classify_FlagsCpuWhenSaturatedWithGpuHeadroom()
+    {
+        var input = new BottleneckClassificationInput(
+            HealthyResources, HealthyUsage with { CpuPercent = 95, GpuPercent = 40 }, NoThermalData, HealthyNetwork, BigVramGpu, null);
+
+        var message = BottleneckClassificationAction.Classify(input);
+
+        Assert.Contains("Gargalo provável: CPU", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Classify_FallsBackToServerByEliminationWhenNothingElseFires()
+    {
+        var input = new BottleneckClassificationInput(
+            HealthyResources, HealthyUsage, NoThermalData, HealthyNetwork, BigVramGpu, null);
+
+        var message = BottleneckClassificationAction.Classify(input);
+
+        Assert.Contains("servidor FiveM", message, StringComparison.Ordinal);
+    }
+}
+
+/// <summary>
+/// Locks the single GPU name heuristic now shared by the vendor diagnosis, the
+/// dual-GPU preference check, the G-SYNC panel hint and the VRAM/kind reading,
+/// so the same adapter can no longer be integrated for one of them and unknown
+/// for another.
+/// </summary>
+public sealed class GpuVendorClassifierTests
+{
+    [Theory]
+    [InlineData("NVIDIA GeForce RTX 4070", "NVIDIA")]
+    [InlineData("AMD Radeon RX 7800 XT", "AMD")]
+    [InlineData("Radeon(TM) Vega 8 Graphics", "AMD")]
+    [InlineData("Intel(R) UHD Graphics 620", "Intel")]
+    [InlineData("Some Unlisted Display Adapter", GpuVendorClassifier.UnknownVendor)]
+    public void VendorOf_RecognizesTheVendorOrAdmitsItDoesNot(string description, string expected)
+    {
+        Assert.Equal(expected, GpuVendorClassifier.VendorOf(description));
+    }
+
+    [Theory]
+    [InlineData("Intel(R) UHD Graphics 770", GpuKindGuess.LikelyIntegrated)]
+    [InlineData("Intel UHD Graphics", GpuKindGuess.LikelyIntegrated)]
+    [InlineData("Intel(R) HD Graphics 4000", GpuKindGuess.LikelyIntegrated)]
+    [InlineData("AMD Radeon(TM) Graphics", GpuKindGuess.LikelyIntegrated)]
+    [InlineData("NVIDIA GeForce GTX 1650", GpuKindGuess.LikelyDiscrete)]
+    [InlineData("AMD Radeon RX 7800 XT", GpuKindGuess.LikelyDiscrete)]
+    [InlineData("Some Unlisted Display Adapter", GpuKindGuess.Unknown)]
+    public void GuessKind_ClassifiesIntegratedBeforeDiscreteAndNeverInvents(
+        string description,
+        GpuKindGuess expected)
+    {
+        Assert.Equal(expected, GpuVendorClassifier.GuessKind(description));
+        Assert.Equal(expected == GpuKindGuess.LikelyIntegrated, GpuVendorClassifier.IsIntegrated(description));
+    }
+}
+
+/// <summary>
+/// The inventory cache must not remember a failed read: a WMI query that fails
+/// once would otherwise report "not available" for a whole TTL.
+/// </summary>
+public sealed class TimedSnapshotCacheTests
+{
+    [Fact]
+    public void GetOrRead_ReadsOnceWhileTheEntryIsFresh()
+    {
+        var cache = new TimedSnapshotCache<string>();
+        var reads = 0;
+
+        Assert.Equal("value", cache.GetOrRead(Read));
+        Assert.Equal("value", cache.GetOrRead(Read));
+        Assert.Equal(1, reads);
+
+        string Read()
+        {
+            reads++;
+            return "value";
+        }
+    }
+
+    [Fact]
+    public void GetOrReadOptional_RetriesAfterAFailedRead()
+    {
+        var cache = new TimedSnapshotCache<string>();
+        var reads = 0;
+
+        Assert.Null(cache.GetOrReadOptional(Read));
+        Assert.Equal("recovered", cache.GetOrReadOptional(Read));
+        Assert.Equal(2, reads);
+
+        string? Read() => ++reads == 1 ? null : "recovered";
+    }
+}
+
+public sealed class HardwareInspectorSmokeTests
+{
+    [Fact]
+    public void WindowsCpuInspector_NeverThrows()
+    {
+        var snapshot = new WindowsCpuInspector().GetSnapshot();
+        if (snapshot is not null)
+        {
+            Assert.True(snapshot.PhysicalCores > 0);
+            Assert.True(snapshot.LogicalThreads > 0);
+        }
+    }
+
+    [Fact]
+    public void WindowsGpuDetailsInspector_NeverThrows()
+    {
+        Assert.NotNull(new WindowsGpuDetailsInspector().GetSnapshot());
+    }
+
+    [Fact]
+    public void WindowsRamDetailsInspector_NeverThrows()
+    {
+        Assert.NotNull(new WindowsRamDetailsInspector().GetSnapshot().Modules);
+    }
+
+    [Fact]
+    public void WindowsStorageHealthInspector_NeverThrows()
+    {
+        Assert.NotNull(new WindowsStorageHealthInspector().GetSnapshot().Disks);
+    }
+
+    [Fact]
+    public void WindowsDriverVersionInspector_NeverThrows()
+    {
+        var snapshot = new WindowsDriverVersionInspector().GetSnapshot();
+        Assert.NotNull(snapshot.Video);
+        Assert.NotNull(snapshot.Network);
+        Assert.NotNull(snapshot.Audio);
+        Assert.NotNull(snapshot.Chipset);
+    }
+
+    [Fact]
+    public void WindowsDisplayConfigurationInspector_NeverThrows()
+    {
+        var snapshot = new WindowsDisplayConfigurationInspector().GetSnapshot();
+        if (snapshot is not null)
+        {
+            Assert.True(snapshot.Width > 0);
+            Assert.True(snapshot.Height > 0);
+            Assert.True(snapshot.CurrentRefreshHz > 0);
+        }
+    }
+
+    [Fact]
+    public void WindowsResourceUsageInspector_NeverThrows()
+    {
+        Assert.NotNull(new WindowsResourceUsageInspector().GetSnapshot());
+    }
+
+    [Fact]
+    public void WindowsVendorLaptopSoftwareInspector_NeverThrows()
+    {
+        Assert.NotNull(new WindowsVendorLaptopSoftwareInspector().DetectInstalledToolNames());
+    }
+
+    [Fact]
+    public void WindowsPowerStatusProvider_IsBatterySaverActive_NeverThrows()
+    {
+        _ = new WindowsPowerStatusProvider().IsBatterySaverActive();
+    }
+
+    [Fact]
+    public void WindowsPciLinkInspector_NeverThrows()
+    {
+        Assert.NotNull(new WindowsPciLinkInspector().GetSnapshot());
+    }
+
+    [Theory]
+    [InlineData(1u, 25)]
+    [InlineData(2u, 50)]
+    [InlineData(3u, 80)]
+    [InlineData(4u, 160)]
+    [InlineData(5u, 320)]
+    [InlineData(6u, 640)]
+    public void PciLinkSpeed_MapsTheGenerationIndexToGtPerSecondTimesTen(uint index, int expected)
+    {
+        Assert.Equal(expected, WindowsPciLinkInspector.MapLinkSpeedToGtPerSecondTimesTen(index));
+    }
+
+    [Theory]
+    [InlineData(0u)]
+    [InlineData(7u)]
+    [InlineData(255u)]
+    public void PciLinkSpeed_UnknownGenerationIndex_ReportsNullInsteadOfGuessing(uint index)
+    {
+        Assert.Null(WindowsPciLinkInspector.MapLinkSpeedToGtPerSecondTimesTen(index));
+    }
+
+    [Fact]
+    public void WindowsHardwareStabilityInspector_NeverThrows()
+    {
+        Assert.NotNull(new WindowsHardwareStabilityInspector().GetSnapshot());
+    }
+
+    [Fact]
+    public void WindowsBackgroundProcessInspector_NeverThrows()
+    {
+        // May legitimately return null when nothing exceeds the internal
+        // exclusions, so only the absence of an exception is asserted here.
+        _ = new WindowsBackgroundProcessInspector().GetTopConsumer(["FiveMCleaner"]);
+    }
+
+    [Fact]
+    public void ClassifyOldDrivers_FlagsAVideoDriverOlderThan18Months()
+    {
+        var now = new DateTimeOffset(2026, 7, 27, 0, 0, 0, TimeSpan.Zero);
+        var snapshot = new DriverVersionSnapshot(
+            Video: [new DriverVersionInfo("NVIDIA GeForce RTX 4070", "31.0.15.5222", now.AddMonths(-24))],
+            Network: [],
+            Audio: [],
+            Chipset: []);
+
+        var warning = DriverVersionsDiagnosisAction.ClassifyOldDrivers(snapshot, now);
+
+        Assert.NotNull(warning);
+        Assert.Contains("NVIDIA GeForce RTX 4070", warning, StringComparison.Ordinal);
+        Assert.Contains("18 meses", warning, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ClassifyOldDrivers_ReturnsNullWhenDriverIsRecentOrDateIsUnknown()
+    {
+        var now = new DateTimeOffset(2026, 7, 27, 0, 0, 0, TimeSpan.Zero);
+        var recent = new DriverVersionSnapshot(
+            Video: [new DriverVersionInfo("NVIDIA GeForce RTX 4070", "31.0.15.5222", now.AddMonths(-2))],
+            Network: [],
+            Audio: [],
+            Chipset: []);
+        var unknownDate = new DriverVersionSnapshot(
+            Video: [new DriverVersionInfo("NVIDIA GeForce RTX 4070", "31.0.15.5222", null)],
+            Network: [],
+            Audio: [],
+            Chipset: []);
+
+        Assert.Null(DriverVersionsDiagnosisAction.ClassifyOldDrivers(recent, now));
+        Assert.Null(DriverVersionsDiagnosisAction.ClassifyOldDrivers(unknownDate, now));
+    }
+
+    [Fact]
+    public void GSyncGuidance_SuggestsFpsCapBelowMaxRefreshWhenKnown()
+    {
+        var snapshot = new DisplayConfigurationSnapshot(
+            Width: 2560,
+            Height: 1440,
+            CurrentRefreshHz: 144,
+            MaxRefreshHzAtCurrentResolution: 144,
+            HardwareGpuScheduling: HardwareGpuSchedulingState.NotSupportedOrUnknown);
+
+        var message = GSyncGuidanceDiagnosisAction.Classify(
+            snapshot,
+            new GpuVendorSnapshot(["NVIDIA GeForce RTX 4070"]));
+
+        Assert.Contains("141 FPS", message, StringComparison.Ordinal);
+        Assert.Contains("NVIDIA Control Panel", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GSyncGuidance_StillOrientsWhenRefreshRateIsUnavailable()
+    {
+        var message = GSyncGuidanceDiagnosisAction.Classify(null, new GpuVendorSnapshot([]));
+
+        Assert.Contains("painel de controle oficial", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GSyncGuidance_NamesAmdSoftwareForRadeonGpus()
+    {
+        var message = GSyncGuidanceDiagnosisAction.Classify(
+            null,
+            new GpuVendorSnapshot(["AMD Radeon RX 7800 XT"]));
+
+        Assert.Contains("AMD Software: Adrenalin Edition", message, StringComparison.Ordinal);
+        Assert.Contains("FreeSync", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task GuidedDriverReinstall_NeverTouchesAnythingAndExplainsTheOfficialSteps()
+    {
+        var action = new GuidedDriverReinstallAction();
+
+        var result = await action.ApplyAsync(
+            new WindowsActionContext
+            {
+                TransactionId = Guid.NewGuid(),
+                StartedAtUtc = DateTimeOffset.UtcNow,
+                IsElevated = false
+            },
+            CancellationToken.None);
+
+        Assert.False(result.Changed);
+        Assert.Contains("DDU", result.Messages[0], StringComparison.Ordinal);
+        Assert.Contains("não baixa, instala nem remove", result.Messages[0], StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void HybridLaptopDiagnosis_RecommendsChargerAndBatterySaverWhenOnBattery()
+    {
+        var message = HybridLaptopDiagnosisAction.Classify(
+            onAc: false,
+            batterySaverActive: true,
+            detectedTools: []);
+
+        Assert.Contains("conecte-o antes de jogar", message, StringComparison.Ordinal);
+        Assert.Contains("Economia de Energia", message, StringComparison.Ordinal);
+        Assert.Contains("Nenhum utilitário conhecido", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void HybridLaptopDiagnosis_MentionsDetectedVendorToolOnAc()
+    {
+        var message = HybridLaptopDiagnosisAction.Classify(
+            onAc: true,
+            batterySaverActive: false,
+            detectedTools: ["ASUS Armoury Crate"]);
+
+        Assert.DoesNotContain("conecte-o antes de jogar", message, StringComparison.Ordinal);
+        Assert.Contains("ASUS Armoury Crate", message, StringComparison.Ordinal);
+        Assert.Contains("não controla isso diretamente", message, StringComparison.Ordinal);
+    }
+}

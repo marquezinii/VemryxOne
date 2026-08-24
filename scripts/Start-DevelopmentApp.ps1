@@ -7,8 +7,8 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $workspace = [System.IO.Path]::GetFullPath((Split-Path -Parent $PSScriptRoot))
-$solutionPath = Join-Path $workspace 'FiveMCleaner.slnx'
-$projectPath = Join-Path $workspace 'src\FiveMCleaner.App\FiveMCleaner.App.csproj'
+$solutionPath = Join-Path $workspace 'Vemryx.One.slnx'
+$projectPath = Join-Path $workspace 'src\Vemryx.One.App\Vemryx.One.App.csproj'
 $artifactsDirectory = Join-Path $workspace 'artifacts'
 $buildLogPath = Join-Path $artifactsDirectory 'development-launcher-build.log'
 
@@ -74,7 +74,7 @@ if ($NoLaunch) {
 
 # Marks this run as Development for remote crash reporting (Sentry), so it
 # never mixes with end-user errors reported by installed Production copies.
-# See FiveMCleaner.App/Services/AppEnvironment.cs.
+# See Vemryx.One.App/Services/AppEnvironment.cs.
 $env:FIVEMCLEANER_ENVIRONMENT = 'Development'
 
 # The development launcher must remain useful on a machine that does not have

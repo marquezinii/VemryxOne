@@ -19,7 +19,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-# Distinctive PRIVATE members from FiveMCleaner.Core / FiveMCleaner.Windows
+# Distinctive PRIVATE members from Vemryx.One.Core / Vemryx.One.Windows
 # source. KeepPublicApi=true (see build/obfuscation/FiveMCleaner.Obfuscar.xml)
 # means Obfuscar renames exactly these - private methods and fully-internal
 # types - while leaving the public surface alone. Their original UTF-8 name
@@ -38,9 +38,9 @@ $ErrorActionPreference = 'Stop'
 # also can't appear in a hardened OR un-hardened build, so absence alone does
 # not create a false pass without also checking the array here is non-empty).
 $forbiddenMarkers = @(
-    'CreateVerificationAndBottleneckActions' # private method, FiveMCleaner.Core
-    'GraphicsTargetProcessGuard'             # internal sealed class, FiveMCleaner.Windows
-    'AddCitizenFxCandidate'                  # private method, FiveMCleaner.Windows
+    'CreateVerificationAndBottleneckActions' # private method, Vemryx.One.Core
+    'GraphicsTargetProcessGuard'             # internal sealed class, Vemryx.One.Windows
+    'AddCitizenFxCandidate'                  # private method, Vemryx.One.Windows
 )
 if ($forbiddenMarkers.Count -eq 0) {
     throw 'No obfuscation markers configured; this check would silently pass everything.'

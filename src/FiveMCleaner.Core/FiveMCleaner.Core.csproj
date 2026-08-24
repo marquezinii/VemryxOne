@@ -1,9 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>$(FiveMCleanerTargetFramework)</TargetFramework>
-    <RootNamespace>FiveMCleaner.Core</RootNamespace>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="../FiveMCleaner.Contracts/FiveMCleaner.Contracts.csproj" />
-  </ItemGroup>
-</Project>

@@ -13,7 +13,7 @@ Fonte: `REBRANDING_VEMRYX_ONE.md`. O ícone oficial fornecido pelo usuário est�
 - [x] Migrar identidade pública e localização para Vemryx One.
 - [x] Projetar e testar compatibilidade de caminhos, mutex, persistência e sessões.
 - [x] Implementar release ponte do instalador/updater antes de renomear executáveis e IDs externos.
-- [ ] Renomear projetos, arquivos e namespaces internos após estabilizar a compatibilidade.
+- [x] Renomear projetos, arquivos e namespaces internos após estabilizar a compatibilidade.
 - [ ] Atualizar backend, site, documentação, CI e allowlist de resíduos.
 - [ ] Executar matriz final de build, testes, instalação, atualização, rollback e acessibilidade.
 
@@ -89,3 +89,17 @@ Eles só mudam junto de aliases, migração idempotente, testes e rollback. O no
 - `dotnet build FiveMCleaner.slnx --configuration Release --no-restore`: aprovado, 0 warnings e 0 erros.
 - `dotnet test FiveMCleaner.slnx --configuration Release --no-restore`: 999 testes aprovados.
 - `dotnet format FiveMCleaner.slnx --verify-no-changes --no-restore`, `scripts/Verify-Safety.ps1` e `scripts/Verify-Installer.ps1 -ScriptOnly`: aprovados.
+
+## Renomeação interna de projetos e namespaces
+
+- A solução passou a ser `Vemryx.One.slnx`; projetos, diretórios, referências e namespaces internos usam `Vemryx.One.*`.
+- `VemryxOneJson` substitui o auxiliar interno com o nome legado. Os assemblies e executáveis que compõem o layout instalado continuam explicitamente `FiveMCleaner.*`, preservando contratos de updater, instalador, hashes e rollback.
+- O gatilho interno de hardening agora é `VemryxOneHarden`; a publicação continua gerando e verificando os binários legados exigidos pelo runtime.
+
+## Validação da renomeação interna
+
+- `dotnet build Vemryx.One.slnx --configuration Release`: aprovado, 0 avisos e 0 erros.
+- `dotnet test Vemryx.One.slnx --configuration Release --no-build`: 999 testes aprovados.
+- `dotnet format Vemryx.One.slnx --verify-no-changes --no-restore` e `git diff --check`: aprovados.
+- `scripts/Build-Portable.ps1 -Runtime win-x64 -Configuration Release -Harden`: aprovado; o pacote mantém `FiveMCleaner.*` apenas como layout de compatibilidade.
+- `scripts/Test-NoUnobfuscatedAssemblies.ps1`: aprovou a árvore publicada, o bundle do launcher e os dois ZIPs; nenhuma cópia não ofuscada, PDB ou mapa de ofuscação foi encontrado.

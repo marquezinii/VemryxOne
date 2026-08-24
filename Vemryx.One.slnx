@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Vemryx.One.App/Vemryx.One.App.csproj" />
+    <Project Path="src/Vemryx.One.Broker/Vemryx.One.Broker.csproj" />
+    <Project Path="src/Vemryx.One.Updater/Vemryx.One.Updater.csproj" />
+    <Project Path="src/Vemryx.One.Launcher/Vemryx.One.Launcher.csproj" />
+    <Project Path="src/Vemryx.One.ReleaseTool/Vemryx.One.ReleaseTool.csproj" />
+    <Project Path="src/Vemryx.One.UpdateRuntime/Vemryx.One.UpdateRuntime.csproj" />
+    <Project Path="src/Vemryx.One.Contracts/Vemryx.One.Contracts.csproj" />
+    <Project Path="src/Vemryx.One.Core/Vemryx.One.Core.csproj" />
+    <Project Path="src/Vemryx.One.Windows/Vemryx.One.Windows.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Vemryx.One.Tests/Vemryx.One.Tests.csproj" />
+  </Folder>
+</Solution>

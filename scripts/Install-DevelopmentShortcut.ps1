@@ -40,12 +40,12 @@ if ($taskWorkspace -ne $stableWorkspace) {
 }
 
 $workspace = $stableWorkspace
-$projectPath = Join-Path $workspace 'src\FiveMCleaner.App\FiveMCleaner.App.csproj'
-$iconPath = Join-Path $workspace 'src\FiveMCleaner.App\Assets\VemryxOne.ico'
+$projectPath = Join-Path $workspace 'src\Vemryx.One.App\Vemryx.One.App.csproj'
+$iconPath = Join-Path $workspace 'src\Vemryx.One.App\Assets\VemryxOne.ico'
 $launcherPath = Join-Path $workspace 'scripts\Start-DevelopmentApp.ps1'
 
 if (-not (Test-Path -LiteralPath $projectPath -PathType Leaf)) {
-    throw "FiveMCleaner.App.csproj was not found under the expected workspace: $workspace"
+    throw "Vemryx.One.App.csproj was not found under the expected workspace: $workspace"
 }
 
 $dotnet = Get-Command dotnet -ErrorAction SilentlyContinue
