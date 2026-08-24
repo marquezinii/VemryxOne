@@ -135,7 +135,7 @@ public sealed class SignedManifestUpdateService : IReleaseUpdateService, IDispos
             uri,
             manifest.PackageSizeBytes,
             manifest.PackageSha256,
-            new Uri($"https://github.com/marquezinii/FiveMCleaner/releases/tag/v{version.CoreVersion}"));
+            new Uri($"https://github.com/marquezinii/VemryxOne/releases/tag/v{version.CoreVersion}"));
     }
 
     public async Task<DownloadedUpdate> DownloadUpdateAsync(

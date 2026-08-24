@@ -43,7 +43,7 @@ test("uses native Next static export as the only website build", async () => {
   assert.match(header, /setLanguage\("en"\)/);
   assert.match(
     copy,
-    /https:\/\/github\.com\/marquezinii\/FiveMCleaner\/releases\/latest/,
+    /https:\/\/github\.com\/marquezinii\/VemryxOne\/releases\/latest/,
   );
   assert.match(layout, /title: "Vemryx One/);
   assert.match(nextConfig, /output: "export"/);
@@ -65,13 +65,13 @@ test("keeps the exported download page aligned with the official release channel
 
   assert.match(
     html,
-    /https:\/\/github\.com\/marquezinii\/FiveMCleaner\/releases\/latest\/download\/VemryxOne-Setup-latest-win-x64\.exe/i,
+    /https:\/\/github\.com\/marquezinii\/VemryxOne\/releases\/latest\/download\/VemryxOne-Setup-latest-win-x64\.exe/i,
   );
   assert.match(html, /GitHub Releases · sem cadastro/i);
   assert.match(html, /Rollback disponível/i);
   assert.match(
     html,
-    /property="og:image" content="https:\/\/marquezinii\.github\.io\/FiveMCleaner\/og\.png"/i,
+    /property="og:image" content="https:\/\/marquezinii\.github\.io\/VemryxOne\/og\.png"/i,
   );
   assert.match(styles, /@media \(prefers-reduced-motion: reduce\)/i);
   assert.match(styles, /--background:\s*#0B0D12/i);

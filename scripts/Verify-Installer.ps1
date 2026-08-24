@@ -98,8 +98,8 @@ foreach ($infoRelative in @(
     foreach ($needle in @(
         'LOCALAPPDATA',
         'sha256',
-        'marquezinii.github.io/FiveMCleaner',
-        'github.com/marquezinii/FiveMCleaner/releases'
+        'marquezinii.github.io/VemryxOne',
+        'github.com/marquezinii/VemryxOne/releases'
     )) {
         if ($infoText -notmatch [regex]::Escape($needle)) {
             throw "Installer info contract missing '$needle' in $infoRelative."
