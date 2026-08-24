@@ -18,6 +18,8 @@ test("exports the Portuguese Vemryx One landing page", async () => {
   assert.match(html, /Sua live continua sendo prioridade\./i);
   assert.match(html, /Sobre o SmartScreen e antivírus/i);
   assert.match(html, /href="https:\/\/vemryx\.com\/"[^>]*>Vemryx<\/a>/i);
+  assert.match(html, /<span>Vemryx<span> One<\/span><\/span>/i);
+  assert.doesNotMatch(html, /FiveM<span>Cleaner<\/span>/i);
   assert.match(html, /href="\/icon\.png"/i);
   assert.match(html, /<main id="main-content">/i);
   assert.match(html, /class="skip-link"/i);

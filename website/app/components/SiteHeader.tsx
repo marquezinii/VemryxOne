@@ -18,7 +18,7 @@ export function SiteHeader({
         <div className="header-inner">
           <a className="brand" href="#top" aria-label="Vemryx One">
             <Image src={ICON_URL} width={38} height={38} alt="" unoptimized priority />
-            <span>FiveM<span>Cleaner</span></span>
+            <span>Vemryx<span> One</span></span>
           </a>
 
           <nav className="main-nav" aria-label={text.navLabel}>
