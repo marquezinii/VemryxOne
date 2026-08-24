@@ -221,7 +221,7 @@ public sealed class InstallationHealthDiagnosisAction : WindowsOptimizationActio
             return true;
         }
 
-        var probeFile = Path.Combine(probeDirectory, $".fivemcleaner-write-probe-{Guid.NewGuid():N}.tmp");
+        var probeFile = Path.Combine(probeDirectory, $".vemryx-one-write-probe-{Guid.NewGuid():N}.tmp");
         try
         {
             File.WriteAllBytes(probeFile, [0]);

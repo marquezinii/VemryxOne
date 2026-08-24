@@ -29,7 +29,7 @@ public sealed class SentryCrashReportingService : ICrashReportingService
         {
             sentryOptions.Dsn = options.SentryDsn;
             sentryOptions.Environment = options.Environment;
-            sentryOptions.Release = $"fivemcleaner@{appVersion}";
+            sentryOptions.Release = $"vemryx-one@{appVersion}";
 
             // Never send IP, machine name, or any other automatically
             // collected personal/technical identifier beyond the sanitized

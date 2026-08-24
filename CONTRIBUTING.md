@@ -21,7 +21,7 @@ Requisitos:
 
 ```powershell
 git clone <url-do-fork>
-Set-Location FiveMCleaner
+Set-Location <diretorio-clonado>
 dotnet restore Vemryx.One.slnx
 dotnet build Vemryx.One.slnx --configuration Release --no-restore
 dotnet test Vemryx.One.slnx --configuration Release --no-build

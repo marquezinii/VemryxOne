@@ -11,7 +11,7 @@ namespace Vemryx.One.App.Services;
 /// </summary>
 public static class CrashReportSanitizer
 {
-    private const string NonIdentifyingServerName = "fivemcleaner-client";
+    private const string NonIdentifyingServerName = "vemryx-one-client";
 
     public static SentryEvent Sanitize(SentryEvent sentryEvent)
     {

@@ -42,7 +42,7 @@ try {
     $brokerOutput = Join-Path $stagingRoot 'broker'
     $launcherOutput = Join-Path $stagingRoot 'launcher'
     $appOutput = Join-Path $stagingRoot 'app'
-    $pathMap = "$workspace=/_/FiveMCleaner"
+    $pathMap = "$workspace=/_/VemryxOne"
     $version = Get-ProjectVersion -Workspace $workspace
     if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "Invalid stable version: $version" }
 

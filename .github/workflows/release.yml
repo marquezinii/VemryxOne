@@ -151,7 +151,7 @@ jobs:
               [string]::IsNullOrWhiteSpace($env:FIVEMCLEANER_SIGNING_PASSWORD)) {
             throw 'Public builds require the offline release signing secrets for broker integrity.'
           }
-          $privateKey = Join-Path $env:RUNNER_TEMP 'fivemcleaner-broker-private.pem'
+          $privateKey = Join-Path $env:RUNNER_TEMP 'vemryx-one-broker-private.pem'
           try {
             [IO.File]::WriteAllText(
               $privateKey,
@@ -239,7 +239,7 @@ jobs:
                 [string]::IsNullOrWhiteSpace($env:FIVEMCLEANER_SIGNING_PASSWORD)) {
               throw 'Stable releases require the offline release signing secrets.'
             }
-            $privateKey = Join-Path $env:RUNNER_TEMP 'fivemcleaner-release-private.pem'
+            $privateKey = Join-Path $env:RUNNER_TEMP 'vemryx-one-release-private.pem'
             try {
               [IO.File]::WriteAllText(
                 $privateKey,
@@ -292,7 +292,7 @@ jobs:
       - name: Upload audited release candidate
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: FiveMCleaner-${{ steps.release.outputs.asset_version }}
+          name: VemryxOne-${{ steps.release.outputs.asset_version }}
           path: artifacts/release/**
           if-no-files-found: error
           retention-days: 14
@@ -317,7 +317,7 @@ jobs:
       - name: Download audited candidate
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
-          name: FiveMCleaner-${{ needs.build_audit.outputs.asset_version }}
+          name: VemryxOne-${{ needs.build_audit.outputs.asset_version }}
           path: release
 
       - name: Attest installer provenance

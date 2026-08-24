@@ -27,7 +27,7 @@ if (-not [System.IO.Path]::IsPathRooted($gitCommonDir)) {
 }
 $gitCommonDir = [System.IO.Path]::GetFullPath($gitCommonDir)
 $repositoryRoot = Split-Path -Parent $gitCommonDir
-$stableWorkspace = Join-Path (Split-Path -Parent $repositoryRoot) 'FiveMCleaner-dev-shortcut'
+$stableWorkspace = Join-Path (Split-Path -Parent $repositoryRoot) 'VemryxOne-dev-shortcut'
 
 if ($taskWorkspace -ne $stableWorkspace) {
     New-Item -ItemType Directory -Path $stableWorkspace -Force | Out-Null

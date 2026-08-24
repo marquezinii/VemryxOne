@@ -27,11 +27,11 @@
 #endif
 
 #ifndef InstallerArtworkPath
-  #define InstallerArtworkPath "..\artifacts\installer-artwork\FiveMCleaner-wizard-side-light.png"
+  #define InstallerArtworkPath "..\artifacts\installer-artwork\VemryxOne-wizard-side-light.png"
 #endif
 
 #ifndef InstallerArtworkPathDark
-  #define InstallerArtworkPathDark "..\artifacts\installer-artwork\FiveMCleaner-wizard-side-dark.png"
+  #define InstallerArtworkPathDark "..\artifacts\installer-artwork\VemryxOne-wizard-side-dark.png"
 #endif
 
 #define InstallerBaseName "VemryxOne-Setup-" + AppVersion + "-win-x64"

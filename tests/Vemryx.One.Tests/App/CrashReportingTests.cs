@@ -339,7 +339,7 @@ public sealed class CrashReportSanitizerTests
 
         var result = CrashReportSanitizer.Sanitize(sentryEvent);
 
-        Assert.Equal("fivemcleaner-client", result.ServerName);
+        Assert.Equal("vemryx-one-client", result.ServerName);
     }
 
     [Fact]
