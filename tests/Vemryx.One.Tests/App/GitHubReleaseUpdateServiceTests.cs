@@ -57,7 +57,7 @@ public sealed class GitHubReleaseUpdateServiceTests
             Assert.Equal(
                 "https://api.github.com/repos/marquezinii/FiveMCleaner/releases/latest",
                 request.RequestUri?.AbsoluteUri);
-            Assert.Contains("FiveMCleaner-Updater/1.0", request.Headers.UserAgent.ToString());
+            Assert.Contains("VemryxOne-Updater/1.0", request.Headers.UserAgent.ToString());
             Assert.Contains(
                 request.Headers.Accept,
                 value => value.MediaType == "application/vnd.github+json");

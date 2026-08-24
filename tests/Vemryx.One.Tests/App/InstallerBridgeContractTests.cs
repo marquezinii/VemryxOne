@@ -8,7 +8,7 @@ public sealed class InstallerBridgeContractTests
     public void ReleaseBridge_UsesThePublicInstallerWhileKeepingTheLegacyUpdateAlias()
     {
         var root = TestHelpers.FindRepositoryRoot();
-        var installer = File.ReadAllText(Path.Combine(root, "installer", "FiveMCleaner.iss"));
+        var installer = File.ReadAllText(Path.Combine(root, "installer", "VemryxOne.iss"));
         var build = File.ReadAllText(Path.Combine(root, "scripts", "Build-Installer.ps1"));
         var workflow = File.ReadAllText(Path.Combine(root, ".github", "workflows", "release.yml"));
 

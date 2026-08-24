@@ -1,4 +1,4 @@
-# AGENTS.md — FiveMCleaner
+# AGENTS.md — Vemryx One
 
 Instruções operacionais para agentes de IA trabalhando neste repositório.
 
@@ -8,7 +8,7 @@ enfraquecer os invariantes de segurança definidos aqui ou em `docs/safety.md`.
 
 ## 1. Missão
 
-O FiveMCleaner é uma aplicação Windows para diagnóstico, manutenção e otimização
+O Vemryx One é uma aplicação Windows para diagnóstico, manutenção e otimização
 transparente, conservadora e reversível de **FiveM sobre GTAV Legacy**.
 
 O objetivo não é acumular “tweaks”. Uma mudança só pertence ao produto quando
@@ -75,16 +75,16 @@ Preserve as responsabilidades atuais:
 
 | Área | Responsabilidade |
 | --- | --- |
-| `src/FiveMCleaner.App` | WPF, navegação, apresentação, interação e serviços de aplicação |
-| `src/FiveMCleaner.Contracts` | DTOs, IDs, estados, erros e contratos compartilhados |
-| `src/FiveMCleaner.Core` | casos de uso, políticas, perfis, planejamento, transação e rollback |
-| `src/FiveMCleaner.Windows` | descoberta e integrações específicas de Windows/FiveM |
-| `src/FiveMCleaner.Broker` | operações administrativas tipadas e allowlisted |
-| `src/FiveMCleaner.Launcher` | inicialização e supervisão de saúde pós-update |
-| `src/FiveMCleaner.Updater` | staging, ativação e rollback de atualização |
-| `src/FiveMCleaner.UpdateRuntime` | primitivas compartilhadas do updater |
-| `src/FiveMCleaner.ReleaseTool` | geração e validação de artefatos de release |
-| `tests/FiveMCleaner.Tests` | testes de contratos, políticas, segurança e regressões |
+| `src/Vemryx.One.App` | WPF, navegação, apresentação, interação e serviços de aplicação |
+| `src/Vemryx.One.Contracts` | DTOs, IDs, estados, erros e contratos compartilhados |
+| `src/Vemryx.One.Core` | casos de uso, políticas, perfis, planejamento, transação e rollback |
+| `src/Vemryx.One.Windows` | descoberta e integrações específicas de Windows/FiveM |
+| `src/Vemryx.One.Broker` | operações administrativas tipadas e allowlisted |
+| `src/Vemryx.One.Launcher` | inicialização e supervisão de saúde pós-update |
+| `src/Vemryx.One.Updater` | staging, ativação e rollback de atualização |
+| `src/Vemryx.One.UpdateRuntime` | primitivas compartilhadas do updater |
+| `src/Vemryx.One.ReleaseTool` | geração e validação de artefatos de release |
+| `tests/Vemryx.One.Tests` | testes de contratos, políticas, segurança e regressões |
 | `infra/cloudflare-worker` | backend remoto suportado |
 | `infra/dashboard` | painel privado |
 | `installer` | instalador Windows |
@@ -252,7 +252,7 @@ necessária para segurança, UI ou rollback.
 
 ## 10. Broker
 
-`FiveMCleaner.Broker` é código de alta criticidade.
+`Vemryx.One.Broker` é código de alta criticidade.
 
 O broker:
 
@@ -350,9 +350,9 @@ Não introduza texto localizado hardcoded.
 
 Ao adicionar/alterar texto público, mantenha a chave correspondente em:
 
-- `src/FiveMCleaner.App/Resources/Strings.resx`
-- `src/FiveMCleaner.App/Resources/Strings.pt-BR.resx`
-- `src/FiveMCleaner.App/Resources/Strings.es.resx`
+- `src/Vemryx.One.App/Resources/Strings.resx`
+- `src/Vemryx.One.App/Resources/Strings.pt-BR.resx`
+- `src/Vemryx.One.App/Resources/Strings.es.resx`
 
 Use o mecanismo de localização existente no XAML/código.
 
@@ -443,15 +443,15 @@ real, estado específico da máquina ou rede externa. Use interfaces/doubles.
 Comandos base:
 
 ```powershell
-dotnet restore FiveMCleaner.slnx
-dotnet build FiveMCleaner.slnx --configuration Release --no-restore
-dotnet test FiveMCleaner.slnx --configuration Release --no-build
+dotnet restore Vemryx.One.slnx
+dotnet build Vemryx.One.slnx --configuration Release --no-restore
+dotnet test Vemryx.One.slnx --configuration Release --no-build
 ```
 
 Execução local do app:
 
 ```powershell
-dotnet run --project src/FiveMCleaner.App/FiveMCleaner.App.csproj
+dotnet run --project src/Vemryx.One.App/Vemryx.One.App.csproj
 ```
 
 Para Worker/site/dashboard, inspecione os scripts reais do respectivo projeto.
@@ -619,7 +619,7 @@ Antes de encerrar:
 - [ ] diff revisado;
 - [ ] commit profissional criado;
 - [ ] branch/worktree corretos;
-- [ ] atalho `FiveMCleaner - Desenvolvimento` reconstruído conforme
+- [ ] atalho `Vemryx One - Desenvolvimento` reconstruído conforme
       `AI_RULES.md`, quando o ambiente permitir.
 
 ## 26. Relatório final

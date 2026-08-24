@@ -10,7 +10,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $workspace = [System.IO.Path]::GetFullPath((Split-Path -Parent $PSScriptRoot))
-$installerScript = Join-Path $workspace 'installer\FiveMCleaner.iss'
+$installerScript = Join-Path $workspace 'installer\VemryxOne.iss'
 
 if (-not (Test-Path -LiteralPath $installerScript -PathType Leaf)) {
     throw "Installer script not found: $installerScript"

@@ -28,7 +28,7 @@ const MAX_UPDATER_EVENT_BODY_BYTES = 4 * 1024;
 const MAX_ACCOUNT_PROFILE_BODY_BYTES = 4 * 1024;
 const MAX_LIVE_ALERT_BODY_BYTES = 4 * 1024;
 
-// FiveMCleaner anonymous telemetry + bug reports + admin dashboard API
+// Vemryx One anonymous telemetry + bug reports + admin dashboard API
 // Worker. See wrangler.toml and README.md for deployment status of each
 // route. Bug reports are text-only -- no attachment/screenshot support, no
 // R2 dependency -- everything lives in D1.

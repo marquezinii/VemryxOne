@@ -1,7 +1,7 @@
 namespace Vemryx.One.Contracts;
 
 /// <summary>
-/// Stable bug classification codes for the FiveMCleaner application and updater.
+/// Stable bug classification codes for the Vemryx One application and updater.
 /// These codes are durable contracts: they are persisted in bug reports, telemetry,
 /// and the admin dashboard. Members may only be appended, never renamed, removed,
 /// or renumbered. Each code maps to a specific failure domain and actionable area.

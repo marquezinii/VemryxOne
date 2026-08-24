@@ -48,7 +48,7 @@ public sealed class SignedManifestUpdateService : IReleaseUpdateService, IDispos
     {
         this.dataRoot = dataRoot;
         client = new HttpClient(handler) { Timeout = TimeSpan.FromMinutes(15) };
-        client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("FiveMCleaner-Updater", "2.0"));
+        client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("VemryxOne-Updater", "2.0"));
         updatesRoot = Path.Combine(dataRoot, "Updates");
         versionFloor = new VersionFloorStore(dataRoot);
         diagnostics = new UpdaterDiagnostics(dataRoot);

@@ -255,7 +255,7 @@ try {
     # Do not run /AUTOUPDATE=yes here: it relaunches FiveMCleaner.exe and is
     # covered by Verify-Installer.ps1 + UpdateHandoff unit tests. Live relaunch
     # leaves a GUI process that blocks uninstall and pollutes the operator machine.
-    $issText = Get-Content -LiteralPath (Join-Path $workspace 'installer\FiveMCleaner.iss') -Raw
+    $issText = Get-Content -LiteralPath (Join-Path $workspace 'installer\VemryxOne.iss') -Raw
     if ($issText -notmatch 'IsAutomaticUpdateRelaunch' -or
         $issText -notmatch 'AUTOUPDATE\|no' -or
         $issText -notmatch 'Parameters: "--updated=') {
@@ -307,7 +307,7 @@ try {
     }
 
     # Interactive removal choice is still guarded by Verify-Installer.ps1.
-    if ((Get-Content -LiteralPath (Join-Path $workspace 'installer\FiveMCleaner.iss') -Raw) -notmatch
+    if ((Get-Content -LiteralPath (Join-Path $workspace 'installer\VemryxOne.iss') -Raw) -notmatch
         "DelTree\(ExpandConstant\('\{localappdata\}\\FiveMCleaner'\), True, True, True\)") {
         throw 'The explicit interactive removal path for user data is missing.'
     }

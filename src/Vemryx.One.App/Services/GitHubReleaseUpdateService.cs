@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 namespace Vemryx.One.App.Services;
 
 /// <summary>
-/// Reads stable public releases from the official FiveMCleaner repository and
+/// Reads stable public releases from the official Vemryx One repository and
 /// downloads a hash-verified installer. This service never starts the installer.
 /// </summary>
 public sealed class GitHubReleaseUpdateService : IReleaseUpdateService, IDisposable
@@ -90,7 +90,7 @@ public sealed class GitHubReleaseUpdateService : IReleaseUpdateService, IDisposa
             Timeout = Timeout.InfiniteTimeSpan,
         };
         httpClient.DefaultRequestHeaders.UserAgent.Add(
-            new ProductInfoHeaderValue("FiveMCleaner-Updater", "1.0"));
+            new ProductInfoHeaderValue("VemryxOne-Updater", "1.0"));
     }
 
     public Task<ReleaseUpdate?> CheckForUpdateAsync(

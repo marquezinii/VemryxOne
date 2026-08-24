@@ -1,4 +1,4 @@
-# FiveMCleaner dashboard
+# Vemryx One dashboard
 
 Static admin dashboard for the telemetry and bug reports collected by
 [`infra/cloudflare-worker`](../cloudflare-worker/README.md). Plain HTML/CSS/JS,
@@ -10,7 +10,7 @@ attachment/screenshot, no R2) — see `infra/cloudflare-worker/README.md`.
 ## What's here
 
 - `index.html` — login screen + the dashboard itself (one page, toggled by
-  whether a session cookie is currently valid), branded with the FiveMCleaner
+  whether a session cookie is currently valid), branded with the Vemryx One
   logo, and organized into four sections: **Adoção** (usage/version/profile
   charts), **Hardware** (CPU/GPU/RAM breakdowns), **Diagnóstico de bugs**
   (error categories, actions most associated with failures, errors by
@@ -61,7 +61,7 @@ Access, no custom domain required).
 
 ## "Active users" honesty note
 
-FiveMCleaner's telemetry never includes a device or machine identifier (see
+Vemryx One's telemetry never includes a device or machine identifier (see
 `docs/telemetry.md`) — that is a deliberate privacy invariant, not a gap. As
 a direct consequence, this dashboard cannot show a true unique-user count;
 every "per day"/"in period" number is a count of *optimization runs*
@@ -71,7 +71,7 @@ it as "usuários online" the way an early sketch of this dashboard did.
 ## Re-deploying
 
 ```bash
-npx wrangler pages deploy . --project-name=fivemcleaner-dashboard
+npx wrangler pages deploy . --project-name=vemryx-one-dashboard
 ```
 
 `assets/app.js` hardcodes the Worker's `workers.dev` URL as the default API

@@ -108,7 +108,7 @@ public partial class MainWindow
     /// the hash-verified installer and runs it silently. There is no second
     /// dialog and no installer wizard to click through — a successful launch
     /// means the installer is already running its own [Run] entry to relaunch
-    /// FiveMCleaner, so this window closes immediately to let it replace the
+    /// Vemryx One, so this window closes immediately to let it replace the
     /// files. A failure at any point (download or install) leaves the app open
     /// with the banner explaining what happened.
     /// </summary>
@@ -160,7 +160,7 @@ public partial class MainWindow
     /// Shell launches fail for reasons outside the app's control (no default
     /// browser or folder handler registered, group policy blocking the verb,
     /// denied access to the folder). Unhandled, they reach
-    /// DispatcherUnhandledException, which shuts FiveMCleaner down — closing
+    /// DispatcherUnhandledException, which shuts Vemryx One down — closing
     /// the app over a failed "open this link" is never the right outcome.
     /// </summary>
     private static void TryOpenExternal(Action launch) => ExternalLauncher.TryOpen(launch);

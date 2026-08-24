@@ -1,6 +1,6 @@
 # Streaming safety
 
-FiveMCleaner possui uma fundação local e somente leitura para reconhecer OBS
+Vemryx One possui uma fundação local e somente leitura para reconhecer OBS
 Studio, Streamlabs Desktop e TikTok LIVE Studio. O detector existe para que uma
 integração futura possa proteger o fluxo de trabalho de criadores durante uma
 otimização.

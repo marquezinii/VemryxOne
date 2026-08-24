@@ -1,6 +1,6 @@
 # Release preview, integridade e simulação
 
-Este documento descreve a distribuição pública do **FiveMCleaner**. A versão
+Este documento descreve a distribuição pública do **Vemryx One**. A versão
 exata e suas mudanças ficam no [CHANGELOG](../CHANGELOG.md) e na página da
 release correspondente; nenhuma delas é garantia de ganho de desempenho.
 
@@ -11,10 +11,13 @@ Baixe binários somente pela página
 cada release `win-x64`, a publicação deve conter os seguintes arquivos
 produzidos pelo mesmo workflow:
 
-- `FiveMCleaner-Setup-X.Y.Z-win-x64.exe`;
-- `FiveMCleaner-Setup-X.Y.Z-win-x64.exe.sha256`;
-- `FiveMCleaner-release-manifest-X.Y.Z.json`;
-- `FiveMCleaner-win-x64.zip` e `FiveMCleaner-win-x64.zip.sha256`.
+- `VemryxOne-Setup-X.Y.Z-win-x64.exe`;
+- `VemryxOne-Setup-X.Y.Z-win-x64.exe.sha256`;
+- `VemryxOne-release-manifest-X.Y.Z.json`;
+- `FiveMCleaner-Setup-X.Y.Z-win-x64.exe` e o alias estável legado quando
+  aplicável;
+- `FiveMCleaner-win-x64.zip` e `FiveMCleaner-win-x64.zip.sha256` para o
+  runtime compatível com instalações existentes.
 
 Não use cópias hospedadas em encurtadores, mirrors, vídeos ou pacotes de
 "FPS boost". O código-fonte correspondente deve estar disponível no mesmo tag

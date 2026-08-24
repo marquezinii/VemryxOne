@@ -1,4 +1,4 @@
--- Schema for the FiveMCleaner anonymous telemetry D1 database.
+-- Schema for the Vemryx One anonymous telemetry D1 database.
 -- Mirrors the closed allowlist documented in docs/telemetry.md (version 2 of
 -- the privacy consent): no file paths, no machine identifiers, no free
 -- text -- CPU/GPU model and RAM bucket are coarse hardware categories, not

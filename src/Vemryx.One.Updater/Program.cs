@@ -39,7 +39,7 @@ public static class Program
             parentProcessId,
             parentStartTimeUtcFileTime,
             ParentExitTimeoutMilliseconds,
-            "O FiveMCleaner não foi encerrado a tempo para instalar a atualização.");
+            "O Vemryx One não foi encerrado a tempo para instalar a atualização.");
 
     private static FileStream VerifyInstaller(UpdateHandoff handoff)
     {
@@ -97,15 +97,15 @@ public static class Program
     }
 
     private static void ShowFailure(string? detail) => MessageBox.Show(
-        $"Não foi possível concluir a atualização do FiveMCleaner.\n\n{detail}\n\nAbra o aplicativo novamente e tente outra vez.",
-        "Atualização do FiveMCleaner", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        $"Não foi possível concluir a atualização do Vemryx One.\n\n{detail}\n\nAbra o aplicativo novamente e tente outra vez.",
+        "Atualização do Vemryx One", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
     private static string DescribeFailure(Exception exception) => exception switch
     {
-        TimeoutException => "A atualização demorou mais que o esperado e foi interrompida. Abra o FiveMCleaner novamente para tentar outra vez.",
+        TimeoutException => "A atualização demorou mais que o esperado e foi interrompida. Abra o Vemryx One novamente para tentar outra vez.",
         UnauthorizedAccessException => "O Windows não permitiu concluir a atualização. Verifique a permissão e tente novamente.",
         CryptographicException or InvalidDataException => "A verificação de segurança do instalador falhou. Nada foi alterado.",
-        FileNotFoundException => "O instalador verificado não está mais disponível. Abra o FiveMCleaner e baixe a atualização novamente.",
-        _ => "O atualizador encontrou um problema inesperado. Abra o FiveMCleaner novamente e tente outra vez."
+        FileNotFoundException => "O instalador verificado não está mais disponível. Abra o Vemryx One e baixe a atualização novamente.",
+        _ => "O atualizador encontrou um problema inesperado. Abra o Vemryx One novamente e tente outra vez."
     };
 }

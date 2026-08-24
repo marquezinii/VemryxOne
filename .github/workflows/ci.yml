@@ -104,7 +104,7 @@ jobs:
           dotnet tool run sbom-tool generate `
             -b ./artifacts/FiveMCleaner-win-x64 `
             -bc . `
-            -pn FiveMCleaner `
+            -pn "Vemryx One" `
             -pv $version `
             -ps "Vemryx" `
             -nsb https://github.com/marquezinii/FiveMCleaner

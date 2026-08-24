@@ -8,23 +8,23 @@
   Scope is deliberately narrow. Only the internal-logic assemblies are
   obfuscated:
 
-    * FiveMCleaner.Core    - action catalog, profiles, planning (the "how it
-                             works" IP the release should not hand to a casual
-                             decompiler).
-    * FiveMCleaner.Windows - Windows/FiveM adapters and diagnostics.
+    * Vemryx.One.Core    - action catalog, profiles, planning (the "how it
+                           works" IP the release should not hand to a casual
+                           decompiler).
+    * Vemryx.One.Windows - Windows/FiveM adapters and diagnostics.
 
   Assemblies intentionally NOT listed here, and why touching them is unsafe:
 
-    * FiveMCleaner.Contracts   - DTOs/enums are serialized BY NAME across four
-                                 durable boundaries (broker IPC, broker events,
-                                 transaction journal, local settings) with
-                                 JsonSerializerOptions.UnmappedMemberHandling =
-                                 Disallow. Renaming a member breaks persisted
-                                 data and the elevated broker contract.
-    * FiveMCleaner.App         - WPF. XAML/BAML resolves types and binds to
-                                 view-model members by string; Obfuscar does not
-                                 read XAML, so renaming would break bindings
-                                 silently ("but it compiled").
+    * Vemryx.One.Contracts   - DTOs/enums are serialized BY NAME across four
+                               durable boundaries (broker IPC, broker events,
+                               transaction journal, local settings) with
+                               JsonSerializerOptions.UnmappedMemberHandling =
+                               Disallow. Renaming a member breaks persisted
+                               data and the elevated broker contract.
+    * Vemryx.One.App         - WPF. XAML/BAML resolves types and binds to
+                               view-model members by string; Obfuscar does not
+                               read XAML, so renaming would break bindings
+                               silently ("but it compiled").
     * Launcher / Broker / *    - entry-point hosts and the release tool.
 
   KeepPublicApi=true is the correctness guarantee: the public surface of Core

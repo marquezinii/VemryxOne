@@ -4,7 +4,7 @@ using System.Threading;
 namespace Vemryx.One.App.Services;
 
 /// <summary>
-/// Prevents more than one FiveMCleaner process from running at the same
+/// Prevents more than one Vemryx One process from running at the same
 /// time for a given <see cref="AppRuntimeEnvironment"/>, using a named,
 /// system-wide <see cref="Mutex"/>. Scoped per environment (not globally) on
 /// purpose: a developer running the Development build side by side with an
@@ -162,7 +162,7 @@ public sealed class SingleInstanceGuard : IDisposable
             activationListener = new Thread(ActivationListenerLoop)
             {
                 IsBackground = true,
-                Name = "FiveMCleaner.SingleInstance.ActivationListener"
+                Name = "Vemryx One.SingleInstance.ActivationListener"
             };
             activationListener.Start();
         }

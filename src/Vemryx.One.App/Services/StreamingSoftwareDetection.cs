@@ -1,7 +1,7 @@
 namespace Vemryx.One.App.Services;
 
 /// <summary>
-/// Aplicativos de transmissão que o FiveMCleaner reconhece localmente.
+/// Aplicativos de transmissão que o Vemryx One reconhece localmente.
 /// A lista é fechada de propósito para evitar classificar processos desconhecidos.
 /// </summary>
 public enum StreamingSoftwareKind

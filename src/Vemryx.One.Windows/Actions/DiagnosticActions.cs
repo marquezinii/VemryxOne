@@ -199,7 +199,7 @@ public sealed class PerformanceDiagnosticsGuideAction : ReadOnlyDiagnosticAction
         return "Use os comandos oficiais do FiveM no console (F8) para medir o desempenho real: "
             + "cl_drawfps true (FPS), cl_drawperf true (FPS/ping/CPU/GPU), netgraph true (rede) e, "
             + "com o modo de desenvolvimento disponível, resmon true (CPU/memória por recurso do servidor). "
-            + "O painel de prontidão para streaming do próprio FiveMCleaner mostra sinais adicionais de sessão.";
+            + "O painel de prontidão para streaming do próprio Vemryx One mostra sinais adicionais de sessão.";
     }
 }
 
@@ -416,7 +416,7 @@ public sealed class GpuVendorDetectionAction : ReadOnlyDiagnosticAction
 
         var message = $"GPU(s) detectada(s): {string.Join(", ", described)}. Ajustes de perfil 3D devem ser feitos "
             + "apenas pelo painel oficial do fabricante (NVIDIA Control Panel, AMD Software ou Intel "
-            + "Graphics Command Center); o FiveMCleaner não escreve nem sobrescreve esses perfis.";
+            + "Graphics Command Center); o Vemryx One não escreve nem sobrescreve esses perfis.";
 
         var links = OfficialDriverLinks
             .Where(entry => vendors.Contains(entry.Vendor, StringComparer.Ordinal))
@@ -557,7 +557,7 @@ public sealed class HybridLaptopDiagnosisAction : ReadOnlyDiagnosticAction
                 + "GPU dedicada e MUX switch, consulte o utilitário do fabricante para ativá-lo."
             : $"Utilitário(s) do fabricante detectado(s): {string.Join(", ", detectedTools)}. Use-o para "
                 + "ativar o modo de GPU dedicada/MUX switch e o perfil de desempenho, se disponíveis -- "
-                + "o FiveMCleaner não controla isso diretamente.");
+                + "o Vemryx One não controla isso diretamente.");
 
         return string.Join(" ", parts);
     }

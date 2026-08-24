@@ -42,7 +42,7 @@ em `account_profiles`, sempre indexado pelo UID já validado do token, nunca
 por um valor enviado pelo cliente. A criação do perfil exige ID token com
 `email_verified=true` e a aceitação da versão vigente dos termos; até ambos
 existirem, a conta fica em `ProfileCompletionRequired`, não em `SignedIn`.
-`AccountProfileService` (`FiveMCleaner.App/Services`) chama essa rota depois
+`AccountProfileService` (`Vemryx.One.App/Services`) chama essa rota depois
 da confirmação de e-mail; se o usuário escolhido já existir, a resposta é
 `409 username-taken` e a conta Firebase já criada é preservada — a janela de
 conta pede outro nome de usuário em vez de descartar o cadastro. A exclusão
@@ -52,12 +52,12 @@ falha.
 
 | Projeto                  | Responsabilidade                                                    | Não deve conhecer                                        |
 | ------------------------ | ------------------------------------------------------------------- | -------------------------------------------------------- |
-| `FiveMCleaner.App`       | WPF, navegação, prévia, progresso e confirmação                     | APIs administrativas ou detalhes de registro             |
-| `FiveMCleaner.Contracts` | DTOs, IDs, estados (inclusive transacionais), erros e contratos entre processos | WPF ou implementação Windows                  |
-| `FiveMCleaner.Core`      | casos de uso, composição de perfis, políticas, transação e rollback | controles visuais ou comandos shell                      |
-| `FiveMCleaner.Windows`   | descoberta de hardware/instalação e adaptadores Windows/FiveM       | decisão de qual perfil o usuário deve escolher           |
-| `FiveMCleaner.Broker`    | executor elevado com allowlist mínima                               | navegação, telemetria ou lógica de produto ampla         |
-| `FiveMCleaner.Tests`     | contratos, políticas, falhas, rollback e doubles de sistema         | dependência de uma instalação real para testes unitários |
+| `Vemryx.One.App`       | WPF, navegação, prévia, progresso e confirmação                     | APIs administrativas ou detalhes de registro             |
+| `Vemryx.One.Contracts` | DTOs, IDs, estados (inclusive transacionais), erros e contratos entre processos | WPF ou implementação Windows                  |
+| `Vemryx.One.Core`      | casos de uso, composição de perfis, políticas, transação e rollback | controles visuais ou comandos shell                      |
+| `Vemryx.One.Windows`   | descoberta de hardware/instalação e adaptadores Windows/FiveM       | decisão de qual perfil o usuário deve escolher           |
+| `Vemryx.One.Broker`    | executor elevado com allowlist mínima                               | navegação, telemetria ou lógica de produto ampla         |
+| `Vemryx.One.Tests`     | contratos, políticas, falhas, rollback e doubles de sistema         | dependência de uma instalação real para testes unitários |
 
 ## Fronteira de confiança
 
@@ -130,7 +130,7 @@ Isso é o que torna a validação possível: tanto o broker elevado quanto `Wind
 
 ### Resultado
 
-`ActionExecutionOutcome` (`FiveMCleaner.Contracts`) é o estado semântico usado por progresso e relatório:
+`ActionExecutionOutcome` (`Vemryx.One.Contracts`) é o estado semântico usado por progresso e relatório:
 
 - `Verified` — máquina já estava no estado desejado; nenhuma escrita ocorreu;
 - `Applied` — alteração e pós-condição confirmadas;
@@ -145,9 +145,9 @@ Esse enum é independente do estado transacional do journal
 (`ActionJournalState`), que continua controlando elegibilidade de
 rollback, e do estado da transação inteira (`TransactionState`).
 
-Os três vivem em `FiveMCleaner.Contracts` (`OptimizationEnums.cs` e
+Os três vivem em `Vemryx.One.Contracts` (`OptimizationEnums.cs` e
 `TransactionEnums.cs`) porque são vocabulário compartilhado entre App, Windows
-e Broker — antes App e Broker importavam `FiveMCleaner.Windows.Engine` só para
+e Broker — antes App e Broker importavam `Vemryx.One.Windows.Engine` só para
 enxergar o estado da transação.
 
 **Contrato durável.** Os três são persistidos *pelo nome* (camelCase) em
@@ -355,7 +355,7 @@ ativado/restaurado por sessão, prioridade de processo restaurada ao
 fechar, afinidade de CPU, core parking, timer resolution solicitado
 enquanto o jogo está aberto — **não foi implementada porque pressupõe um
 processo de vigilância de ciclo de vida do FiveM/GTA V (detectar
-início/fim em tempo real) que este produto não tem**. O FiveMCleaner é
+início/fim em tempo real) que este produto não tem**. O Vemryx One é
 hoje "aplicar uma vez, verificar, confirmar, reverter se necessário", não
 um serviço residente que reage a um processo abrindo/fechando. Ver
 `docs/graphics-optimizations-backlog.md`, seção 13, para a lista completa
@@ -376,7 +376,7 @@ O MVP grava somente sob `%LOCALAPPDATA%\FiveMCleaner`:
 
 - `Transactions/<id>.json`: plano, estados por ação e snapshots pequenos necessários ao rollback;
 - `Requests/<id>.json`: solicitação efêmera e de uso único consumida atomicamente pelo broker;
-- `settings.json`: preferências do próprio FiveMCleaner;
+- `settings.json`: preferências do próprio Vemryx One;
 - `crash.log`: exceções fatais locais, criado apenas quando necessário.
 
 Esses arquivos têm durabilidades diferentes e isso muda o que pode ser alterado:

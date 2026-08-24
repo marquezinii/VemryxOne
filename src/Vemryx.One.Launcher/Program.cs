@@ -62,7 +62,7 @@ internal static class Program
                 start.ArgumentList.Add($"--update-transaction={transaction.Id}");
                 start.ArgumentList.Add($"--update-nonce={transaction.Nonce}");
             }
-            using var process = Process.Start(start) ?? throw new InvalidOperationException("O Windows não iniciou o FiveMCleaner.");
+            using var process = Process.Start(start) ?? throw new InvalidOperationException("O Windows não iniciou o Vemryx One.");
             if (!hasCandidate) return 0;
 
             var receipt = new UpdateHealthReceiptStore(runtimeRoot);
@@ -86,7 +86,7 @@ internal static class Program
             await RecordAsync(diagnostics, transaction, "rollback", "rolled-back", "health-timeout", null, dataRoot, telemetryAuthorized);
             MessageBox.Show(
                 "A nova versão não confirmou uma inicialização saudável. A versão anterior foi restaurada e será usada na próxima abertura.",
-                "Recuperação do FiveMCleaner", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                "Recuperação do Vemryx One", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return 1;
         }
         catch (Exception exception)
@@ -120,7 +120,7 @@ internal static class Program
                 }
                 await RecordAsync(diagnostics, currentTransaction, "activation", "failed", Classify(exception), exception.ToString(), dataRoot, telemetryAuthorized);
             }
-            MessageBox.Show(DescribeFailure(exception), "FiveMCleaner", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(DescribeFailure(exception), "Vemryx One", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return 2;
         }
     }
@@ -132,7 +132,7 @@ internal static class Program
         if (pidText is null && startText is null) return;
         if (!int.TryParse(pidText, out var pid) || pid <= 0 || !long.TryParse(startText, out var expectedStart) || expectedStart <= 0)
             throw new InvalidDataException("Identidade do processo anterior inválida.");
-        ParentProcessWait.WaitForExit(pid, expectedStart, 30_000, "O FiveMCleaner anterior não encerrou a tempo.");
+        ParentProcessWait.WaitForExit(pid, expectedStart, 30_000, "O Vemryx One anterior não encerrou a tempo.");
     }
 
     private static Task RecordAsync(
@@ -171,10 +171,10 @@ internal static class Program
 
     private static string DescribeFailure(Exception exception) => exception switch
     {
-        TimeoutException => "O FiveMCleaner anterior não encerrou a tempo. Aguarde alguns instantes e tente abrir novamente.",
+        TimeoutException => "O Vemryx One anterior não encerrou a tempo. Aguarde alguns instantes e tente abrir novamente.",
         UnauthorizedAccessException => "O Windows não permitiu abrir esta versão. Verifique a permissão e tente novamente.",
         CryptographicException or InvalidDataException => "Não foi possível verificar esta atualização com segurança. Nada foi alterado.",
-        FileNotFoundException => "Os arquivos necessários para abrir o FiveMCleaner não foram encontrados. Tente reparar ou reinstalar o aplicativo.",
-        _ => "Não foi possível abrir o FiveMCleaner agora. Tente novamente; se continuar, reinstale o aplicativo."
+        FileNotFoundException => "Os arquivos necessários para abrir o Vemryx One não foram encontrados. Tente reparar ou reinstalar o aplicativo.",
+        _ => "Não foi possível abrir o Vemryx One agora. Tente novamente; se continuar, reinstale o aplicativo."
     };
 }

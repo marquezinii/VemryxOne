@@ -62,7 +62,7 @@ export function osVersionBreakdown(filters) {
   };
 }
 
-/** Distribution of FiveMCleaner app versions among reported events. */
+/** Distribution of Vemryx One app versions among reported events. */
 export function appVersionBreakdown(filters) {
   const { whereSql, params } = buildFilters(filters);
   return {

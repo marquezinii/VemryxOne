@@ -1,6 +1,6 @@
 # Release hardening (code obfuscation)
 
-FiveMCleaner is source-available: the clean, readable C# on GitHub stays the
+Vemryx One is source-available: the clean, readable C# on GitHub stays the
 source of truth, and development/CI builds are never obfuscated. Only the
 **public release binaries** are hardened, by an obfuscation step that runs
 inside the release pipeline. The obfuscator never runs on a user's machine — the
@@ -18,30 +18,30 @@ Worker), never by a client-side `if`.
 
 Only the internal-logic assemblies:
 
-- `FiveMCleaner.Core` — action catalog, profiles, planning.
-- `FiveMCleaner.Windows` — Windows/FiveM adapters and diagnostics.
+- `Vemryx.One.Core` — action catalog, profiles, planning.
+- `Vemryx.One.Windows` — Windows/FiveM adapters and diagnostics.
 
 Everything else is intentionally left untouched, because these assemblies are
 resolved **by name at runtime** and renaming their members would break the app
 silently:
 
-- `FiveMCleaner.Contracts` — its DTOs and enums are serialized by member name
+- `Vemryx.One.Contracts` — its DTOs and enums are serialized by member name
   across four durable boundaries (broker IPC, broker events, transaction
   journal, local settings) with `UnmappedMemberHandling = Disallow`. Renaming a
   member breaks persisted data and the elevated broker contract.
-- `FiveMCleaner.App` — WPF. XAML/BAML binds to view-model members and resolves
+- `Vemryx.One.App` — WPF. XAML/BAML binds to view-model members and resolves
   types by string; the obfuscator does not read XAML.
-- `FiveMCleaner.Broker` — entry-point host (its own `Core`/`Windows` copy is
+- `Vemryx.One.Broker` — entry-point host (its own `Core`/`Windows` copy is
   hardened like the App's, see below — the project itself isn't touched).
-- `FiveMCleaner.UpdateRuntime` — the update/rollback state machine is
+- `Vemryx.One.UpdateRuntime` — the update/rollback state machine is
   safety-critical and low IP value; kept clean deliberately.
 
-`FiveMCleaner.Launcher` is a host too, but its `Core`/`Windows` *dependency
+`Vemryx.One.Launcher` is a host too, but its `Core`/`Windows` *dependency
 copies* need special handling — see "The Launcher's single-file bundle" below.
 
 ### Why `KeepPublicApi` is the correctness guarantee
 
-The obfuscation config (`build/obfuscation/FiveMCleaner.Obfuscar.xml`) sets
+The obfuscation config (`build/obfuscation/VemryxOne.Obfuscar.xml`) sets
 `KeepPublicApi=true` + `HidePrivateApi=true`. Because the non-obfuscated
 `App`/`Broker` and the JSON layer only ever touch the **public** surface of
 `Core`/`Windows`, keeping that surface intact means the app behaves exactly as
@@ -68,7 +68,7 @@ day-to-day debugging is unaffected.
 
 ### The Launcher's single-file bundle
 
-`FiveMCleaner.Launcher` publishes as a self-contained single file
+`Vemryx.One.Launcher` publishes as a self-contained single file
 (`PublishSingleFile=true`). The .NET SDK's single-file bundler does not read
 its managed dependencies from the loose publish output — per
 `Microsoft.NET.Publish.targets`, "when publishing to a single file, ... files
@@ -93,14 +93,14 @@ own MSBuild execution**, between the moment `ComputeFilesToPublish` fixes
 recompiles them again in between, and this ordering is an explicit MSBuild
 target-graph guarantee (`AfterTargets`/`BeforeTargets`), not a side effect of
 incremental build caching or of which target happens to run first or last.
-`src/FiveMCleaner.Launcher/FiveMCleaner.Launcher.csproj` defines two targets,
-gated on `-p:FiveMCleanerHarden=true`:
+`src/Vemryx.One.Launcher/Vemryx.One.Launcher.csproj` defines two targets,
+gated on `-p:VemryxOneHarden=true`:
 
 - `HardenBundledAssemblies` (`AfterTargets="ComputeFilesToPublish"`,
   `BeforeTargets="GenerateSingleFileBundle"`) backs up the current
   `Core.dll`/`Windows.dll` bytes, runs `Invoke-Obfuscation.ps1` against
-  `FiveMCleaner.Windows`'s own build output in place, then copies the
-  hardened `Core.dll` over to `FiveMCleaner.Core`'s own canonical output (a
+  `Vemryx.One.Windows`'s own build output in place, then copies the
+  hardened `Core.dll` over to `Vemryx.One.Core`'s own canonical output (a
   separate folder, since `Core` has no reference to `Windows`).
 - `RestoreCanonicalAssembliesAfterBundling` (`AfterTargets="GenerateSingleFileBundle"`)
   restores both canonical outputs from that backup, unconditionally, right
@@ -113,12 +113,12 @@ transient effect scoped to this one publish, instead of a lasting mutation
 that a later `dotnet build`/debug session (or the Broker/App targets, if the
 publish order ever changes) could pick up by accident. This was verified by
 publishing the Launcher completely in isolation — no Broker/App target
-before or after it — with `-p:FiveMCleanerHarden=true`: the resulting bundle
+before or after it — with `-p:VemryxOneHarden=true`: the resulting bundle
 is hardened, and the canonical `Core`/`Windows` build output is back to its
 clean, pre-hardening bytes immediately afterward, with nothing else in the
 build graph involved.
 
-`scripts/Build-Portable.ps1` passes `-p:FiveMCleanerHarden=true` to every
+`scripts/Build-Portable.ps1` passes `-p:VemryxOneHarden=true` to every
 `-Harden` publish target; it's a no-op for Broker/App, which don't define
 these targets.
 

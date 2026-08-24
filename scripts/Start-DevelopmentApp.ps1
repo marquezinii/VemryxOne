@@ -20,7 +20,7 @@ foreach ($requiredPath in @($solutionPath, $projectPath)) {
 
 $dotnet = Get-Command dotnet -ErrorAction SilentlyContinue
 if ($null -eq $dotnet) {
-    throw 'The .NET SDK is required to run the FiveMCleaner development launcher.'
+    throw 'The .NET SDK is required to run the Vemryx One development launcher.'
 }
 
 New-Item -ItemType Directory -Path $artifactsDirectory -Force | Out-Null
@@ -30,8 +30,8 @@ $buildOutput | Set-Content -LiteralPath $buildLogPath -Encoding utf8
 if ($LASTEXITCODE -ne 0) {
     Add-Type -AssemblyName PresentationFramework
     [void][System.Windows.MessageBox]::Show(
-        "O FiveMCleaner não pôde ser preparado para execução. O registro do build está em:`n$buildLogPath",
-        'FiveMCleaner - Desenvolvimento',
+        "O Vemryx One não pôde ser preparado para execução. O registro do build está em:`n$buildLogPath",
+        'Vemryx One - Desenvolvimento',
         [System.Windows.MessageBoxButton]::OK,
         [System.Windows.MessageBoxImage]::Error)
     exit $LASTEXITCODE

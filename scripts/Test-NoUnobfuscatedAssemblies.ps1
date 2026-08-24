@@ -20,7 +20,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 # Distinctive PRIVATE members from Vemryx.One.Core / Vemryx.One.Windows
-# source. KeepPublicApi=true (see build/obfuscation/FiveMCleaner.Obfuscar.xml)
+# source. KeepPublicApi=true (see build/obfuscation/VemryxOne.Obfuscar.xml)
 # means Obfuscar renames exactly these - private methods and fully-internal
 # types - while leaving the public surface alone. Their original UTF-8 name
 # bytes live verbatim in a compiled assembly's #Strings metadata heap (ECMA-335)
@@ -97,7 +97,7 @@ Test-FileHardened -Path (Join-Path $runtimeRoot 'FiveMCleaner.Launcher.exe') -La
 
 # The portable/runtime ZIPs and the installer are repackagings of this same
 # $RuntimeDirectory tree with no separate compilation step (Build-Portable.ps1
-# zips $finalRoot as-is; installer/FiveMCleaner.iss's [Files] section sources
+# zips $finalRoot as-is; installer/VemryxOne.iss's [Files] section sources
 # "{#SourceDir}\*" - the same tree - verbatim). Scanning them too is
 # redundant with the checks above by construction, but cheap, and catches a
 # packaging-step regression (e.g. a future change that zips a different,
@@ -175,7 +175,7 @@ if ($InstallerPath) {
         }
     }
     else {
-        Write-Warning '7-Zip not found; skipped the direct installer-payload extraction check (covered indirectly: the installer packages the already-verified runtime tree verbatim, see installer/FiveMCleaner.iss).'
+        Write-Warning '7-Zip not found; skipped the direct installer-payload extraction check (covered indirectly: the installer packages the already-verified runtime tree verbatim, see installer/VemryxOne.iss).'
     }
 }
 

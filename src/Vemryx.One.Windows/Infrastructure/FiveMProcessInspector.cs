@@ -44,7 +44,7 @@ public sealed class WindowsFiveMProcessInspector : IFiveMProcessInspector
 
         // Process.ProcessName does not include the .exe suffix. FiveM's runtime
         // children use the FiveM_* and CitizenFX_* families. Matching a bare
-        // substring would make FiveMCleaner detect itself as the game.
+        // substring would make Vemryx One detect itself as the game.
         return processName.Equals("FiveM", StringComparison.OrdinalIgnoreCase)
             || processName.StartsWith("FiveM_", StringComparison.OrdinalIgnoreCase)
             || processName.Equals("CitizenFX", StringComparison.OrdinalIgnoreCase)

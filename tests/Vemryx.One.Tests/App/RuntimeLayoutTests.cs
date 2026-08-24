@@ -16,7 +16,7 @@ public sealed class RuntimeLayoutTests : IDisposable
     public void Resolve_RecognizesTheRealInstallerLayout()
     {
         // {installRoot}/Runtime/versions/{version}/FiveMCleaner.exe -- exactly
-        // what FiveMCleaner.iss and RuntimePackageStager produce.
+        // what VemryxOne.iss and RuntimePackageStager produce.
         var baseDirectory = Path.Combine(root, "FiveMCleaner", "Runtime", "versions", "1.2.3");
         Directory.CreateDirectory(baseDirectory);
 

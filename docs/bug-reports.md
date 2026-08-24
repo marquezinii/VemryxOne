@@ -24,7 +24,7 @@ O formulário envia sempre:
 
 - identificador aleatório do relato;
 - categoria, resumo e descrição digitados;
-- versão do FiveMCleaner;
+- versão do Vemryx One;
 - perfil selecionado.
 
 Opcionalmente, o usuário também pode informar:

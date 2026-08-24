@@ -52,7 +52,7 @@ export function HeroSection({ text }: { text: Copy }) {
                 <div className="preview-topbar">
                   <div className="preview-brand">
                     <Image src={ICON_URL} width={28} height={28} alt="" unoptimized />
-                    <span>FiveMCleaner</span>
+                    <span>Vemryx One</span>
                   </div>
                   <span className="system-ready"><i />{text.preview.appStatus}</span>
                 </div>

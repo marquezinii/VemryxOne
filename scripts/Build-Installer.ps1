@@ -224,7 +224,7 @@ try {
         }
     }
 
-    $installerScript = Join-Path $workspace 'installer\FiveMCleaner.iss'
+    $installerScript = Join-Path $workspace 'installer\VemryxOne.iss'
     $arguments = @(
         '/Qp',
         "/DAppVersion=$Version",

@@ -1,10 +1,10 @@
-# Plano de Refatoração Profunda e Remoção de Dead Code — FiveMCleaner
+# Plano de Refatoração Profunda e Remoção de Dead Code — Vemryx One
 
 > **Status deste plano:** a Fase 0 já foi enviada para execução antes desta revisão. **Não reinicie nem reexecute a Fase 0 automaticamente.** As Fases 1–10 abaixo substituem o roteiro antigo e devem partir do estado real produzido pela Fase 0 depois que ele estiver validado e integrado.
 
 ## 1. Objetivo
 
-Este documento define uma refatoração ampla, conservadora e verificável do FiveMCleaner, com quatro objetivos principais:
+Este documento define uma refatoração ampla, conservadora e verificável do Vemryx One, com quatro objetivos principais:
 
 1. remover dead code, artefatos órfãos e dependências sem uso comprovado;
 2. reduzir duplicação, acoplamento desnecessário e responsabilidades misturadas;
@@ -32,16 +32,16 @@ O plano deve se adaptar ao estado real do código. **Nunca restaure uma implemen
 
 A solução atual não é somente App/Core/Windows/Broker. O sweep completo deve considerar:
 
-- `src/FiveMCleaner.App`
-- `src/FiveMCleaner.Contracts`
-- `src/FiveMCleaner.Core`
-- `src/FiveMCleaner.Windows`
-- `src/FiveMCleaner.Broker`
-- `src/FiveMCleaner.Launcher`
-- `src/FiveMCleaner.Updater`
-- `src/FiveMCleaner.UpdateRuntime`
-- `src/FiveMCleaner.ReleaseTool`
-- `tests/FiveMCleaner.Tests`
+- `src/Vemryx.One.App`
+- `src/Vemryx.One.Contracts`
+- `src/Vemryx.One.Core`
+- `src/Vemryx.One.Windows`
+- `src/Vemryx.One.Broker`
+- `src/Vemryx.One.Launcher`
+- `src/Vemryx.One.Updater`
+- `src/Vemryx.One.UpdateRuntime`
+- `src/Vemryx.One.ReleaseTool`
+- `tests/Vemryx.One.Tests`
 - `infra/cloudflare-worker`
 - `infra/dashboard`
 - `website`
@@ -260,7 +260,7 @@ As Fases 2–9 precisam ter um mapa de escopo claro e nenhuma área importante d
 ## Fase 2 — Windows Infrastructure: descoberta, sensores e primitivas de sistema
 
 **Risco:** alto.
-**Escopo principal:** `src/FiveMCleaner.Windows/Infrastructure` e testes relacionados.
+**Escopo principal:** `src/Vemryx.One.Windows/Infrastructure` e testes relacionados.
 
 ### Objetivo
 
@@ -297,7 +297,7 @@ Separar rigorosamente **observação do sistema** de **decisão/mutação**, red
 ## Fase 3 — Motor transacional, journal, runtime e rollback
 
 **Risco:** CRÍTICO.
-**Escopo principal:** `FiveMCleaner.Windows/Engine`, `WindowsOptimizationRuntime`, contratos diretamente envolvidos e testes transacionais.
+**Escopo principal:** `Vemryx.One.Windows/Engine`, `WindowsOptimizationRuntime`, contratos diretamente envolvidos e testes transacionais.
 
 ### Objetivo
 
@@ -345,7 +345,7 @@ Exigir testes explícitos para sucesso, já-verificado, skip, falha, rollback, r
 ## Fase 4 — Catálogo de Actions, implementações e regras de negócio
 
 **Risco:** alto.
-**Escopo principal:** `FiveMCleaner.Core` relacionado ao catálogo/políticas e `FiveMCleaner.Windows/Actions`.
+**Escopo principal:** `Vemryx.One.Core` relacionado ao catálogo/políticas e `Vemryx.One.Windows/Actions`.
 
 ### Objetivo
 
@@ -385,7 +385,7 @@ Garantir uma relação clara e mínima entre **definição de Action**, **implem
 ## Fase 5 — App WPF, composição, ViewModels, Services e recursos de UI
 
 **Risco:** alto.
-**Escopo principal:** `src/FiveMCleaner.App`.
+**Escopo principal:** `src/Vemryx.One.App`.
 
 ### Objetivo
 
@@ -418,7 +418,7 @@ Remover superfície de UI/serviço órfã, reduzir acoplamento de composição e
 ## Fase 6 — Broker, IPC e fronteira de privilégio
 
 **Risco:** CRÍTICO.
-**Escopo principal:** `src/FiveMCleaner.Broker`, contratos interprocesso e callers no App/Core.
+**Escopo principal:** `src/Vemryx.One.Broker`, contratos interprocesso e callers no App/Core.
 
 ### Objetivo
 
@@ -449,10 +449,10 @@ Nenhuma simplificação pode ampliar o poder do processo elevado. Menos código 
 **Risco:** CRÍTICO.
 **Escopo principal:**
 
-- `FiveMCleaner.Launcher`
-- `FiveMCleaner.Updater`
-- `FiveMCleaner.UpdateRuntime`
-- `FiveMCleaner.ReleaseTool`
+- `Vemryx.One.Launcher`
+- `Vemryx.One.Updater`
+- `Vemryx.One.UpdateRuntime`
+- `Vemryx.One.ReleaseTool`
 - `installer`
 - scripts de build/release/update
 - workflows de CI/release relacionados.
@@ -605,10 +605,10 @@ Repita o inventário da Fase 1 sobre o estado final e compare:
 Quando aplicável ao estado atual:
 
 ```powershell
-dotnet restore FiveMCleaner.slnx
-dotnet build FiveMCleaner.slnx --configuration Release --no-restore
-dotnet test FiveMCleaner.slnx --configuration Release --no-build
-dotnet format FiveMCleaner.slnx --verify-no-changes
+dotnet restore Vemryx.One.slnx
+dotnet build Vemryx.One.slnx --configuration Release --no-restore
+dotnet test Vemryx.One.slnx --configuration Release --no-build
+dotnet format Vemryx.One.slnx --verify-no-changes
 .\scripts\Verify-Safety.ps1
 git diff --check
 ```

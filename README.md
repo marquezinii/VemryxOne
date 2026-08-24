@@ -1,6 +1,6 @@
-<p align="center"><img src="docs/assets/icon.png" alt="FiveMCleaner" width="112"></p>
+<p align="center"><img src="docs/assets/icon.png" alt="Vemryx One" width="112"></p>
 
-<h1 align="center">FiveMCleaner</h1>
+<h1 align="center">Vemryx One</h1>
 
 <p align="center">Diagnóstico, manutenção e otimização transparente para <strong>FiveM sobre GTAV Legacy</strong> no Windows.</p>
 
@@ -8,14 +8,14 @@
 
 <p align="center"><a href="https://github.com/marquezinii/FiveMCleaner/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/marquezinii/FiveMCleaner/ci.yml?branch=main&style=flat-square&label=CI"></a> <a href="https://github.com/marquezinii/FiveMCleaner/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/marquezinii/FiveMCleaner?style=flat-square&color=f97316"></a> <img alt="Windows 10 e 11" src="https://img.shields.io/badge/Windows-10%20%7C%2011-2563eb?style=flat-square"> <img alt=".NET 10" src="https://img.shields.io/badge/.NET-10-512bd4?style=flat-square"></p>
 
-![Visão do FiveMCleaner](docs/assets/hero.png)
+![Visão do Vemryx One](docs/assets/hero.png)
 
 > [!IMPORTANT]
-> O FiveMCleaner suporta somente **FiveM em GTAV Legacy**. GTAV Enhanced é identificado e bloqueado com segurança até existir um adaptador dedicado, pesquisado e testado.
+> O Vemryx One suporta somente **FiveM em GTAV Legacy**. GTAV Enhanced é identificado e bloqueado com segurança até existir um adaptador dedicado, pesquisado e testado.
 
 ## Otimização explicável, não "tweak" oculto
 
-O FiveMCleaner começa pelo diagnóstico, monta um plano compreensível e mostra o que poderá ser alterado antes de executar. Cada ação tem escopo, pré-condições, risco, resultado e estratégia de rollback quando aplicável.
+O Vemryx One começa pelo diagnóstico, monta um plano compreensível e mostra o que poderá ser alterado antes de executar. Cada ação tem escopo, pré-condições, risco, resultado e estratégia de rollback quando aplicável.
 
 - Diagnóstico de FiveM/GTA V, CPU, GPU, RAM, armazenamento, drivers, rede, energia, processos e gargalos prováveis.
 - Perfis **Leve**, **Médio** e **Agressivo** formados por ações conhecidas, nunca por scripts genéricos.
@@ -24,7 +24,7 @@ O FiveMCleaner começa pelo diagnóstico, monta um plano compreensível e mostra
 - Histórico, relatório técnico sanitizado e comparação local antes/depois.
 
 > [!WARNING]
-> Nenhum software pode prometer FPS, ping ou ausência de stutter em todo PC ou servidor. O FiveMCleaner não desativa Defender, Firewall, SmartScreen ou UAC; não injeta código; não modifica binários ou memória do jogo; e não usa prioridade Realtime, afinidade fixa ou debloat genérico.
+> Nenhum software pode prometer FPS, ping ou ausência de stutter em todo PC ou servidor. O Vemryx One não desativa Defender, Firewall, SmartScreen ou UAC; não injeta código; não modifica binários ou memória do jogo; e não usa prioridade Realtime, afinidade fixa ou debloat genérico.
 
 ## Experiência atual
 
@@ -65,9 +65,9 @@ Veja [telemetria](docs/telemetry.md) e [relatos de bug](docs/bug-reports.md).
 Requisitos: Windows 10/11 x64, [.NET SDK 10.0.303](https://dotnet.microsoft.com/download/dotnet/10.0) e Node.js 24.19.0 LTS.
 
 ```powershell
-dotnet restore FiveMCleaner.slnx
-dotnet build FiveMCleaner.slnx --configuration Release --no-restore
-dotnet test FiveMCleaner.slnx --configuration Release --no-build
+dotnet restore Vemryx.One.slnx
+dotnet build Vemryx.One.slnx --configuration Release --no-restore
+dotnet test Vemryx.One.slnx --configuration Release --no-build
 .\scripts\Verify-Safety.ps1
 ```
 
@@ -101,4 +101,4 @@ Consulte [docs/architecture.md](docs/architecture.md) para as fronteiras complet
 - Interface renovada em Visão geral, Otimizador e Histórico.
 - Cadeia de distribuição endurecida com validação fail-closed dos binários distribuídos.
 
-FiveMCleaner é um projeto comunitário independente, sem afiliação, endosso ou patrocínio de Rockstar Games, Cfx.re ou FiveM.
+Vemryx One é um projeto comunitário independente, sem afiliação, endosso ou patrocínio de Rockstar Games, Cfx.re ou FiveM.

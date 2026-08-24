@@ -14,7 +14,7 @@ Fonte: `REBRANDING_VEMRYX_ONE.md`. O ícone oficial fornecido pelo usuário est�
 - [x] Projetar e testar compatibilidade de caminhos, mutex, persistência e sessões.
 - [x] Implementar release ponte do instalador/updater antes de renomear executáveis e IDs externos.
 - [x] Renomear projetos, arquivos e namespaces internos após estabilizar a compatibilidade.
-- [ ] Atualizar backend, site, documentação, CI e allowlist de resíduos.
+- [x] Atualizar backend, site, documentação, CI e allowlist de resíduos.
 - [ ] Executar matriz final de build, testes, instalação, atualização, rollback e acessibilidade.
 
 ## Identificadores deliberadamente preservados nesta fase
@@ -103,3 +103,19 @@ Eles só mudam junto de aliases, migração idempotente, testes e rollback. O no
 - `dotnet format Vemryx.One.slnx --verify-no-changes --no-restore` e `git diff --check`: aprovados.
 - `scripts/Build-Portable.ps1 -Runtime win-x64 -Configuration Release -Harden`: aprovado; o pacote mantém `FiveMCleaner.*` apenas como layout de compatibilidade.
 - `scripts/Test-NoUnobfuscatedAssemblies.ps1`: aprovou a árvore publicada, o bundle do launcher e os dois ZIPs; nenhuma cópia não ofuscada, PDB ou mapa de ofuscação foi encontrado.
+
+## Superfícies públicas e resíduos técnicos
+
+- Site, dashboard, issue template, notificações de release, documentação operacional e mensagens do launcher/updater usam `Vemryx One`; o download público usa `VemryxOne-Setup-latest-win-x64.exe`.
+- Os projetos locais de npm foram renomeados para `vemryx-one-*`. Worker, D1, Firebase, Pages e URLs de repositório continuam com os IDs implantados até uma migração de infraestrutura separada.
+- `docs/brand/legacy-identifiers.md` documenta a allowlist: layout e aliases assinados, dados locais, secrets/variáveis, infraestrutura implantada e documentos históricos. `PROJECT_HISTORY.md`, `CHANGELOG.md` e `docs/superpowers/` continuam como registro histórico.
+- `installer/VemryxOne.iss` e `build/obfuscation/VemryxOne.Obfuscar.xml` removem os últimos nomes legados de arquivos internos; os assemblies de saída mantêm `FiveMCleaner.*` por compatibilidade.
+
+## Validação das superfícies públicas e resíduos
+
+- Website: build estático Next.js e 3 testes aprovados, incluindo título Vemryx One e download público atual.
+- Dashboard: 49 testes aprovados, incluindo bloqueio contra a marca legada no HTML público.
+- Worker Cloudflare: 199 testes aprovados.
+- `scripts/Verify-Installer.ps1 -ScriptOnly`, `dotnet format Vemryx.One.slnx --verify-no-changes --no-restore` e `git diff --check`: aprovados.
+- `scripts/Verify-Safety.ps1`: aprovado; build Release sem avisos/erros e 999 testes .NET aprovados.
+- `scripts/Install-DevelopmentShortcut.ps1 -Build`: reconstruiu `Vemryx One - Desenvolvimento.lnk`; atalhos legados são preservados em backup recuperável quando encontrados.
