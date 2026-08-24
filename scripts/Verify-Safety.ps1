@@ -52,8 +52,8 @@ try {
     ) -join '|'
 
     $scanRoots = @(
-        'src/FiveMCleaner.Windows',
-        'src/FiveMCleaner.Broker'
+        'src/Vemryx.One.Windows',
+        'src/Vemryx.One.Broker'
     )
     # GtaVLaunchParametersActions.cs is a reviewed, documented exception (see
     # docs/safety.md "Escopo de edição gráfica" / GTA V launch parameters):
@@ -70,8 +70,8 @@ try {
     }
 
     $contractRoots = @(
-        'src/FiveMCleaner.Contracts',
-        'src/FiveMCleaner.Core'
+        'src/Vemryx.One.Contracts',
+        'src/Vemryx.One.Core'
     )
     $commandFields = @(
         Find-CSharpSourceMatches `
@@ -82,11 +82,11 @@ try {
         throw "A command-like field leaked into plan contracts:`n$($commandFields -join [Environment]::NewLine)"
     }
 
-    dotnet build '.\FiveMCleaner.slnx' --configuration Release
+    dotnet build '.\Vemryx.One.slnx' --configuration Release
     if ($LASTEXITCODE -ne 0) { throw 'Release build failed.' }
 
     if (-not $SkipTests) {
-        dotnet test '.\tests\FiveMCleaner.Tests\FiveMCleaner.Tests.csproj' --configuration Release --no-build
+        dotnet test '.\tests\Vemryx.One.Tests\Vemryx.One.Tests.csproj' --configuration Release --no-build
         if ($LASTEXITCODE -ne 0) { throw 'Tests failed.' }
     }
 

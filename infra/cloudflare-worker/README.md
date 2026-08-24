@@ -1,4 +1,4 @@
-# FiveMCleaner telemetry + dashboard API Worker
+# Vemryx One telemetry + dashboard API Worker
 
 **Deployed** at `https://fivemcleaner-telemetry.felipemarquesini10.workers.dev`.
 
@@ -97,11 +97,11 @@ URL), authentication is a small, self-contained system:
   domains — a stricter policy silently never sends the cookie back on a
   cross-site `fetch`, which is exactly what made the first deployment's
   login appear to succeed but leave the dashboard stuck on the login screen.
-- **CSRF e limites de entrada**: login e logout exigem o `Origin` exato de
-  `DASHBOARD_ORIGIN`; todos os corpos JSON públicos são lidos com limite de
-  bytes por rota antes do parse. Isso mantém o cookie cross-site necessário
-  sem aceitar mutações administrativas de outras páginas e impede buffering
-  irrestrito de payloads anônimos.
+- **CSRF e limites de entrada**: toda mutação sob `/admin/*` exige o `Origin`
+  exato de `DASHBOARD_ORIGIN`; todos os corpos JSON públicos são lidos com
+  limite de bytes por rota antes do parse. Isso mantém o cookie cross-site
+  necessário sem aceitar mutações administrativas de outras páginas e impede
+  buffering irrestrito de payloads anônimos.
 - **Swappable by design**: `src/auth/passwordAuthProvider.js` exposes exactly
   three functions — `login`, `logout`, `requireSession` — and `index.js` only
   ever calls those three. A future OAuth-based provider (Google/GitHub, or
@@ -140,11 +140,13 @@ tested.
 
 `POST /account/profile` is the first route built on it: Firebase manages
 email/password/uid only, so this route stores the fields it doesn't —
-username (globally unique, case-insensitive), first name, last name — in
-`account_profiles`, keyed by the verified Firebase UID. A username conflict
-returns `409 { "error": "username-taken" }`; the client is expected to let
-the user pick another one without discarding the Firebase account already
-created. See `src/auth/accountProfile.js`.
+username (globally unique, case-insensitive), first name, last name and the
+accepted current terms version — in `account_profiles`, keyed by the verified
+Firebase UID. It accepts only an `email_verified=true` token. A username
+conflict returns `409 { "error": "username-taken" }`; the client is expected
+to let the user pick another one without discarding the Firebase account
+already created. `DELETE /account/profile` removes only that same verified
+UID's row as part of account deletion. See `src/auth/accountProfile.js`.
 
 `GET /account/username-available?u=<name>` answers `{ "available": true|false }`
 for the registration form, so a taken name is reported while the user types
@@ -212,7 +214,7 @@ manifest against the embedded public key and publishes it automatically with
 `wrangler secret put RELEASE_MANIFEST_JSON` immediately before deploying this
 Worker. Do not hand-author, truncate, or commit that value. A manual repair is
 part of the authorized release procedure only and must pipe the generated
-`release/FiveMCleaner-signed-update-manifest.json` file unchanged into the same
+`release/Vemryx One-signed-update-manifest.json` file unchanged into the same
 Wrangler command. Preview releases do not update this stable feed.
 
 The real deployment uses plain `wrangler deploy`/`npm run deploy` with no

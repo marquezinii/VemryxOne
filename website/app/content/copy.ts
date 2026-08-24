@@ -1,9 +1,10 @@
 export type Language = "pt" | "en";
 
 export const DOWNLOAD_URL =
-  "https://github.com/marquezinii/FiveMCleaner/releases/latest/download/FiveMCleaner-Setup-latest-win-x64.exe";
+  "https://github.com/marquezinii/FiveMCleaner/releases/latest/download/VemryxOne-Setup-latest-win-x64.exe";
 export const GITHUB_URL = "https://github.com/marquezinii/FiveMCleaner";
 export const DISCORD_URL = "https://discord.gg/bazcuQB9n6";
+export const VEMRYX_URL = "https://vemryx.com/";
 export const ICON_URL = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/icon.png`;
 
 export const copy = {
@@ -103,7 +104,7 @@ export const copy = {
         },
       ],
       estimateTitle: "Estimativa honesta, baseada no seu PC",
-      estimateBody: "O FiveMCleaner usa o hardware e o estado detectado para contextualizar o potencial de cada perfil. Quando não existe um benchmark real, ele informa “ganho não medido” — nunca inventa FPS.",
+      estimateBody: "O Vemryx One usa o hardware e o estado detectado para contextualizar o potencial de cada perfil. Quando não existe um benchmark real, ele informa “ganho não medido” — nunca inventa FPS.",
       estimateTag: "SEM NÚMEROS FALSOS",
     },
     process: {
@@ -136,7 +137,7 @@ export const copy = {
     transparency: {
       eyebrow: "CONTROLE SEM COMPLEXIDADE",
       title: "Nada escondido atrás do botão.",
-      body: "O FiveMCleaner foi projetado para automatizar trabalho técnico sem transformar o Windows em uma caixa-preta.",
+      body: "O Vemryx One foi projetado para automatizar trabalho técnico sem transformar o Windows em uma caixa-preta.",
       items: [
         {
           title: "Snapshot antes de mudar",
@@ -160,7 +161,7 @@ export const copy = {
     streamers: {
       eyebrow: "PRONTO PARA QUEM JOGA E TRANSMITE",
       title: "Sua live continua sendo prioridade.",
-      body: "Se OBS Studio, Streamlabs ou TikTok LIVE Studio estiver instalado ou aberto, o FiveMCleaner reconhece o ambiente e preserva ferramentas de transmissão. Ele não encerra esses processos nem altera cenas, perfis, gravações ou chats.",
+      body: "Se OBS Studio, Streamlabs ou TikTok LIVE Studio estiver instalado ou aberto, o Vemryx One reconhece o ambiente e preserva ferramentas de transmissão. Ele não encerra esses processos nem altera cenas, perfis, gravações ou chats.",
       note: "A proteção para streaming faz parte dos três perfis — não é um modo separado que você precisa lembrar de ativar.",
       platforms: ["OBS Studio", "Streamlabs", "TikTok LIVE Studio"],
       safeTitle: "O que fica protegido",
@@ -194,7 +195,7 @@ export const copy = {
     safety: {
       eyebrow: "SEGURANÇA SEM MARKETING VAZIO",
       title: "Forte no que faz. Transparente sobre os limites.",
-      body: "O FiveMCleaner usa APIs e configurações documentadas do Windows, publica o código-fonte e evita técnicas que costumam gerar bloqueios ou colocar o sistema em risco.",
+      body: "O Vemryx One usa APIs e configurações documentadas do Windows, publica o código-fonte e evita técnicas que costumam gerar bloqueios ou colocar o sistema em risco.",
       cards: [
         ["Código aberto", "Você pode inspecionar exatamente o que o aplicativo faz."],
         ["Sem evasão", "Nada de ofuscação, exclusões no antivírus, injeção ou truques para esconder comportamento."],
@@ -208,7 +209,7 @@ export const copy = {
       title: "Sem letra miúda.",
       items: [
         [
-          "O FiveMCleaner garante mais FPS?",
+          "O Vemryx One garante mais FPS?",
           "Não existe ganho universal: hardware, servidor, temperatura e outros fatores influenciam o resultado. O app melhora configurações relevantes, mostra uma estimativa contextual e distingue claramente estimativa de medição real.",
         ],
         [
@@ -234,7 +235,7 @@ export const copy = {
       ],
     },
     finalCta: {
-      eyebrow: "FIVEMCLEANER",
+      eyebrow: "VEMRYX ONE",
       title: "Um clique. Um plano claro. Seu PC no controle.",
       body: "Baixe a versão estável mais recente e deixe o aplicativo decidir com segurança o que faz sentido para o seu computador.",
       download: "Baixar instalador",
@@ -247,8 +248,8 @@ export const copy = {
       trust: "Transparência",
       community: "Comunidade",
       discord: "Discord oficial",
-      developed: "Desenvolvido por Felipe Marquezini",
-      rights: "© 2026 FiveMCleaner. Todos os direitos reservados.",
+      owner: "Vemryx",
+      rights: "© 2026 Vemryx One. Todos os direitos reservados.",
       noTracking: "Este site não usa cookies, analytics ou formulários.",
     },
   },
@@ -348,7 +349,7 @@ export const copy = {
         },
       ],
       estimateTitle: "An honest estimate, based on your PC",
-      estimateBody: "FiveMCleaner uses detected hardware and system state to contextualize each profile's potential. When no real benchmark exists, it says “gain not measured” — it never invents FPS.",
+      estimateBody: "Vemryx One uses detected hardware and system state to contextualize each profile's potential. When no real benchmark exists, it says “gain not measured” — it never invents FPS.",
       estimateTag: "NO MADE-UP NUMBERS",
     },
     process: {
@@ -381,7 +382,7 @@ export const copy = {
     transparency: {
       eyebrow: "CONTROL WITHOUT COMPLEXITY",
       title: "Nothing hidden behind the button.",
-      body: "FiveMCleaner automates technical work without turning Windows into a black box.",
+      body: "Vemryx One automates technical work without turning Windows into a black box.",
       items: [
         {
           title: "Snapshot before changes",
@@ -405,7 +406,7 @@ export const copy = {
     streamers: {
       eyebrow: "READY FOR PLAYERS WHO STREAM",
       title: "Your broadcast remains a priority.",
-      body: "If OBS Studio, Streamlabs or TikTok LIVE Studio is installed or open, FiveMCleaner recognizes the environment and preserves streaming tools. It does not close these processes or alter scenes, profiles, recordings or chats.",
+      body: "If OBS Studio, Streamlabs or TikTok LIVE Studio is installed or open, Vemryx One recognizes the environment and preserves streaming tools. It does not close these processes or alter scenes, profiles, recordings or chats.",
       note: "Streaming protection is part of all three profiles — not a separate mode you must remember to enable.",
       platforms: ["OBS Studio", "Streamlabs", "TikTok LIVE Studio"],
       safeTitle: "What stays protected",
@@ -439,9 +440,9 @@ export const copy = {
     safety: {
       eyebrow: "SECURITY WITHOUT EMPTY MARKETING",
       title: "Powerful where it matters. Clear about limits.",
-      body: "FiveMCleaner uses documented Windows APIs and settings, publishes its source code and avoids techniques that commonly cause blocks or put the system at risk.",
+      body: "Vemryx One uses documented Windows APIs and settings, publishes its source code and avoids techniques that commonly cause blocks or put the system at risk.",
       cards: [
-        ["Source available", "You can inspect the code under the FiveMCleaner license."],
+        ["Source available", "You can inspect the code under the Vemryx One license."],
         ["No evasion", "No obfuscation, antivirus exclusions, injection or tricks to hide behavior."],
         ["Verifiable hash", "Check the SHA-256 published with the release before installing."],
       ],
@@ -453,7 +454,7 @@ export const copy = {
       title: "No fine print.",
       items: [
         [
-          "Does FiveMCleaner guarantee more FPS?",
+          "Does Vemryx One guarantee more FPS?",
           "There is no universal gain: hardware, server, temperature and other factors affect results. The app improves relevant settings, provides a contextual estimate and clearly separates estimates from real measurements.",
         ],
         [
@@ -479,7 +480,7 @@ export const copy = {
       ],
     },
     finalCta: {
-      eyebrow: "FIVEMCLEANER",
+      eyebrow: "VEMRYX ONE",
       title: "One click. One clear plan. Your PC in control.",
       body: "Download the latest stable version and let the app safely decide what makes sense for your computer.",
       download: "Download installer",
@@ -492,8 +493,8 @@ export const copy = {
       trust: "Transparency",
       community: "Community",
       discord: "Official Discord",
-      developed: "Developed by Felipe Marquezini",
-      rights: "© 2026 FiveMCleaner. All rights reserved.",
+      owner: "Vemryx",
+      rights: "© 2026 Vemryx One. All rights reserved.",
       noTracking: "This website uses no cookies, analytics or forms.",
     },
   },

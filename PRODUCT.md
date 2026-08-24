@@ -12,7 +12,7 @@ Jogadores de FiveM (GTA V Legacy) em PC Windows que querem diagnosticar e otimiz
 
 ## Product Purpose
 
-FiveMCleaner diagnostica, limpa e otimiza a instalação do FiveM/GTA V Legacy de forma transparente e reversível. Sucesso é o usuário confiar no que foi feito — cada ação é visível, documentada e reversível — e não uma promessa de FPS não verificável.
+Vemryx One diagnostica, limpa e otimiza a instalação do FiveM/GTA V Legacy de forma transparente e reversível. Sucesso é o usuário confiar no que foi feito — cada ação é visível, documentada e reversível — e não uma promessa de FPS não verificável.
 
 ## Positioning
 
@@ -28,7 +28,7 @@ Diagnóstico de hardware/software, perfis versionados, execução transacional c
 
 ## Brand Commitments
 
-Nome "FiveMCleaner". Logo estabelecido (`src/FiveMCleaner.App/Assets/FiveMCleaner.png`): "5M" em laranja com um rasto/sparkle que sugere limpeza, "M" em metal escovado prateado, sobre grafite quase preto. Laranja como acento é um compromisso de marca real e deve continuar sendo a cor de identidade em qualquer redesign; o metal escovado do "M" é material de marca tão real quanto a cor.
+O produto usa a marca **Vemryx One**. O ícone oficial (`src/Vemryx.One.App/Assets/VemryxOne.png`) combina um V geométrico com referência ao número 1, em índigo e ciano sobre grafite. O nome antigo permanece apenas nos contratos de compatibilidade, migração, atualização e histórico listados em `docs/brand/legacy-identifiers.md`.
 
 ## Evidence on Hand
 

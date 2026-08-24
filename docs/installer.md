@@ -1,9 +1,9 @@
 # Instalador, atualização e publicação
 
-O instalador oficial do FiveMCleaner é um executável Inno Setup moderno para
+O instalador oficial do Vemryx One é um executável Inno Setup moderno para
 Windows 11 e, em compatibilidade legada, Windows 10 build 19041 ou mais recente,
 em sistemas compatíveis com binários x64. Windows 11 é o sistema recomendado.
-Ele instala por usuário em `{autopf}\FiveMCleaner`; por padrão, isso corresponde
+Em instalações novas, ele instala por usuário em `{autopf}\Vemryx One`; por padrão, isso corresponde
 à pasta de programas local do usuário e não exige UAC.
 
 ## Dependências e funcionamento offline
@@ -24,7 +24,7 @@ Windows realmente for executada.
 - português do Brasil e inglês, escolhidos pela interface do Windows;
 - tema moderno que acompanha o modo claro/escuro do sistema, com arte lateral
   clara e escura gerada a partir do ícone oficial;
-- ícone e imagem oficiais do FiveMCleaner;
+- ícone e imagem oficiais do Vemryx One;
 - atalhos do menu Iniciar e desinstalação completa, com rótulos localizados;
 - atalho de Área de Trabalho habilitado por padrão; inicialização com o Windows
   desmarcada por padrão (ambas alteráveis na instalação e depois);
@@ -36,7 +36,7 @@ Windows realmente for executada.
 - logs padrões do Inno Setup para diagnóstico (pasta temporária quando ativos).
 
 Configurações, journals, logs, backups e downloads de atualização ficam fora da
-pasta de instalação, em `%LOCALAPPDATA%\FiveMCleaner`. Na desinstalação
+pasta de instalação, em `%LOCALAPPDATA%\FiveMCleaner` durante a ponte. Na desinstalação
 interativa, a pessoa escolhe se deseja preservar ou remover esses dados. A
 opção padrão é preservar; uma desinstalação silenciosa também preserva os dados
 para nunca apagar histórico ou backup sem confirmação visível.
@@ -46,7 +46,7 @@ para nunca apagar histórico ou backup sem confirmação visível.
 ```powershell
 .\scripts\Build-Installer.ps1 -Version 1.0.0
 
-$installer = Resolve-Path .\artifacts\installer\FiveMCleaner-Setup-1.0.0-win-x64.exe
+$installer = Resolve-Path .\artifacts\installer\VemryxOne-Setup-1.0.0-win-x64.exe
 .\scripts\Test-Installer.ps1 `
   -InstallerPath $installer `
   -PublishDirectory .\artifacts\FiveMCleaner-win-x64 `
@@ -148,5 +148,7 @@ Fontes oficiais usadas no desenho:
 O workflow nunca publica por `push`; a etapa de criação de release exige o
 disparo manual com `publish=true`. A página pública de download é
 `https://marquezinii.github.io/FiveMCleaner/`, gratuita e sem login para
-visitantes. O botao da pagina inicia diretamente o alias estavel
-`FiveMCleaner-Setup-latest-win-x64.exe` hospedado na release oficial.
+visitantes. O botão da página usa `VemryxOne-Setup-latest-win-x64.exe`; a mesma
+release também publica os aliases `FiveMCleaner-Setup-<versão>-win-x64.exe` e
+`FiveMCleaner-Setup-latest-win-x64.exe` para que instalações antigas encontrem
+o instalador idêntico esperado pelo atualizador legado.

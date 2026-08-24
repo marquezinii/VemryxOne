@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>$(VemryxOneWindowsTargetFramework)</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <ApplicationIcon>../Vemryx.One.App/Assets/VemryxOne.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>FiveMCleaner.Updater</AssemblyName>
+    <RootNamespace>Vemryx.One.Updater</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Vemryx.One.UpdateRuntime/Vemryx.One.UpdateRuntime.csproj" />
+  </ItemGroup>
+</Project>

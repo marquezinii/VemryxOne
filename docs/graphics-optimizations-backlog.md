@@ -224,7 +224,7 @@ ferramentas que fazem isso (nvidiaProfileInspector e similares) usam a
 NVAPI de forma não documentada/não suportada oficialmente. Isso já é a
 política registrada em `docs/safety.md` e reforçada pelo próprio texto do
 `GpuVendorDetectionAction`: *"Ajustes de perfil 3D devem ser feitos apenas
-pelo painel oficial do fabricante... o FiveMCleaner não escreve nem
+pelo painel oficial do fabricante... o Vemryx One não escreve nem
 sobrescreve esses perfis."* Quase toda a lista de "configurações possíveis"
 proposta cai direto nessa regra já existente, não é uma decisão nova.
 
@@ -304,7 +304,7 @@ proposta cai direto nessa regra já existente, não é uma decisão nova.
 
 ## 13. Energia e CPU (lote proposto e parcialmente implementado em 26/07/2026, sétima rodada)
 
-**Contexto que decide a maior parte desta seção**: o FiveMCleaner hoje é
+**Contexto que decide a maior parte desta seção**: o Vemryx One hoje é
 uma ferramenta transacional de "aplicar uma vez, verificar, confirmar,
 reverter se necessário" — o usuário clica em "Otimizar", o app aplica um
 conjunto de ações e confirma. **Não existe hoje um processo de segundo
@@ -318,7 +318,7 @@ produto não tem.
 
 Implementar esses itens "pela metade" — por exemplo, subir a prioridade do
 processo do GTA uma vez, sem qualquer garantia de que ela será restaurada
-quando o jogo fechar minutos ou horas depois, com o FiveMCleaner já
+quando o jogo fechar minutos ou horas depois, com o Vemryx One já
 fechado — quebraria o princípio central de segurança deste projeto: toda
 ação reversível tem que ter um caminho garantido de reversão. Por isso,
 esta rodada **implementou o que já cabe no modelo atual (ajuste único,
@@ -356,7 +356,7 @@ decidida implicitamente ao implementar um item isolado.
 
 | Item | Classificação pedida | Por que depende de vigilância de sessão |
 | --- | --- | --- |
-| Criar plano `FiveMCleaner Gaming` (duplicar, ativar só na sessão, restaurar ao fechar) | ✅ | "Ativar apenas durante a sessão" e "restaurar ao fechar FiveM" exigem saber quando o FiveM abre/fecha. `powercfg` já suporta duplicar/criar/importar planos — a parte tecnicamente viável (`powercfg -duplicatescheme`) não é o problema; o problema é o gatilho de início/fim. |
+| Criar plano `Vemryx One Gaming` (duplicar, ativar só na sessão, restaurar ao fechar) | ✅ | "Ativar apenas durante a sessão" e "restaurar ao fechar FiveM" exigem saber quando o FiveM abre/fecha. `powercfg` já suporta duplicar/criar/importar planos — a parte tecnicamente viável (`powercfg -duplicatescheme`) não é o problema; o problema é o gatilho de início/fim. |
 | Configurar comportamento diferente para desktop/notebook | ✅ | Viável tecnicamente (já detectamos bateria/notebook na seção 12), mas só faz sentido dentro do plano de sessão acima. |
 | Não permitir economia agressiva de CPU / não desligar disco durante o jogo | ✅ | Mesma dependência — são configurações do plano de sessão proposto. |
 | Configurar refrigeração ativa em notebooks | 🟡 | Depende do utilitário do fabricante (seção 12) — mesma limitação de API, mesma dependência de sessão. |
@@ -370,7 +370,7 @@ decidida implicitamente ao implementar um item isolado.
 **Recomendação para uma futura sessão**: antes de implementar qualquer um
 destes, decidir e documentar (em `docs/architecture.md`) como o app vai
 detectar o ciclo de vida do FiveM/GTA V em tempo real e garantir reversão
-mesmo se o FiveMCleaner for fechado antes do jogo. Só depois faz sentido
+mesmo se o Vemryx One for fechado antes do jogo. Só depois faz sentido
 portar os itens ✅/🟡/🧪 desta tabela para o catálogo.
 
 ## Resumo por perfil

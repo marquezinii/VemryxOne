@@ -1,12 +1,12 @@
 {
-  "name": "fivemcleaner-telemetry-worker",
+  "name": "vemryx-one-telemetry-worker",
   "private": true,
   "version": "0.1.0",
   "type": "module",
   "engines": {
     "node": ">=24.19.0 <25"
   },
-  "description": "FiveMCleaner anonymous telemetry + admin dashboard API Cloudflare Worker (D1-backed). Deployed at https://fivemcleaner-telemetry.felipemarquesini10.workers.dev.",
+  "description": "Vemryx One anonymous telemetry + admin dashboard API Cloudflare Worker (D1-backed). Deployed at https://fivemcleaner-telemetry.felipemarquesini10.workers.dev.",
   "scripts": {
     "test": "node --test",
     "hash-admin-password": "node scripts/hash-admin-password.mjs",
@@ -16,7 +16,7 @@
     "deploy": "wrangler deploy"
   },
   "devDependencies": {
-    "wrangler": "^4.123.0"
+    "wrangler": "^4.125.0"
   },
   "allowScripts": {
     "esbuild@0.28.1": true,

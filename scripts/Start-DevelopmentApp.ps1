@@ -7,8 +7,8 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $workspace = [System.IO.Path]::GetFullPath((Split-Path -Parent $PSScriptRoot))
-$solutionPath = Join-Path $workspace 'FiveMCleaner.slnx'
-$projectPath = Join-Path $workspace 'src\FiveMCleaner.App\FiveMCleaner.App.csproj'
+$solutionPath = Join-Path $workspace 'Vemryx.One.slnx'
+$projectPath = Join-Path $workspace 'src\Vemryx.One.App\Vemryx.One.App.csproj'
 $artifactsDirectory = Join-Path $workspace 'artifacts'
 $buildLogPath = Join-Path $artifactsDirectory 'development-launcher-build.log'
 
@@ -20,7 +20,7 @@ foreach ($requiredPath in @($solutionPath, $projectPath)) {
 
 $dotnet = Get-Command dotnet -ErrorAction SilentlyContinue
 if ($null -eq $dotnet) {
-    throw 'The .NET SDK is required to run the FiveMCleaner development launcher.'
+    throw 'The .NET SDK is required to run the Vemryx One development launcher.'
 }
 
 New-Item -ItemType Directory -Path $artifactsDirectory -Force | Out-Null
@@ -30,8 +30,8 @@ $buildOutput | Set-Content -LiteralPath $buildLogPath -Encoding utf8
 if ($LASTEXITCODE -ne 0) {
     Add-Type -AssemblyName PresentationFramework
     [void][System.Windows.MessageBox]::Show(
-        "O FiveMCleaner não pôde ser preparado para execução. O registro do build está em:`n$buildLogPath",
-        'FiveMCleaner - Desenvolvimento',
+        "O Vemryx One não pôde ser preparado para execução. O registro do build está em:`n$buildLogPath",
+        'Vemryx One - Desenvolvimento',
         [System.Windows.MessageBoxButton]::OK,
         [System.Windows.MessageBoxImage]::Error)
     exit $LASTEXITCODE
@@ -74,7 +74,7 @@ if ($NoLaunch) {
 
 # Marks this run as Development for remote crash reporting (Sentry), so it
 # never mixes with end-user errors reported by installed Production copies.
-# See FiveMCleaner.App/Services/AppEnvironment.cs.
+# See Vemryx.One.App/Services/AppEnvironment.cs.
 $env:FIVEMCLEANER_ENVIRONMENT = 'Development'
 
 # The development launcher must remain useful on a machine that does not have

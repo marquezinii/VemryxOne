@@ -1,0 +1,33 @@
+<Application x:Class="Vemryx.One.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:services="clr-namespace:Vemryx.One.App.Services"
+             xmlns:local="clr-namespace:Vemryx.One.App"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ui:ThemesDictionary Theme="Dark" />
+                <ui:ControlsDictionary />
+                <!-- Tokens de cor: ThemeManager troca este item de lugar por
+                     Colors.Light.xaml em runtime; o valor inicial aqui só
+                     importa para o instante entre o carregamento do XAML e a
+                     primeira chamada a ThemeManager.Apply. -->
+                <ResourceDictionary Source="Themes/Tokens/Colors.Dark.xaml" />
+                <ResourceDictionary Source="Themes/Tokens/Radii.xaml" />
+                <ResourceDictionary Source="Themes/Tokens/Motion.xaml" />
+                <ResourceDictionary Source="Themes/Typography.xaml" />
+                <ResourceDictionary Source="Themes/Surfaces.xaml" />
+                <ResourceDictionary Source="Themes/Icons.xaml" />
+                <ResourceDictionary Source="Themes/Controls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <local:BrushKeyConverter x:Key="BrushKeyConverter" />
+            <local:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+            <local:GeometryKeyConverter x:Key="GeometryKeyConverter" />
+            <local:CollectionEmptyToVisibilityConverter x:Key="CollectionEmptyToVisibilityConverter" />
+            <services:LocalizedStrings x:Key="LocalizedStrings" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

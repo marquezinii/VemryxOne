@@ -1,4 +1,4 @@
-## FiveMCleaner anonymous telemetry + admin dashboard API Worker.
+## Vemryx One anonymous telemetry + admin dashboard API Worker.
 ##
 ## Receives the same closed-allowlist telemetry event already documented in
 ## docs/telemetry.md, validates it server-side (never trusting client-side

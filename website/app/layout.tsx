@@ -6,33 +6,33 @@ const socialImagePath = `${assetPrefix || "/FiveMCleaner"}/og.png`;
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://marquezinii.github.io/"),
-  title: "FiveMCleaner — Otimização transparente para FiveM",
+  title: "Vemryx One — Otimização transparente para FiveM",
   description:
     "Otimize Windows, FiveM e GTA V com perfis automáticos, progresso claro e rollback. Windows 11 recomendado, com compatibilidade legada para Windows 10 x64.",
-  applicationName: "FiveMCleaner",
+  applicationName: "Vemryx One",
   keywords: [
-    "FiveMCleaner",
+    "Vemryx One",
     "FiveM",
     "otimização Windows",
     "GTA V",
     "FPS",
     "Windows 11",
   ],
-  authors: [{ name: "Felipe Marquezini" }],
-  creator: "Felipe Marquezini",
+  authors: [{ name: "Vemryx" }],
+  creator: "Vemryx",
   openGraph: {
     type: "website",
     locale: "pt_BR",
     alternateLocale: "en_US",
-    title: "FiveMCleaner — Seu PC mais preparado para o FiveM",
+    title: "Vemryx One — Seu PC mais preparado para o FiveM",
     description:
       "Perfis automáticos, mudanças transparentes e rollback para Windows, FiveM e GTA V.",
-    siteName: "FiveMCleaner",
+    siteName: "Vemryx One",
     images: [{ url: socialImagePath, width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "FiveMCleaner",
+    title: "Vemryx One",
     description: "Otimização transparente para FiveM no Windows.",
     images: [socialImagePath],
   },

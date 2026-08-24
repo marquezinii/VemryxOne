@@ -1,6 +1,6 @@
 # Modelo de segurança
 
-O FiveMCleaner altera configurações de alto impacto potencial. Segurança, explicabilidade e reversão são requisitos funcionais; não são uma tela de aviso adicionada depois.
+O Vemryx One altera configurações de alto impacto potencial. Segurança, explicabilidade e reversão são requisitos funcionais; não são uma tela de aviso adicionada depois.
 
 ## Invariantes
 
@@ -322,9 +322,9 @@ Não é possível garantir ausência de falsos positivos em todos os produtos. O
 - manifesto do broker com escopo mínimo;
 - comunicação clara de cada alteração administrativa.
 
-O instalador ainda não possui assinatura digital de uma autoridade pública e pode não possuir reputação no SmartScreen. O usuário deve conferir o GitHub Release e o SHA-256, mas essa conferência não autoriza evasão: o FiveMCleaner não desativa proteções, não cria exclusões e não recomenda renomear, reempacotar ou ofuscar binários para evitar detecção. Se a política do computador bloquear o instalador, a alternativa segura é não executá-lo, compilar o código revisado ou aguardar uma release assinada. Veja [release, integridade e simulação](release-preview.md).
+O instalador ainda não possui assinatura digital de uma autoridade pública e pode não possuir reputação no SmartScreen. O usuário deve conferir o GitHub Release e o SHA-256, mas essa conferência não autoriza evasão: o Vemryx One não desativa proteções, não cria exclusões e não recomenda renomear, reempacotar ou ofuscar binários para evitar detecção. Se a política do computador bloquear o instalador, a alternativa segura é não executá-lo, compilar o código revisado ou aguardar uma release assinada. Veja [release, integridade e simulação](release-preview.md).
 
-Uma exceção de antivírus recomendada pelo suporte do FiveM para um erro específico não autoriza o FiveMCleaner a criar essa exceção automaticamente.
+Uma exceção de antivírus recomendada pelo suporte do FiveM para um erro específico não autoriza o Vemryx One a criar essa exceção automaticamente.
 
 ## Dados e privacidade
 
@@ -357,7 +357,7 @@ usuário e qualquer caminho pessoal. Detalhes completos em
 
 O scaffold do painel administrativo (`infra/dashboard/`) e do Worker que o
 alimenta (`infra/cloudflare-worker/`) não fazem parte do aplicativo
-FiveMCleaner distribuído: rodam apenas na infraestrutura Cloudflare, nunca
+Vemryx One distribuído: rodam apenas na infraestrutura Cloudflare, nunca
 no processo do usuário nem no broker. A senha de administrador nunca fica em
 texto puro em nenhum lugar do repositório — só um hash PBKDF2 gerado
 localmente, guardado exclusivamente como Secret do Worker.

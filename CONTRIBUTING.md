@@ -1,4 +1,4 @@
-# Contribuindo com o FiveMCleaner
+# Contribuindo com o Vemryx One
 
 Obrigado por ajudar a construir uma ferramenta transparente e segura para FiveM Legacy. Mudanças pequenas, bem justificadas e reversíveis são preferíveis a listas extensas de “tweaks”.
 
@@ -21,10 +21,10 @@ Requisitos:
 
 ```powershell
 git clone <url-do-fork>
-Set-Location FiveMCleaner
-dotnet restore FiveMCleaner.slnx
-dotnet build FiveMCleaner.slnx --configuration Release --no-restore
-dotnet test FiveMCleaner.slnx --configuration Release --no-build
+Set-Location <diretorio-clonado>
+dotnet restore Vemryx.One.slnx
+dotnet build Vemryx.One.slnx --configuration Release --no-restore
+dotnet test Vemryx.One.slnx --configuration Release --no-build
 ```
 
 Não execute testes destrutivos na instalação real do FiveM. Use diretórios temporários e doubles para registro, processos e sistema de arquivos. Testes que realmente exigirem elevação devem ser isolados, explícitos e nunca fazer parte do fluxo padrão.
@@ -36,7 +36,7 @@ Não execute testes destrutivos na instalação real do FiveM. Use diretórios t
 3. Escreva a mensagem em [Conventional Commits](https://www.conventionalcommits.org/pt-br/):
    `tipo(escopo opcional): descrição curta no imperativo` (ex.: `fix(worker):
    corrige rate limit da rota de telemetria`). Evite mensagens genéricas ou de
-   artefato de build (`WIP`, `update`, `Build FiveMCleaner vX.Y MVP`). Para
+   artefato de build (`WIP`, `update`, `Build Vemryx One vX.Y MVP`). Para
    validar localmente, ative o hook incluído com
    `git config core.hooksPath scripts/githooks`.
 4. Atualize testes e documentação junto com o comportamento.
@@ -93,5 +93,5 @@ O pull request deve explicar o problema e a decisão, não apenas listar arquivo
 
 Ao contribuir, você concorda com o [Código de Conduta](CODE_OF_CONDUCT.md) e
 aceita os termos de contribuições da [Licença Source-Available do
-FiveMCleaner](LICENSE), inclusive a licença necessária para que o mantenedor
+Vemryx One](LICENSE), inclusive a licença necessária para que o mantenedor
 incorpore sua contribuição ao projeto.
