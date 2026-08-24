@@ -328,6 +328,7 @@
   <data name="ReleaseNotes.1_5_0.Improved" xml:space="preserve"><value>• Refined the visual resources, icon, and public text for the Vemryx One identity.</value></data>
   <data name="ReleaseNotes.1_5_0.Fixed" xml:space="preserve"><value>• Fixed localized-text bindings that could display incorrect content in parts of the interface.</value></data>
   <data name="ReleaseNotes.1_5_0.Security" xml:space="preserve"><value>• Sessions now require a verified email, valid profile, and accepted terms; administrative remote changes validate the dashboard origin.</value></data>
+  <data name="ReleaseNotes.1_5_1.Fixed" xml:space="preserve"><value>• Updated the public download and update links to the Vemryx One address while preserving updates for existing installations.</value></data>
   <data name="ReleaseNotes.Category.Removed" xml:space="preserve"><value>Removed</value></data>
   <data name="ReleaseNotes.Category.Security" xml:space="preserve"><value>Security</value></data>
   <data name="ReleaseNotes.Close" xml:space="preserve"><value>Close</value></data>

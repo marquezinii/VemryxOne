@@ -7,7 +7,7 @@ release correspondente; nenhuma delas é garantia de ganho de desempenho.
 ## Origem oficial
 
 Baixe binários somente pela página
-[GitHub Releases](https://github.com/marquezinii/FiveMCleaner/releases). Para
+[GitHub Releases](https://github.com/marquezinii/VemryxOne/releases). Para
 cada release `win-x64`, a publicação deve conter os seguintes arquivos
 produzidos pelo mesmo workflow:
 

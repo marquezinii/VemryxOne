@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 const assetPrefix = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-const socialImagePath = `${assetPrefix || "/FiveMCleaner"}/og.png`;
+const socialImagePath = `${assetPrefix || "/VemryxOne"}/og.png`;
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://marquezinii.github.io/"),

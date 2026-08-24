@@ -1,17 +1,17 @@
 #define AppName "Vemryx One"
 #define AppPublisher "Vemryx"
 #define AppPublisherUrl "https://vemryx.com/"
-#define AppUrl "https://github.com/marquezinii/FiveMCleaner"
-#define AppWebsite "https://marquezinii.github.io/FiveMCleaner/"
+#define AppUrl "https://github.com/marquezinii/VemryxOne"
+#define AppWebsite "https://marquezinii.github.io/VemryxOne/"
 #define AppExeName "FiveMCleaner.Launcher.exe"
 #define StableAppId "{{49338651-127F-4FD3-BEAD-88D8C9377672}"
 
 #ifndef AppVersion
-  #define AppVersion "1.5.0"
+  #define AppVersion "1.5.1"
 #endif
 
 #ifndef AppNumericVersion
-  #define AppNumericVersion "1.5.0.0"
+  #define AppNumericVersion "1.5.1.0"
 #endif
 
 #ifndef SourceDir

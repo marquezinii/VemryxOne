@@ -41,7 +41,8 @@ public static class ReleaseTrustPolicy
             || !string.IsNullOrEmpty(url.Query)
             || !string.IsNullOrEmpty(url.Fragment)
             || !url.Host.Equals("github.com", StringComparison.OrdinalIgnoreCase)
-            || !url.AbsolutePath.StartsWith("/marquezinii/FiveMCleaner/releases/download/", StringComparison.Ordinal)
+            || !(url.AbsolutePath.StartsWith("/marquezinii/VemryxOne/releases/download/", StringComparison.Ordinal)
+                || url.AbsolutePath.StartsWith("/marquezinii/FiveMCleaner/releases/download/", StringComparison.Ordinal))
             || manifest.PackageSizeBytes is <= 0 or > 1_073_741_824
             || manifest.PackageSha256.Length != 64 || !manifest.PackageSha256.All(char.IsAsciiHexDigit)
             || manifest.SignatureBase64.Length is < 80 or > 256)

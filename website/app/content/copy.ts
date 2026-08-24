@@ -1,8 +1,8 @@
 export type Language = "pt" | "en";
 
 export const DOWNLOAD_URL =
-  "https://github.com/marquezinii/FiveMCleaner/releases/latest/download/VemryxOne-Setup-latest-win-x64.exe";
-export const GITHUB_URL = "https://github.com/marquezinii/FiveMCleaner";
+  "https://github.com/marquezinii/VemryxOne/releases/latest/download/VemryxOne-Setup-latest-win-x64.exe";
+export const GITHUB_URL = "https://github.com/marquezinii/VemryxOne";
 export const DISCORD_URL = "https://discord.gg/bazcuQB9n6";
 export const VEMRYX_URL = "https://vemryx.com/";
 export const ICON_URL = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/icon.png`;
