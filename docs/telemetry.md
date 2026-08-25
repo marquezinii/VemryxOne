@@ -9,10 +9,9 @@ Quando uma versão altera a política, a tela de transparência volta a aparecer
 e só pode ser fechada por **Continuar**. Sem mudança na política, a escolha
 salva não é perguntada de novo.
 
-Relatórios de falha sanitizados são diagnósticos essenciais. A telemetria de
-uso e os eventos técnicos de otimização dependem da opção abaixo. Nenhum dos
-dois inclui HWID, MAC, serial, nome do PC, usuário do Windows ou caminhos
-locais.
+Relatórios de falha sanitizados, a telemetria de uso e os eventos técnicos de
+otimização dependem das opções abaixo. Nenhum deles inclui HWID, MAC, serial,
+nome do PC, usuário do Windows ou caminhos locais.
 
 A opção **Ajudar a melhorar o Vemryx One** fica em **Configurações**, vem
 habilitada por padrão em instalações novas e pode ser desligada a qualquer
@@ -35,7 +34,7 @@ ver `PrivacyConsentPolicy`):
 | FiveM detectado; edição do GTA V; contagem de alvos | Verificar instalação sem caminho, edição suportada e escopo da execução. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
 | Tipo de disco; faixa de espaço livre | Contextualizar I/O e falta de espaço sem enviar valor exato fora das faixas permitidas. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
 | Timestamp da execução; dias desde a última execução em faixa | Calcular padrões agregados de horário e frequência. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
-| Backup criado/restaurado; elevação usada; quantidade de processos FiveM/GTA em faixa | Avaliar rollback, necessidade de privilégio e se o jogo estava em execução. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
+| Quantidade de processos FiveM/GTA em faixa | Avaliar se o jogo estava em execução. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
 | Ambiente (`Development` ou `Production`) | Separar dados de desenvolvimento dos dados da distribuição pública. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
 
 A telemetria de uso só é transmitida após o consentimento. A retenção no D1
@@ -46,9 +45,8 @@ As únicas categorias de erro possíveis são `cancelled`, `timeout`,
 `access-denied`, `io`, `invalid-data` e `unexpected`. Mensagens de exceção,
 stack traces, nomes de arquivos e caminhos locais nunca entram nesse contrato.
 Modelo de CPU/GPU e faixa de RAM são os mesmos dados já mostrados no
-diagnóstico local do app — categorias de hardware compartilhadas por muitas
-máquinas, nunca um identificador único (número de série, MAC, GUID de
-hardware). O transporte é o Worker Cloudflare
+diagnóstico local do app. Os modelos podem identificar o hardware comercial,
+mas nunca incluem número de série, MAC ou GUID de hardware. O transporte é o Worker Cloudflare
 (`CloudflareTelemetryService.cs`), que transmite todos os campos da tabela
 acima. O FormSubmit foi removido por completo do app: não existe mais
 código nem configuração que envie telemetria de uso para ele.
@@ -85,10 +83,10 @@ separado e opt-in; suas regras estão em [Relatos de bug e privacidade](bug-repo
 
 ## Relatório de falhas (Sentry)
 
-Relatórios de crash fazem parte dos diagnósticos essenciais e seguem a mesma
-sanitização e minimização descritas nesta página.
+Relatórios de crash são opcionais e seguem a mesma sanitização e minimização
+descritas nesta página.
 
-### Dados enviados como diagnóstico essencial
+### Dados enviados quando autorizados
 
 Quando o aplicativo trava ou encontra uma exceção não tratada, envia ao Sentry:
 
@@ -99,7 +97,7 @@ Quando o aplicativo trava ou encontra uma exceção não tratada, envia ao Sentr
 | Versão do aplicativo | `1.1.0` | correlacionar com uma versão específica |
 | Ambiente | `Development` ou `Production` | nunca mistura erros de desenvolvimento com erros de usuários finais |
 
-O SDK do Sentry é inicializado como diagnóstico essencial, com
+O SDK do Sentry é inicializado somente após autorização, com
 `SendDefaultPii=false`, `AutoSessionTracking`/`CaptureFailedRequests`/
 `TracesSampleRate` desligados (nenhum dado além do evento de erro em si é
 enviado) e um `BeforeSend` obrigatório (`CrashReportSanitizer`) que reaplica

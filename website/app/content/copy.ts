@@ -226,7 +226,7 @@ export const copy = {
         ],
         [
           "O aplicativo coleta meus dados?",
-          "A telemetria técnica anônima vem habilitada por padrão em instalações novas e pode ser desligada a qualquer momento. Ela inclui dados técnicos allowlisted, como versão e build do Windows, categorias de hardware, perfil, ações aplicadas, estado do jogo, execução, backup e elevação; a política pública no repositório detalha campos, finalidade, retenção e destinatários. A otimização continua acontecendo localmente.",
+          "A telemetria técnica anônima vem habilitada por padrão em instalações novas e pode ser desligada a qualquer momento. Ela inclui dados técnicos allowlisted, como versão e build do Windows, modelos de CPU e GPU, faixa de RAM, perfil, ações aplicadas, estado do jogo e execução; a política pública no repositório detalha campos, finalidade, retenção e destinatários. A otimização continua acontecendo localmente.",
         ],
         [
           "Por que o SmartScreen pode alertar?",
@@ -471,7 +471,7 @@ export const copy = {
         ],
         [
           "Does the application collect my data?",
-          "Anonymous technical telemetry is enabled by default on new installations and can be turned off at any time. It includes allowlisted technical data such as Windows version and build, hardware categories, profile, applied actions, game state, execution, backup and elevation; the public policy in the repository details fields, purpose, retention and recipients. Optimization stays local.",
+          "Anonymous technical telemetry is enabled by default on new installations and can be turned off at any time. It includes allowlisted technical data such as Windows version and build, CPU and GPU models, RAM range, profile, applied actions, game state and execution; the public policy in the repository details fields, purpose, retention and recipients. Optimization stays local.",
         ],
         [
           "Why might SmartScreen show a warning?",

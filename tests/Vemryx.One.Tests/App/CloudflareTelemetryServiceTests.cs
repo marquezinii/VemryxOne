@@ -646,6 +646,23 @@ public sealed class QueuedCloudflareTelemetryServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task FlushPendingAsync_WithoutConsent_PrunesExpiredQueuedEvents()
+    {
+        var handler = new CountingHandler(HttpStatusCode.Accepted);
+        using var client = new HttpClient(handler);
+        var queue = new LocalTelemetryQueue(tempDirectory);
+        var service = new QueuedCloudflareTelemetryService(queue, new CloudflareTelemetryTransport(client, TestEndpoint));
+        await queue.EnqueueAsync(SampleEvent(), cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
+        var queuedFile = Directory.GetFiles(tempDirectory, "*.json").Single();
+        File.SetCreationTimeUtc(queuedFile, DateTime.UtcNow.AddDays(-15));
+
+        await service.FlushPendingAsync(cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
+
+        Assert.Equal(0, handler.CallCount);
+        Assert.Empty(queue.ReadPending(10));
+    }
+
+    [Fact]
     public async Task TrackAsync_InvalidEvent_ThrowsAndNeverQueuesIt()
     {
         var handler = new CountingHandler(HttpStatusCode.Accepted);
