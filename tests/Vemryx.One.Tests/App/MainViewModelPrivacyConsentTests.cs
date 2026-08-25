@@ -17,7 +17,7 @@ namespace Vemryx.One.Tests.App;
 public sealed class MainViewModelPrivacyConsentTests
 {
     [Fact]
-    public async Task InitializeAsync_NewInstallation_RequestsFirstInstallationScreenWithBothTogglesTrue()
+    public async Task InitializeAsync_NewInstallation_RequestsFirstInstallationScreenWithCrashReportsDisabled()
     {
         var service = new FakeAppOptimizationService(new AppSettings(), settingsFileExists: false);
         var telemetry = new RecordingTelemetryService();
@@ -30,7 +30,7 @@ public sealed class MainViewModelPrivacyConsentTests
         Assert.True(decision!.RequiresConsentScreen);
         Assert.Equal(PrivacyConsentScreenVariant.FirstInstallation, decision.Variant);
         Assert.True(viewModel.ShareAnonymousTelemetry);
-        Assert.True(viewModel.ShareCrashReports);
+        Assert.False(viewModel.ShareCrashReports);
         Assert.Equal(0, telemetry.TrackCallCount);
     }
 
@@ -111,18 +111,17 @@ public sealed class MainViewModelPrivacyConsentTests
         Assert.True(viewModel.ShareAnonymousTelemetry);
         Assert.True(viewModel.ShareCrashReports);
         Assert.True(telemetry.IsEnabled);
+        Assert.True(viewModel.PrivacyConsentDecision!.IsCrashReportingAuthorized);
     }
 
     [Fact]
-    public async Task ConfirmPrivacyConsentAsync_ClosingIsPassedAsBothFalse_PersistsBothFalseButStillStampsTheVersion()
+    public async Task ConfirmPrivacyConsentAsync_BothDeclined_PersistsBothFalseButStillStampsTheVersion()
     {
         var service = new FakeAppOptimizationService(new AppSettings(), settingsFileExists: false);
         var telemetry = new RecordingTelemetryService();
         var viewModel = new MainViewModel(service, telemetry: telemetry);
         await viewModel.InitializeAsync();
 
-        // MainWindow passes (false, false) when the consent window was
-        // closed via the X button or Alt+F4 instead of "Continue".
         await viewModel.ConfirmPrivacyConsentAsync(acceptAnonymousTelemetry: false, acceptCrashReports: false);
 
         Assert.False(service.SavedSettings!.ShareAnonymousTelemetry);
@@ -131,6 +130,7 @@ public sealed class MainViewModelPrivacyConsentTests
         Assert.False(viewModel.ShareAnonymousTelemetry);
         Assert.False(viewModel.ShareCrashReports);
         Assert.False(telemetry.IsEnabled);
+        Assert.False(viewModel.PrivacyConsentDecision!.IsCrashReportingAuthorized);
     }
 
     [Fact]

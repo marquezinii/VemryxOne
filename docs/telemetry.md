@@ -10,7 +10,7 @@ e só pode ser fechada por **Continuar**. Sem mudança na política, a escolha
 salva não é perguntada de novo.
 
 **Diagnósticos essenciais** permanecem ativos: versão do app e do Windows,
-arquitetura, crashes, eventos do atualizador e resultado técnico das
+arquitetura, eventos do atualizador e resultado técnico das
 otimizações. Não incluem HWID, MAC, serial, nome do PC, usuário do Windows ou
 caminhos locais.
 
@@ -21,7 +21,7 @@ momento. Ela controla apenas hardware, perfil e recursos usados.
 ## Dados opcionais enviados com a opção ativada
 
 Ao término, falha ou cancelamento de uma otimização, o aplicativo monta um
-evento técnico com estes campos (versão 5 do consentimento de privacidade —
+evento técnico com estes campos (versão 6 do consentimento de privacidade —
 ver `PrivacyConsentPolicy`):
 
 | Campo | Exemplo | Finalidade |
@@ -97,10 +97,12 @@ separado e opt-in; suas regras estão em [Relatos de bug e privacidade](bug-repo
 
 ## Relatório de falhas (Sentry)
 
-Relatórios de crash fazem parte dos diagnósticos essenciais e seguem a mesma
-sanitização e minimização descritas nesta página.
+Relatórios automáticos de crash começam desativados em instalações novas e podem
+ser ativados antes da confirmação ou a qualquer momento nas configurações.
+Só são enviados depois da confirmação da versão vigente do consentimento. Eles
+seguem a mesma sanitização e minimização descritas nesta página.
 
-### Dados enviados como diagnóstico essencial
+### Dados enviados com a opção ativada
 
 Quando o aplicativo trava ou encontra uma exceção não tratada, envia ao Sentry:
 
@@ -111,7 +113,7 @@ Quando o aplicativo trava ou encontra uma exceção não tratada, envia ao Sentr
 | Versão do aplicativo | `1.1.0` | correlacionar com uma versão específica |
 | Ambiente | `Development` ou `Production` | nunca mistura erros de desenvolvimento com erros de usuários finais |
 
-O SDK do Sentry é inicializado como diagnóstico essencial, com
+O SDK do Sentry só é inicializado após essa autorização, com
 `SendDefaultPii=false`, `AutoSessionTracking`/`CaptureFailedRequests`/
 `TracesSampleRate` desligados (nenhum dado além do evento de erro em si é
 enviado) e um `BeforeSend` obrigatório (`CrashReportSanitizer`) que reaplica

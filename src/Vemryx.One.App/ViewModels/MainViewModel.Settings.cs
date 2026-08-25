@@ -124,25 +124,31 @@ public sealed partial class MainViewModel
     /// já usado pelos demais ajustes, mas nunca altera
     /// <see cref="PrivacyConsentVersion"/> nem reabre a tela de
     /// consentimento — só a confirmação explícita dessa tela faz isso (ver
-    /// <see cref="ConfirmPrivacyConsentAsync"/>). Nenhum serviço externo de
-    /// relatório de falhas existe ainda; este toggle só governa a
-    /// preferência persistida.
+    /// <see cref="ConfirmPrivacyConsentAsync"/>).
     /// </summary>
     public bool ShareCrashReports
     {
         get => shareCrashReports;
         set
         {
-            if (SetProperty(ref shareCrashReports, value))
+            if (shareCrashReports == value)
             {
-                SettingsChanged(refreshPlan: false);
+                return;
             }
+
+            shareCrashReports = value;
+            PrivacyConsentDecision = PrivacyConsentEvaluator.Evaluate(
+                BuildSettingsSnapshot(),
+                settingsFileExistedBeforeLoad: true);
+            OnPropertyChanged();
+            SettingsChanged(refreshPlan: false);
         }
     }
 
     /// <summary>
     /// Decisão computada pelo <see cref="PrivacyConsentEvaluator"/> a partir
-    /// das configurações recém-carregadas em <see cref="InitializeAsync"/>.
+    /// das configurações recém-carregadas em <see cref="InitializeAsync"/>
+    /// e atualizada quando a preferência de crash reports muda. É
     /// <see langword="null"/> antes da primeira inicialização. A janela
     /// (responsabilidade da view) decide se e qual variante mostrar a partir
     /// deste valor; nenhuma leitura adicional de <c>settings.json</c> é
@@ -270,30 +276,27 @@ public sealed partial class MainViewModel
 
     /// <summary>
     /// Persists the outcome of the privacy consent screen: whether the user
-    /// clicked "Continue" with their chosen toggles, or closed the window
-    /// (interpreted by the caller as declining both — pass
-    /// <see langword="false"/>/<see langword="false"/>). Always stamps
+    /// clicked "Continue" with their chosen toggles. Always stamps
     /// <see cref="PrivacyConsentPolicy.CurrentVersion"/> so the screen does
     /// not reappear next launch, and always reuses the same settings
     /// persistence path as every other preference
     /// (<see cref="IAppOptimizationService.SaveSettingsAsync"/>) — no second
     /// storage mechanism is introduced.
     /// </summary>
-    public async Task ConfirmPrivacyConsentAsync(bool acceptAnonymousTelemetry, bool acceptCrashReports = true)
+    public async Task ConfirmPrivacyConsentAsync(bool acceptAnonymousTelemetry, bool acceptCrashReports)
     {
         var snapshot = PrivacyConsentOutcomeBuilder.BuildConfirmed(
             BuildSettingsSnapshot(),
             acceptAnonymousTelemetry,
             acceptCrashReports);
 
+        PrivacyConsentDecision = PrivacyConsentEvaluator.Evaluate(snapshot, settingsFileExistedBeforeLoad: true);
         shareAnonymousTelemetry = snapshot.ShareAnonymousTelemetry;
         telemetry.SetEnabled(snapshot.ShareAnonymousTelemetry);
         shareCrashReports = snapshot.ShareCrashReports;
         privacyConsentVersion = snapshot.PrivacyConsentVersion;
         OnPropertyChanged(nameof(ShareAnonymousTelemetry));
         OnPropertyChanged(nameof(ShareCrashReports));
-        PrivacyConsentDecision = null;
-
         var revision = Interlocked.Increment(ref settingsRevision);
         await SaveSettingsRevisionAsync(snapshot, revision).ConfigureAwait(false);
     }

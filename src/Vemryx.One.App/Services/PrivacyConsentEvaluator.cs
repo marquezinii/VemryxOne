@@ -98,7 +98,7 @@ public static class PrivacyConsentEvaluator
             RequiresConsentScreen = requiresRenewal,
             Variant = variant,
             IsAnonymousTelemetryAuthorized = settings.ShareAnonymousTelemetry && !requiresRenewal,
-            IsCrashReportingAuthorized = true
+            IsCrashReportingAuthorized = settings.ShareCrashReports && !requiresRenewal
         };
     }
 }

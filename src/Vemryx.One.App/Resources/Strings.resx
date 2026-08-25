@@ -287,13 +287,13 @@
   <data name="PrivacyConsent.Intro.Upgrade" xml:space="preserve"><value>Your installation was already sending usage telemetry. You can now also choose to send automatic crash reports. Review both options before continuing.</value></data>
   <data name="PrivacyConsent.Intro.Renewal" xml:space="preserve"><value>We changed what is collected or where the data goes. Review the options below and confirm again before continuing.</value></data>
   <data name="PrivacyConsent.Essential.Title" xml:space="preserve"><value>Essential diagnostics</value></data>
-  <data name="PrivacyConsent.Essential.Description" xml:space="preserve"><value>We collect the minimum needed for updates, security, stability and troubleshooting: app and Windows version, architecture, crashes, updater events and technical optimization outcomes. This cannot be turned off.</value></data>
+  <data name="PrivacyConsent.Essential.Description" xml:space="preserve"><value>We collect the minimum needed for updates, security, stability and troubleshooting: app and Windows version, architecture, updater events and technical optimization outcomes. This cannot be turned off.</value></data>
   <data name="PrivacyConsent.Telemetry.Title" xml:space="preserve"><value>Help improve Vemryx One</value></data>
   <data name="PrivacyConsent.Telemetry.Description" xml:space="preserve"><value>Shares optional anonymous hardware, profile and feature-use data to improve the app. You can turn this off at any time.</value></data>
   <data name="PrivacyConsent.CrashReports.Title" xml:space="preserve"><value>Send automatic error and crash reports</value></data>
   <data name="PrivacyConsent.CrashReports.Description" xml:space="preserve"><value>Sanitized stack traces and app version when Vemryx One crashes or hits an unexpected error.</value></data>
   <data name="PrivacyConsent.Continue" xml:space="preserve"><value>Continue</value></data>
-  <data name="Privacy.Collects.Title" xml:space="preserve"><value>WE COLLECT</value></data>
+  <data name="Privacy.Collects.Title" xml:space="preserve"><value>WITH YOUR OPTIONS, WE MAY COLLECT</value></data>
   <data name="Privacy.Collects.Items" xml:space="preserve"><value>• Vemryx One version
 • General Windows version and architecture
 • Duration and outcome of optimizations

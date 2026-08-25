@@ -33,9 +33,9 @@ public sealed class PrivacyConsentPolicyTests
     }
 
     [Fact]
-    public void CurrentVersion_Is5()
+    public void CurrentVersion_Is6()
     {
-        Assert.Equal(5, PrivacyConsentPolicy.CurrentVersion);
+        Assert.Equal(6, PrivacyConsentPolicy.CurrentVersion);
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public sealed class PrivacyConsentEvaluatorTests
         Assert.True(decision.RequiresConsentScreen);
         Assert.Equal(PrivacyConsentScreenVariant.FirstInstallation, decision.Variant);
         Assert.False(decision.IsAnonymousTelemetryAuthorized);
-        Assert.True(decision.IsCrashReportingAuthorized);
+        Assert.False(decision.IsCrashReportingAuthorized);
     }
 
     [Fact]
@@ -85,7 +85,7 @@ public sealed class PrivacyConsentEvaluatorTests
         Assert.True(decision.RequiresConsentScreen);
         Assert.Equal(PrivacyConsentScreenVariant.UpgradeFromOlderInstallation, decision.Variant);
         Assert.False(decision.IsAnonymousTelemetryAuthorized);
-        Assert.True(decision.IsCrashReportingAuthorized);
+        Assert.False(decision.IsCrashReportingAuthorized);
     }
 
     [Fact]
@@ -103,7 +103,7 @@ public sealed class PrivacyConsentEvaluatorTests
         Assert.True(decision.RequiresConsentScreen);
         Assert.Equal(PrivacyConsentScreenVariant.UpgradeFromOlderInstallation, decision.Variant);
         Assert.False(decision.IsAnonymousTelemetryAuthorized);
-        Assert.True(decision.IsCrashReportingAuthorized);
+        Assert.False(decision.IsCrashReportingAuthorized);
     }
 
     [Fact]
@@ -139,7 +139,7 @@ public sealed class PrivacyConsentEvaluatorTests
         Assert.False(decision.RequiresConsentScreen);
         Assert.Equal(PrivacyConsentScreenVariant.AlreadyValid, decision.Variant);
         Assert.False(decision.IsAnonymousTelemetryAuthorized);
-        Assert.True(decision.IsCrashReportingAuthorized);
+        Assert.False(decision.IsCrashReportingAuthorized);
     }
 
     [Fact]
@@ -156,7 +156,7 @@ public sealed class PrivacyConsentEvaluatorTests
 
         Assert.False(decision.RequiresConsentScreen);
         Assert.True(decision.IsAnonymousTelemetryAuthorized);
-        Assert.True(decision.IsCrashReportingAuthorized);
+        Assert.False(decision.IsCrashReportingAuthorized);
     }
 
     [Fact]
@@ -191,7 +191,7 @@ public sealed class PrivacyConsentEvaluatorTests
         Assert.True(decision.RequiresConsentScreen);
         Assert.Equal(PrivacyConsentScreenVariant.ConsentRenewalRequired, decision.Variant);
         Assert.False(decision.IsAnonymousTelemetryAuthorized);
-        Assert.True(decision.IsCrashReportingAuthorized);
+        Assert.False(decision.IsCrashReportingAuthorized);
     }
 
     [Fact]
@@ -218,7 +218,7 @@ public sealed class PrivacyConsentEvaluatorTests
         var decision = PrivacyConsentEvaluator.Evaluate(settings, settingsFileExistedBeforeLoad: false);
 
         Assert.False(decision.IsAnonymousTelemetryAuthorized);
-        Assert.True(decision.IsCrashReportingAuthorized);
+        Assert.False(decision.IsCrashReportingAuthorized);
     }
 
     [Fact]
@@ -234,7 +234,7 @@ public sealed class PrivacyConsentEvaluatorTests
         var decision = PrivacyConsentEvaluator.Evaluate(settings, settingsFileExistedBeforeLoad: true);
 
         Assert.False(decision.IsAnonymousTelemetryAuthorized);
-        Assert.True(decision.IsCrashReportingAuthorized);
+        Assert.False(decision.IsCrashReportingAuthorized);
     }
 }
 
@@ -263,7 +263,7 @@ public sealed class AppSettingsSerializationTests
         var settings = JsonSerializer.Deserialize<AppSettings>(json, Options)!;
 
         Assert.True(settings.ShareAnonymousTelemetry);
-        Assert.True(settings.ShareCrashReports);
+        Assert.False(settings.ShareCrashReports);
         Assert.Null(settings.PrivacyConsentVersion);
     }
 
@@ -280,7 +280,7 @@ public sealed class AppSettingsSerializationTests
         var settings = JsonSerializer.Deserialize<AppSettings>(json, Options)!;
 
         Assert.False(settings.ShareAnonymousTelemetry);
-        Assert.True(settings.ShareCrashReports);
+        Assert.False(settings.ShareCrashReports);
         Assert.Null(settings.PrivacyConsentVersion);
         Assert.True(settings.MinimizeToTrayOnClose);
     }
@@ -294,13 +294,13 @@ public sealed class AppSettingsSerializationTests
     }
 
     [Fact]
-    public void Deserialize_JsonWithoutShareCrashReports_DefaultsToTrue()
+    public void Deserialize_JsonWithoutShareCrashReports_DefaultsToFalse()
     {
         const string json = "{}";
 
         var settings = JsonSerializer.Deserialize<AppSettings>(json, Options)!;
 
-        Assert.True(settings.ShareCrashReports);
+        Assert.False(settings.ShareCrashReports);
     }
 
     [Fact]
