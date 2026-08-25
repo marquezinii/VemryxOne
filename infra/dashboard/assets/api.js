@@ -69,12 +69,19 @@ export async function getLiveAlert(baseUrl, fetchImpl = fetch) {
   return requestJson(new URL('/live-alert', baseUrl).toString(), {}, fetchImpl);
 }
 
+export function getCsrfToken(baseUrl, fetchImpl = fetch) {
+  return requestJson(new URL('/admin/csrf', baseUrl).toString(), {}, fetchImpl);
+}
+
 /** Publishes or clears the live alert. `message` is optional (omit to only flip `active`). */
-export async function setLiveAlert(baseUrl, { message, active }, fetchImpl = fetch) {
+export async function setLiveAlert(baseUrl, { message, active }, csrfToken, fetchImpl = fetch) {
   const body = message === undefined ? { active } : { message, active };
   return requestJson(new URL('/admin/live-alert', baseUrl).toString(), {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Vemryx-Csrf-Token': csrfToken,
+    },
     body: JSON.stringify(body),
   }, fetchImpl);
 }

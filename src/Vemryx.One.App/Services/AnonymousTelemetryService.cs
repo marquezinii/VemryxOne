@@ -49,7 +49,12 @@ public sealed record AnonymousTelemetryEvent(
     bool? BackupCreated = null,
     bool? BackupRestored = null,
     bool? ElevationUsed = null,
-    int? ProcessCountAtStart = null);
+    int? ProcessCountAtStart = null)
+{
+    // This identifies a delivery attempt's logical event, never a device or user.
+    // It is persisted with the queued payload so retries retain the same value.
+    public Guid EventId { get; init; } = Guid.NewGuid();
+}
 
 public interface IAnonymousTelemetryService
 {

@@ -191,14 +191,7 @@ public partial class App : System.Windows.Application
 
     private static void TryShutdownCrashReporting()
     {
-        try
-        {
-            CrashReporting.Current.Shutdown();
-        }
-        catch
-        {
-            // Best-effort flush on exit; never block shutdown on it.
-        }
+        CrashReportingLifecycle.TryShutdown(CrashReporting.Current);
     }
 
     private static void ShowFatalError(Exception exception)

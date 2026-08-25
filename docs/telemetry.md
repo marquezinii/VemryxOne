@@ -10,7 +10,7 @@ e só pode ser fechada por **Continuar**. Sem mudança na política, a escolha
 salva não é perguntada de novo.
 
 **Diagnósticos essenciais** permanecem ativos: versão do app e do Windows,
-arquitetura, crashes, eventos do atualizador e resultado técnico das
+arquitetura, eventos do atualizador e resultado técnico das
 otimizações. Não incluem HWID, MAC, serial, nome do PC, usuário do Windows ou
 caminhos locais.
 
@@ -21,12 +21,13 @@ momento. Ela controla apenas hardware, perfil e recursos usados.
 ## Dados opcionais enviados com a opção ativada
 
 Ao término, falha ou cancelamento de uma otimização, o aplicativo monta um
-evento técnico com estes campos (versão 5 do consentimento de privacidade —
+evento técnico com estes campos (versão 6 do consentimento de privacidade —
 ver `PrivacyConsentPolicy`):
 
 | Campo | Exemplo | Finalidade |
 | --- | --- | --- |
 | Tipo | `optimization-completed` | distinguir conclusão, falha ou cancelamento |
+| ID do evento | UUID aleatório por evento | garantir entrega idempotente; não identifica máquina ou usuário |
 | Tempo de execução | `18342` ms | identificar operações anormalmente longas |
 | Versão | `1.1.0` | correlacionar comportamento com uma versão |
 | Categoria de erro | `timeout` | presente apenas em falhas; é uma lista fechada |
@@ -69,9 +70,14 @@ código nem configuração que envie telemetria de uso para ele.
   tabela acima;
 - texto livre, mensagens de erro brutas, stack traces ou caminhos.
 
-O código limita os nomes de evento e categorias a uma allowlist e recusa
-campos fora desse esquema. Falhas de rede são ignoradas: não interrompem a
-otimização, não geram nova telemetria e não são reenviadas automaticamente.
+A fila preserva o UUID aleatório de cada evento em todos os retries. O Worker
+grava um lote em uma única transação D1; repetir o mesmo lote com UUID do
+cliente não cria eventos ou ações adicionais. Enquanto houver instalações
+anteriores sem UUID, o Worker gera um UUID apenas para compatibilidade, sem
+promessa de idempotência para esse protocolo legado. O código limita os nomes
+de evento e categorias a uma allowlist e recusa campos fora desse esquema.
+Falhas de rede são ignoradas: não interrompem a otimização, não geram nova
+telemetria e não são reenviadas automaticamente.
 A fila local (`LocalTelemetryQueue`) persiste eventos pendentes por até 14
 dias antes de descartá-los, para sobreviver a reinícios e períodos offline
 sem crescer indefinidamente.
@@ -91,10 +97,12 @@ separado e opt-in; suas regras estão em [Relatos de bug e privacidade](bug-repo
 
 ## Relatório de falhas (Sentry)
 
-Relatórios de crash fazem parte dos diagnósticos essenciais e seguem a mesma
-sanitização e minimização descritas nesta página.
+Relatórios automáticos de crash começam desativados em instalações novas e podem
+ser ativados antes da confirmação ou a qualquer momento nas configurações.
+Só são enviados depois da confirmação da versão vigente do consentimento. Eles
+seguem a mesma sanitização e minimização descritas nesta página.
 
-### Dados enviados como diagnóstico essencial
+### Dados enviados com a opção ativada
 
 Quando o aplicativo trava ou encontra uma exceção não tratada, envia ao Sentry:
 
@@ -105,7 +113,7 @@ Quando o aplicativo trava ou encontra uma exceção não tratada, envia ao Sentr
 | Versão do aplicativo | `1.1.0` | correlacionar com uma versão específica |
 | Ambiente | `Development` ou `Production` | nunca mistura erros de desenvolvimento com erros de usuários finais |
 
-O SDK do Sentry é inicializado como diagnóstico essencial, com
+O SDK do Sentry só é inicializado após essa autorização, com
 `SendDefaultPii=false`, `AutoSessionTracking`/`CaptureFailedRequests`/
 `TracesSampleRate` desligados (nenhum dado além do evento de erro em si é
 enviado) e um `BeforeSend` obrigatório (`CrashReportSanitizer`) que reaplica

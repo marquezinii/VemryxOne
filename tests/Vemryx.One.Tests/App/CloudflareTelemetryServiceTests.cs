@@ -45,6 +45,12 @@ public sealed class TelemetryEventValidatorTests
     }
 
     [Fact]
+    public void Validate_EmptyEventId_Throws()
+    {
+        Assert.Throws<ArgumentException>(() => TelemetryEventValidator.Validate(ValidEvent() with { EventId = Guid.Empty }));
+    }
+
+    [Fact]
     public void Validate_UnknownEventName_Throws()
     {
         Assert.Throws<ArgumentException>(() => TelemetryEventValidator.Validate(ValidEvent() with { EventName = "unknown" }));
@@ -297,12 +303,14 @@ public sealed class LocalTelemetryQueueTests : IDisposable
     public async Task EnqueueAsync_ThenReadPending_RoundTripsTheEvent()
     {
         var queue = new LocalTelemetryQueue(tempDirectory);
+        var telemetryEvent = SampleEvent();
 
-        await queue.EnqueueAsync(SampleEvent(), cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
+        await queue.EnqueueAsync(telemetryEvent, cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
         var pending = queue.ReadPending(10);
 
         var item = Assert.Single(pending);
         Assert.Equal("optimization-completed", item.Event.EventName);
+        Assert.Equal(telemetryEvent.EventId, item.Event.EventId);
     }
 
     [Fact]
@@ -455,8 +463,9 @@ public sealed class CloudflareTelemetryTransportTests
         var handler = new RecordingHandler();
         using var client = new HttpClient(handler);
         var transport = new CloudflareTelemetryTransport(client, TestEndpoint);
+        var telemetryEvent = SampleEvent();
 
-        var result = await transport.SendBatchAsync([SampleEvent(), SampleEvent() with { AppVersion = "1.0.5" }], cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
+        var result = await transport.SendBatchAsync([telemetryEvent, telemetryEvent with { AppVersion = "1.0.5" }], cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
 
         Assert.True(result);
         Assert.Equal(1, handler.CallCount);
@@ -464,6 +473,7 @@ public sealed class CloudflareTelemetryTransportTests
         Assert.Contains("1.0.4", handler.Body, StringComparison.Ordinal);
         Assert.Contains("1.0.5", handler.Body, StringComparison.Ordinal);
         Assert.Contains("AMD Ryzen 5 5600X", handler.Body, StringComparison.Ordinal);
+        Assert.Contains($"\"eventId\":\"{telemetryEvent.EventId:D}\"", handler.Body, StringComparison.Ordinal);
         Assert.Contains("\"environment\":\"Production\"", handler.Body, StringComparison.Ordinal);
     }
 
