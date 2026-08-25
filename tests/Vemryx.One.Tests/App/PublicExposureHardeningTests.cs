@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Xunit;
 
 namespace Vemryx.One.Tests.App;
@@ -20,6 +21,8 @@ public sealed class PublicExposureHardeningTests
             firstSecretReference > provenanceGuard,
             "The provenance guard must run before any workflow secret is referenced.");
         Assert.Contains("refs/remotes/origin/main", workflow, StringComparison.Ordinal);
+        Assert.Contains("trusted_commit: ${{ steps.release.outputs.trusted_commit }}", workflow, StringComparison.Ordinal);
+        Assert.Equal(2, workflow.Split("ref: ${{ needs.build_audit.outputs.trusted_commit }}", StringSplitOptions.None).Length - 1);
     }
 
     [Fact]
@@ -55,6 +58,10 @@ public sealed class PublicExposureHardeningTests
         var updateKey = File.ReadAllText(Path.Combine(root, "src", "Vemryx.One.App", "Assets", "update-manifest-public-key.pem"));
         var brokerKey = File.ReadAllText(Path.Combine(root, "src", "Vemryx.One.App", "Assets", "broker-integrity-public-key.pem"));
         Assert.NotEqual(updateKey, brokerKey);
+
+        using var brokerVerifier = ECDsa.Create();
+        brokerVerifier.ImportFromPem(brokerKey);
+        Assert.Equal(32, brokerVerifier.ExportParameters(includePrivateParameters: false).Q.X!.Length);
     }
 
     [Fact]
