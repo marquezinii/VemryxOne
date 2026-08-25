@@ -36,8 +36,7 @@ public sealed class PublicExposureHardeningTests
         Assert.Contains("environment: release-signing", workflow, StringComparison.Ordinal);
         Assert.Contains("environment: production", workflow, StringComparison.Ordinal);
         Assert.Contains("BROKER_INTEGRITY_SIGNING_PRIVATE_KEY", workflow, StringComparison.Ordinal);
-        Assert.Contains("UPDATE_MANIFEST_SIGNING_PRIVATE_KEY", workflow, StringComparison.Ordinal);
-        Assert.DoesNotContain("RELEASE_SIGNING_PRIVATE_KEY", workflow, StringComparison.Ordinal);
+        Assert.Contains("RELEASE_SIGNING_PRIVATE_KEY", workflow[buildEnd..publishStart], StringComparison.Ordinal);
     }
 
     [Fact]
@@ -52,6 +51,10 @@ public sealed class PublicExposureHardeningTests
         Assert.Contains("Assets/broker-integrity-public-key.pem", project, StringComparison.Ordinal);
         Assert.Contains("Assets.update-manifest-public-key.pem", updater, StringComparison.Ordinal);
         Assert.Contains("Assets.broker-integrity-public-key.pem", broker, StringComparison.Ordinal);
+
+        var updateKey = File.ReadAllText(Path.Combine(root, "src", "Vemryx.One.App", "Assets", "update-manifest-public-key.pem"));
+        var brokerKey = File.ReadAllText(Path.Combine(root, "src", "Vemryx.One.App", "Assets", "broker-integrity-public-key.pem"));
+        Assert.NotEqual(updateKey, brokerKey);
     }
 
     [Fact]

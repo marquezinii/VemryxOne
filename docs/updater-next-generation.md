@@ -104,21 +104,24 @@ daí, o botão de atualização usa exclusivamente o runtime ZIP assinado.
 
 Antes dessa release, configure os ambientes GitHub abaixo. Chaves usadas por
 Actions são **chaves online de CI**, não chaves offline: o ambiente
-`release-signing` guarda, separadamente,
-`UPDATE_MANIFEST_SIGNING_PRIVATE_KEY`/`UPDATE_MANIFEST_SIGNING_PASSWORD` e
+`release-signing` guarda a chave de broker em
 `BROKER_INTEGRITY_SIGNING_PRIVATE_KEY`/`BROKER_INTEGRITY_SIGNING_PASSWORD`.
+O par de update já implantado continua nos secrets legados
+`RELEASE_SIGNING_PRIVATE_KEY`/`FIVEMCLEANER_SIGNING_PASSWORD`, referenciados
+somente pelo job isolado de assinatura para não romper clientes que confiam na
+chave pública atual.
 As respectivas chaves públicas ficam incorporadas em
 `update-manifest-public-key.pem` e `broker-integrity-public-key.pem`; cada
 segredo deve corresponder apenas ao seu arquivo público. O ambiente
 `production`, com revisores obrigatórios, guarda `CLOUDFLARE_API_TOKEN` e
 `CLOUDFLARE_ACCOUNT_ID` e é o único que pode publicar a release e o feed.
 
-Os dois arquivos públicos têm escopo separado para permitir a rotação sem
-mudar o protocolo. Antes da próxima release, gere um par ECDSA P-256 exclusivo
-para o broker, substitua `broker-integrity-public-key.pem` pela chave pública e
-armazene a chave privada correspondente somente no ambiente
-`release-signing`. Não copie a chave atual de update para o segredo do broker:
-isso preservaria a mesma autoridade e invalidaria esta separação.
+Os dois arquivos públicos têm escopo separado e o par ECDSA P-256 do broker é
+distinto do par de update. Em rotações futuras, gere o novo par exclusivamente
+fora do repositório, substitua `broker-integrity-public-key.pem` pela parte
+pública e armazene a parte privada somente no ambiente `release-signing`.
+Nunca copie a chave de update para o segredo do broker: isso preservaria a
+mesma autoridade e invalidaria esta separação.
 
 Uma raiz offline, se adotada, fica exclusivamente em HSM/cofre fora do GitHub
 e assina ou autoriza as chaves online em procedimento manual. Ela nunca é

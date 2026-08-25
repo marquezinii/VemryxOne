@@ -229,8 +229,10 @@ jobs:
           ASSET_VERSION: ${{ needs.build_audit.outputs.asset_version }}
           RELEASE_TAG: ${{ inputs.release_tag }}
           RELEASE_CHANNEL: ${{ inputs.channel }}
-          UPDATE_MANIFEST_SIGNING_PASSWORD: ${{ secrets.UPDATE_MANIFEST_SIGNING_PASSWORD }}
-          UPDATE_MANIFEST_SIGNING_PRIVATE_KEY: ${{ secrets.UPDATE_MANIFEST_SIGNING_PRIVATE_KEY }}
+          # The existing update trust anchor remains in use so released
+          # clients continue to accept the first signed runtime migration.
+          FIVEMCLEANER_SIGNING_PASSWORD: ${{ secrets.FIVEMCLEANER_SIGNING_PASSWORD }}
+          RELEASE_SIGNING_PRIVATE_KEY: ${{ secrets.RELEASE_SIGNING_PRIVATE_KEY }}
         run: |
           New-Item -ItemType Directory -Force -Path ./artifacts/release | Out-Null
           Copy-Item -LiteralPath "./artifacts/installer/VemryxOne-Setup-$env:ASSET_VERSION-win-x64.exe" -Destination ./artifacts/release
@@ -247,17 +249,16 @@ jobs:
           # sem uma etapa intermediária. O updater usa exclusivamente o runtime ZIP
           # versionado autorizado pelo manifesto assinado abaixo.
           if ($env:RELEASE_CHANNEL -eq 'stable') {
-            if ([string]::IsNullOrWhiteSpace($env:UPDATE_MANIFEST_SIGNING_PRIVATE_KEY) -or
-                [string]::IsNullOrWhiteSpace($env:UPDATE_MANIFEST_SIGNING_PASSWORD)) {
+            if ([string]::IsNullOrWhiteSpace($env:RELEASE_SIGNING_PRIVATE_KEY) -or
+                [string]::IsNullOrWhiteSpace($env:FIVEMCLEANER_SIGNING_PASSWORD)) {
               throw 'Stable releases require the protected update-manifest signing key.'
             }
             $privateKey = Join-Path $env:RUNNER_TEMP 'vemryx-one-release-private.pem'
             try {
               [IO.File]::WriteAllText(
                 $privateKey,
-                $env:UPDATE_MANIFEST_SIGNING_PRIVATE_KEY,
+                $env:RELEASE_SIGNING_PRIVATE_KEY,
                 [Text.UTF8Encoding]::new($false))
-              $env:FIVEMCLEANER_SIGNING_PASSWORD = $env:UPDATE_MANIFEST_SIGNING_PASSWORD
               $minimum = (Get-Content -LiteralPath ./installer/minimum-update-version.txt -Raw).Trim()
               # The signed bridge remains on the legacy redirect so already-installed
               # 1.5.0 clients can accept this first release after the repository rename.
