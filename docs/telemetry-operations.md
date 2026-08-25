@@ -29,8 +29,11 @@ rota autorizados.
 - valide a serialização do cliente, incluindo `environment: Production`;
 - execute `npm.cmd test` em `infra/cloudflare-worker` e `infra/dashboard`;
 - execute o build e os testes Release do .NET;
-- usando credenciais Cloudflare, execute uma consulta remota ao D1 para
-  confirmar a migration e o último evento recebido;
+- usando credenciais Cloudflare, aplique as migrations com
+  `wrangler d1 migrations apply fivemcleaner-telemetry --remote` antes do
+  deploy do Worker; o Wrangler captura o backup D1 dessa operação. Em seguida,
+  faça uma consulta remota que cubra as colunas/tabelas usadas pelo Worker novo
+  e confirme o último evento recebido;
 - instale o artefato Release, dê consentimento e execute uma otimização
   controlada; registre versão, horário UTC e identificador de smoke test;
 - confirme o `202` no Worker, a linha no D1 e a visibilidade no dashboard;
@@ -52,6 +55,7 @@ campo explicitamente; `null` ou valores desconhecidos continuam rejeitados.
 
 ```powershell
 npx.cmd wrangler d1 execute fivemcleaner-telemetry --remote --command "SELECT COUNT(*) AS total, MAX(received_at) AS last_received FROM telemetry_events"
+npx.cmd wrangler d1 execute fivemcleaner-telemetry --remote --command "SELECT five_m_install_detected FROM telemetry_events LIMIT 1; SELECT terms_version FROM account_profiles LIMIT 1; SELECT message, active, updated_at FROM live_alert WHERE id = 1"
 npx.cmd wrangler deployments list --name fivemcleaner-telemetry
 ```
 

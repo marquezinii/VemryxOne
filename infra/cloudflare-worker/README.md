@@ -28,16 +28,15 @@ summary, optional email, optional plain-text log excerpt capped at 100 KB).
   dashboard's filters, not a second deployment. (An earlier
   `env.development`/`env.production` named-environment design was removed:
   it added no benefit since D1 already distinguishes rows by that column.)
-- `schema.sql` — the D1 tables: `telemetry_events` (one row per optimization
-  run, including the version-2-consent hardware profile and a client UUID for
-  idempotent retry),
-  `telemetry_event_actions` (one row per applied action ID, for "most used
-  function"), `login_attempts` and `admin_sessions` (custom dashboard auth).
-- `migrations/` — incremental changes for the already deployed D1 database.
-  The account migration adds a unique username plus the accepted terms version
-  and timestamp. Apply `0006_telemetry_event_idempotency.sql` before deploying
-  the Worker that accepts client event UUIDs. `schema.sql` remains the
-  complete snapshot for a new local database.
+- `migrations/` — the authoritative D1 history. `0000_initial_schema.sql`
+  provides the historical baseline for an empty database; later files evolve
+  it incrementally. The release workflow adopts the known legacy bootstrap
+  only when its v5/profile-terms shape is confirmed, then applies every later
+  migration (including `0006_telemetry_event_idempotency.sql`) before the
+  Worker deploys. Use `wrangler d1 migrations apply`, never `schema.sql`, for
+  a database that may later receive an upgrade.
+- `schema.sql` — a human-readable current-schema reference. It is not a deploy
+  or bootstrap input because it does not record migration history.
 - `src/validateEvent.js` — pure, dependency-free validation of one event or a
   batch. The Worker never trusts client-side validation alone; every field is
   re-checked against the same allowlist server-side.
@@ -200,15 +199,16 @@ no test data was left behind).
 
 ```bash
 npm install
-npm run db:bootstrap:local        # creates a fresh local database from schema.sql
+npm run db:bootstrap:local        # creates a fresh local database through migrations
 npm run db:migrate:local          # applies pending migrations to an existing local database
+npm run test:migrations           # empty, historical, and failed-migration local D1 checks
 
 npm run hash-admin-password       # prints the ADMIN_PASSWORD_HASH value
 wrangler secret put ADMIN_PASSWORD_HASH
 wrangler secret put IP_HASH_SECRET   # any long random string
 wrangler secret put ADMIN_CSRF_SECRET # distinct long random string
 
-wrangler d1 migrations apply fivemcleaner-telemetry --remote   # touches the real database — ask first
+wrangler d1 migrations apply fivemcleaner-telemetry --remote   # captures a D1 backup; touches the real database — ask first
 wrangler deploy   # touches Cloudflare — ask first
 ```
 
