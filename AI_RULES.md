@@ -387,7 +387,8 @@ Ao ser disparada, a IA deve:
 2. confirmar que `PROJECT_STATE.md` representa o estado integrado atual e continua
    compacto; corrigir inconsistências de estado antes de gerar notas públicas;
 3. calcular a próxima versão com [Semantic Versioning](https://semver.org/lang/pt-BR/),
-   usando todas as mudanças efetivamente integradas desde a última tag;
+   usando todas as mudanças efetivamente integradas desde a última **GitHub
+   Release estável publicada**;
 4. atualizar todos os arquivos de versão, `CHANGELOG.md`, notas de release,
    instalador, site e demais artefatos de distribuição, sem divergências;
 5. fazer merge de `dev/proxima-versao` para `main`, salvo se uma comparação
@@ -403,6 +404,19 @@ Um push autorizado não permite ocultar falhas: build, testes, lint, typecheck,
 empacotamento e validação de versão devem passar, ou o bloqueio deve ser
 informado claramente.
 
+### Tags sem release publicada
+
+Antes de calcular a versão, confirme no GitHub a última release estável, além
+das tags existentes. Uma tag sem GitHub Release pública não é uma versão
+publicada e não pode reduzir o intervalo de mudanças das Release Notes.
+
+- nunca mova, reaproveite, force-push ou apague uma tag publicada/protegida;
+- escolha a próxima versão SemVer disponível após a maior tag estável existente;
+- gere changelog e Release Notes a partir da última GitHub Release estável,
+  incluindo as mudanças presentes em qualquer tag sem release;
+- trate uma tag sem release como pendência de publicação até a próxima release
+  estável válida concluir todo o fluxo.
+
 ### Levantamento das mudanças integradas
 
 O passo 3 ("calcular a próxima versão... usando todas as mudanças
@@ -411,9 +425,9 @@ efetivamente integradas desde a última tag") e o passo 4 ("atualizar...
 lembrança aproximada do que foi feito. Antes de escrever qualquer changelog,
 nota de release ou classificar a versão, a IA que publica deve:
 
-1. determinar o intervalo exato: da última tag publicada (`git describe
-   --tags --abbrev=0` a partir de `main`, ou a versão registrada em
-   `PROJECT_STATE.md`) até o `HEAD` atual de `dev/proxima-versao`;
+1. determinar o intervalo exato: da última **GitHub Release estável publicada**
+   (confirmada por `gh release view`/API; não apenas por `git describe`) até o
+   `HEAD` atual de `dev/proxima-versao`;
 2. listar **todos** os commits desse intervalo (`git log <última-tag>..HEAD
    --oneline` em `dev/proxima-versao`) e, quando existirem, os Pull Requests
    correspondentes — não confiar apenas na memória da sessão ou em um
