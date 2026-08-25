@@ -19,7 +19,7 @@ test("exports the Portuguese Vemryx One landing page", async () => {
   assert.match(html, /Sobre o SmartScreen e antivírus/i);
   assert.match(html, /Código-fonte disponível/i);
   assert.match(html, /A distribuição ofusca partes internas de Core e Windows/i);
-  assert.match(html, /categorias de hardware, perfil, ações aplicadas/i);
+  assert.match(html, /modelos de CPU e GPU, faixa de RAM, perfil, ações aplicadas/i);
   assert.doesNotMatch(html, /Código aberto/i);
   assert.doesNotMatch(html, /Nada de ofuscação/i);
   assert.match(html, /href="https:\/\/vemryx\.com\/"[^>]*>Vemryx<\/a>/i);
