@@ -17,7 +17,8 @@ import { rateLimitKey, withinRateLimit, withinRequiredRateLimit } from './rateLi
 import * as queries from './stats/queries.js';
 import { toCsv } from './stats/csv.js';
 import { buildCorsHeaders, isAllowedDashboardOrigin, withCorsHeaders } from './cors.js';
-import { readBoundedJson } from './requestSecurity.js';
+import { hasExactJsonContentType, readBoundedJson } from './requestSecurity.js';
+import { createCsrfToken, isValidCsrfToken } from './auth/crypto.js';
 import { parseReleaseManifest } from './releaseManifest.js';
 import { validateLiveAlertUpdate } from './liveAlert/validateSubmission.js';
 import { buildLiveAlertUpsert, toLiveAlertResponse } from './liveAlert/store.js';
@@ -42,6 +43,7 @@ const MAX_LIVE_ALERT_BODY_BYTES = 4 * 1024;
 //   GET     /account/username-available -- advisory "is this username free?" probe for the registration form (no auth; rate limited per IP)
 //   POST    /admin/login           -- { password } -> session cookie
 //   POST    /admin/logout          -- clears the session cookie
+//   GET     /admin/csrf            -- session-bound CSRF token (requires a valid session)
 //   GET     /api/stats/:name       -- one chart's data (requires a valid session)
 //   GET     /api/stats/:name.csv   -- same data as CSV (requires a valid session)
 //   GET     /api/bugs              -- recent bug reports, newest first (requires a valid session)
@@ -113,6 +115,12 @@ async function route(request, env, url) {
     return new Response('Forbidden', { status: 403 });
   }
 
+  if (request.method === 'POST'
+    && (url.pathname === '/admin/login' || url.pathname === '/admin/live-alert')
+    && !hasExactJsonContentType(request)) {
+    return new Response('Unsupported Media Type', { status: 415 });
+  }
+
   if (request.method === 'POST' && url.pathname === '/telemetry') {
     return handleTelemetryIngest(request, env);
   }
@@ -143,6 +151,10 @@ async function route(request, env, url) {
   }
   if (request.method === 'POST' && url.pathname === '/admin/live-alert') {
     return handleLiveAlertUpdate(request, env);
+  }
+
+  if (request.method === 'GET' && url.pathname === '/admin/csrf') {
+    return handleAdminCsrfToken(request, env);
   }
 
   if (request.method === 'POST' && url.pathname === '/admin/login') {
@@ -246,6 +258,14 @@ async function handleLiveAlertUpdate(request, env) {
   const auth = await createPasswordAuthProvider(env).requireSession(request);
   if (!auth.authorized) return auth.response;
 
+  if (!(await isValidCsrfToken(
+    request.headers.get('X-Vemryx-Csrf-Token'),
+    auth.sessionId,
+    env.ADMIN_CSRF_SECRET,
+  ))) {
+    return new Response('Forbidden', { status: 403 });
+  }
+
   const payload = await readBoundedJson(request, MAX_LIVE_ALERT_BODY_BYTES);
   if (payload === null) return new Response('Invalid JSON', { status: 400 });
 
@@ -255,6 +275,19 @@ async function handleLiveAlertUpdate(request, env) {
   const { sql, params } = buildLiveAlertUpsert(update, new Date().toISOString());
   await env.TELEMETRY_DB.prepare(sql).bind(...params).run();
   return jsonResponse({ success: true });
+}
+
+async function handleAdminCsrfToken(request, env) {
+  if (!isAllowedDashboardOrigin(request.headers.get('Origin'), env.DASHBOARD_ORIGIN)) {
+    return new Response('Forbidden', { status: 403 });
+  }
+
+  const auth = await createPasswordAuthProvider(env).requireSession(request);
+  if (!auth.authorized) return auth.response;
+
+  const csrfToken = await createCsrfToken(auth.sessionId, env.ADMIN_CSRF_SECRET);
+  if (!csrfToken) return jsonResponse({ error: 'server-misconfigured' }, 500);
+  return jsonResponse({ csrfToken });
 }
 
 // Completes the profile of a Firebase-authenticated account with the
