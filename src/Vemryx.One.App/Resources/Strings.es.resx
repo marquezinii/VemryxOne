@@ -287,7 +287,7 @@
   <data name="PrivacyConsent.Intro.Upgrade" xml:space="preserve"><value>Tu instalación ya enviaba telemetría de uso. Ahora también puedes elegir enviar reportes de fallos automáticos. Revisa ambas opciones antes de continuar.</value></data>
   <data name="PrivacyConsent.Intro.Renewal" xml:space="preserve"><value>Cambiamos lo que se recopila o adónde van los datos. Revisa las opciones a continuación y confirma de nuevo antes de continuar.</value></data>
   <data name="PrivacyConsent.Essential.Title" xml:space="preserve"><value>Diagnósticos esenciales</value></data>
-  <data name="PrivacyConsent.Essential.Description" xml:space="preserve"><value>Recopilamos el mínimo necesario para actualizaciones, seguridad, estabilidad y diagnóstico: versión de la app y Windows, arquitectura, fallos, eventos del actualizador y resultados técnicos de optimización. No se puede desactivar.</value></data>
+  <data name="PrivacyConsent.Essential.Description" xml:space="preserve"><value>Recopilamos el mínimo necesario para actualizaciones, seguridad, estabilidad y diagnóstico: versión de la app y Windows, arquitectura, eventos del actualizador y resultados técnicos de optimización. No se puede desactivar.</value></data>
   <data name="PrivacyConsent.Telemetry.Title" xml:space="preserve"><value>Ayudar a mejorar Vemryx One</value></data>
   <data name="PrivacyConsent.Telemetry.Description" xml:space="preserve"><value>Comparte datos anónimos opcionales de hardware, perfil y uso de funciones para mejorar la aplicación. Puedes desactivarlo cuando quieras.</value></data>
   <data name="PrivacyConsent.CrashReports.Title" xml:space="preserve"><value>Enviar reportes automáticos de errores y fallos</value></data>

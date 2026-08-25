@@ -66,3 +66,48 @@ public static class CrashReporting
         set => current = value ?? throw new ArgumentNullException(nameof(value));
     }
 }
+
+/// <summary>
+/// Keeps crash reporting fail-closed: initialization only happens after the
+/// caller has evaluated current consent, and SDK failures fall back to the
+/// inert service without affecting application startup or shutdown.
+/// </summary>
+internal static class CrashReportingLifecycle
+{
+    internal static ICrashReportingService InitializeIfAuthorized(
+        bool isAuthorized,
+        RemoteServicesOptions options,
+        string appVersion,
+        Func<ICrashReportingService> serviceFactory)
+    {
+        if (!isAuthorized)
+        {
+            return NoOpCrashReportingService.Instance;
+        }
+
+        ICrashReportingService? service = null;
+        try
+        {
+            service = serviceFactory();
+            service.Initialize(options, appVersion);
+            return service;
+        }
+        catch
+        {
+            TryShutdown(service);
+            return NoOpCrashReportingService.Instance;
+        }
+    }
+
+    internal static void TryShutdown(ICrashReportingService? service)
+    {
+        try
+        {
+            service?.Shutdown();
+        }
+        catch
+        {
+            // Crash reporting must never prevent a clean application exit.
+        }
+    }
+}

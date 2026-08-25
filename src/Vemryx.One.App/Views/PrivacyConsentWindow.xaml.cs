@@ -20,6 +20,7 @@ public partial class PrivacyConsentWindow : Wpf.Ui.Controls.FluentWindow
     public PrivacyConsentWindow(
         PrivacyConsentScreenVariant variant,
         bool initialShareAnonymousTelemetry,
+        bool initialShareCrashReports,
         ILocalizationService? localization = null)
     {
         this.localization = localization ?? LocalizationService.Current;
@@ -27,7 +28,9 @@ public partial class PrivacyConsentWindow : Wpf.Ui.Controls.FluentWindow
         InitializeComponent();
         DataContext = this;
         TelemetryCheckBox.IsChecked = initialShareAnonymousTelemetry;
+        CrashReportsCheckBox.IsChecked = initialShareCrashReports;
         AcceptedAnonymousTelemetry = initialShareAnonymousTelemetry;
+        AcceptedCrashReports = initialShareCrashReports;
         Closing += PrivacyConsentWindow_Closing;
         Loaded += (_, _) => TelemetryCheckBox.Focus();
     }
@@ -39,6 +42,9 @@ public partial class PrivacyConsentWindow : Wpf.Ui.Controls.FluentWindow
     /// "Continue".
     /// </summary>
     public bool AcceptedAnonymousTelemetry { get; private set; }
+
+    /// <summary>The user's final choice for automatic crash reports.</summary>
+    public bool AcceptedCrashReports { get; private set; }
 
     public string HeadingText => Variant switch
     {
@@ -57,6 +63,7 @@ public partial class PrivacyConsentWindow : Wpf.Ui.Controls.FluentWindow
     private void Continue_Click(object sender, RoutedEventArgs e)
     {
         AcceptedAnonymousTelemetry = TelemetryCheckBox.IsChecked == true;
+        AcceptedCrashReports = CrashReportsCheckBox.IsChecked == true;
         confirmedByUser = true;
         DialogResult = true;
     }
