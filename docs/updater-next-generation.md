@@ -102,13 +102,32 @@ preserva `%LOCALAPPDATA%\FiveMCleaner`, atalhos e preferência de inicializaçã
 mas instala `FiveMCleaner.Launcher.exe` e a primeira versão imutável. A partir
 daí, o botão de atualização usa exclusivamente o runtime ZIP assinado.
 
-Antes dessa release, o repositório GitHub precisa possuir os secrets
-`RELEASE_SIGNING_PRIVATE_KEY`, `FIVEMCLEANER_SIGNING_PASSWORD`,
-`CLOUDFLARE_API_TOKEN` e `CLOUDFLARE_ACCOUNT_ID`. A chave pública correspondente
-já está incorporada ao app; o job de release falha fechado se a chave privada
-não corresponder. `installer/minimum-update-version.txt` é o piso explícito do
-canal estável e só deve ser elevado após confirmar que a versão indicada pode
-servir de predecessor seguro.
+Antes dessa release, configure os ambientes GitHub abaixo. Chaves usadas por
+Actions são **chaves online de CI**, não chaves offline: o ambiente
+`release-signing` guarda, separadamente,
+`UPDATE_MANIFEST_SIGNING_PRIVATE_KEY`/`UPDATE_MANIFEST_SIGNING_PASSWORD` e
+`BROKER_INTEGRITY_SIGNING_PRIVATE_KEY`/`BROKER_INTEGRITY_SIGNING_PASSWORD`.
+As respectivas chaves públicas ficam incorporadas em
+`update-manifest-public-key.pem` e `broker-integrity-public-key.pem`; cada
+segredo deve corresponder apenas ao seu arquivo público. O ambiente
+`production`, com revisores obrigatórios, guarda `CLOUDFLARE_API_TOKEN` e
+`CLOUDFLARE_ACCOUNT_ID` e é o único que pode publicar a release e o feed.
+
+Os dois arquivos públicos têm escopo separado para permitir a rotação sem
+mudar o protocolo. Antes da próxima release, gere um par ECDSA P-256 exclusivo
+para o broker, substitua `broker-integrity-public-key.pem` pela chave pública e
+armazene a chave privada correspondente somente no ambiente
+`release-signing`. Não copie a chave atual de update para o segredo do broker:
+isso preservaria a mesma autoridade e invalidaria esta separação.
+
+Uma raiz offline, se adotada, fica exclusivamente em HSM/cofre fora do GitHub
+e assina ou autoriza as chaves online em procedimento manual. Ela nunca é
+copiada para um secret, runner, artefato ou máquina de desenvolvimento. Um
+certificado Authenticode é outra identidade: quando existir, deve ser mantido
+em ambiente/provedor de assinatura próprio e não reutilizar nenhuma chave de
+update ou de integridade. `installer/minimum-update-version.txt` é o piso
+explícito do canal estável e só deve ser elevado após confirmar que a versão
+indicada pode servir de predecessor seguro.
 
 Inno continua apenas para instalação inicial, reparo e migração de instalações
 legadas. Removê-lo desse papel somente depois de validação em Windows limpo e

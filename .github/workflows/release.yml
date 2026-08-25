@@ -140,58 +140,6 @@ jobs:
         # release asset ships the hardened binaries. See docs/release-hardening.md.
         run: ./scripts/Build-Installer.ps1 -Version $env:ASSET_VERSION -Harden
 
-      - name: Sign broker integrity manifest
-        shell: pwsh
-        env:
-          ASSET_VERSION: ${{ steps.release.outputs.asset_version }}
-          FIVEMCLEANER_SIGNING_PASSWORD: ${{ secrets.FIVEMCLEANER_SIGNING_PASSWORD }}
-          RELEASE_SIGNING_PRIVATE_KEY: ${{ secrets.RELEASE_SIGNING_PRIVATE_KEY }}
-        run: |
-          if ([string]::IsNullOrWhiteSpace($env:RELEASE_SIGNING_PRIVATE_KEY) -or
-              [string]::IsNullOrWhiteSpace($env:FIVEMCLEANER_SIGNING_PASSWORD)) {
-            throw 'Public builds require the offline release signing secrets for broker integrity.'
-          }
-          $privateKey = Join-Path $env:RUNNER_TEMP 'vemryx-one-broker-private.pem'
-          try {
-            [IO.File]::WriteAllText(
-              $privateKey,
-              $env:RELEASE_SIGNING_PRIVATE_KEY,
-              [Text.UTF8Encoding]::new($false))
-            $versionRoot = "./artifacts/FiveMCleaner-win-x64/Runtime/versions/$env:ASSET_VERSION"
-            dotnet run --project ./src/Vemryx.One.ReleaseTool/Vemryx.One.ReleaseTool.csproj `
-              --configuration Release --no-build -- `
-              sign-broker "$versionRoot/broker/SHA256SUMS.txt" $env:ASSET_VERSION `
-              $privateKey "$versionRoot/broker-integrity.json"
-            if ($LASTEXITCODE -ne 0) { throw 'Signing the broker integrity manifest failed.' }
-            dotnet run --project ./src/Vemryx.One.ReleaseTool/Vemryx.One.ReleaseTool.csproj `
-              --configuration Release --no-build -- `
-              verify-broker "$versionRoot/broker-integrity.json" `
-              ./src/Vemryx.One.App/Assets/release-public-key.pem
-            if ($LASTEXITCODE -ne 0) { throw 'The broker manifest does not match the embedded public key.' }
-          }
-          finally {
-            if (Test-Path -LiteralPath $privateKey) { Remove-Item -LiteralPath $privateKey -Force }
-          }
-
-      - name: Repackage signed broker
-        shell: pwsh
-        env:
-          ASSET_VERSION: ${{ steps.release.outputs.asset_version }}
-        run: ./scripts/Finalize-BrokerIntegrity.ps1 -Version $env:ASSET_VERSION
-
-      - name: Post-obfuscation runtime smoke
-        shell: pwsh
-        env:
-          ASSET_VERSION: ${{ steps.release.outputs.asset_version }}
-        # Runs the hardened app in synthetic-demo capture mode. Rendering the
-        # pages proves the obfuscated Core/Windows assemblies load and execute
-        # (renamed members and encrypted strings resolve) before the release is
-        # allowed to proceed.
-        run: |
-          ./scripts/Test-HardenedRuntime.ps1 `
-            -RuntimeDirectory ./artifacts/FiveMCleaner-win-x64 `
-            -Version $env:ASSET_VERSION
-
       - name: Upload obfuscation symbol maps
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
@@ -200,25 +148,89 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
-      - name: Install and uninstall smoke test
-        shell: pwsh
-        env:
-          ASSET_VERSION: ${{ steps.release.outputs.asset_version }}
-        run: |
-          $installer = Resolve-Path "./artifacts/installer/VemryxOne-Setup-$env:ASSET_VERSION-win-x64.exe"
-          ./scripts/Test-Installer.ps1 `
-            -InstallerPath $installer `
-            -PublishDirectory ./artifacts/FiveMCleaner-win-x64 `
-            -ExpectedVersion $env:ASSET_VERSION
+      - name: Upload unsigned build candidate
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: VemryxOne-unsigned-${{ steps.release.outputs.asset_version }}
+          path: |
+            artifacts/FiveMCleaner-win-x64/**
+            artifacts/installer/**
+          if-no-files-found: error
+          retention-days: 14
 
-      - name: Stage release assets
+  sign_release:
+    name: Sign audited release candidate
+    needs: build_audit
+    runs-on: windows-latest
+    timeout-minutes: 20
+    # Configure this GitHub Environment with required reviewers. Its secrets
+    # are online CI keys, never an offline root or an Authenticode credential.
+    environment: release-signing
+
+    steps:
+      - name: Checkout release tooling
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ inputs.release_tag }}
+
+      - name: Setup .NET from global.json
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Download unsigned build candidate
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: VemryxOne-unsigned-${{ needs.build_audit.outputs.asset_version }}
+          path: artifacts
+
+      - name: Build release signer without secrets
+        shell: pwsh
+        run: dotnet build ./src/Vemryx.One.ReleaseTool/Vemryx.One.ReleaseTool.csproj --configuration Release
+
+      - name: Sign broker integrity manifest
         shell: pwsh
         env:
-          ASSET_VERSION: ${{ steps.release.outputs.asset_version }}
+          ASSET_VERSION: ${{ needs.build_audit.outputs.asset_version }}
+          BROKER_INTEGRITY_SIGNING_PASSWORD: ${{ secrets.BROKER_INTEGRITY_SIGNING_PASSWORD }}
+          BROKER_INTEGRITY_SIGNING_PRIVATE_KEY: ${{ secrets.BROKER_INTEGRITY_SIGNING_PRIVATE_KEY }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:BROKER_INTEGRITY_SIGNING_PRIVATE_KEY) -or
+              [string]::IsNullOrWhiteSpace($env:BROKER_INTEGRITY_SIGNING_PASSWORD)) {
+            throw 'The protected signing environment requires the broker integrity signing key.'
+          }
+          $privateKey = Join-Path $env:RUNNER_TEMP 'vemryx-one-broker-private.pem'
+          try {
+            [IO.File]::WriteAllText($privateKey, $env:BROKER_INTEGRITY_SIGNING_PRIVATE_KEY, [Text.UTF8Encoding]::new($false))
+            $env:FIVEMCLEANER_SIGNING_PASSWORD = $env:BROKER_INTEGRITY_SIGNING_PASSWORD
+            $versionRoot = "./artifacts/FiveMCleaner-win-x64/Runtime/versions/$env:ASSET_VERSION"
+            dotnet run --project ./src/Vemryx.One.ReleaseTool/Vemryx.One.ReleaseTool.csproj --configuration Release --no-build -- `
+              sign-broker "$versionRoot/broker/SHA256SUMS.txt" $env:ASSET_VERSION $privateKey "$versionRoot/broker-integrity.json"
+            if ($LASTEXITCODE -ne 0) { throw 'Signing the broker integrity manifest failed.' }
+            dotnet run --project ./src/Vemryx.One.ReleaseTool/Vemryx.One.ReleaseTool.csproj --configuration Release --no-build -- `
+              verify-broker "$versionRoot/broker-integrity.json" ./src/Vemryx.One.App/Assets/broker-integrity-public-key.pem
+            if ($LASTEXITCODE -ne 0) { throw 'The broker manifest does not match the embedded broker key.' }
+          }
+          finally { if (Test-Path -LiteralPath $privateKey) { Remove-Item -LiteralPath $privateKey -Force } }
+
+      - name: Repackage signed broker and validate runtime
+        shell: pwsh
+        env:
+          ASSET_VERSION: ${{ needs.build_audit.outputs.asset_version }}
+        run: |
+          ./scripts/Finalize-BrokerIntegrity.ps1 -Version $env:ASSET_VERSION
+          ./scripts/Test-HardenedRuntime.ps1 -RuntimeDirectory ./artifacts/FiveMCleaner-win-x64 -Version $env:ASSET_VERSION
+          $installer = Resolve-Path "./artifacts/installer/VemryxOne-Setup-$env:ASSET_VERSION-win-x64.exe"
+          ./scripts/Test-Installer.ps1 -InstallerPath $installer -PublishDirectory ./artifacts/FiveMCleaner-win-x64 -ExpectedVersion $env:ASSET_VERSION
+
+      - name: Stage and sign release assets
+        shell: pwsh
+        env:
+          ASSET_VERSION: ${{ needs.build_audit.outputs.asset_version }}
           RELEASE_TAG: ${{ inputs.release_tag }}
           RELEASE_CHANNEL: ${{ inputs.channel }}
-          FIVEMCLEANER_SIGNING_PASSWORD: ${{ secrets.FIVEMCLEANER_SIGNING_PASSWORD }}
-          RELEASE_SIGNING_PRIVATE_KEY: ${{ secrets.RELEASE_SIGNING_PRIVATE_KEY }}
+          UPDATE_MANIFEST_SIGNING_PASSWORD: ${{ secrets.UPDATE_MANIFEST_SIGNING_PASSWORD }}
+          UPDATE_MANIFEST_SIGNING_PRIVATE_KEY: ${{ secrets.UPDATE_MANIFEST_SIGNING_PRIVATE_KEY }}
         run: |
           New-Item -ItemType Directory -Force -Path ./artifacts/release | Out-Null
           Copy-Item -LiteralPath "./artifacts/installer/VemryxOne-Setup-$env:ASSET_VERSION-win-x64.exe" -Destination ./artifacts/release
@@ -235,16 +247,17 @@ jobs:
           # sem uma etapa intermediária. O updater usa exclusivamente o runtime ZIP
           # versionado autorizado pelo manifesto assinado abaixo.
           if ($env:RELEASE_CHANNEL -eq 'stable') {
-            if ([string]::IsNullOrWhiteSpace($env:RELEASE_SIGNING_PRIVATE_KEY) -or
-                [string]::IsNullOrWhiteSpace($env:FIVEMCLEANER_SIGNING_PASSWORD)) {
-              throw 'Stable releases require the offline release signing secrets.'
+            if ([string]::IsNullOrWhiteSpace($env:UPDATE_MANIFEST_SIGNING_PRIVATE_KEY) -or
+                [string]::IsNullOrWhiteSpace($env:UPDATE_MANIFEST_SIGNING_PASSWORD)) {
+              throw 'Stable releases require the protected update-manifest signing key.'
             }
             $privateKey = Join-Path $env:RUNNER_TEMP 'vemryx-one-release-private.pem'
             try {
               [IO.File]::WriteAllText(
                 $privateKey,
-                $env:RELEASE_SIGNING_PRIVATE_KEY,
+                $env:UPDATE_MANIFEST_SIGNING_PRIVATE_KEY,
                 [Text.UTF8Encoding]::new($false))
+              $env:FIVEMCLEANER_SIGNING_PASSWORD = $env:UPDATE_MANIFEST_SIGNING_PASSWORD
               $minimum = (Get-Content -LiteralPath ./installer/minimum-update-version.txt -Raw).Trim()
               # The signed bridge remains on the legacy redirect so already-installed
               # 1.5.0 clients can accept this first release after the repository rename.
@@ -257,7 +270,7 @@ jobs:
               if ($LASTEXITCODE -ne 0) { throw 'Signing the runtime manifest failed.' }
               dotnet run --project ./src/Vemryx.One.ReleaseTool/Vemryx.One.ReleaseTool.csproj `
                 --configuration Release --no-build -- `
-                verify $signedManifest ./src/Vemryx.One.App/Assets/release-public-key.pem $minimum
+                verify $signedManifest ./src/Vemryx.One.App/Assets/update-manifest-public-key.pem $minimum
               if ($LASTEXITCODE -ne 0) { throw 'The signed manifest does not match the embedded public key.' }
             }
             finally {
@@ -291,10 +304,10 @@ jobs:
           $notes = $notes -replace '(?m)^### Alterações técnicas$', '## ⚙️ Alterações técnicas'
           $notes.Trim() | Set-Content -LiteralPath ./artifacts/release/RELEASE_NOTES.md -Encoding utf8
 
-      - name: Upload audited release candidate
+      - name: Upload signed release candidate
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: VemryxOne-${{ steps.release.outputs.asset_version }}
+          name: VemryxOne-signed-${{ needs.build_audit.outputs.asset_version }}
           path: artifacts/release/**
           if-no-files-found: error
           retention-days: 14
@@ -302,9 +315,12 @@ jobs:
   publish:
     name: Publish GitHub release
     if: ${{ inputs.publish }}
-    needs: build_audit
+    needs: [build_audit, sign_release]
     runs-on: windows-latest
     timeout-minutes: 10
+    # Required reviewers are configured on this GitHub Environment; the job
+    # cannot create a public release or deploy production before approval.
+    environment: production
     permissions:
       contents: write
       id-token: write
@@ -319,7 +335,7 @@ jobs:
       - name: Download audited candidate
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
-          name: VemryxOne-${{ needs.build_audit.outputs.asset_version }}
+          name: VemryxOne-signed-${{ needs.build_audit.outputs.asset_version }}
           path: release
 
       - name: Attest installer provenance

@@ -12,8 +12,7 @@ migração explícita, testada e reversível.
   nomes de executável/assembly `FiveMCleaner.*` usados pelo instalador, updater,
   hashes, rollback e downgrade;
 - aliases de release, runtime ZIP e árvore `artifacts/FiveMCleaner-win-x64`;
-- o secret `FIVEMCLEANER_SIGNING_PASSWORD` e a variável
-  `FIVEMCLEANER_ENVIRONMENT`.
+- a variável `FIVEMCLEANER_ENVIRONMENT`.
 
 ## Infraestrutura já implantada
 
