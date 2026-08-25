@@ -5,7 +5,7 @@
 <h1 align="center">Vemryx One</h1>
 
 <p align="center">
-  Diagnóstico, manutenção e otimização transparente para <strong>FiveM sobre GTAV Legacy</strong> no Windows.
+  Diagnóstico e manutenção assistida do Windows, com otimização especializada para <strong>FiveM sobre GTAV Legacy</strong>.
 </p>
 
 <p align="center">
@@ -28,11 +28,11 @@
 ![Arte do Vemryx One](docs/assets/hero-vemryx-one.png)
 
 > [!IMPORTANT]
-> O Vemryx One suporta somente **FiveM em GTAV Legacy**. GTAV Enhanced é identificado e bloqueado com segurança até existir um adaptador dedicado, pesquisado e testado.
+> O módulo FiveM do Vemryx One suporta somente **GTAV Legacy**. GTAV Enhanced é identificado e bloqueado com segurança até existir um adaptador dedicado, pesquisado e testado.
 
-## Uma forma mais clara de cuidar do seu FiveM
+## Seu PC em um lugar, FiveM com profundidade
 
-Nada de scripts opacos ou promessas irreais. O Vemryx One detecta o ambiente, monta um plano compreensível e mostra o que será alterado antes de executar. Cada ação declara escopo, pré-condições, risco, resultado e rollback quando aplicável.
+Sistema e Aplicativos reúnem acessos seguros às superfícies nativas do Windows. A categoria FiveM preserva o fluxo especializado: detecta o ambiente, monta um plano compreensível e mostra o que será alterado antes de executar. Cada ação declara escopo, pré-condições, risco, resultado e rollback quando aplicável.
 
 | Você vê | O que isso significa |
 | --- | --- |
@@ -66,7 +66,9 @@ Leia a [política de segurança](docs/safety.md) e as [evidências técnicas](do
 
 | Área | Disponível hoje |
 | --- | --- |
-| Otimizador | Prévia, perfis, progresso real, cancelamento seguro, resultado por ação e rollback. |
+| Sistema | Acesso centralizado a Windows Update, armazenamento, Segurança do Windows e informações do PC. |
+| Aplicativos | Acesso a aplicativos instalados, inicialização, atualizações da Microsoft Store e aplicativos padrão. |
+| FiveM | Prévia, perfis, progresso real, cancelamento seguro, resultado por ação e rollback. |
 | Conta | Cadastro, login, Google com OAuth 2.0 + PKCE, verificação de e-mail, recuperação, senha, troca de credenciais e exclusão. |
 | Privacidade | ID token somente em memória, refresh token protegido por DPAPI e telemetria limitada por consentimento. |
 | Relatos de bug | Envio explícito com campos validados, e-mail e trecho de log opcionais — sem anexos automáticos. |

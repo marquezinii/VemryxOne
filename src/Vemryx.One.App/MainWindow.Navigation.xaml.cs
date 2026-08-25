@@ -9,7 +9,9 @@ namespace Vemryx.One.App;
 
 public partial class MainWindow
 {
-    // Keep the dashboard as the only non-deferred page during InitializeComponent. The optimizer and history views are heavier and are created only when first selected.
+    // Keep the dashboard as the only page created during InitializeComponent. Every other page is created only when first selected.
+    private SystemPage SystemPage => systemPage ??= CreateDeferredPage<SystemPage>();
+    private ApplicationsPage ApplicationsPage => applicationsPage ??= CreateDeferredPage<ApplicationsPage>();
     private OptimizerPage OptimizerPage => optimizerPage ??= CreateDeferredPage<OptimizerPage>();
     private HistoryPage HistoryPage => historyPage ??= CreateDeferredPage<HistoryPage>();
 
@@ -30,6 +32,8 @@ public partial class MainWindow
         ActivateNavItem(item);
         Navigate(tag switch
         {
+            "System" => SystemPage,
+            "Applications" => ApplicationsPage,
             "Optimizer" => OptimizerPage,
             "History" => HistoryPage,
             "Settings" => SettingsPage,
@@ -40,6 +44,8 @@ public partial class MainWindow
     private void ActivateNavItem(Wpf.Ui.Controls.NavigationViewItem selected)
     {
         DashboardNav.IsActive = ReferenceEquals(selected, DashboardNav);
+        SystemNav.IsActive = ReferenceEquals(selected, SystemNav);
+        ApplicationsNav.IsActive = ReferenceEquals(selected, ApplicationsNav);
         OptimizerNav.IsActive = ReferenceEquals(selected, OptimizerNav);
         HistoryNav.IsActive = ReferenceEquals(selected, HistoryNav);
         SettingsNav.IsActive = ReferenceEquals(selected, SettingsNav);
@@ -48,6 +54,14 @@ public partial class MainWindow
     private void Navigate(UIElement page)
     {
         DashboardPage.Visibility = Visibility.Collapsed;
+        if (systemPage is not null)
+        {
+            systemPage.Visibility = Visibility.Collapsed;
+        }
+        if (applicationsPage is not null)
+        {
+            applicationsPage.Visibility = Visibility.Collapsed;
+        }
         if (optimizerPage is not null)
         {
             optimizerPage.Visibility = Visibility.Collapsed;

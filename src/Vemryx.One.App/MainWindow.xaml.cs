@@ -17,7 +17,7 @@ using Vemryx.One.UpdateRuntime;
 namespace Vemryx.One.App;
 
 /// <summary>
-/// O shell: title bar, navegação lateral e as quatro seções de nível
+/// O shell: title bar, navegação lateral e as seções de nível
 /// superior. É o único dono de estado de janela (fechar, bandeja, conta,
 /// atualização) — as páginas em <c>Views/Pages</c> chamam de volta os
 /// métodos <c>Request*</c> públicos abaixo quando uma ação delas precisa
@@ -34,6 +34,8 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
     private readonly bool demoMode;
     private readonly RemoteServicesOptions remoteServicesOptions;
     private readonly QueuedCloudflareTelemetryService? queuedCloudflareTelemetry;
+    private SystemPage? systemPage;
+    private ApplicationsPage? applicationsPage;
     private OptimizerPage? optimizerPage;
     private HistoryPage? historyPage;
     private readonly IFirebaseAuthService? accountService;

@@ -168,7 +168,9 @@
                             Background="Transparent">
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem x:Name="DashboardNav" Content="{Binding [Navigation.Overview], Source={StaticResource LocalizedStrings}}" Icon="{ui:SymbolIcon Home24}" Tag="Dashboard" Click="NavItem_Click" />
-                <ui:NavigationViewItem x:Name="OptimizerNav" Content="{Binding [Navigation.Optimizer], Source={StaticResource LocalizedStrings}}" Icon="{ui:SymbolIcon FlashSettings24}" Tag="Optimizer" Click="NavItem_Click" />
+                <ui:NavigationViewItem x:Name="SystemNav" Content="{Binding [Navigation.System], Source={StaticResource LocalizedStrings}}" Icon="{ui:SymbolIcon DesktopPulse24}" Tag="System" Click="NavItem_Click" />
+                <ui:NavigationViewItem x:Name="ApplicationsNav" Content="{Binding [Navigation.Applications], Source={StaticResource LocalizedStrings}}" Icon="{ui:SymbolIcon Apps24}" Tag="Applications" Click="NavItem_Click" />
+                <ui:NavigationViewItem x:Name="OptimizerNav" Content="{Binding [Navigation.FiveM], Source={StaticResource LocalizedStrings}}" Icon="{ui:SymbolIcon FlashSettings24}" Tag="Optimizer" Click="NavItem_Click" />
                 <ui:NavigationViewItem x:Name="HistoryNav" Content="{Binding [Navigation.History], Source={StaticResource LocalizedStrings}}" Icon="{ui:SymbolIcon History24}" Tag="History" Click="NavItem_Click" />
                 <ui:NavigationViewItem x:Name="SettingsNav" Content="{Binding [Navigation.Settings], Source={StaticResource LocalizedStrings}}" Icon="{ui:SymbolIcon Settings24}" Tag="Settings" Click="NavItem_Click" />
             </ui:NavigationView.MenuItems>

@@ -6,6 +6,9 @@
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
   <data name="Navigation.Section" xml:space="preserve"><value>NAVEGAÇÃO</value></data>
   <data name="Navigation.Overview" xml:space="preserve"><value>Visão geral</value></data>
+  <data name="Navigation.System" xml:space="preserve"><value>Sistema</value></data>
+  <data name="Navigation.Applications" xml:space="preserve"><value>Aplicativos</value></data>
+  <data name="Navigation.FiveM" xml:space="preserve"><value>FiveM</value></data>
   <data name="Navigation.Optimizer" xml:space="preserve"><value>Otimizador</value></data>
   <data name="Navigation.History" xml:space="preserve"><value>Histórico</value></data>
   <data name="Navigation.Settings" xml:space="preserve"><value>Configurações</value></data>
@@ -15,6 +18,34 @@
   <data name="BugReport.LinkTooltip" xml:space="preserve"><value>Abrir formulário de relato</value></data>
   <data name="Dashboard.Title" xml:space="preserve"><value>Visão geral</value></data>
   <data name="Dashboard.Subtitle" xml:space="preserve"><value>Estado do PC, compatibilidade e o próximo passo recomendado.</value></data>
+  <data name="System.Title" xml:space="preserve"><value>Sistema</value></data>
+  <data name="System.Subtitle" xml:space="preserve"><value>Revise áreas importantes do Windows usando os controles que o próprio sistema operacional protege.</value></data>
+  <data name="System.WindowsUpdate.Title" xml:space="preserve"><value>Windows Update</value></data>
+  <data name="System.WindowsUpdate.Description" xml:space="preserve"><value>Confira atualizações do sistema e de segurança diretamente nas Configurações do Windows.</value></data>
+  <data name="System.WindowsUpdate.Action" xml:space="preserve"><value>Abrir Windows Update</value></data>
+  <data name="System.Storage.Title" xml:space="preserve"><value>Armazenamento</value></data>
+  <data name="System.Storage.Description" xml:space="preserve"><value>Revise o uso do disco e as recomendações de armazenamento do Windows antes de remover qualquer coisa.</value></data>
+  <data name="System.Storage.Action" xml:space="preserve"><value>Revisar armazenamento</value></data>
+  <data name="System.Security.Title" xml:space="preserve"><value>Segurança do Windows</value></data>
+  <data name="System.Security.Description" xml:space="preserve"><value>Veja o estado de proteção informado pelo Windows sem alterar as configurações de segurança.</value></data>
+  <data name="System.Security.Action" xml:space="preserve"><value>Abrir Segurança do Windows</value></data>
+  <data name="System.About.Title" xml:space="preserve"><value>Informações do PC</value></data>
+  <data name="System.About.Description" xml:space="preserve"><value>Veja edição e versão do Windows, processador, memória instalada e especificações do dispositivo.</value></data>
+  <data name="System.About.Action" xml:space="preserve"><value>Ver informações do PC</value></data>
+  <data name="Applications.Title" xml:space="preserve"><value>Aplicativos</value></data>
+  <data name="Applications.Subtitle" xml:space="preserve"><value>Acesse os controles nativos do Windows para aplicativos instalados, inicialização e Microsoft Store.</value></data>
+  <data name="Applications.Installed.Title" xml:space="preserve"><value>Aplicativos instalados</value></data>
+  <data name="Applications.Installed.Description" xml:space="preserve"><value>Revise os aplicativos instalados, o espaço usado e as opções de desinstalação fornecidas pelo Windows.</value></data>
+  <data name="Applications.Installed.Action" xml:space="preserve"><value>Gerenciar aplicativos instalados</value></data>
+  <data name="Applications.Startup.Title" xml:space="preserve"><value>Aplicativos de inicialização</value></data>
+  <data name="Applications.Startup.Description" xml:space="preserve"><value>Escolha quais aplicativos podem iniciar junto com a sua sessão do Windows.</value></data>
+  <data name="Applications.Startup.Action" xml:space="preserve"><value>Revisar aplicativos de inicialização</value></data>
+  <data name="Applications.StoreUpdates.Title" xml:space="preserve"><value>Atualizações da Microsoft Store</value></data>
+  <data name="Applications.StoreUpdates.Description" xml:space="preserve"><value>Abra a biblioteca da Store para conferir atualizações de aplicativos instalados por ela.</value></data>
+  <data name="Applications.StoreUpdates.Action" xml:space="preserve"><value>Abrir atualizações da Store</value></data>
+  <data name="Applications.Defaults.Title" xml:space="preserve"><value>Aplicativos padrão</value></data>
+  <data name="Applications.Defaults.Description" xml:space="preserve"><value>Escolha os aplicativos usados pelo Windows para abrir links e tipos de arquivo compatíveis.</value></data>
+  <data name="Applications.Defaults.Action" xml:space="preserve"><value>Revisar aplicativos padrão</value></data>
   <data name="Greeting.Morning.WithName" xml:space="preserve"><value>Bom dia, {0}. O que iremos fazer hoje?</value></data>
   <data name="Greeting.Morning.NoName" xml:space="preserve"><value>Bom dia. O que iremos fazer hoje?</value></data>
   <data name="Greeting.Afternoon.WithName" xml:space="preserve"><value>Boa tarde, {0}. O que iremos fazer hoje?</value></data>

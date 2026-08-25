@@ -13,6 +13,19 @@ Este documento descreve a arquitetura-alvo e os limites entre componentes. Uma c
 - bloquear GTAV Enhanced até existir adaptador próprio;
 - permitir testes sem alterar a máquina do desenvolvedor.
 
+## Áreas de produto
+
+O shell separa a experiência em **Visão geral**, **Sistema**, **Aplicativos** e
+**FiveM**. Sistema e Aplicativos apenas encaminham o usuário para superfícies
+nativas do Windows e da Microsoft Store; não executam comandos, não pedem
+elevação e não alteram configurações diretamente. O catálogo transacional de
+ações continua restrito ao domínio FiveM/GTAV Legacy existente.
+
+Integração com catálogos de pacotes, como WinGet, ainda não faz parte desta
+fundação. Quando existir, cada operação deverá usar contratos tipados, origem
+identificada e confirmação explícita; o broker não pode virar um executor de
+linha de comando genérico.
+
 ## Componentes
 
 ## Autenticação Firebase
