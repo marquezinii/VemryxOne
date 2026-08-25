@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import test from 'node:test';
@@ -9,14 +9,10 @@ import { fileURLToPath } from 'node:url';
 const workerRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const migrationSource = join(workerRoot, 'migrations');
 const wrangler = join(workerRoot, 'node_modules', 'wrangler', 'bin', 'wrangler.js');
-const migrationNames = [
-  '0000_initial_schema.sql',
-  '0001_account_username_terms.sql',
-  '0002_account_profiles.sql',
-  '0003_live_alert.sql',
-  '0004_telemetry_v5_fields.sql',
-  '0005_account_profile_terms.sql',
-];
+const migrationNames = (await readdir(migrationSource))
+  .filter((name) => /^\d{4}_.+\.sql$/.test(name))
+  .sort();
+const historicalBootstrapMigrations = migrationNames.filter((name) => /^000[0-5]_/.test(name));
 
 function run(args, { expectSuccess = true } = {}) {
   const result = spawnSync(process.execPath, [wrangler, ...args], { cwd: workerRoot, encoding: 'utf8' });
@@ -68,6 +64,32 @@ function execute(config, stateDirectory, command) {
   ]));
 }
 
+function adoptHistoricalBootstrap(config, stateDirectory) {
+  const state = execute(config, stateDirectory, `
+    SELECT
+      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'telemetry_events') AS has_schema,
+      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'd1_migrations') AS has_ledger,
+      EXISTS(SELECT 1 FROM pragma_table_info('telemetry_events') WHERE name = 'process_count_at_start') AS has_v5_telemetry,
+      EXISTS(SELECT 1 FROM pragma_table_info('account_profiles') WHERE name = 'terms_version') AS has_profile_terms;
+  `)[0].results[0];
+
+  if (!state.has_schema || state.has_ledger) {
+    return;
+  }
+
+  assert.equal(state.has_v5_telemetry, 1, 'legacy bootstrap must have the v5 telemetry schema before adoption');
+  assert.equal(state.has_profile_terms, 1, 'legacy bootstrap must have the profile terms schema before adoption');
+  execute(config, stateDirectory, `
+    CREATE TABLE IF NOT EXISTS d1_migrations (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT UNIQUE,
+      applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+    );
+    INSERT OR IGNORE INTO d1_migrations (name) VALUES
+      ${historicalBootstrapMigrations.map((name) => `('${name}')`).join(',\n      ')};
+  `);
+}
+
 const workerSchemaSmoke = `
   INSERT INTO telemetry_events
     (event_name, execution_time_ms, app_version, environment, received_at,
@@ -104,6 +126,21 @@ for (let priorCount = 0; priorCount < migrationNames.length; priorCount += 1) {
   const source = priorCount === 0 ? 'an empty database' : `the ${migrationNames[priorCount - 1]} schema`;
   test(`D1 migrations upgrade ${source} to the current Worker contract`, (t) => verifyUpgradeFrom(priorCount, t));
 }
+
+test('D1 migrations adopt the historical schema.sql bootstrap before applying newer migrations', async (t) => {
+  const root = await mkdtemp(join(tmpdir(), 'vemryx-d1-legacy-bootstrap-'));
+  t.after(() => rm(root, { recursive: true, force: true }));
+
+  const stateDirectory = join(root, 'state');
+  const legacyConfig = await createFixture(root, 'legacy', historicalBootstrapMigrations);
+  apply(legacyConfig, stateDirectory);
+  execute(legacyConfig, stateDirectory, 'DROP TABLE d1_migrations;');
+
+  adoptHistoricalBootstrap(legacyConfig, stateDirectory);
+  const currentConfig = await createFixture(root, 'current', migrationNames);
+  apply(currentConfig, stateDirectory);
+  execute(currentConfig, stateDirectory, workerSchemaSmoke);
+});
 
 test('a failed D1 migration is atomic and is not recorded as applied', async (t) => {
   const root = await mkdtemp(join(tmpdir(), 'vemryx-d1-atomicity-'));
