@@ -104,10 +104,10 @@ Preferências, journals, solicitações efêmeras, filas e logs locais ficam sob
 
 - FormSubmit foi removido do código de desenvolvimento. O transporte atual usa Cloudflare Worker/D1.
 - Infraestrutura registrada como ativa: `/telemetry`, `POST /bugs`, `GET /api/bugs` e `GET /live-alert`/`POST /admin/live-alert` (aviso ao vivo do dashboard para o app, painel dedicado no dashboard); relatos de bug são texto, e-mail opcional e trecho de log opcional. **Não há anexo/R2**.
-- Telemetria e crash reporting obedecem consentimento e allowlists; falhas de envio nunca devem bloquear ou alterar o resultado da otimização.
-- Consentimento de privacidade na versão **5** (`PrivacyConsentPolicy`): diagnósticos essenciais agora incluem detecção do FiveM/GTA V, edição do GTA V e contagem de alvos; dados opcionais (sob consentimento) incluem build do Windows, tipo de disco, espaço livre, timestamp da execução, frequência de uso, backup e contagem de processos no início. Schema/migration/`INSERT` do Worker (`0004_telemetry_v5_fields.sql`) já ingerem todos os campos.
+- Telemetria e crash reporting obedecem consentimento e allowlists; falhas de envio nunca devem bloquear ou alterar o resultado da otimização. Novas instalações mantêm o compartilhamento de crash reports desativado até consentimento explícito.
+- Consentimento de privacidade na versão **6** (`PrivacyConsentPolicy`): diagnósticos essenciais agora incluem detecção do FiveM/GTA V, edição do GTA V e contagem de alvos; dados opcionais (sob consentimento) incluem build do Windows, tipo de disco, espaço livre, timestamp da execução, frequência de uso, backup e contagem de processos no início. Schema/migration/`INSERT` do Worker (`0004_telemetry_v5_fields.sql`) já ingerem todos os campos; cada evento também possui UUID para reenvio idempotente (`0006_telemetry_event_idempotency.sql`).
 - Serviço de telemetria anônima expõe contadores de saúde (`SuccessfulSends`, `FailedSends`, `IsHealthy`) e grava falhas best-effort em `telemetry_failures.log` na pasta local da fila, sem nunca lançar para o chamador.
-- Sentry é usado para crash reporting do aplicativo, com sanitização/configuração centralizada e sem transformar o SDK em dependência das camadas Core/Windows/Broker.
+- Sentry é usado para crash reporting somente após consentimento explícito, com sanitização/configuração centralizada e sem transformar o SDK em dependência das camadas Core/Windows/Broker.
 - Dashboard administrativo possui filtros, visão de telemetria e bugs e tratamento defensivo de falhas de rede/respostas inválidas.
 - Cookies administrativos cross-site usam `SameSite=None`; toda mutação `POST /admin/*` exige a origem exata do dashboard, e o dashboard publica CSP restritiva/anti-frame.
 
