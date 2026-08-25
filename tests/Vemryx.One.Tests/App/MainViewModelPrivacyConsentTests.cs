@@ -17,7 +17,7 @@ namespace Vemryx.One.Tests.App;
 public sealed class MainViewModelPrivacyConsentTests
 {
     [Fact]
-    public async Task InitializeAsync_NewInstallation_RequestsFirstInstallationScreenWithCrashReportsDisabled()
+    public async Task InitializeAsync_NewInstallation_RequestsFirstInstallationScreenWithCrashReportsEnabled()
     {
         var service = new FakeAppOptimizationService(new AppSettings(), settingsFileExists: false);
         var telemetry = new RecordingTelemetryService();
@@ -30,7 +30,7 @@ public sealed class MainViewModelPrivacyConsentTests
         Assert.True(decision!.RequiresConsentScreen);
         Assert.Equal(PrivacyConsentScreenVariant.FirstInstallation, decision.Variant);
         Assert.True(viewModel.ShareAnonymousTelemetry);
-        Assert.False(viewModel.ShareCrashReports);
+        Assert.True(viewModel.ShareCrashReports);
         Assert.Equal(0, telemetry.TrackCallCount);
     }
 

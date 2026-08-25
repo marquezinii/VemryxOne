@@ -91,10 +91,10 @@ separado e opt-in; suas regras estão em [Relatos de bug e privacidade](bug-repo
 
 ## Relatório de falhas (Sentry)
 
-Relatórios automáticos de crash são opcionais, vêm desativados em instalações
-novas e só são enviados depois que o usuário os habilita e confirma a versão
-vigente do consentimento. Eles seguem a mesma sanitização e minimização descritas
-nesta página.
+Relatórios automáticos de crash começam ativados em instalações novas, mas podem
+ser desativados antes da confirmação ou a qualquer momento nas configurações.
+Só são enviados depois da confirmação da versão vigente do consentimento. Eles
+seguem a mesma sanitização e minimização descritas nesta página.
 
 ### Dados enviados com a opção ativada
 

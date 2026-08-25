@@ -233,12 +233,12 @@ public sealed record AppSettings
 
     /// <summary>
     /// Consentimento para relatórios automáticos de falhas (crash reports).
-    /// Vem desabilitado por padrão em instalações novas. Nenhum envio ocorre
-    /// antes de o usuário habilitá-lo e confirmar explicitamente a tela de
-    /// consentimento — ver
+    /// Vem habilitado por padrão em instalações novas; o usuário pode
+    /// desabilitá-lo antes de confirmar ou a qualquer momento depois. Nenhum
+    /// envio ocorre antes da confirmação explícita da tela de consentimento — ver
     /// <see cref="PrivacyConsentVersion"/> e <see cref="PrivacyConsentEvaluator"/>.
     /// </summary>
-    public bool ShareCrashReports { get; init; }
+    public bool ShareCrashReports { get; init; } = true;
 
     /// <summary>
     /// Versão do consentimento de privacidade confirmada explicitamente pelo

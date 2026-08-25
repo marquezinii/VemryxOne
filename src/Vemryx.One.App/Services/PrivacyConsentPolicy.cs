@@ -62,7 +62,8 @@ public static class PrivacyConsentPolicy
             "Continua sem identificador único de máquina, caminho ou texto livre."),
         new PrivacyConsentVersionEntry(
             6,
-            "Relatórios automáticos de falhas passam a exigir uma escolha separada e explícita, desabilitada por padrão. " +
+            "Relatórios automáticos de falhas passam a exigir uma escolha separada e explícita, habilitada por padrão e " +
+            "que pode ser desativada. " +
             "Nenhum relatório é enviado sem essa opção e o aceite vigente.")
     ];
 
