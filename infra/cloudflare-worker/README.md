@@ -89,7 +89,7 @@ URL), authentication is a small, self-contained system:
   the window passes.
 - **Sessions**: server-side, revocable (`admin_sessions`, `src/auth/
   sessionStore.js`) — a random 256-bit session ID is the *only* thing stored
-  in the browser cookie (`HttpOnly`, `Secure`, `SameSite=None`), so logout
+  in the browser cookie (`__Host-`, `HttpOnly`, `Secure`, `SameSite=None`), so logout
   or manually clearing the table actually invalidates it immediately, unlike
   a stateless signed token that can only be waited out. `SameSite=None`
   (not `Strict`/`Lax`) is required because the dashboard (`*.pages.dev`) and
@@ -97,11 +97,12 @@ URL), authentication is a small, self-contained system:
   domains — a stricter policy silently never sends the cookie back on a
   cross-site `fetch`, which is exactly what made the first deployment's
   login appear to succeed but leave the dashboard stuck on the login screen.
-- **CSRF e limites de entrada**: toda mutação sob `/admin/*` exige o `Origin`
-  exato de `DASHBOARD_ORIGIN`; todos os corpos JSON públicos são lidos com
-  limite de bytes por rota antes do parse. Isso mantém o cookie cross-site
-  necessário sem aceitar mutações administrativas de outras páginas e impede
-  buffering irrestrito de payloads anônimos.
+- **CSRF e limites de entrada**: a publicação do alerta exige o `Origin`
+  exato de `DASHBOARD_ORIGIN`, o cabeçalho `X-Vemryx-Csrf-Token` e
+  `Content-Type: application/json` exato. O token é derivado no Worker da
+  sessão e de `ADMIN_CSRF_SECRET`, fica somente em memória no dashboard e é
+  recuperado em `GET /admin/csrf` após um recarregamento. Todos os JSON
+  continuam limitados por rota antes do parse.
 - **Swappable by design**: `src/auth/passwordAuthProvider.js` exposes exactly
   three functions — `login`, `logout`, `requireSession` — and `index.js` only
   ever calls those three. A future OAuth-based provider (Google/GitHub, or
@@ -203,6 +204,7 @@ npm run db:migrate:local          # applies pending migrations to an existing lo
 npm run hash-admin-password       # prints the ADMIN_PASSWORD_HASH value
 wrangler secret put ADMIN_PASSWORD_HASH
 wrangler secret put IP_HASH_SECRET   # any long random string
+wrangler secret put ADMIN_CSRF_SECRET # distinct long random string
 
 wrangler d1 migrations apply fivemcleaner-telemetry --remote   # touches the real database — ask first
 wrangler deploy   # touches Cloudflare — ask first

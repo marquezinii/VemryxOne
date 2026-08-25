@@ -1,4 +1,4 @@
-import { buildStatsUrl, buildCsvUrl, buildBugsUrl, buildUpdaterEventsUrl, requestJson, resolveApiBase, getLiveAlert, setLiveAlert } from './api.js';
+import { buildStatsUrl, buildCsvUrl, buildBugsUrl, buildUpdaterEventsUrl, requestJson, resolveApiBase, getCsrfToken, getLiveAlert, setLiveAlert } from './api.js';
 import {
   toBarSeries,
   toCombinedBarSeries,
@@ -48,6 +48,7 @@ const CHART_DEFINITIONS = [
 ];
 
 async function main() {
+  let csrfToken = null;
   const loginView = document.getElementById('login-view');
   const dashboardView = document.getElementById('dashboard-view');
   const loginForm = document.getElementById('login-form');
@@ -104,6 +105,13 @@ async function main() {
       return;
     }
 
+    const body = await response.json().catch(() => null);
+    if (typeof body?.csrfToken !== 'string') {
+      loginError.textContent = 'Não foi possível iniciar a sessão com segurança.';
+      return;
+    }
+
+    csrfToken = body.csrfToken;
     showDashboard();
     await Promise.all([refreshAll(), loadLiveAlertStatus()]);
   });
@@ -171,7 +179,7 @@ async function main() {
       return;
     }
 
-    const result = await setLiveAlert(API_BASE, { message, active: true });
+    const result = await setLiveAlert(API_BASE, { message, active: true }, csrfToken);
     if (result.error || result.unauthorized) {
       liveAlertError.textContent = 'Erro ao enviar o aviso.';
       return;
@@ -182,7 +190,7 @@ async function main() {
 
   liveAlertDeactivate.addEventListener('click', async () => {
     liveAlertError.textContent = '';
-    const result = await setLiveAlert(API_BASE, { active: false });
+    const result = await setLiveAlert(API_BASE, { active: false }, csrfToken);
     if (result.error || result.unauthorized) {
       liveAlertError.textContent = 'Erro ao desativar o aviso.';
       return;
@@ -335,6 +343,18 @@ async function main() {
     showLogin();
     loginError.textContent = 'Não foi possível conectar à telemetria. Verifique se o Worker está no ar.';
   } else {
+    const csrf = await getCsrfToken(API_BASE);
+    if (csrf.unauthorized) {
+      showLogin();
+      return;
+    }
+    if (csrf.error || typeof csrf.data?.csrfToken !== 'string') {
+      showLogin();
+      loginError.textContent = 'Não foi possível iniciar a sessão com segurança.';
+      return;
+    }
+
+    csrfToken = csrf.data.csrfToken;
     showDashboard();
     await Promise.all([refreshAll(), loadLiveAlertStatus()]);
   }
