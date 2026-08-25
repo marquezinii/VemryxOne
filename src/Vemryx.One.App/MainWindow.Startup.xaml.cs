@@ -72,7 +72,7 @@ public partial class MainWindow
         var consentWindow = new PrivacyConsentWindow(
             decision.Variant,
             viewModel.ShareAnonymousTelemetry,
-            viewModel.ShareCrashReports)
+            initialShareCrashReports: false)
         {
             Owner = this
         };

@@ -92,7 +92,8 @@ internal static class CrashReportingLifecycle
             service.Initialize(options, appVersion);
             return service;
         }
-        catch
+        catch (Exception exception) when (exception is not (
+            OutOfMemoryException or StackOverflowException or AccessViolationException))
         {
             TryShutdown(service);
             return NoOpCrashReportingService.Instance;
@@ -105,7 +106,8 @@ internal static class CrashReportingLifecycle
         {
             service?.Shutdown();
         }
-        catch
+        catch (Exception exception) when (exception is not (
+            OutOfMemoryException or StackOverflowException or AccessViolationException))
         {
             // Crash reporting must never prevent a clean application exit.
         }

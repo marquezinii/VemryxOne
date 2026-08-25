@@ -263,7 +263,7 @@ public sealed class AppSettingsSerializationTests
         var settings = JsonSerializer.Deserialize<AppSettings>(json, Options)!;
 
         Assert.True(settings.ShareAnonymousTelemetry);
-        Assert.True(settings.ShareCrashReports);
+        Assert.False(settings.ShareCrashReports);
         Assert.Null(settings.PrivacyConsentVersion);
     }
 
@@ -280,7 +280,7 @@ public sealed class AppSettingsSerializationTests
         var settings = JsonSerializer.Deserialize<AppSettings>(json, Options)!;
 
         Assert.False(settings.ShareAnonymousTelemetry);
-        Assert.True(settings.ShareCrashReports);
+        Assert.False(settings.ShareCrashReports);
         Assert.Null(settings.PrivacyConsentVersion);
         Assert.True(settings.MinimizeToTrayOnClose);
     }
@@ -294,13 +294,13 @@ public sealed class AppSettingsSerializationTests
     }
 
     [Fact]
-    public void Deserialize_JsonWithoutShareCrashReports_DefaultsToTrue()
+    public void Deserialize_JsonWithoutShareCrashReports_DefaultsToFalse()
     {
         const string json = "{}";
 
         var settings = JsonSerializer.Deserialize<AppSettings>(json, Options)!;
 
-        Assert.True(settings.ShareCrashReports);
+        Assert.False(settings.ShareCrashReports);
     }
 
     [Fact]

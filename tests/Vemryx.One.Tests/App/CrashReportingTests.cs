@@ -374,6 +374,17 @@ public sealed class CrashReportingLifecycleTests
     }
 
     [Fact]
+    public void InitializeIfAuthorized_WhenStartupFailsFatally_Rethrows()
+    {
+        Assert.Throws<OutOfMemoryException>(() =>
+            CrashReportingLifecycle.InitializeIfAuthorized(
+                isAuthorized: true,
+                Options,
+                "1.0.0",
+                () => throw new OutOfMemoryException()));
+    }
+
+    [Fact]
     public void TryShutdown_WhenShutdownFails_DoesNotThrow()
     {
         var failingService = new RecordingCrashReportingService { ThrowOnShutdown = true };

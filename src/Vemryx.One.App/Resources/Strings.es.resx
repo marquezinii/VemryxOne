@@ -293,7 +293,7 @@
   <data name="PrivacyConsent.CrashReports.Title" xml:space="preserve"><value>Enviar reportes automáticos de errores y fallos</value></data>
   <data name="PrivacyConsent.CrashReports.Description" xml:space="preserve"><value>Trazas de pila depuradas y versión de la app cuando Vemryx One falla o encuentra un error inesperado.</value></data>
   <data name="PrivacyConsent.Continue" xml:space="preserve"><value>Continuar</value></data>
-  <data name="Privacy.Collects.Title" xml:space="preserve"><value>RECOPILAMOS</value></data>
+  <data name="Privacy.Collects.Title" xml:space="preserve"><value>CON TUS OPCIONES, PODEMOS RECOPILAR</value></data>
   <data name="Privacy.Collects.Items" xml:space="preserve"><value>• Versión de Vemryx One
 • Versión y arquitectura general de Windows
 • Duración y resultado de las optimizaciones

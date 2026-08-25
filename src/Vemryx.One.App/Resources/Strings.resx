@@ -293,7 +293,7 @@
   <data name="PrivacyConsent.CrashReports.Title" xml:space="preserve"><value>Send automatic error and crash reports</value></data>
   <data name="PrivacyConsent.CrashReports.Description" xml:space="preserve"><value>Sanitized stack traces and app version when Vemryx One crashes or hits an unexpected error.</value></data>
   <data name="PrivacyConsent.Continue" xml:space="preserve"><value>Continue</value></data>
-  <data name="Privacy.Collects.Title" xml:space="preserve"><value>WE COLLECT</value></data>
+  <data name="Privacy.Collects.Title" xml:space="preserve"><value>WITH YOUR OPTIONS, WE MAY COLLECT</value></data>
   <data name="Privacy.Collects.Items" xml:space="preserve"><value>• Vemryx One version
 • General Windows version and architecture
 • Duration and outcome of optimizations
