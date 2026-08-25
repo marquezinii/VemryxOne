@@ -117,6 +117,33 @@ export async function hashSessionId(sessionId) {
   return toBase64Url(new Uint8Array(digest));
 }
 
+/** Derives a session-bound CSRF token without exposing the HttpOnly cookie. */
+export async function createCsrfToken(sessionId, secret) {
+  if (typeof sessionId !== 'string' || typeof secret !== 'string' || secret.length < 32) {
+    return null;
+  }
+
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+  const signature = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(sessionId));
+  return toBase64Url(new Uint8Array(signature));
+}
+
+/** Verifies the custom CSRF header with a fixed-time comparison. */
+export async function isValidCsrfToken(token, sessionId, secret) {
+  const expected = await createCsrfToken(sessionId, secret);
+  if (typeof token !== 'string' || !expected || token.length !== expected.length) {
+    return false;
+  }
+
+  return timingSafeEqual(new TextEncoder().encode(token), new TextEncoder().encode(expected));
+}
+
 /**
  * HMACs a client IP with the `IP_HASH_SECRET` Worker secret so brute-force
  * tracking never stores a reversible IP address, only a keyed digest of it.

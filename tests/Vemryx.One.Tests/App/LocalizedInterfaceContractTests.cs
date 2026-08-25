@@ -433,7 +433,7 @@ public sealed partial class LocalizedInterfaceContractTests
     }
 
     [Fact]
-    public void GeneralSettings_ExposeOnlyAppBehaviorChoices()
+    public void GeneralSettings_ExposeAppBehaviorAndPrivacyChoices()
     {
         var root = TestHelpers.FindRepositoryRoot();
         var document = XDocument.Load(
@@ -449,7 +449,8 @@ public sealed partial class LocalizedInterfaceContractTests
             {
                 "{Binding MinimizeToTrayOnClose}",
                 "{Binding LaunchAtStartup}",
-                "{Binding ShareAnonymousTelemetry}"
+                "{Binding ShareAnonymousTelemetry}",
+                "{Binding ShareCrashReports}"
             },
             checkBoxBindings);
 

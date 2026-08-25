@@ -330,6 +330,111 @@ public sealed class CrashReportingHolderTests
     }
 }
 
+public sealed class CrashReportingLifecycleTests
+{
+    private static readonly RemoteServicesOptions Options = new()
+    {
+        SentryDsn = "https://x@y.ingest.sentry.io/1",
+        Environment = "Production"
+    };
+
+    [Fact]
+    public void InitializeIfAuthorized_WhenUnauthorized_DoesNotCreateTheRemoteService()
+    {
+        var created = false;
+
+        var service = CrashReportingLifecycle.InitializeIfAuthorized(
+            isAuthorized: false,
+            Options,
+            "1.0.0",
+            () =>
+            {
+                created = true;
+                return new RecordingCrashReportingService();
+            });
+
+        Assert.Same(NoOpCrashReportingService.Instance, service);
+        Assert.False(created);
+    }
+
+    [Fact]
+    public void InitializeIfAuthorized_WhenStartupFails_ReturnsTheInertService()
+    {
+        var failingService = new RecordingCrashReportingService { ThrowOnInitialize = true };
+
+        var service = CrashReportingLifecycle.InitializeIfAuthorized(
+            isAuthorized: true,
+            Options,
+            "1.0.0",
+            () => failingService);
+
+        Assert.Same(NoOpCrashReportingService.Instance, service);
+        Assert.Equal(1, failingService.InitializeCalls);
+        Assert.Equal(1, failingService.ShutdownCalls);
+    }
+
+    [Fact]
+    public void InitializeIfAuthorized_WhenStartupFailsFatally_Rethrows()
+    {
+        Assert.Throws<OutOfMemoryException>(() =>
+            CrashReportingLifecycle.InitializeIfAuthorized(
+                isAuthorized: true,
+                Options,
+                "1.0.0",
+                () => throw new OutOfMemoryException()));
+    }
+
+    [Fact]
+    public void TryShutdown_WhenShutdownFails_DoesNotThrow()
+    {
+        var failingService = new RecordingCrashReportingService { ThrowOnShutdown = true };
+
+        var exception = Record.Exception(() => CrashReportingLifecycle.TryShutdown(failingService));
+
+        Assert.Null(exception);
+        Assert.Equal(1, failingService.ShutdownCalls);
+    }
+
+    private sealed class RecordingCrashReportingService : ICrashReportingService
+    {
+        public bool ThrowOnInitialize { get; init; }
+
+        public bool ThrowOnShutdown { get; init; }
+
+        public int InitializeCalls { get; private set; }
+
+        public int ShutdownCalls { get; private set; }
+
+        public bool IsInitialized { get; private set; }
+
+        public void Initialize(RemoteServicesOptions options, string appVersion)
+        {
+            InitializeCalls++;
+            if (ThrowOnInitialize)
+            {
+                throw new InvalidOperationException("startup failure");
+            }
+
+            IsInitialized = true;
+        }
+
+        public void CaptureException(Exception exception)
+        {
+        }
+
+        public void Shutdown()
+        {
+            ShutdownCalls++;
+            if (ThrowOnShutdown)
+            {
+                throw new InvalidOperationException("shutdown failure");
+            }
+
+            IsInitialized = false;
+        }
+    }
+}
+
 public sealed class CrashReportSanitizerTests
 {
     [Fact]

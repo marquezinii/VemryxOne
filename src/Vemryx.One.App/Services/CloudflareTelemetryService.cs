@@ -29,6 +29,11 @@ public static class TelemetryEventValidator
     {
         ArgumentNullException.ThrowIfNull(telemetryEvent);
 
+        if (telemetryEvent.EventId == Guid.Empty)
+        {
+            throw new ArgumentException("Identificador de evento de telemetria inválido.", nameof(telemetryEvent));
+        }
+
         if (telemetryEvent.EventName is not ("optimization-completed" or "optimization-failed" or "optimization-cancelled"))
         {
             throw new ArgumentException("Evento de telemetria não permitido.", nameof(telemetryEvent));
@@ -358,6 +363,7 @@ public sealed class CloudflareTelemetryTransport
 
     private static object ToWirePayload(AnonymousTelemetryEvent telemetryEvent, string environment) => new
     {
+        eventId = telemetryEvent.EventId.ToString("D"),
         eventName = telemetryEvent.EventName,
         executionTimeMs = (long)Math.Clamp(telemetryEvent.ExecutionTime.TotalMilliseconds, 0, 86_400_000),
         appVersion = telemetryEvent.AppVersion,
@@ -407,7 +413,9 @@ public sealed class CloudflareTelemetryTransport
 /// </summary>
 public sealed class QueuedCloudflareTelemetryService : IAnonymousTelemetryService
 {
-    private const int MaxBatchSize = 20;
+    // D1 executes this whole request as one transaction. 16 events with at
+    // most 30 actions each require 496 statements, below its 500 limit.
+    private const int MaxBatchSize = 16;
     private const int MaxQueuedEvents = 200;
     private static readonly TimeSpan MaxQueueAge = TimeSpan.FromDays(14);
 
@@ -465,7 +473,7 @@ public sealed class QueuedCloudflareTelemetryService : IAnonymousTelemetryServic
     /// </summary>
     public async Task FlushPendingAsync(CancellationToken cancellationToken = default)
     {
-        if (!enabled || !await flushLock.WaitAsync(0, cancellationToken).ConfigureAwait(false))
+        if (!await flushLock.WaitAsync(0, cancellationToken).ConfigureAwait(false))
         {
             return;
         }
@@ -473,6 +481,11 @@ public sealed class QueuedCloudflareTelemetryService : IAnonymousTelemetryServic
         try
         {
             queue.Prune(MaxQueueAge, MaxQueuedEvents);
+            if (!enabled)
+            {
+                return;
+            }
+
             var pending = queue.ReadPending(MaxBatchSize);
             if (pending.Count == 0)
             {

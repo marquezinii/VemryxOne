@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Xunit;
 
 namespace Vemryx.One.Tests.App;
@@ -20,6 +21,47 @@ public sealed class PublicExposureHardeningTests
             firstSecretReference > provenanceGuard,
             "The provenance guard must run before any workflow secret is referenced.");
         Assert.Contains("refs/remotes/origin/main", workflow, StringComparison.Ordinal);
+        Assert.Contains("trusted_commit: ${{ steps.release.outputs.trusted_commit }}", workflow, StringComparison.Ordinal);
+        Assert.Equal(2, workflow.Split("ref: ${{ needs.build_audit.outputs.trusted_commit }}", StringSplitOptions.None).Length - 1);
+    }
+
+    [Fact]
+    public void ReleaseSigning_IsIsolatedFromBuildAndProductionPublishing()
+    {
+        var root = FindRepositoryRoot();
+        var workflow = File.ReadAllText(Path.Combine(root, ".github", "workflows", "release.yml"));
+        var buildEnd = workflow.IndexOf("  sign_release:", StringComparison.Ordinal);
+        var publishStart = workflow.IndexOf("  publish:", buildEnd, StringComparison.Ordinal);
+
+        Assert.True(buildEnd > 0, "The unsigned build and signing jobs must remain separate.");
+        Assert.True(publishStart > buildEnd, "The signing job must complete before publishing.");
+        Assert.DoesNotContain("SIGNING_PRIVATE_KEY", workflow[..buildEnd], StringComparison.Ordinal);
+        Assert.Contains("environment: release-signing", workflow, StringComparison.Ordinal);
+        Assert.Contains("environment: production", workflow, StringComparison.Ordinal);
+        Assert.Contains("BROKER_INTEGRITY_SIGNING_PRIVATE_KEY", workflow, StringComparison.Ordinal);
+        Assert.Contains("RELEASE_SIGNING_PRIVATE_KEY", workflow[buildEnd..publishStart], StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void RuntimeTrustAnchors_AreSeparatedByPurpose()
+    {
+        var root = FindRepositoryRoot();
+        var project = File.ReadAllText(Path.Combine(root, "src", "Vemryx.One.App", "Vemryx.One.App.csproj"));
+        var updater = File.ReadAllText(Path.Combine(root, "src", "Vemryx.One.App", "Services", "SignedManifestUpdateService.cs"));
+        var broker = File.ReadAllText(Path.Combine(root, "src", "Vemryx.One.App", "Services", "BrokerIntegrityVerifier.cs"));
+
+        Assert.Contains("Assets/update-manifest-public-key.pem", project, StringComparison.Ordinal);
+        Assert.Contains("Assets/broker-integrity-public-key.pem", project, StringComparison.Ordinal);
+        Assert.Contains("Assets.update-manifest-public-key.pem", updater, StringComparison.Ordinal);
+        Assert.Contains("Assets.broker-integrity-public-key.pem", broker, StringComparison.Ordinal);
+
+        var updateKey = File.ReadAllText(Path.Combine(root, "src", "Vemryx.One.App", "Assets", "update-manifest-public-key.pem"));
+        var brokerKey = File.ReadAllText(Path.Combine(root, "src", "Vemryx.One.App", "Assets", "broker-integrity-public-key.pem"));
+        Assert.NotEqual(updateKey, brokerKey);
+
+        using var brokerVerifier = ECDsa.Create();
+        brokerVerifier.ImportFromPem(brokerKey);
+        Assert.Equal(32, brokerVerifier.ExportParameters(includePrivateParameters: false).Q.X!.Length);
     }
 
     [Fact]

@@ -104,17 +104,20 @@ administrativa somente após consentimento explícito de telemetria.
 
 ## Publicação no GitHub
 
-O workflow `.github/workflows/release.yml` só aceita disparo manual. Com
-`publish=false`, ele compila, testa e guarda os artefatos apenas dentro da
-execução. A criação pública exige uma tag exata (`vX.Y.Z` ou
-`vX.Y.Z-preview`), `publish=true` e o canal correspondente.
+O workflow `.github/workflows/release.yml` só aceita disparo manual. O job de
+build compila, testa e entrega um candidato **sem chaves de assinatura**. Um
+job separado, protegido pelo ambiente `release-signing`, recebe esse candidato,
+assina os manifestos de update e broker com chaves online distintas e devolve o
+artefato assinado. A criação pública exige uma tag exata (`vX.Y.Z` ou
+`vX.Y.Z-preview`), `publish=true`, o canal correspondente e aprovação manual
+do ambiente GitHub `production`.
 
 Antes de criar a release, o workflow repete build, testes, instalação e
-desinstalação; gera checksums; assina e verifica o manifesto do runtime; aplica
-o schema D1; implanta o Worker/feed; e produz uma atestação de proveniência do
-instalador. O binário permanece sem assinatura de código até existir um
-certificado Authenticode. SHA-256 e atestação aumentam a transparência, mas não
-substituem reputação ou uma assinatura pública.
+desinstalação; gera checksums; assina e verifica os manifestos do runtime e do
+broker; aplica o schema D1; implanta o Worker/feed; e produz uma atestação de
+proveniência do instalador. O binário permanece sem assinatura de código até
+existir um certificado Authenticode. SHA-256 e atestação aumentam a
+transparência, mas não substituem reputação ou uma assinatura pública.
 
 ### Sequência de versões públicas
 

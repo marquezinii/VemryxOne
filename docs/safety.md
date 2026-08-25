@@ -38,7 +38,7 @@ O projeto não aceita implementações que:
   como caminho de otimização do FiveM);
 - sobrescrevam perfil NVIDIA ou ativem/limpem shader cache à força;
 - removam dados de autenticação, entitlement, plugins ou configurações em perfis automáticos;
-- escondam ações, usem ofuscação ou baixem código executável depois da instalação;
+- escondam ações, usem ofuscação para ocultar ações ou payloads, ou baixem código executável depois da instalação;
 - contornem anti-cheat, pure mode ou verificações de integridade;
 - operem em FiveM/GTAV Enhanced enquanto esse adaptador estiver bloqueado.
 
@@ -314,7 +314,11 @@ Não é possível garantir ausência de falsos positivos em todos os produtos. O
 - binários e instalador assinados;
 - builds determinísticos e hashes de release publicados;
 - código-fonte correspondente a cada release;
-- sem packers, ofuscação ou payload embutido inesperado; a única exceção de
+- sem packers ou payload embutido inesperado. A distribuição de release
+  ofusca assemblies internos de `Core` e `Windows` após a compilação e antes
+  de hash, assinatura e empacotamento; isso não é evasão de antivírus e é
+  verificado no pipeline. O código-fonte permanece disponível para auditoria;
+  veja [hardening da release](release-hardening.md). A única exceção de
   atualização é o `FiveMCleaner.Updater.exe` autocontido, empacotado pelo
   instalador, copiado para `%LOCALAPPDATA%\FiveMCleaner\Updater` e limitado a
   executar o instalador GitHub já validado por nome, caminho, tamanho e SHA-256;
@@ -338,17 +342,16 @@ O diagnóstico permanece local por padrão. Relatórios exportados devem:
 
 O formulário de bug é uma exceção explícita ao processamento apenas local: depois do clique em **Enviar**, os campos autorizados (somente texto — categoria, resumo, descrição, versão, perfil, e-mail e log opcionais) são encaminhados ao Worker Cloudflare do projeto (rota `/bugs`), não mais ao FormSubmit. Não há mais anexo/captura de tela nesse formulário. O app não envia esse conteúdo em segundo plano, não repete automaticamente uma falha e oferece cópia local do texto. Consulte [Relatos de bug e privacidade](bug-reports.md) antes de usar o canal.
 
-Os diagnósticos técnicos essenciais incluem apenas categorias allowlisted de
-erro, duração e resultado de uma otimização, versão do aplicativo, Windows e
-arquitetura. Hardware detalhado, perfil e IDs das ações são dados opcionais,
-controlados em Configurações. Eles não leem nem enviam logs, arquivos,
-documentos, histórico, caminhos, identificador de máquina ou outros dados
-pessoais. A especificação, o provedor e o limite de metadados de transporte
-estão documentados em [Diagnósticos essenciais, dados opcionais e privacidade](telemetry.md).
+Os diagnósticos técnicos, incluindo categoria allowlisted de erro, duração e
+resultado de uma otimização, versão do aplicativo, Windows, arquitetura,
+hardware, perfil e IDs das ações, são opcionais e controlados em
+Configurações. Eles não leem nem enviam logs, arquivos, documentos, histórico,
+caminhos, identificador de máquina ou outros dados pessoais. A especificação,
+o provedor e o limite de metadados de transporte estão documentados em
+[Diagnósticos essenciais, dados opcionais e privacidade](telemetry.md).
 
-O relatório automático de falhas (Sentry) também é um diagnóstico essencial e
-nunca roda no broker elevado (`ICrashReportingService` só existe na camada
-App). O DSN vem de um arquivo
+O relatório automático de falhas (Sentry) também é opcional e nunca roda no
+broker elevado (`ICrashReportingService` só existe na camada App). O DSN vem de um arquivo
 de configuração por ambiente, nunca de um literal no código-fonte; todo
 evento é sanitizado (`CrashReportSanitizer`, reaproveitando `ReportSanitizer`)
 antes de sair do processo, removendo nome de máquina, IP, identificador de
