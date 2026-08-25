@@ -213,8 +213,9 @@ Progresso é calculado por passos concluídos e pesos declarados. Mensagens deve
 
 `IAnonymousTelemetryService` é uma fronteira da camada App, separada do
 serviço de otimização. A preferência persistida `AppSettings.ShareAnonymousTelemetry`
-nasce como `true` em instalações novas e controla hardware, perfil e ações;
-os diagnósticos essenciais continuam ativos. O
+nasce como `true` em instalações novas e controla o envio de toda a
+telemetria de uso; quando desativada, nenhum evento passa por esse serviço.
+Relatórios de falha sanitizados seguem o fluxo essencial separado. O
 contrato `AnonymousTelemetryEvent` não aceita payload livre: contém o nome
 allowlisted do evento, duração, versão, categoria de erro allowlisted em
 falha e, desde a versão 2 do consentimento, um perfil de hardware (CPU/GPU/

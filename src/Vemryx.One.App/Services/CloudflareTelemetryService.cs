@@ -473,7 +473,7 @@ public sealed class QueuedCloudflareTelemetryService : IAnonymousTelemetryServic
     /// </summary>
     public async Task FlushPendingAsync(CancellationToken cancellationToken = default)
     {
-        if (!enabled || !await flushLock.WaitAsync(0, cancellationToken).ConfigureAwait(false))
+        if (!await flushLock.WaitAsync(0, cancellationToken).ConfigureAwait(false))
         {
             return;
         }
@@ -481,6 +481,11 @@ public sealed class QueuedCloudflareTelemetryService : IAnonymousTelemetryServic
         try
         {
             queue.Prune(MaxQueueAge, MaxQueuedEvents);
+            if (!enabled)
+            {
+                return;
+            }
+
             var pending = queue.ReadPending(MaxBatchSize);
             if (pending.Count == 0)
             {

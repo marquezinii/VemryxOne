@@ -197,8 +197,8 @@ export const copy = {
       title: "Forte no que faz. Transparente sobre os limites.",
       body: "O Vemryx One usa APIs e configurações documentadas do Windows, publica o código-fonte e evita técnicas que costumam gerar bloqueios ou colocar o sistema em risco.",
       cards: [
-        ["Código aberto", "Você pode inspecionar exatamente o que o aplicativo faz."],
-        ["Sem evasão", "Nada de ofuscação, exclusões no antivírus, injeção ou truques para esconder comportamento."],
+        ["Código-fonte disponível", "Você pode auditar o código sob a licença source-available do Vemryx One."],
+        ["Sem evasão", "O app não usa ofuscação para evitar detecção, exclusões no antivírus, injeção ou truques para esconder comportamento. A distribuição ofusca partes internas de Core e Windows; o código-fonte continua disponível para auditoria."],
         ["Hash verificável", "Confira o SHA-256 publicado na release antes de instalar."],
       ],
       warningTitle: "Sobre o SmartScreen e antivírus",
@@ -226,7 +226,7 @@ export const copy = {
         ],
         [
           "O aplicativo coleta meus dados?",
-          "A telemetria técnica anônima vem habilitada por padrão em instalações novas e pode ser desligada a qualquer momento. Ela envia apenas erros categorizados, tempo de execução e versão; a otimização continua acontecendo localmente.",
+          "A telemetria técnica anônima vem habilitada por padrão em instalações novas e pode ser desligada a qualquer momento. Ela inclui dados técnicos allowlisted, como versão e build do Windows, modelos de CPU e GPU, faixa de RAM, perfil, ações aplicadas, estado do jogo e execução; a política pública no repositório detalha campos, finalidade, retenção e destinatários. A otimização continua acontecendo localmente.",
         ],
         [
           "Por que o SmartScreen pode alertar?",
@@ -240,7 +240,7 @@ export const copy = {
       body: "Baixe a versão estável mais recente e deixe o aplicativo decidir com segurança o que faz sentido para o seu computador.",
       download: "Baixar instalador",
       github: "Abrir GitHub",
-      note: "Grátis · código aberto · Windows x64",
+      note: "Grátis · código-fonte disponível · Windows x64",
     },
     footer: {
       tagline: "Otimização transparente para FiveM no Windows.",
@@ -443,7 +443,7 @@ export const copy = {
       body: "Vemryx One uses documented Windows APIs and settings, publishes its source code and avoids techniques that commonly cause blocks or put the system at risk.",
       cards: [
         ["Source available", "You can inspect the code under the Vemryx One license."],
-        ["No evasion", "No obfuscation, antivirus exclusions, injection or tricks to hide behavior."],
+        ["No evasion", "No obfuscation to evade detection, antivirus exclusions, injection or tricks to hide behavior. The distribution obfuscates internal Core and Windows parts; the source code remains available for audit."],
         ["Verifiable hash", "Check the SHA-256 published with the release before installing."],
       ],
       warningTitle: "About SmartScreen and antivirus",
@@ -471,7 +471,7 @@ export const copy = {
         ],
         [
           "Does the application collect my data?",
-          "Anonymous technical telemetry is enabled only for new installs and can be turned off at any time. It sends only categorized errors, execution time, and version; optimization stays local.",
+          "Anonymous technical telemetry is enabled by default on new installations and can be turned off at any time. It includes allowlisted technical data such as Windows version and build, CPU and GPU models, RAM range, profile, applied actions, game state and execution; the public policy in the repository details fields, purpose, retention and recipients. Optimization stays local.",
         ],
         [
           "Why might SmartScreen show a warning?",
