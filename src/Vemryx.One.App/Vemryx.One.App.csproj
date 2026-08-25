@@ -32,7 +32,8 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets/VemryxOne.png" />
-    <EmbeddedResource Include="Assets/release-public-key.pem" />
+    <EmbeddedResource Include="Assets/update-manifest-public-key.pem" />
+    <EmbeddedResource Include="Assets/broker-integrity-public-key.pem" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Config/appsettings.json;Config/appsettings.Development.json;Config/appsettings.Production.json">
