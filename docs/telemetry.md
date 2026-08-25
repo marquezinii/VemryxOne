@@ -27,6 +27,7 @@ ver `PrivacyConsentPolicy`):
 | Campo | Exemplo | Finalidade |
 | --- | --- | --- |
 | Tipo | `optimization-completed` | distinguir conclusão, falha ou cancelamento |
+| ID do evento | UUID aleatório por evento | garantir entrega idempotente; não identifica máquina ou usuário |
 | Tempo de execução | `18342` ms | identificar operações anormalmente longas |
 | Versão | `1.1.0` | correlacionar comportamento com uma versão |
 | Categoria de erro | `timeout` | presente apenas em falhas; é uma lista fechada |
@@ -69,9 +70,12 @@ código nem configuração que envie telemetria de uso para ele.
   tabela acima;
 - texto livre, mensagens de erro brutas, stack traces ou caminhos.
 
-O código limita os nomes de evento e categorias a uma allowlist e recusa
-campos fora desse esquema. Falhas de rede são ignoradas: não interrompem a
-otimização, não geram nova telemetria e não são reenviadas automaticamente.
+A fila preserva o UUID aleatório de cada evento em todos os retries. O Worker
+grava um lote em uma única transação D1 e rejeita UUIDs ausentes ou inválidos;
+repetir o mesmo lote não cria eventos ou ações adicionais. O código limita os
+nomes de evento e categorias a uma allowlist e recusa campos fora desse esquema.
+Falhas de rede são ignoradas: não interrompem a otimização, não geram nova
+telemetria e não são reenviadas automaticamente.
 A fila local (`LocalTelemetryQueue`) persiste eventos pendentes por até 14
 dias antes de descartá-los, para sobreviver a reinícios e períodos offline
 sem crescer indefinidamente.

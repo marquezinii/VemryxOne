@@ -4,6 +4,7 @@ import { validateEvent, validateBatch, MAX_BATCH_SIZE, MAX_ACTION_IDS } from '..
 
 function validEvent(overrides = {}) {
   return {
+    eventId: '11111111-1111-4111-8111-111111111111',
     eventName: 'optimization-completed',
     executionTimeMs: 18342,
     appVersion: '1.0.4',
@@ -23,6 +24,7 @@ function validEvent(overrides = {}) {
 test('validateEvent accepts a well-formed completed event with the full hardware profile', () => {
   const result = validateEvent(validEvent());
   assert.deepEqual(result, {
+    eventId: '11111111-1111-4111-8111-111111111111',
     eventName: 'optimization-completed',
     executionTimeMs: 18342,
     appVersion: '1.0.4',
@@ -53,6 +55,7 @@ test('validateEvent accepts a well-formed completed event with the full hardware
 test('validateEvent accepts an event without any of the optional hardware fields', () => {
   const result = validateEvent({
     eventName: 'optimization-cancelled',
+    eventId: '22222222-2222-4222-8222-222222222222',
     executionTimeMs: 0,
     appVersion: '1.0.4',
     environment: 'Development',
@@ -75,6 +78,7 @@ test('validateEvent accepts a failed event with an allowlisted error category', 
 test('validateEvent defaults a missing environment to Production for compatibility', () => {
   const result = validateEvent({
     eventName: 'optimization-completed',
+    eventId: '33333333-3333-4333-8333-333333333333',
     executionTimeMs: 100,
     appVersion: '1.1.1',
   });
@@ -118,10 +122,18 @@ test('validateEvent rejects an unknown environment', () => {
 test('validateEvent still rejects a null environment', () => {
   assert.equal(validateEvent({
     eventName: 'optimization-completed',
+    eventId: '44444444-4444-4444-8444-444444444444',
     executionTimeMs: 100,
     appVersion: '1.1.1',
     environment: null,
   }), null);
+});
+
+test('validateEvent rejects a missing, empty, or malformed event UUID', () => {
+  const { eventId: _, ...withoutId } = validEvent();
+  assert.equal(validateEvent(withoutId), null);
+  assert.equal(validateEvent(validEvent({ eventId: '00000000-0000-0000-0000-000000000000' })), null);
+  assert.equal(validateEvent(validEvent({ eventId: 'not-a-uuid' })), null);
 });
 
 test('validateEvent rejects a payload that is not an object', () => {
