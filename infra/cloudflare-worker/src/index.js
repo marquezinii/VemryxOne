@@ -68,21 +68,6 @@ const STATS_BUILDERS = {
   'ram-buckets': queries.ramBucketBreakdown,
 };
 
-// D1's batch() rejects calls with more than 500 statements. A single
-// telemetry batch is capped at MAX_BATCH_SIZE=50 events, each carrying up to
-// MAX_ACTION_IDS=30 action ids, so the action-link statements alone can reach
-// 1500 -- well over the limit. Chunking keeps every batch call inside the
-// bound and avoids a 500 + partial write on oversized payloads.
-export const MAX_D1_BATCH_STATEMENTS = 500;
-
-export function chunkStatements(statements, maxStatements = MAX_D1_BATCH_STATEMENTS) {
-  const chunks = [];
-  for (let i = 0; i < statements.length; i += maxStatements) {
-    chunks.push(statements.slice(i, i + maxStatements));
-  }
-  return chunks;
-}
-
 // Every route below answers with a JSON body -- this is the one shared shape
 // (Content-Type plus whatever status/extra headers a route needs). Cache-
 // Control is deliberately not set here: withCorsHeaders already defaults it
@@ -352,17 +337,19 @@ async function handleTelemetryIngest(request, env) {
     statements.push(
       env.TELEMETRY_DB
         .prepare(
-          `INSERT OR IGNORE INTO telemetry_events
-             (event_name, execution_time_ms, app_version, error_category,
+          `INSERT INTO telemetry_events
+             (event_id, event_name, execution_time_ms, app_version, error_category,
               os_version, system_architecture, cpu_model, gpu_model,
               ram_bucket_gib, profile, environment, received_at,
               five_m_install_detected, gta_edition, optimization_target_count,
               windows_build, disk_type, free_space_gib_bucket, run_timestamp,
               days_since_last_run_bucket, backup_created, backup_restored,
               elevation_used, process_count_at_start)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+           ON CONFLICT(event_id) DO NOTHING`,
         )
         .bind(
+          event.eventId,
           event.eventName,
           event.executionTimeMs,
           event.appVersion,
@@ -389,39 +376,25 @@ async function handleTelemetryIngest(request, env) {
           event.processCountAtStart,
         ),
     );
-  }
-
-  const results = [];
-  for (const chunk of chunkStatements(statements)) {
-    try {
-      results.push(...await env.TELEMETRY_DB.batch(chunk));
-    } catch (err) {
-      console.error('Telemetry chunk failed, continuing:', err?.message || 'unknown');
-    }
-  }
-
-  const actionStatements = [];
-  results.forEach((result, index) => {
-    const eventId = result.meta?.last_row_id;
-    if (!eventId) {
-      return;
-    }
-
-    for (const actionId of events[index].actionIds) {
-      actionStatements.push(
+    for (const actionId of event.actionIds) {
+      statements.push(
         env.TELEMETRY_DB
-          .prepare('INSERT INTO telemetry_event_actions (telemetry_event_id, action_id) VALUES (?, ?)')
-          .bind(eventId, actionId),
+          .prepare(
+            `INSERT OR IGNORE INTO telemetry_event_actions (telemetry_event_id, action_id)
+             SELECT id, ? FROM telemetry_events WHERE event_id = ?`,
+          )
+          .bind(actionId, event.eventId),
       );
     }
-  });
+  }
 
-  for (const chunk of chunkStatements(actionStatements)) {
-    try {
-      await env.TELEMETRY_DB.batch(chunk);
-    } catch (err) {
-      return jsonResponse({ error: 'Database write failed for action links' }, 500);
-    }
+  try {
+    // D1 batch() is transactional: a failed event or action statement rolls
+    // back the entire request, so the client can retry this exact payload.
+    await env.TELEMETRY_DB.batch(statements);
+  } catch (err) {
+    console.error('Telemetry transaction failed:', err?.message || 'unknown');
+    return jsonResponse({ error: 'Database write failed' }, 500);
   }
 
   return new Response(null, { status: 202 });

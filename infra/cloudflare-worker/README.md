@@ -29,21 +29,23 @@ summary, optional email, optional plain-text log excerpt capped at 100 KB).
   `env.development`/`env.production` named-environment design was removed:
   it added no benefit since D1 already distinguishes rows by that column.)
 - `schema.sql` — the D1 tables: `telemetry_events` (one row per optimization
-  run, including the version-2-consent hardware profile), 
+  run, including the version-2-consent hardware profile and a client UUID for
+  idempotent retry),
   `telemetry_event_actions` (one row per applied action ID, for "most used
   function"), `login_attempts` and `admin_sessions` (custom dashboard auth).
-  Applied to the real database already.
 - `migrations/` — incremental changes for the already deployed D1 database.
   The account migration adds a unique username plus the accepted terms version
-  and timestamp. `schema.sql` remains the complete snapshot for a new local
-  database.
+  and timestamp. Apply `0006_telemetry_event_idempotency.sql` before deploying
+  the Worker that requires client event UUIDs. `schema.sql` remains the
+  complete snapshot for a new local database.
 - `src/validateEvent.js` — pure, dependency-free validation of one event or a
   batch. The Worker never trusts client-side validation alone; every field is
   re-checked against the same allowlist server-side.
 - `src/index.js` — routes: `POST /telemetry` (ingest), `POST /admin/login` /
   `POST /admin/logout`, `GET /api/stats/:name[.csv]` (protected), plus CORS
   handling (`src/cors.js`) for every response since the dashboard is served
-  from a different origin than this Worker.
+  from a different origin than this Worker. Telemetry accepts up to 16 events
+  per request so its events and normalized actions fit in one atomic D1 batch.
 - `src/liveAlert/` — the single-row admin broadcast the dashboard writes
   (`POST /admin/live-alert`, session-protected) and the desktop app polls at
   startup plus once an hour (`GET /live-alert`, public, rate limited). See
