@@ -37,6 +37,8 @@ public sealed partial class LocalizedInterfaceContractTests
             Path.Combine(root, "src", "Vemryx.One.App", "Views", "PasswordSecurityWindow.xaml"),
             Path.Combine(root, "src", "Vemryx.One.App", "Views", "TermsOfUseWindow.xaml"),
             Path.Combine(root, "src", "Vemryx.One.App", "Views", "OptimizationConfirmationWindow.xaml"),
+            Path.Combine(root, "src", "Vemryx.One.App", "Views", "Pages", "SystemPage.xaml"),
+            Path.Combine(root, "src", "Vemryx.One.App", "Views", "Pages", "ApplicationsPage.xaml"),
             Path.Combine(root, "src", "Vemryx.One.App", "Views", "Pages", "OptimizerPage.xaml")
         };
         var keys = sources
@@ -57,6 +59,25 @@ public sealed partial class LocalizedInterfaceContractTests
             Assert.NotEqual(key, portuguese.GetString(key));
             Assert.NotEqual(key, spanish.GetString(key));
         }
+    }
+
+    [Fact]
+    public void GeneralExpansion_UsesNativeWindowsSurfacesAndKeepsFiveMAsItsOwnCategory()
+    {
+        var root = TestHelpers.FindRepositoryRoot();
+        var appDirectory = Path.Combine(root, "src", "Vemryx.One.App");
+        var mainWindow = File.ReadAllText(Path.Combine(appDirectory, "MainWindow.xaml"));
+        var systemPage = File.ReadAllText(Path.Combine(appDirectory, "Views", "Pages", "SystemPage.xaml.cs"));
+        var applicationsPage = File.ReadAllText(Path.Combine(appDirectory, "Views", "Pages", "ApplicationsPage.xaml.cs"));
+
+        Assert.Contains("Tag=\"System\"", mainWindow, StringComparison.Ordinal);
+        Assert.Contains("Tag=\"Applications\"", mainWindow, StringComparison.Ordinal);
+        Assert.Contains("[Navigation.FiveM]", mainWindow, StringComparison.Ordinal);
+        Assert.Contains("ms-settings:windowsupdate", systemPage, StringComparison.Ordinal);
+        Assert.Contains("ms-settings:appsfeatures", applicationsPage, StringComparison.Ordinal);
+        Assert.Contains("ms-windows-store://downloadsandupdates", applicationsPage, StringComparison.Ordinal);
+        Assert.DoesNotContain("Arguments =", systemPage + applicationsPage, StringComparison.Ordinal);
+        Assert.DoesNotContain("runas", systemPage + applicationsPage, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

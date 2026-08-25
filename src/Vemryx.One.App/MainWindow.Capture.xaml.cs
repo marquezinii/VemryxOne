@@ -48,6 +48,8 @@ public partial class MainWindow
                 var tag = page["--capture-page=".Length..].Trim('"');
                 var target = tag switch
                 {
+                    "System" => (Element: (UIElement)SystemPage, Nav: SystemNav),
+                    "Applications" => (Element: (UIElement)ApplicationsPage, Nav: ApplicationsNav),
                     "Optimizer" => (Element: (UIElement)OptimizerPage, Nav: OptimizerNav),
                     "History" => (HistoryPage, HistoryNav),
                     "Settings" => (SettingsPage, SettingsNav),

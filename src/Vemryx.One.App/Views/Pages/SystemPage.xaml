@@ -1,0 +1,67 @@
+<UserControl x:Class="Vemryx.One.App.Views.Pages.SystemPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:primitives="clr-namespace:System.Windows.Controls.Primitives;assembly=PresentationFramework"
+             mc:Ignorable="d" d:DesignWidth="1400" d:DesignHeight="820">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="28,24,28,28">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Style="{StaticResource TitleBlockSurface}">
+                <StackPanel>
+                    <TextBlock Text="{Binding [System.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource PageTitleText}" />
+                    <Rectangle Style="{StaticResource TitleAccentRule}" Margin="0,10,0,0" />
+                    <TextBlock Text="{Binding [System.Subtitle], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,12,0,0" />
+                </StackPanel>
+            </Border>
+
+            <primitives:UniformGrid Grid.Row="1" Columns="2" VerticalAlignment="Top">
+                <Border Style="{StaticResource PanelSurface}" Padding="24" Margin="0,0,16,16">
+                    <Grid>
+                        <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="{Binding [System.WindowsUpdate.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SectionText}" />
+                            <TextBlock Text="{Binding [System.WindowsUpdate.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,8,0,0" />
+                        </StackPanel>
+                        <Button Grid.Row="1" Content="{Binding [System.WindowsUpdate.Action], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryButtonStyle}" HorizontalAlignment="Left" Margin="0,24,0,0" Click="OpenWindowsUpdate_Click" />
+                    </Grid>
+                </Border>
+                <Border Style="{StaticResource PanelSurface}" Padding="24" Margin="0,0,0,16">
+                    <Grid>
+                        <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="{Binding [System.Storage.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SectionText}" />
+                            <TextBlock Text="{Binding [System.Storage.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,8,0,0" />
+                        </StackPanel>
+                        <Button Grid.Row="1" Content="{Binding [System.Storage.Action], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryButtonStyle}" HorizontalAlignment="Left" Margin="0,24,0,0" Click="OpenStorage_Click" />
+                    </Grid>
+                </Border>
+                <Border Style="{StaticResource PanelSurface}" Padding="24" Margin="0,0,16,0">
+                    <Grid>
+                        <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="{Binding [System.Security.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SectionText}" />
+                            <TextBlock Text="{Binding [System.Security.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,8,0,0" />
+                        </StackPanel>
+                        <Button Grid.Row="1" Content="{Binding [System.Security.Action], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryButtonStyle}" HorizontalAlignment="Left" Margin="0,24,0,0" Click="OpenSecurity_Click" />
+                    </Grid>
+                </Border>
+                <Border Style="{StaticResource PanelSurface}" Padding="24">
+                    <Grid>
+                        <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="{Binding [System.About.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SectionText}" />
+                            <TextBlock Text="{Binding [System.About.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,8,0,0" />
+                        </StackPanel>
+                        <Button Grid.Row="1" Content="{Binding [System.About.Action], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryButtonStyle}" HorizontalAlignment="Left" Margin="0,24,0,0" Click="OpenAbout_Click" />
+                    </Grid>
+                </Border>
+            </primitives:UniformGrid>
+        </Grid>
+    </ScrollViewer>
+</UserControl>
