@@ -71,9 +71,11 @@ código nem configuração que envie telemetria de uso para ele.
 - texto livre, mensagens de erro brutas, stack traces ou caminhos.
 
 A fila preserva o UUID aleatório de cada evento em todos os retries. O Worker
-grava um lote em uma única transação D1 e rejeita UUIDs ausentes ou inválidos;
-repetir o mesmo lote não cria eventos ou ações adicionais. O código limita os
-nomes de evento e categorias a uma allowlist e recusa campos fora desse esquema.
+grava um lote em uma única transação D1; repetir o mesmo lote com UUID do
+cliente não cria eventos ou ações adicionais. Enquanto houver instalações
+anteriores sem UUID, o Worker gera um UUID apenas para compatibilidade, sem
+promessa de idempotência para esse protocolo legado. O código limita os nomes
+de evento e categorias a uma allowlist e recusa campos fora desse esquema.
 Falhas de rede são ignoradas: não interrompem a otimização, não geram nova
 telemetria e não são reenviadas automaticamente.
 A fila local (`LocalTelemetryQueue`) persiste eventos pendentes por até 14
