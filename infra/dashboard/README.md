@@ -71,7 +71,7 @@ it as "usuários online" the way an early sketch of this dashboard did.
 ## Re-deploying
 
 ```bash
-npx wrangler pages deploy . --project-name=vemryx-one-dashboard
+npx wrangler pages deploy . --project-name=fivemcleaner-dashboard --branch=production
 ```
 
 `assets/app.js` hardcodes the Worker's `workers.dev` URL as the default API

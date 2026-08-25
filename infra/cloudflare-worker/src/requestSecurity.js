@@ -27,3 +27,8 @@ export async function readBoundedJson(request, maximumBytes) {
     return null;
   }
 }
+
+/** Admin JSON endpoints intentionally accept only the exact media type. */
+export function hasExactJsonContentType(request) {
+  return request.headers.get('Content-Type') === 'application/json';
+}

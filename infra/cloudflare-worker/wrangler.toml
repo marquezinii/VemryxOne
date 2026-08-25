@@ -30,6 +30,8 @@
 ##   ADMIN_PASSWORD_HASH -- output of `npm run hash-admin-password`
 ##   IP_HASH_SECRET      -- a long random string, used only to keep
 ##                          brute-force tracking from storing a raw IP
+##   ADMIN_CSRF_SECRET   -- a distinct long random string for session-bound
+##                          CSRF tokens
 ##   RELEASE_MANIFEST_JSON -- signed stable feed generated and published by
 ##                            the official stable-release workflow
 ##

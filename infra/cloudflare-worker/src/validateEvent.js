@@ -49,7 +49,10 @@ export const MAX_ACTION_IDS = 30;
 // FormSubmitAnonymousTelemetryService / CloudflareTelemetryTransport.
 export const MAX_EXECUTION_TIME_MS = 86_400_000;
 
-export const MAX_BATCH_SIZE = 50;
+// Each event uses one insert plus up to MAX_ACTION_IDS action-link inserts.
+// Keeping this at 16 lets D1 execute the entire request atomically (496
+// statements at most), within its 500-statement batch limit.
+export const MAX_BATCH_SIZE = 16;
 
 // Old and future clients must not silently lose telemetry if they omit this
 // classification field. The production Worker is the only public endpoint,
@@ -57,6 +60,8 @@ export const MAX_BATCH_SIZE = 50;
 
 const ACTION_ID_PATTERN = /^[A-Za-z0-9.-]+$/;
 const CONTROL_CHARACTER_PATTERN = /[\x00-\x1F\x7F]/;
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const EMPTY_UUID = '00000000-0000-0000-0000-000000000000';
 
 function isValidShortField(value) {
   if (value === undefined || value === null) {
@@ -81,6 +86,7 @@ export function validateEvent(event) {
   }
 
   const {
+    eventId,
     eventName,
     executionTimeMs,
     appVersion,
@@ -106,6 +112,16 @@ export function validateEvent(event) {
     elevationUsed,
     processCountAtStart,
   } = event;
+
+  // Compatibility bridge: released clients without eventId still reach the
+  // Worker. New clients persist their own UUID, which is the idempotent path.
+  const normalizedEventId = eventId === undefined
+    ? crypto.randomUUID()
+    : typeof eventId === 'string' && UUID_PATTERN.test(eventId) && eventId !== EMPTY_UUID
+      ? eventId.toLowerCase()
+      : null;
+
+  if (normalizedEventId === null) return null;
 
   if (typeof eventName !== 'string' || !ALLOWED_EVENT_NAMES.has(eventName)) {
     return null;
@@ -244,6 +260,7 @@ export function validateEvent(event) {
   }
 
   return {
+    eventId: normalizedEventId,
     eventName,
     executionTimeMs: Math.trunc(executionTimeMs),
     appVersion,

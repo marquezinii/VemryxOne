@@ -6,6 +6,7 @@
 
 CREATE TABLE IF NOT EXISTS telemetry_events (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_id TEXT NOT NULL UNIQUE,
     event_name TEXT NOT NULL,
     execution_time_ms INTEGER NOT NULL,
     app_version TEXT NOT NULL,
@@ -49,7 +50,8 @@ CREATE INDEX IF NOT EXISTS idx_telemetry_events_app_version
 CREATE TABLE IF NOT EXISTS telemetry_event_actions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     telemetry_event_id INTEGER NOT NULL REFERENCES telemetry_events (id),
-    action_id TEXT NOT NULL
+    action_id TEXT NOT NULL,
+    UNIQUE (telemetry_event_id, action_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_telemetry_event_actions_action_id
