@@ -16,6 +16,7 @@ public sealed class InstallerBridgeContractTests
         Assert.Contains("#define InstallerBaseName \"VemryxOne-Setup-\"", installer, StringComparison.Ordinal);
         Assert.Contains("#define AppExeName \"FiveMCleaner.Launcher.exe\"", installer, StringComparison.Ordinal);
         Assert.Contains("#define StableAppId \"{{49338651-127F-4FD3-BEAD-88D8C9377672}\"", installer, StringComparison.Ordinal);
+        Assert.Contains("UsePreviousGroup=no", installer, StringComparison.Ordinal);
 
         Assert.Contains("$baseName = \"VemryxOne-Setup-$Version-win-x64\"", build, StringComparison.Ordinal);
         Assert.Contains("$legacyBaseName = \"FiveMCleaner-Setup-$Version-win-x64\"", build, StringComparison.Ordinal);

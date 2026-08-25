@@ -66,6 +66,13 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         var installRoot = runtimeLayout.InstallRoot;
         var runtimeRoot = runtimeLayout.RuntimeRoot;
 
+        if (!demoMode && installRoot is not null)
+        {
+            LegacyBrandMigration.TryMigrate(
+                installRoot,
+                Path.Combine(AppContext.BaseDirectory, "FiveMCleaner.exe"));
+        }
+
         var startupRegistration = CreateStartupRegistrationService(demoMode, installRoot, runtimeRoot);
         releaseUpdateService = CreateReleaseUpdateService(demoMode, runtimeRoot);
         var silentUpdateInstaller = CreateSilentUpdateInstaller(demoMode, installRoot, runtimeRoot);
