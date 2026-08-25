@@ -5,111 +5,120 @@ using System.Runtime.InteropServices;
 
 namespace Vemryx.One.App.Services;
 
+internal sealed record ShortcutDefinition(string TargetPath, string WorkingDirectory, string IconPath, string Description);
+
+internal interface ILegacyShortcutStore
+{
+    bool Exists(string path);
+    bool TryReadTarget(string path, out string? target);
+    bool TryCreate(string path, ShortcutDefinition definition);
+    bool TryDelete(string path);
+}
+
 /// <summary>
-/// Replaces only the known FiveMCleaner shortcuts that resolve to this exact
-/// installation. Runtime updates intentionally preserve legacy executable and
-/// data-path contracts, but they must not leave the old public identity behind.
+/// Replaces only verified FiveMCleaner shortcuts that resolve to this exact
+/// installation. The runtime and data-path contracts remain intentionally legacy.
 /// </summary>
 internal static class LegacyBrandMigration
 {
     private const string ProductName = "Vemryx One";
     private const string LegacyProductName = "FiveMCleaner";
+    private static readonly string[] LegacyMainShortcutNames =
+    ["FiveMCleaner.lnk", "Vemryx One.lnk"];
     private static readonly string[] LegacyUninstallShortcutNames =
-    [
-        "Desinstalar o FiveMCleaner.lnk",
-        "Uninstall FiveMCleaner.lnk",
-    ];
+    ["Desinstalar o FiveMCleaner.lnk", "Uninstall FiveMCleaner.lnk"];
 
-    internal static void TryMigrate(string installRoot, string appExecutablePath)
-    {
+    internal static void TryMigrate(string installRoot, string appExecutablePath) =>
         TryMigrate(
             installRoot,
             appExecutablePath,
             Environment.GetFolderPath(Environment.SpecialFolder.Programs),
-            Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
-    }
+            Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+            new WindowsShortcutStore());
 
     internal static bool TryMigrate(
         string installRoot,
         string appExecutablePath,
         string programsRoot,
-        string desktopRoot)
+        string desktopRoot,
+        ILegacyShortcutStore shortcuts)
     {
         try
         {
-            var launcherPath = Path.Combine(RequireDirectory(installRoot), "FiveMCleaner.Launcher.exe");
+            ArgumentNullException.ThrowIfNull(shortcuts);
+            installRoot = RequireDirectory(installRoot);
+            var launcherPath = Path.Combine(installRoot, "FiveMCleaner.Launcher.exe");
             var iconPath = Path.GetFullPath(appExecutablePath);
-            if (!File.Exists(launcherPath) || !File.Exists(iconPath)) return false;
-
-            if (!Path.IsPathFullyQualified(programsRoot)) return false;
-            if (!Path.IsPathFullyQualified(desktopRoot)) return false;
+            if (!File.Exists(launcherPath) || !File.Exists(iconPath)
+                || !Path.IsPathFullyQualified(programsRoot) || !Path.IsPathFullyQualified(desktopRoot)) return false;
 
             var oldGroup = Path.Combine(programsRoot, LegacyProductName);
             var newGroup = Path.Combine(programsRoot, ProductName);
-            var oldMainShortcut = Path.Combine(oldGroup, $"{LegacyProductName}.lnk");
-            if (TryReadShortcutTarget(oldMainShortcut, out var mainTarget)
-                && PathsEqual(mainTarget, launcherPath))
+            var removedFromOldGroup = false;
+            foreach (var name in LegacyMainShortcutNames)
             {
-                if (!EnsureShortcut(
+                removedFromOldGroup |= TryMigrateShortcut(
+                    shortcuts,
+                    Path.Combine(oldGroup, name),
                     Path.Combine(newGroup, $"{ProductName}.lnk"),
-                    launcherPath,
-                    installRoot,
-                    iconPath,
-                    ProductName))
-                {
-                    return false;
-                }
-
-                File.Delete(oldMainShortcut);
+                    new(launcherPath, installRoot, iconPath, ProductName));
             }
 
             var uninstallerPath = Path.Combine(installRoot, "unins000.exe");
-            var oldUninstallShortcuts = LegacyUninstallShortcutNames
-                .Select(name => Path.Combine(oldGroup, name))
-                .Where(path => TryReadShortcutTarget(path, out var target) && PathsEqual(target, uninstallerPath))
-                .ToArray();
-            if (oldUninstallShortcuts.Length != 0
-                && File.Exists(uninstallerPath)
-                && EnsureShortcut(
-                    Path.Combine(newGroup, $"Desinstalar {ProductName}.lnk"),
-                    uninstallerPath,
-                    installRoot,
-                    uninstallerPath,
-                    $"Desinstalar {ProductName}"))
+            if (File.Exists(uninstallerPath))
             {
-                foreach (var path in oldUninstallShortcuts)
+                foreach (var name in LegacyUninstallShortcutNames)
                 {
-                    File.Delete(path);
+                    removedFromOldGroup |= TryMigrateShortcut(
+                        shortcuts,
+                        Path.Combine(oldGroup, name),
+                        Path.Combine(newGroup, $"Desinstalar {ProductName}.lnk"),
+                        new(uninstallerPath, installRoot, uninstallerPath, $"Desinstalar {ProductName}"));
                 }
             }
 
-            TryDeleteEmptyDirectory(oldGroup);
+            if (removedFromOldGroup) TryDeleteEmptyDirectory(oldGroup);
 
-            var oldDesktopShortcut = Path.Combine(desktopRoot, $"{LegacyProductName}.lnk");
-            if (TryReadShortcutTarget(oldDesktopShortcut, out var desktopTarget)
-                && PathsEqual(desktopTarget, launcherPath)
-                && EnsureShortcut(
-                    Path.Combine(desktopRoot, $"{ProductName}.lnk"),
-                    launcherPath,
-                    installRoot,
-                    iconPath,
-                    ProductName))
-            {
-                File.Delete(oldDesktopShortcut);
-            }
-
+            TryMigrateShortcut(
+                shortcuts,
+                Path.Combine(desktopRoot, $"{LegacyProductName}.lnk"),
+                Path.Combine(desktopRoot, $"{ProductName}.lnk"),
+                new(launcherPath, installRoot, iconPath, ProductName));
             return true;
         }
         catch (Exception exception) when (exception is not (
             OutOfMemoryException or StackOverflowException or AccessViolationException))
         {
-            // Branding never blocks the application or its signed runtime update.
+            // Branding is best-effort and must never delay or block startup.
             return false;
         }
     }
 
     internal static bool PathsEqual(string? candidate, string expected) => candidate is not null
         && Path.GetFullPath(candidate).Equals(Path.GetFullPath(expected), StringComparison.OrdinalIgnoreCase);
+
+    private static bool TryMigrateShortcut(
+        ILegacyShortcutStore shortcuts,
+        string sourcePath,
+        string destinationPath,
+        ShortcutDefinition definition)
+    {
+        if (!shortcuts.TryReadTarget(sourcePath, out var target) || !PathsEqual(target, definition.TargetPath)) return false;
+        if (!EnsureShortcut(shortcuts, destinationPath, definition)) return false;
+        return shortcuts.TryDelete(sourcePath);
+    }
+
+    private static bool EnsureShortcut(ILegacyShortcutStore shortcuts, string path, ShortcutDefinition definition)
+    {
+        if (shortcuts.Exists(path))
+        {
+            return shortcuts.TryReadTarget(path, out var target) && PathsEqual(target, definition.TargetPath);
+        }
+
+        return shortcuts.TryCreate(path, definition)
+            && shortcuts.TryReadTarget(path, out var createdTarget)
+            && PathsEqual(createdTarget, definition.TargetPath);
+    }
 
     private static string RequireDirectory(string value)
     {
@@ -118,66 +127,72 @@ internal static class LegacyBrandMigration
         return Path.TrimEndingDirectorySeparator(Path.GetFullPath(value));
     }
 
-    private static bool EnsureShortcut(string shortcutPath, string targetPath, string workingDirectory, string iconPath, string description)
-    {
-        Directory.CreateDirectory(Path.GetDirectoryName(shortcutPath)!);
-        object? shell = null;
-        object? shortcut = null;
-        try
-        {
-            shell = CreateShell();
-            shortcut = ((dynamic)shell).CreateShortcut(shortcutPath);
-            ((dynamic)shortcut).TargetPath = targetPath;
-            ((dynamic)shortcut).WorkingDirectory = workingDirectory;
-            ((dynamic)shortcut).IconLocation = $"{iconPath},0";
-            ((dynamic)shortcut).Description = description;
-            ((dynamic)shortcut).Save();
-        }
-        finally
-        {
-            ReleaseComObject(shortcut);
-            ReleaseComObject(shell);
-        }
-
-        return TryReadShortcutTarget(shortcutPath, out var actualTarget) && PathsEqual(actualTarget, targetPath);
-    }
-
-    private static bool TryReadShortcutTarget(string shortcutPath, out string? target)
-    {
-        target = null;
-        if (!File.Exists(shortcutPath)) return false;
-
-        object? shell = null;
-        object? shortcut = null;
-        try
-        {
-            shell = CreateShell();
-            shortcut = ((dynamic)shell).CreateShortcut(shortcutPath);
-            target = ((dynamic)shortcut).TargetPath as string;
-            return !string.IsNullOrWhiteSpace(target);
-        }
-        finally
-        {
-            ReleaseComObject(shortcut);
-            ReleaseComObject(shell);
-        }
-    }
-
-    private static object CreateShell() => Activator.CreateInstance(
-        Type.GetTypeFromProgID("WScript.Shell")
-        ?? throw new COMException("O Windows não disponibilizou o serviço de atalhos."))
-        ?? throw new COMException("O Windows não criou o serviço de atalhos.");
-
-    private static void ReleaseComObject(object? value)
-    {
-        if (value is not null && Marshal.IsComObject(value)) Marshal.FinalReleaseComObject(value);
-    }
-
     private static void TryDeleteEmptyDirectory(string path)
     {
-        if (Directory.Exists(path) && !Directory.EnumerateFileSystemEntries(path).Any())
+        if (Directory.Exists(path) && !Directory.EnumerateFileSystemEntries(path).Any()) Directory.Delete(path);
+    }
+
+    private sealed class WindowsShortcutStore : ILegacyShortcutStore
+    {
+        public bool Exists(string path) => File.Exists(path);
+
+        public bool TryReadTarget(string path, out string? target)
         {
-            Directory.Delete(path);
+            target = null;
+            if (!File.Exists(path)) return false;
+            object? shell = null;
+            object? shortcut = null;
+            try
+            {
+                shell = CreateShell();
+                shortcut = ((dynamic)shell).CreateShortcut(path);
+                target = ((dynamic)shortcut).TargetPath as string;
+                return !string.IsNullOrWhiteSpace(target);
+            }
+            finally
+            {
+                Release(shortcut);
+                Release(shell);
+            }
+        }
+
+        public bool TryCreate(string path, ShortcutDefinition definition)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            object? shell = null;
+            object? shortcut = null;
+            try
+            {
+                shell = CreateShell();
+                shortcut = ((dynamic)shell).CreateShortcut(path);
+                ((dynamic)shortcut).TargetPath = definition.TargetPath;
+                ((dynamic)shortcut).WorkingDirectory = definition.WorkingDirectory;
+                ((dynamic)shortcut).IconLocation = $"{definition.IconPath},0";
+                ((dynamic)shortcut).Description = definition.Description;
+                ((dynamic)shortcut).Save();
+                return true;
+            }
+            finally
+            {
+                Release(shortcut);
+                Release(shell);
+            }
+        }
+
+        public bool TryDelete(string path)
+        {
+            File.Delete(path);
+            return !File.Exists(path);
+        }
+
+        private static object CreateShell() => Activator.CreateInstance(
+            Type.GetTypeFromProgID("WScript.Shell")
+            ?? throw new COMException("O Windows não disponibilizou o serviço de atalhos."))
+            ?? throw new COMException("O Windows não criou o serviço de atalhos.");
+
+        private static void Release(object? value)
+        {
+            if (value is not null && Marshal.IsComObject(value)) Marshal.FinalReleaseComObject(value);
         }
     }
 }

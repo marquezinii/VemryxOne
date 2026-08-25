@@ -84,9 +84,7 @@ SetupLogging=yes
 SetupMutex=FiveMCleaner.Setup.49338651-127F-4FD3-BEAD-88D8C9377672
 UninstallLogging=yes
 UsePreviousAppDir=yes
-; The public group is part of the Vemryx One identity. The runtime migration
-; removes only verified legacy shortcuts for users who update in-app.
-UsePreviousGroup=no
+UsePreviousGroup=yes
 UsePreviousLanguage=no
 UsePreviousTasks=yes
 LanguageDetectionMethod=uilanguage

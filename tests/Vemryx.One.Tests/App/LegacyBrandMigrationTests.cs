@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Vemryx.One.App.Services;
 using Xunit;
@@ -14,74 +15,84 @@ public sealed class LegacyBrandMigrationTests : IDisposable
         if (Directory.Exists(root)) Directory.Delete(root, recursive: true);
     }
 
+    [Theory]
+    [InlineData("FiveMCleaner.lnk")]
+    [InlineData("Vemryx One.lnk")]
+    public void TryMigrate_MovesBothKnownLegacyMainShortcutNames(string legacyName)
+    {
+        var paths = CreatePaths();
+        var shortcuts = new FakeShortcutStore();
+        shortcuts.Add(Path.Combine(paths.OldGroup, legacyName), paths.Launcher);
+
+        Assert.True(LegacyBrandMigration.TryMigrate(paths.Install, paths.Icon, paths.Programs, paths.Desktop, shortcuts));
+        Assert.False(shortcuts.Exists(Path.Combine(paths.OldGroup, legacyName)));
+        Assert.Equal(paths.Launcher, shortcuts.Target(Path.Combine(paths.NewGroup, "Vemryx One.lnk")));
+    }
+
+    [Fact]
+    public void TryMigrate_PreservesAnExistingDestinationShortcutAndTheLegacySource()
+    {
+        var paths = CreatePaths();
+        var shortcuts = new FakeShortcutStore();
+        var source = Path.Combine(paths.OldGroup, "FiveMCleaner.lnk");
+        var destination = Path.Combine(paths.NewGroup, "Vemryx One.lnk");
+        var customTarget = Path.Combine(root, "custom.exe");
+        shortcuts.Add(source, paths.Launcher);
+        shortcuts.Add(destination, customTarget);
+
+        Assert.True(LegacyBrandMigration.TryMigrate(paths.Install, paths.Icon, paths.Programs, paths.Desktop, shortcuts));
+        Assert.Equal(customTarget, shortcuts.Target(destination));
+        Assert.True(shortcuts.Exists(source));
+    }
+
+    [Fact]
+    public void TryMigrate_PreservesAnUnrelatedLegacyGroupAndShortcut()
+    {
+        var paths = CreatePaths();
+        var shortcuts = new FakeShortcutStore();
+        var source = Path.Combine(paths.OldGroup, "FiveMCleaner.lnk");
+        shortcuts.Add(source, Path.Combine(root, "other.exe"));
+
+        Assert.True(LegacyBrandMigration.TryMigrate(paths.Install, paths.Icon, paths.Programs, paths.Desktop, shortcuts));
+        Assert.True(shortcuts.Exists(source));
+        Assert.True(Directory.Exists(paths.OldGroup));
+        Assert.False(shortcuts.Exists(Path.Combine(paths.NewGroup, "Vemryx One.lnk")));
+    }
+
     [Fact]
     public void PathsEqual_OnlyAcceptsTheExactCanonicalInstallTarget()
     {
         var expected = Path.Combine(Path.GetTempPath(), "Vemryx One", "FiveMCleaner.Launcher.exe");
 
-        Assert.True(LegacyBrandMigration.PathsEqual(
-            Path.Combine(Path.GetTempPath(), "Vemryx One", ".", "FiveMCleaner.Launcher.exe"), expected));
-        Assert.False(LegacyBrandMigration.PathsEqual(
-            Path.Combine(Path.GetTempPath(), "Outra instalacao", "FiveMCleaner.Launcher.exe"), expected));
-        Assert.False(LegacyBrandMigration.PathsEqual(null, expected));
+        Assert.True(LegacyBrandMigration.PathsEqual(Path.Combine(Path.GetTempPath(), "Vemryx One", ".", "FiveMCleaner.Launcher.exe"), expected));
+        Assert.False(LegacyBrandMigration.PathsEqual(Path.Combine(Path.GetTempPath(), "Outra instalacao", "FiveMCleaner.Launcher.exe"), expected));
     }
 
-    [Fact]
-    public void TryMigrate_CreatesNewLinksBeforeRemovingOnlyMatchingLegacyLinks()
+    private (string Install, string Programs, string Desktop, string OldGroup, string NewGroup, string Launcher, string Icon) CreatePaths()
     {
         var install = Path.Combine(root, "install");
         var programs = Path.Combine(root, "Programs");
         var desktop = Path.Combine(root, "Desktop");
+        var oldGroup = Path.Combine(programs, "FiveMCleaner");
+        Directory.CreateDirectory(install);
+        Directory.CreateDirectory(oldGroup);
+        Directory.CreateDirectory(desktop);
         var launcher = Path.Combine(install, "FiveMCleaner.Launcher.exe");
         var icon = Path.Combine(root, "FiveMCleaner.exe");
-        Directory.CreateDirectory(install);
-        Directory.CreateDirectory(Path.Combine(programs, "FiveMCleaner"));
-        Directory.CreateDirectory(desktop);
         File.WriteAllText(launcher, "launcher");
         File.WriteAllText(icon, "icon");
-        CreateShortcut(Path.Combine(programs, "FiveMCleaner", "FiveMCleaner.lnk"), launcher);
-        CreateShortcut(Path.Combine(desktop, "FiveMCleaner.lnk"), launcher);
-
-        var migrated = LegacyBrandMigration.TryMigrate(install, icon, programs, desktop);
-
-        Assert.True(migrated);
-        Assert.True(File.Exists(Path.Combine(programs, "Vemryx One", "Vemryx One.lnk")));
-        Assert.True(File.Exists(Path.Combine(desktop, "Vemryx One.lnk")));
-        Assert.False(File.Exists(Path.Combine(programs, "FiveMCleaner", "FiveMCleaner.lnk")));
-        Assert.False(File.Exists(Path.Combine(desktop, "FiveMCleaner.lnk")));
+        return (install, programs, desktop, oldGroup, Path.Combine(programs, "Vemryx One"), launcher, icon);
     }
 
-    [Fact]
-    public void TryMigrate_PreservesALegacyShortcutThatDoesNotPointToThisInstallation()
+    private sealed class FakeShortcutStore : ILegacyShortcutStore
     {
-        var install = Path.Combine(root, "install");
-        var programs = Path.Combine(root, "Programs");
-        var desktop = Path.Combine(root, "Desktop");
-        var launcher = Path.Combine(install, "FiveMCleaner.Launcher.exe");
-        var icon = Path.Combine(root, "FiveMCleaner.exe");
-        var otherTarget = Path.Combine(root, "other.exe");
-        Directory.CreateDirectory(install);
-        Directory.CreateDirectory(Path.Combine(programs, "FiveMCleaner"));
-        Directory.CreateDirectory(desktop);
-        File.WriteAllText(launcher, "launcher");
-        File.WriteAllText(icon, "icon");
-        File.WriteAllText(otherTarget, "other");
-        var legacyShortcut = Path.Combine(programs, "FiveMCleaner", "FiveMCleaner.lnk");
-        CreateShortcut(legacyShortcut, otherTarget);
+        private readonly Dictionary<string, string> links = new(StringComparer.OrdinalIgnoreCase);
 
-        Assert.True(LegacyBrandMigration.TryMigrate(install, icon, programs, desktop));
-        Assert.True(File.Exists(legacyShortcut));
-        Assert.False(File.Exists(Path.Combine(programs, "Vemryx One", "Vemryx One.lnk")));
-    }
-
-    private static void CreateShortcut(string path, string target)
-    {
-        var shellType = Type.GetTypeFromProgID("WScript.Shell")
-            ?? throw new InvalidOperationException("Windows Script Host indisponível para o teste de atalhos.");
-        dynamic shell = Activator.CreateInstance(shellType)
-            ?? throw new InvalidOperationException("Windows não criou o serviço de atalhos para o teste.");
-        dynamic shortcut = shell.CreateShortcut(path);
-        shortcut.TargetPath = target;
-        shortcut.Save();
+        public void Add(string path, string target) => links[path] = target;
+        public bool Exists(string path) => links.ContainsKey(path);
+        public string? Target(string path) => links.GetValueOrDefault(path);
+        public bool TryReadTarget(string path, out string? target) => links.TryGetValue(path, out target);
+        public bool TryCreate(string path, ShortcutDefinition definition) => links.TryAdd(path, definition.TargetPath);
+        public bool TryDelete(string path) => links.Remove(path);
     }
 }

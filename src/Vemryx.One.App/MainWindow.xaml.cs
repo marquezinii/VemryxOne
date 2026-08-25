@@ -46,6 +46,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
     private bool systemSessionEnding;
     private bool syncingLanguageSelector;
     private bool crashReportingConfigured;
+    private readonly string? legacyBrandMigrationInstallRoot;
 
 
     public MainWindow()
@@ -65,13 +66,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         var runtimeLayout = RuntimeLayout.Resolve(AppContext.BaseDirectory);
         var installRoot = runtimeLayout.InstallRoot;
         var runtimeRoot = runtimeLayout.RuntimeRoot;
-
-        if (!demoMode && installRoot is not null)
-        {
-            LegacyBrandMigration.TryMigrate(
-                installRoot,
-                Path.Combine(AppContext.BaseDirectory, "FiveMCleaner.exe"));
-        }
+        legacyBrandMigrationInstallRoot = installRoot;
 
         var startupRegistration = CreateStartupRegistrationService(demoMode, installRoot, runtimeRoot);
         releaseUpdateService = CreateReleaseUpdateService(demoMode, runtimeRoot);
@@ -257,6 +252,12 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
     {
         ActivateNavItem(DashboardNav);
         Navigate(DashboardPage);
+        if (!demoMode && legacyBrandMigrationInstallRoot is { } installRoot)
+        {
+            _ = Task.Run(() => LegacyBrandMigration.TryMigrate(
+                installRoot,
+                Path.Combine(AppContext.BaseDirectory, "FiveMCleaner.exe")));
+        }
         if (!demoMode)
         {
             // O recibo de saúde precisa ser gravado antes do InitializeAsync:
