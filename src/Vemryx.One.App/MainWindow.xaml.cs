@@ -45,6 +45,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
     private bool trayAnnouncementShown;
     private bool systemSessionEnding;
     private bool syncingLanguageSelector;
+    private bool crashReportingConfigured;
 
 
     public MainWindow()
@@ -121,6 +122,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         trayIcon.ShowRequested += TrayIcon_ShowRequested;
         trayIcon.ExitRequested += TrayIcon_ExitRequested;
         viewModel.UpdateAvailableDetected += ViewModel_UpdateAvailableDetected;
+        viewModel.PropertyChanged += ViewModel_PropertyChanged;
         DataContext = viewModel;
         Loaded += MainWindow_Loaded;
         SourceInitialized += MainWindow_SourceInitialized;
@@ -344,6 +346,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         windowSource?.RemoveHook(WindowMessageHook);
         System.Windows.Application.Current.SessionEnding -= Application_SessionEnding;
         viewModel.UpdateAvailableDetected -= ViewModel_UpdateAvailableDetected;
+        viewModel.PropertyChanged -= ViewModel_PropertyChanged;
         themeManager.Dispose();
         trayIcon.Dispose();
         accountService?.Dispose();

@@ -1,5 +1,6 @@
 using System.IO;
 using Vemryx.One.App.Services;
+using Vemryx.One.App.ViewModels;
 using Vemryx.One.App.Views;
 using Vemryx.One.Contracts;
 using Vemryx.One.UpdateRuntime;
@@ -70,12 +71,15 @@ public partial class MainWindow
 
         var consentWindow = new PrivacyConsentWindow(
             decision.Variant,
-            viewModel.ShareAnonymousTelemetry)
+            viewModel.ShareAnonymousTelemetry,
+            initialShareCrashReports: false)
         {
             Owner = this
         };
         consentWindow.ShowDialog();
-        await viewModel.ConfirmPrivacyConsentAsync(consentWindow.AcceptedAnonymousTelemetry);
+        await viewModel.ConfirmPrivacyConsentAsync(
+            consentWindow.AcceptedAnonymousTelemetry,
+            consentWindow.AcceptedCrashReports);
     }
 
     /// <summary>
@@ -117,12 +121,9 @@ public partial class MainWindow
 
     /// <summary>
     /// Initializes the real Sentry-backed crash reporter, but only after
-    /// <see cref="ShowPrivacyConsentIfNeededAsync"/> has resolved: by that
-    /// point <see cref="MainViewModel.ShareCrashReports"/> is guaranteed to
-    /// reflect a current, confirmed consent (either it already was current,
-    /// or the consent window just made it so) — so this single check is
-    /// enough, no separate re-evaluation of
-    /// <see cref="MainViewModel.PrivacyConsentDecision"/> is needed. Loads
+    /// <see cref="ShowPrivacyConsentIfNeededAsync"/> has resolved. The
+    /// decision is evaluated from both the toggle and the consent version;
+    /// anything else remains fail-closed. Loads
     /// the Sentry DSN from the environment-specific config file
     /// (<see cref="RemoteServicesOptionsLoader"/>) — never from a literal in
     /// source — and tags the event with the resolved
@@ -131,8 +132,29 @@ public partial class MainWindow
     /// </summary>
     private void InitializeCrashReportingIfAuthorized()
     {
-        CrashReporting.Current = new SentryCrashReportingService();
-        CrashReporting.Current.Initialize(remoteServicesOptions, viewModel.AppVersion);
+        var current = CrashReporting.Current;
+        var next = CrashReportingLifecycle.InitializeIfAuthorized(
+            viewModel.ShareCrashReports
+                && viewModel.PrivacyConsentDecision?.IsCrashReportingAuthorized == true,
+            remoteServicesOptions,
+            viewModel.AppVersion,
+            static () => new SentryCrashReportingService());
+        if (!ReferenceEquals(current, next))
+        {
+            CrashReportingLifecycle.TryShutdown(current);
+        }
+
+        CrashReporting.Current = next;
+        crashReportingConfigured = true;
+    }
+
+    private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (crashReportingConfigured
+            && e.PropertyName == nameof(MainViewModel.ShareCrashReports))
+        {
+            InitializeCrashReportingIfAuthorized();
+        }
     }
 
     /// <summary>

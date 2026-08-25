@@ -233,9 +233,10 @@ privacidade: [telemetry.md](telemetry.md) e [bug-reports.md](bug-reports.md).
 ### Relatório de falhas e configuração centralizada
 
 `ICrashReportingService` (implementação `SentryCrashReportingService`) é
-outra fronteira da camada App, análoga à de telemetria e parte dos diagnósticos
-essenciais; nunca é referenciada por `Core`/`Windows`/`Broker`. `MainWindow` a inicializa
-uma única vez, logo depois que o fluxo de consentimento resolve, usando
+outra fronteira da camada App, análoga à de telemetria e opcional; nunca é
+referenciada por `Core`/`Windows`/`Broker`. `MainWindow` a inicializa uma única
+vez somente quando `ShareCrashReports` e o consentimento vigente autorizam,
+usando
 `RemoteServicesOptionsLoader` para ler o DSN de um arquivo de configuração
 por ambiente (`Config/appsettings.{Development,Production}.json`, com
 `appsettings.json` como base sem DSN) — nenhum identificador remoto fica

@@ -21,11 +21,12 @@ campos técnicos abaixo.
 ## Dados enviados, finalidade, retenção e destinatários
 
 Ao término, falha ou cancelamento de uma otimização, o aplicativo monta um
-evento técnico com estes campos (versão 5 do consentimento de privacidade —
+evento técnico com estes campos (versão 6 do consentimento de privacidade —
 ver `PrivacyConsentPolicy`):
 
 | Campos | Finalidade | Obrigatório | Retenção | Destinatários |
 | --- | --- | --- | --- | --- |
+| ID do evento | Garantir entrega idempotente sem identificar máquina ou usuário. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
 | Tipo do evento, tempo de execução e versão do app | Distinguir conclusão, falha ou cancelamento; detectar operações anormalmente longas e correlacioná-las à versão. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, banco D1 e painel administrativo autenticado com métricas agregadas. |
 | Categoria de erro allowlisted (`cancelled`, `timeout`, `access-denied`, `io`, `invalid-data`, `unexpected`) | Classificar falhas sem enviar mensagem, stack trace, arquivo ou caminho. | Não. Só em falhas, com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
 | Versão e build do Windows; arquitetura | Compatibilidade agregada do sistema operacional. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
@@ -61,9 +62,14 @@ código nem configuração que envie telemetria de uso para ele.
   tabela acima;
 - texto livre, mensagens de erro brutas, stack traces ou caminhos.
 
-O código limita os nomes de evento e categorias a uma allowlist e recusa
-campos fora desse esquema. Falhas de rede são ignoradas: não interrompem a
-otimização, não geram nova telemetria e não são reenviadas automaticamente.
+A fila preserva o UUID aleatório de cada evento em todos os retries. O Worker
+grava um lote em uma única transação D1; repetir o mesmo lote com UUID do
+cliente não cria eventos ou ações adicionais. Enquanto houver instalações
+anteriores sem UUID, o Worker gera um UUID apenas para compatibilidade, sem
+promessa de idempotência para esse protocolo legado. O código limita os nomes
+de evento e categorias a uma allowlist e recusa campos fora desse esquema.
+Falhas de rede são ignoradas: não interrompem a otimização, não geram nova
+telemetria e não são reenviadas automaticamente.
 A fila local (`LocalTelemetryQueue`) persiste eventos pendentes por até 14
 dias antes de descartá-los, para sobreviver a reinícios e períodos offline
 sem crescer indefinidamente.
@@ -83,10 +89,12 @@ separado e opt-in; suas regras estão em [Relatos de bug e privacidade](bug-repo
 
 ## Relatório de falhas (Sentry)
 
-Relatórios de crash são opcionais e seguem a mesma sanitização e minimização
-descritas nesta página.
+Relatórios automáticos de crash começam desativados em instalações novas e podem
+ser ativados antes da confirmação ou a qualquer momento nas configurações.
+Só são enviados depois da confirmação da versão vigente do consentimento. Eles
+seguem a mesma sanitização e minimização descritas nesta página.
 
-### Dados enviados quando autorizados
+### Dados enviados com a opção ativada
 
 Quando o aplicativo trava ou encontra uma exceção não tratada, envia ao Sentry:
 
@@ -97,7 +105,7 @@ Quando o aplicativo trava ou encontra uma exceção não tratada, envia ao Sentr
 | Versão do aplicativo | `1.1.0` | correlacionar com uma versão específica |
 | Ambiente | `Development` ou `Production` | nunca mistura erros de desenvolvimento com erros de usuários finais |
 
-O SDK do Sentry é inicializado somente após autorização, com
+O SDK do Sentry só é inicializado após essa autorização, com
 `SendDefaultPii=false`, `AutoSessionTracking`/`CaptureFailedRequests`/
 `TracesSampleRate` desligados (nenhum dado além do evento de erro em si é
 enviado) e um `BeforeSend` obrigatório (`CrashReportSanitizer`) que reaplica

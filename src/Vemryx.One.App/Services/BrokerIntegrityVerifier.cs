@@ -19,8 +19,8 @@ internal static class BrokerIntegrityVerifier
     {
         var requireSignedManifest = IsVersionedRuntimeLayout(baseDirectory);
         using var resource = typeof(BrokerIntegrityVerifier).Assembly.GetManifestResourceStream(
-            "Vemryx.One.App.Assets.release-public-key.pem")
-            ?? throw new InvalidOperationException("A chave pública de release não foi incorporada ao aplicativo.");
+            "Vemryx.One.App.Assets.broker-integrity-public-key.pem")
+            ?? throw new InvalidOperationException("A chave pública de integridade do broker não foi incorporada ao aplicativo.");
         using var reader = new StreamReader(resource, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
         using var verifier = ECDsa.Create();
         verifier.ImportFromPem(reader.ReadToEnd());

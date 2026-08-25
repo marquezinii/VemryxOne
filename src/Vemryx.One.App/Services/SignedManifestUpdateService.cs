@@ -53,7 +53,7 @@ public sealed class SignedManifestUpdateService : IReleaseUpdateService, IDispos
         versionFloor = new VersionFloorStore(dataRoot);
         diagnostics = new UpdaterDiagnostics(dataRoot);
         using var keyStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(
-            "Vemryx.One.App.Assets.release-public-key.pem")
+            "Vemryx.One.App.Assets.update-manifest-public-key.pem")
             ?? throw new InvalidOperationException("A chave pública de releases não foi incorporada.");
         using var reader = new StreamReader(keyStream);
         using var verifier = ECDsa.Create();
