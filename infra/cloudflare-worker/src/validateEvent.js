@@ -113,9 +113,15 @@ export function validateEvent(event) {
     processCountAtStart,
   } = event;
 
-  if (typeof eventId !== 'string' || !UUID_PATTERN.test(eventId) || eventId === EMPTY_UUID) {
-    return null;
-  }
+  // Compatibility bridge: released clients without eventId still reach the
+  // Worker. New clients persist their own UUID, which is the idempotent path.
+  const normalizedEventId = eventId === undefined
+    ? crypto.randomUUID()
+    : typeof eventId === 'string' && UUID_PATTERN.test(eventId) && eventId !== EMPTY_UUID
+      ? eventId.toLowerCase()
+      : null;
+
+  if (normalizedEventId === null) return null;
 
   if (typeof eventName !== 'string' || !ALLOWED_EVENT_NAMES.has(eventName)) {
     return null;
@@ -254,7 +260,7 @@ export function validateEvent(event) {
   }
 
   return {
-    eventId: eventId.toLowerCase(),
+    eventId: normalizedEventId,
     eventName,
     executionTimeMs: Math.trunc(executionTimeMs),
     appVersion,

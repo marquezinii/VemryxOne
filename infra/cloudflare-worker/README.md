@@ -36,7 +36,7 @@ summary, optional email, optional plain-text log excerpt capped at 100 KB).
 - `migrations/` — incremental changes for the already deployed D1 database.
   The account migration adds a unique username plus the accepted terms version
   and timestamp. Apply `0006_telemetry_event_idempotency.sql` before deploying
-  the Worker that requires client event UUIDs. `schema.sql` remains the
+  the Worker that accepts client event UUIDs. `schema.sql` remains the
   complete snapshot for a new local database.
 - `src/validateEvent.js` — pure, dependency-free validation of one event or a
   batch. The Worker never trusts client-side validation alone; every field is

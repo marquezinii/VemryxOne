@@ -129,9 +129,12 @@ test('validateEvent still rejects a null environment', () => {
   }), null);
 });
 
-test('validateEvent rejects a missing, empty, or malformed event UUID', () => {
+test('validateEvent assigns a server UUID only for a legacy event without one', () => {
   const { eventId: _, ...withoutId } = validEvent();
-  assert.equal(validateEvent(withoutId), null);
+  assert.match(validateEvent(withoutId).eventId, /^[0-9a-f-]{36}$/);
+});
+
+test('validateEvent rejects an empty or malformed event UUID', () => {
   assert.equal(validateEvent(validEvent({ eventId: '00000000-0000-0000-0000-000000000000' })), null);
   assert.equal(validateEvent(validEvent({ eventId: 'not-a-uuid' })), null);
 });
