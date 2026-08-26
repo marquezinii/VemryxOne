@@ -33,7 +33,9 @@ Não são aceitos, em espaços públicos ou privados relacionados ao projeto:
 - insultos, ataques pessoais, linguagem discriminatória ou comentários
   depreciativos;
 - conteúdo sexualizado ou atenção sexual indesejada;
-- publicação ou solicitação de dados pessoais sem consentimento explícito;
+- publicação ou solicitação de dados pessoais sem consentimento explícito,
+  exceto o mínimo necessário para um relato confidencial e de boa-fé pelo
+  canal autorizado;
 - divulgação de vulnerabilidades, credenciais ou informações sensíveis fora do
   fluxo responsável indicado em [SECURITY.md](SECURITY.md);
 - pressão para que alguém execute, aprove ou publique mudanças inseguras;
@@ -49,9 +51,10 @@ quando alguém representa oficialmente o Vemryx One em outro espaço.
 ## Como relatar uma ocorrência
 
 Relatos de conduta devem ser enviados de forma privada pelo canal descrito em
-[SECURITY.md](SECURITY.md), com o assunto **Conduta**. Não abra uma issue
-pública e não publique dados pessoais, evidências sensíveis ou detalhes que
-possam expor pessoas envolvidas.
+[SECURITY.md](SECURITY.md), com o assunto **Conduta**. Não publique dados
+pessoais, evidências sensíveis ou detalhes que possam expor pessoas envolvidas.
+Se o canal privado não estiver disponível, abra somente uma issue pública sem
+detalhes para solicitar uma forma segura de contato.
 
 Inclua somente o necessário para permitir a avaliação: contexto, data
 aproximada, espaço em que ocorreu, pessoas envolvidas e eventuais evidências
@@ -89,3 +92,10 @@ não é uma forma aceitável de colaboração.
 
 Este Código pode ser ajustado para melhorar a segurança, a clareza e a
 aplicação consistente das regras. Alterações serão publicadas neste arquivo.
+
+## Atribuição
+
+Este Código de Conduta adapta e modifica o
+[Contributor Covenant, versão 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct.html),
+disponibilizado sob a licença
+[Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0/).
