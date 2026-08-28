@@ -1,0 +1,93 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>$(RalvenWindowsTargetFramework)</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <ApplicationIcon>../Ralven.App/Assets/Ralven.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>Ralven.Launcher</AssemblyName>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Ralven.UpdateRuntime/Ralven.UpdateRuntime.csproj" />
+    <ProjectReference Include="../Ralven.App/Ralven.App.csproj" />
+    <ProjectReference Include="../Ralven.Contracts/Ralven.Contracts.csproj" />
+  </ItemGroup>
+  <!--
+    Single-file publish (PublishSingleFile=true, used only for this project)
+    bundles every managed dependency directly from its build output path -
+    including Ralven.Core/.Windows - bypassing the loose $(PublishDir)
+    entirely (see Microsoft.NET.Publish.targets: "When publishing to a single
+    file, ... files are directly written to the bundle file"). Hardening those
+    two assemblies AFTER this publish, the way scripts/Build-Portable.ps1
+    hardens the Broker/App loose output, is too late: the bundle is already
+    written. Hardening them BEFORE this publish doesn't stick either: any
+    subsequent `dotnet build`/`publish` recompiles Core/Windows from source
+    into that same canonical path regardless of the (newer) hardened bytes
+    already sitting there.
+    The only point where hardening reliably survives is INSIDE this exact
+    publish's own MSBuild execution, between the moment the file list is
+    computed (Core/Windows's canonical build output path is now fixed as
+    their bundle source) and the moment GenerateSingleFileBundle actually
+    reads bytes from that path - nothing recompiles them again in between.
+
+    This mutates Ralven.Core/.Windows's own shared project build output
+    in place, which every other project reference resolves from too - so it
+    must not be a lasting side effect. Backing up the pre-hardening bytes
+    here and restoring them in RestoreCanonicalAssembliesAfterBundling below
+    (AfterTargets="GenerateSingleFileBundle") keeps the canonical output
+    clean once bundling is done, regardless of what publishes next, in what
+    order, or whether anything else republishes at all - a plain `dotnet
+    build`/debug session right after `-Harden` never risks picking up
+    hardened bytes by accident.
+  -->
+  <PropertyGroup>
+    <_RalvenWindowsCanonicalOutput>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\Ralven.Windows\bin\$(Configuration)\$(RalvenWindowsTargetFramework)'))</_RalvenWindowsCanonicalOutput>
+    <_RalvenCoreCanonicalOutput>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\Ralven.Core\bin\$(Configuration)\$(RalvenTargetFramework)'))</_RalvenCoreCanonicalOutput>
+    <_RalvenHardenBackupDir>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)ralven-harden-backup'))</_RalvenHardenBackupDir>
+  </PropertyGroup>
+  <Target Name="HardenBundledAssemblies"
+          Condition="'$(RalvenHarden)' == 'true'"
+          AfterTargets="ComputeFilesToPublish"
+          BeforeTargets="GenerateSingleFileBundle">
+    <!--
+      Back up the pre-hardening bytes before touching anything. One copy of
+      Core.dll suffices for restoring both locations: Windows's own build
+      output holds a local copy of it alongside Windows.dll, and Core's own
+      canonical output is a separate folder (Core has no reference to
+      Windows) - both are byte-identical, deterministic compiles of the same
+      unchanged source at this point.
+    -->
+    <RemoveDir Directories="$(_RalvenHardenBackupDir)" Condition="Exists('$(_RalvenHardenBackupDir)')" />
+    <MakeDir Directories="$(_RalvenHardenBackupDir)" />
+    <Copy SourceFiles="$(_RalvenWindowsCanonicalOutput)\Ralven.Windows.dll" DestinationFolder="$(_RalvenHardenBackupDir)" />
+    <Copy SourceFiles="$(_RalvenWindowsCanonicalOutput)\Ralven.Core.dll" DestinationFolder="$(_RalvenHardenBackupDir)" />
+    <!--
+      Obfuscar needs both assemblies together to keep cross-assembly renaming
+      consistent, and Ralven.Windows's own build output already holds a
+      local copy of Ralven.Core.dll alongside its own Windows.dll - so
+      hardening in place there covers Windows.dll at its true canonical path
+      directly. Core.dll's own canonical path is a separate folder, so its
+      hardened bytes are propagated there by a plain copy, not a second
+      Obfuscar run.
+    -->
+    <Exec Command="pwsh -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildThisFileDirectory)..\..\scripts\Invoke-Obfuscation.ps1&quot; -PublishDirectory &quot;$(_RalvenWindowsCanonicalOutput)&quot; -MappingOutputDirectory &quot;$(MSBuildThisFileDirectory)..\..\artifacts\obfuscation-maps&quot;" />
+    <Copy SourceFiles="$(_RalvenWindowsCanonicalOutput)\Ralven.Core.dll" DestinationFolder="$(_RalvenCoreCanonicalOutput)" />
+  </Target>
+  <Target Name="RestoreCanonicalAssembliesAfterBundling"
+          Condition="'$(RalvenHarden)' == 'true'"
+          AfterTargets="GenerateSingleFileBundle">
+    <!--
+      GenerateBundle already read and embedded the hardened bytes by this
+      point (this target only runs after GenerateSingleFileBundle completes).
+      Restoring the backup here, unconditionally, is what makes the
+      hardening a transient effect scoped to this one publish instead of a
+      standing mutation of shared build state.
+    -->
+    <Copy SourceFiles="$(_RalvenHardenBackupDir)\Ralven.Windows.dll" DestinationFolder="$(_RalvenWindowsCanonicalOutput)" />
+    <Copy SourceFiles="$(_RalvenHardenBackupDir)\Ralven.Core.dll" DestinationFolder="$(_RalvenWindowsCanonicalOutput)" />
+    <Copy SourceFiles="$(_RalvenHardenBackupDir)\Ralven.Core.dll" DestinationFolder="$(_RalvenCoreCanonicalOutput)" />
+    <RemoveDir Directories="$(_RalvenHardenBackupDir)" />
+  </Target>
+</Project>

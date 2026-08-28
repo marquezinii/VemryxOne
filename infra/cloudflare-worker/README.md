@@ -1,6 +1,12 @@
-# Vemryx One telemetry + dashboard API Worker
+# Ralven telemetry + dashboard API Worker
 
-**Deployed** at `https://fivemcleaner-telemetry.felipemarquesini10.workers.dev`.
+**Deployed** at
+`https://fivemcleaner-telemetry.felipemarquesini10.workers.dev`.
+
+The hostname, Cloudflare Worker name, D1 database name/ID and Firebase project
+ID are pre-existing external infrastructure identifiers. They remain unchanged
+until a separately provisioned migration exists; none of them is exposed as
+Ralven product branding in the UI.
 
 This is the Cloudflare Worker + D1 backend for the anonymous telemetry
 pipeline described in [`docs/telemetry.md`](../../docs/telemetry.md) and the
@@ -99,7 +105,7 @@ URL), authentication is a small, self-contained system:
   cross-site `fetch`, which is exactly what made the first deployment's
   login appear to succeed but leave the dashboard stuck on the login screen.
 - **CSRF e limites de entrada**: a publicação do alerta exige o `Origin`
-  exato de `DASHBOARD_ORIGIN`, o cabeçalho `X-Vemryx-Csrf-Token` e
+  exato de `DASHBOARD_ORIGIN`, o cabeçalho `X-Ralven-Csrf-Token` e
   `Content-Type: application/json` exato. O token é derivado no Worker da
   sessão e de `ADMIN_CSRF_SECRET`, fica somente em memória no dashboard e é
   recuperado em `GET /admin/csrf` após um recarregamento. Todos os JSON
@@ -218,7 +224,7 @@ manifest against the embedded public key and publishes it automatically with
 `wrangler secret put RELEASE_MANIFEST_JSON` immediately before deploying this
 Worker. Do not hand-author, truncate, or commit that value. A manual repair is
 part of the authorized release procedure only and must pipe the generated
-`release/Vemryx One-signed-update-manifest.json` file unchanged into the same
+`release/Ralven-signed-update-manifest.json` file unchanged into the same
 Wrangler command. Preview releases do not update this stable feed.
 
 The real deployment uses plain `wrangler deploy`/`npm run deploy` with no

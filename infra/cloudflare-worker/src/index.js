@@ -29,7 +29,7 @@ const MAX_UPDATER_EVENT_BODY_BYTES = 4 * 1024;
 const MAX_ACCOUNT_PROFILE_BODY_BYTES = 4 * 1024;
 const MAX_LIVE_ALERT_BODY_BYTES = 4 * 1024;
 
-// Vemryx One anonymous telemetry + bug reports + admin dashboard API
+// Ralven anonymous telemetry + bug reports + admin dashboard API
 // Worker. See wrangler.toml and README.md for deployment status of each
 // route. Bug reports are text-only -- no attachment/screenshot support, no
 // R2 dependency -- everything lives in D1.
@@ -259,7 +259,7 @@ async function handleLiveAlertUpdate(request, env) {
   if (!auth.authorized) return auth.response;
 
   if (!(await isValidCsrfToken(
-    request.headers.get('X-Vemryx-Csrf-Token'),
+    request.headers.get('X-Ralven-Csrf-Token'),
     auth.sessionId,
     env.ADMIN_CSRF_SECRET,
   ))) {

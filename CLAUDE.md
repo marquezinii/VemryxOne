@@ -1,9 +1,9 @@
-# Vemryx One — Claude Code
+# Ralven — Claude Code
 
 Instruções persistentes específicas deste repositório. Mantenha este arquivo curto, estável e focado no que Claude não deve inferir sozinho.
 ## Missão e prioridades
 
-Vemryx One é um aplicativo Windows de diagnóstico, limpeza e otimização segura para FiveM sobre GTAV Legacy.
+Ralven é um aplicativo Windows de diagnóstico, limpeza e otimização segura para FiveM sobre GTAV Legacy.
 
 Priorize, nesta ordem: segurança e dados do usuário; reversibilidade; correção/confiabilidade; transparência; UX; desempenho; conveniência de implementação.
 
@@ -62,17 +62,17 @@ O fluxo completo e as autorizações estão em `AI_RULES.md`. Essenciais:
 
 Respeite as responsabilidades existentes:
 
-- `Vemryx.One.App`: WPF, composição e apresentação sem elevação permanente.
-- `Vemryx.One.Contracts`: contratos compartilhados.
-- `Vemryx.One.Core`: políticas, orquestração, execução e rollback.
-- `Vemryx.One.Windows`: integrações Windows/FiveM.
-- `Vemryx.One.Broker`: operações administrativas tipadas e de privilégio mínimo.
-- `Vemryx.One.Launcher`: inicialização e health-check pós-update.
-- `Vemryx.One.Updater`: staging, ativação e rollback de updates.
-- `Vemryx.One.UpdateRuntime`: primitivas seguras do updater.
-- `Vemryx.One.ReleaseTool`: empacotamento e assinatura.
+- `Ralven.App`: WPF, composição e apresentação sem elevação permanente.
+- `Ralven.Contracts`: contratos compartilhados.
+- `Ralven.Core`: políticas, orquestração, execução e rollback.
+- `Ralven.Windows`: integrações Windows/FiveM.
+- `Ralven.Broker`: operações administrativas tipadas e de privilégio mínimo.
+- `Ralven.Launcher`: inicialização e health-check pós-update.
+- `Ralven.Updater`: staging, ativação e rollback de updates.
+- `Ralven.UpdateRuntime`: primitivas seguras do updater.
+- `Ralven.ReleaseTool`: empacotamento e assinatura.
 - `infra/cloudflare-worker`, `infra/dashboard`, `website` e `installer`: superfícies remotas/distribuição.
-- `tests/Vemryx.One.Tests`: testes .NET do produto.
+- `tests/Ralven.Tests`: testes .NET do produto.
 
 Não crie dependência circular nem mova responsabilidades entre camadas por conveniência local. Prefira contratos pequenos e explícitos entre processos e camadas.
 ## Invariantes de segurança
@@ -139,10 +139,10 @@ Para Windows, FiveM, GTAV, drivers, APIs e tweaks:
 Durante o desenvolvimento, rode primeiro os testes mais próximos da mudança. Para validação .NET completa, quando aplicável:
 
 ```powershell
-dotnet restore Vemryx.One.slnx
-dotnet build Vemryx.One.slnx --configuration Release --no-restore
-dotnet test Vemryx.One.slnx --configuration Release --no-build
-dotnet format Vemryx.One.slnx --verify-no-changes
+dotnet restore Ralven.slnx
+dotnet build Ralven.slnx --configuration Release --no-restore
+dotnet run --project tests/Ralven.Tests/Ralven.Tests.csproj --configuration Release --no-build -- --minimum-expected-tests 1
+dotnet format Ralven.slnx --verify-no-changes
 .\scripts\Verify-Safety.ps1
 git diff --check
 ```

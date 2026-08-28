@@ -2,7 +2,7 @@
 
 ## Compromisso
 
-O Vemryx One busca manter uma comunidade técnica segura, respeitosa e
+O Ralven busca manter uma comunidade técnica segura, respeitosa e
 profissional. Todas as pessoas que participam do projeto — contribuidores,
 usuários, mantenedores e visitantes — devem poder colaborar sem assédio,
 discriminação ou intimidação.
@@ -46,7 +46,7 @@ Não são aceitos, em espaços públicos ou privados relacionados ao projeto:
 
 Este Código de Conduta se aplica a issues, pull requests, revisões, discussões,
 repositórios, canais de comunicação e eventos do projeto. Também se aplica
-quando alguém representa oficialmente o Vemryx One em outro espaço.
+quando alguém representa oficialmente o Ralven em outro espaço.
 
 ## Como relatar uma ocorrência
 

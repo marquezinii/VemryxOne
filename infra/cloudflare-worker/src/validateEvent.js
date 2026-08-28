@@ -1,6 +1,6 @@
 // Pure, dependency-free validation for one telemetry event. Kept separate
 // from index.js so it can be unit tested without Miniflare/wrangler and
-// without a D1 binding. Mirrors Vemryx One.App.Services.TelemetryEventValidator
+// without a D1 binding. Mirrors Ralven.App.Services.TelemetryEventValidator
 // on the .NET side -- the Worker never trusts client-side validation alone.
 
 import { ALLOWED_ENVIRONMENTS } from './environments.js';

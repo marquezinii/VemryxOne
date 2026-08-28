@@ -18,12 +18,12 @@ planos gratuitos, sujeitos aos limites documentados desses provedores.
 Não usar pinning de certificado TLS da Cloudflare ou do GitHub. Certificados
 de borda podem ser rotacionados legitimamente. A cadeia de confiança terá dois
 controles independentes: TLS padrão do Windows, com validação e revogação, e
-assinatura de código/manifesto com chave pública fixa do Vemryx One.
+assinatura de código/manifesto com chave pública fixa do Ralven.
 
 ## Cadeia de confiança
 
 1. O instalador de transição ou download inicial instala somente o
-   `FiveMCleaner.Launcher.exe` e uma versão conhecida em diretório por usuário.
+   `Ralven.Launcher.exe` e uma versão conhecida em diretório por usuário.
 2. O feed de release é um documento canônico, assinado com ECDSA P-256/SHA-256
    usando exclusivamente a criptografia nativa do .NET. O app e o
    Recovery Agent contêm somente a chave pública de produção e rejeitam feed,
@@ -98,8 +98,8 @@ usuário escolhe compartilhar.
 
 O código, o empacotamento e o pipeline estão implementados. A próxima release
 estável usa o Inno existente uma última vez como instalador de transição: ele
-preserva `%LOCALAPPDATA%\FiveMCleaner`, atalhos e preferência de inicialização,
-mas instala `FiveMCleaner.Launcher.exe` e a primeira versão imutável. A partir
+preserva `%LOCALAPPDATA%\Ralven`, atalhos e preferência de inicialização,
+mas instala `Ralven.Launcher.exe` e a primeira versão imutável. A partir
 daí, o botão de atualização usa exclusivamente o runtime ZIP assinado.
 
 Antes dessa release, configure os ambientes GitHub abaixo. Chaves usadas por
@@ -107,7 +107,7 @@ Actions são **chaves online de CI**, não chaves offline: o ambiente
 `release-signing` guarda a chave de broker em
 `BROKER_INTEGRITY_SIGNING_PRIVATE_KEY`/`BROKER_INTEGRITY_SIGNING_PASSWORD`.
 O par de update já implantado continua nos secrets legados
-`RELEASE_SIGNING_PRIVATE_KEY`/`FIVEMCLEANER_SIGNING_PASSWORD`, referenciados
+`RELEASE_SIGNING_PRIVATE_KEY`/`RALVEN_SIGNING_PASSWORD`, referenciados
 somente pelo job isolado de assinatura para não romper clientes que confiam na
 chave pública atual.
 As respectivas chaves públicas ficam incorporadas em
@@ -153,7 +153,7 @@ evidência de adoção do launcher; ele não participa das atualizações seguin
 
 As otimizações não dependem de uma pasta fixa do aplicativo: atuam em FiveM,
 GTA V e configurações do Windows. Mesmo assim, o runtime novo deve preservar
-sem alteração `%LOCALAPPDATA%\FiveMCleaner` para configurações, consentimento,
+sem alteração `%LOCALAPPDATA%\Ralven` para configurações, consentimento,
 journals, rollback das otimizações e logs. Somente binários passam para
 `Runtime\versions`; dados mutáveis ficam em `Data`, com contrato de migração
 reversível. O broker é distribuído junto de cada versão e iniciado apenas pelo

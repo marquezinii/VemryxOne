@@ -1,22 +1,22 @@
 # Release preview, integridade e simulação
 
-Este documento descreve a distribuição pública do **Vemryx One**. A versão
+Este documento descreve a distribuição pública do **Ralven**. A versão
 exata e suas mudanças ficam no [CHANGELOG](../CHANGELOG.md) e na página da
 release correspondente; nenhuma delas é garantia de ganho de desempenho.
 
 ## Origem oficial
 
 Baixe binários somente pela página
-[GitHub Releases](https://github.com/marquezinii/VemryxOne/releases). Para
+[GitHub Releases](https://github.com/marquezinii/Ralven/releases). Para
 cada release `win-x64`, a publicação deve conter os seguintes arquivos
 produzidos pelo mesmo workflow:
 
-- `VemryxOne-Setup-X.Y.Z-win-x64.exe`;
-- `VemryxOne-Setup-X.Y.Z-win-x64.exe.sha256`;
-- `VemryxOne-release-manifest-X.Y.Z.json`;
-- `FiveMCleaner-Setup-X.Y.Z-win-x64.exe` e o alias estável legado quando
+- `Ralven-Setup-X.Y.Z-win-x64.exe`;
+- `Ralven-Setup-X.Y.Z-win-x64.exe.sha256`;
+- `Ralven-release-manifest-X.Y.Z.json`;
+- `Ralven-Setup-X.Y.Z-win-x64.exe` e o alias estável legado quando
   aplicável;
-- `FiveMCleaner-win-x64.zip` e `FiveMCleaner-win-x64.zip.sha256` para o
+- `Ralven-win-x64.zip` e `Ralven-win-x64.zip.sha256` para o
   runtime compatível com instalações existentes.
 
 Não use cópias hospedadas em encurtadores, mirrors, vídeos ou pacotes de
@@ -28,7 +28,7 @@ da release.
 Depois de baixar os dois arquivos para a mesma pasta, execute:
 
 ```powershell
-$archive = Resolve-Path .\FiveMCleaner-win-x64.zip
+$archive = Resolve-Path .\Ralven-win-x64.zip
 $expected = ((Get-Content "$archive.sha256" -Raw).Trim() -split '\s+')[0].ToLowerInvariant()
 $actual = (Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant()
 

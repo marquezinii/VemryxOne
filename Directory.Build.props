@@ -1,18 +1,18 @@
 <Project>
   <PropertyGroup>
     <LangVersion>14.0</LangVersion>
-    <VemryxOneTargetFramework>net10.0</VemryxOneTargetFramework>
-    <VemryxOneWindowsTargetFramework>net10.0-windows10.0.19041.0</VemryxOneWindowsTargetFramework>
+    <RalvenTargetFramework>net10.0</RalvenTargetFramework>
+    <RalvenWindowsTargetFramework>net10.0-windows10.0.19041.0</RalvenWindowsTargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Deterministic>true</Deterministic>
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
-    <Authors>Vemryx</Authors>
-    <Company>Vemryx</Company>
-    <Copyright>Copyright (c) 2026 Vemryx. All rights reserved.</Copyright>
+    <Authors>Ralven</Authors>
+    <Company>Ralven</Company>
+    <Copyright>Copyright (c) 2026 Ralven. All rights reserved.</Copyright>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/marquezinii/VemryxOne</RepositoryUrl>
-    <Product>Vemryx One</Product>
+    <RepositoryUrl>https://github.com/marquezinii/Ralven</RepositoryUrl>
+    <Product>Ralven</Product>
     <Version>1.5.1</Version>
   </PropertyGroup>
 </Project>

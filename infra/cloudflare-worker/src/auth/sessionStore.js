@@ -5,7 +5,7 @@
 import { generateSessionId, hashSessionId } from './crypto.js';
 
 export const SESSION_DURATION_MS = 12 * 60 * 60 * 1000; // 12h
-export const SESSION_COOKIE_NAME = '__Host-vemryx_dashboard_session';
+export const SESSION_COOKIE_NAME = '__Host-ralven-dashboard-session';
 
 /** True when the given session row is currently valid at `now`. */
 export function isSessionValid(row, now) {

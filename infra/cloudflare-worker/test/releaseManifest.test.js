@@ -13,7 +13,7 @@ test('signed release feed is unavailable by default and no-store when configured
     channel: 'stable',
     version: '2.0.0',
     minimumAllowedVersion: '1.1.3',
-    packageUrl: 'https://github.com/marquezinii/FiveMCleaner/releases/download/v2.0.0/FiveMCleaner-Runtime-win-x64.zip',
+    packageUrl: 'https://github.com/marquezinii/Ralven/releases/download/v2.0.0/Ralven-Runtime-win-x64.zip',
     packageSha256: 'a'.repeat(64),
     packageSizeBytes: 1024,
     signatureBase64: 'a'.repeat(96),

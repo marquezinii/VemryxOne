@@ -1,6 +1,6 @@
 # Política de segurança
 
-O Vemryx One altera configurações locais e possui operações que podem exigir elevação. Uma falha nesse limite de confiança é tratada com prioridade.
+O Ralven altera configurações locais e possui operações que podem exigir elevação. Uma falha nesse limite de confiança é tratada com prioridade.
 
 ## Versões cobertas
 

@@ -18,7 +18,7 @@ $ErrorActionPreference = 'Stop'
 
 $scriptRoot = $PSScriptRoot
 $workspace = Split-Path -Parent $scriptRoot
-$template = Join-Path $workspace 'build\obfuscation\VemryxOne.Obfuscar.xml'
+$template = Join-Path $workspace 'build\obfuscation\Ralven.Obfuscar.xml'
 
 if (-not (Test-Path -LiteralPath $template -PathType Leaf)) {
     throw "Obfuscar project template not found: $template"
@@ -32,7 +32,7 @@ if (-not (Test-Path -LiteralPath $inPath -PathType Container)) {
 # Assemblies the template declares as <Module>. Skip the run entirely if none
 # of them are present (e.g. the broker output has no UpdateRuntime); never fail
 # just because a directory legitimately lacks one.
-$targetAssemblies = @('FiveMCleaner.Core.dll', 'FiveMCleaner.Windows.dll')
+$targetAssemblies = @('Ralven.Core.dll', 'Ralven.Windows.dll')
 $present = @($targetAssemblies | Where-Object { Test-Path -LiteralPath (Join-Path $inPath $_) -PathType Leaf })
 if ($present.Count -eq 0) {
     Write-Host "No hardenable assemblies in $inPath; nothing to obfuscate." -ForegroundColor Yellow

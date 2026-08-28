@@ -13,7 +13,7 @@ Relatórios de falha sanitizados, a telemetria de uso e os eventos técnicos de
 otimização dependem das opções abaixo. Nenhum deles inclui HWID, MAC, serial,
 nome do PC, usuário do Windows ou caminhos locais.
 
-A opção **Ajudar a melhorar o Vemryx One** fica em **Configurações**, vem
+A opção **Ajudar a melhorar o Ralven** fica em **Configurações**, vem
 habilitada por padrão em instalações novas e pode ser desligada a qualquer
 momento. Ela controla o envio da telemetria de uso inteira, inclusive os
 campos técnicos abaixo.
@@ -79,7 +79,7 @@ sem crescer indefinidamente.
 A telemetria é enviada ao endpoint HTTPS do Worker Cloudflare (rota
 `/telemetry`, ver abaixo) — esse é o único transporte, o FormSubmit não é
 mais usado para nada relacionado a telemetria de uso. O payload do
-Vemryx One não contém dados pessoais. Como em qualquer conexão HTTPS, a
+Ralven não contém dados pessoais. Como em qualquer conexão HTTPS, a
 infraestrutura de rede pode processar metadados de conexão, como endereço
 IP, conforme suas próprias políticas; isso não é controlado nem incluído
 como campo pelo aplicativo.
@@ -117,10 +117,10 @@ identificador de usuário são sempre sobrescritos/limpos, nunca enviados.
 ### Configuração centralizada e ambientes
 
 O DSN do Sentry não é um literal espalhado pelo código: fica em
-`src/Vemryx.One.App/Config/appsettings.Development.json` e
+`src/Ralven.App/Config/appsettings.Development.json` e
 `appsettings.Production.json` (com `appsettings.json` como base/fallback
 seguro, sem DSN). `AppEnvironment.Resolve()` decide qual arquivo usar: a
-variável de ambiente `FIVEMCLEANER_ENVIRONMENT` tem prioridade (é isso que
+variável de ambiente `RALVEN_ENVIRONMENT` tem prioridade (é isso que
 `scripts/Start-DevelopmentApp.ps1` define como `Development`); sem ela, uma
 build Debug resolve para `Development` e uma build Release (a distribuição
 pública real) resolve para `Production`. Isso garante que erros do

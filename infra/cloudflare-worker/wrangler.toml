@@ -1,4 +1,4 @@
-## Vemryx One anonymous telemetry + admin dashboard API Worker.
+## Ralven anonymous telemetry + admin dashboard API Worker.
 ##
 ## Receives the same closed-allowlist telemetry event already documented in
 ## docs/telemetry.md, validates it server-side (never trusting client-side
@@ -43,6 +43,9 @@
 ##
 ## See README.md for the full setup walkthrough.
 
+# External Cloudflare resource identifiers intentionally remain unchanged.
+# Renaming these values would provision unrelated resources instead of
+# rebranding the deployed Ralven service.
 name = "fivemcleaner-telemetry"
 main = "src/index.js"
 compatibility_date = "2026-08-11"

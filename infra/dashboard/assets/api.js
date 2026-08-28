@@ -80,7 +80,7 @@ export async function setLiveAlert(baseUrl, { message, active }, csrfToken, fetc
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-Vemryx-Csrf-Token': csrfToken,
+      'X-Ralven-Csrf-Token': csrfToken,
     },
     body: JSON.stringify(body),
   }, fetchImpl);

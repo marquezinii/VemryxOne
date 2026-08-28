@@ -316,7 +316,7 @@ No modo integrador, o agente deve:
     preservado fora de Git/PR/CHANGELOG;
 13. reconstruir a simulação local da próxima versão com
     `scripts\Install-DevelopmentShortcut.ps1 -Build` e confirmar que o atalho
-    `Vemryx One - Desenvolvimento` aponta para
+    `Ralven - Desenvolvimento` aponta para
     `scripts\Start-DevelopmentApp.ps1`;
 14. garantir que `origin/dev/proxima-versao` reflita o estado integrado e validado;
 15. após confirmação de merge e validação, remover worktrees locais temporários e
@@ -324,9 +324,9 @@ No modo integrador, o agente deve:
     PR já mergeadas podem ser removidas como limpeza normal.
 
 Ao concluir qualquer tarefa — exceto tarefas que envolvam diretamente
-instalador/updater (`Vemryx.One.Updater`, `Vemryx.One.UpdateRuntime`,
-`Vemryx.One.ReleaseTool`, `installer/`, fluxos de staging/ativação/rollback) —
-o agente deve **sempre** reconstruir o atalho `Vemryx One - Desenvolvimento`
+instalador/updater (`Ralven.Updater`, `Ralven.UpdateRuntime`,
+`Ralven.ReleaseTool`, `installer/`, fluxos de staging/ativação/rollback) —
+o agente deve **sempre** reconstruir o atalho `Ralven - Desenvolvimento`
 com `scripts\Install-DevelopmentShortcut.ps1 -Build`, executado a partir do
 próprio checkout/worktree da tarefa, para que ele reflita o app com as
 últimas mudanças implementadas, pronto para o usuário testar quando quiser.
@@ -336,7 +336,7 @@ Isso vale tanto para tarefas isoladas quanto para a integração da
 O script não aponta o atalho para o worktree que o executou: ele espelha a
 árvore de trabalho atual (exceto `.git`, `bin`, `obj`, `artifacts`,
 `node_modules`) para uma pasta irmã fixa e permanente,
-`VemryxOne-dev-shortcut`, e aponta o atalho para essa cópia estável. Assim
+`Ralven-dev-shortcut`, e aponta o atalho para essa cópia estável. Assim
 o atalho nunca fica órfão quando um worktree de tarefa é removido após o
 merge — a próxima tarefa ou integração que reconstruir o atalho simplesmente
 sobrescreve o espelho com o estado mais recente.
@@ -485,7 +485,7 @@ obrigatório.
 
 - Tag: `vMAJOR.MINOR.PATCH` (ex.: `v1.4.2`) — sem `v` duplicado, sem espaços
   e sem formato alternativo.
-- Título: `Vemryx One vMAJOR.MINOR.PATCH` (ex.: `Vemryx One v1.4.2`).
+- Título: `Ralven vMAJOR.MINOR.PATCH` (ex.: `Ralven v1.4.2`).
 
 **Tipo de release**
 
@@ -556,7 +556,7 @@ seção inteira — nunca escreva algo como "Nenhuma alteração"):
    em seções diferentes; agrupe alterações muito pequenas quando fizer
    sentido, mas sem esconder mudanças relevantes.
 7. Preserve nomes oficiais de funcionalidades, telas e componentes públicos
-   do Vemryx One.
+   do Ralven.
 8. Nunca inclua hashes de commit, nomes de branch internas, caminhos locais,
    worktrees, prompts, nomes de agentes de IA, detalhes de processo interno,
    segredos, tokens ou dados pessoais.
@@ -577,7 +577,7 @@ changelog técnico.
 O corpo da GitHub Release é consumido automaticamente pelo sistema oficial
 de notificações do Discord. Por isso:
 
-- não insira um cabeçalho manual como "Vemryx One vX.Y.Z está disponível"
+- não insira um cabeçalho manual como "Ralven vX.Y.Z está disponível"
   nem repita a versão no início do corpo — o sistema do Discord já cria esse
   cabeçalho a partir do título/tag;
 - não adicione links genéricos de download no corpo só para o Discord — a
@@ -689,7 +689,7 @@ Nova tarefa
 → criar branch pelo objetivo da mudança
 → criar/reutilizar worktree exclusivo
 → implementar e testar
-→ reconstruir Vemryx One - Desenvolvimento (exceto tarefas de instalador/updater)
+→ reconstruir Ralven - Desenvolvimento (exceto tarefas de instalador/updater)
 → commit(s) profissionais
 → push automático somente da branch da tarefa
 → criar/atualizar PR automático → dev/proxima-versao
@@ -703,7 +703,7 @@ Integração solicitada
 → validar estado combinado
 → consolidar PROJECT_STATE como snapshot curto, sem cronologia
 → não atualizar PROJECT_HISTORY rotineiramente
-→ reconstruir Vemryx One - Desenvolvimento
+→ reconstruir Ralven - Desenvolvimento
 → atualizar origin/dev/proxima-versao
 → limpar worktrees/branches temporários já mergeados
 → dev pronta

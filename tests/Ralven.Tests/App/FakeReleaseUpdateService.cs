@@ -1,0 +1,68 @@
+using Ralven.App.Services;
+
+namespace Ralven.Tests.App;
+
+/// <summary>
+/// Test double for <see cref="IReleaseUpdateService"/> letting tests control
+/// exactly what <see cref="MainViewModel.CheckForUpdatesManuallyAsync"/> and
+/// <see cref="MainViewModel.CheckForUpdatesAsync"/> observe, without any real
+/// network access.
+/// </summary>
+internal sealed class FakeReleaseUpdateService : IReleaseUpdateService
+{
+    private readonly ReleaseUpdate? updateToReturn;
+    private readonly Exception? exceptionToThrow;
+    private readonly DownloadedUpdate? downloadToReturn;
+    private readonly Exception? downloadExceptionToThrow;
+
+    public FakeReleaseUpdateService(
+        ReleaseUpdate? updateToReturn = null,
+        Exception? exceptionToThrow = null,
+        DownloadedUpdate? downloadToReturn = null,
+        Exception? downloadExceptionToThrow = null)
+    {
+        this.updateToReturn = updateToReturn;
+        this.exceptionToThrow = exceptionToThrow;
+        this.downloadToReturn = downloadToReturn;
+        this.downloadExceptionToThrow = downloadExceptionToThrow;
+    }
+
+    public int CheckForUpdateCallCount { get; private set; }
+
+    public int DownloadUpdateCallCount { get; private set; }
+
+    public static ReleaseUpdate CreateUpdate(string version = "9.9.9") => new(
+        StableSemanticVersion.Parse(version),
+        tagName: $"v{version}",
+        assetName: $"Ralven-Setup-{version}-win-x64.exe",
+        downloadUri: new Uri($"https://example.com/Ralven-Setup-{version}-win-x64.exe"),
+        sizeBytes: 10 * 1024 * 1024,
+        sha256Hex: new string('a', 64),
+        releaseNotesUri: new Uri("https://example.com/releases/tag/v" + version));
+
+    public Task<ReleaseUpdate?> CheckForUpdateAsync(
+        StableSemanticVersion currentVersion,
+        CancellationToken cancellationToken = default)
+    {
+        CheckForUpdateCallCount++;
+        return exceptionToThrow is not null
+            ? Task.FromException<ReleaseUpdate?>(exceptionToThrow)
+            : Task.FromResult(updateToReturn);
+    }
+
+    public Task<DownloadedUpdate> DownloadUpdateAsync(
+        ReleaseUpdate update,
+        IProgress<UpdateDownloadProgress>? progress = null,
+        CancellationToken cancellationToken = default)
+    {
+        DownloadUpdateCallCount++;
+        if (downloadExceptionToThrow is not null)
+        {
+            return Task.FromException<DownloadedUpdate>(downloadExceptionToThrow);
+        }
+
+        return downloadToReturn is not null
+            ? Task.FromResult(downloadToReturn)
+            : throw new NotSupportedException("Not exercised by these tests.");
+    }
+}

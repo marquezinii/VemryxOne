@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>$(RalvenWindowsTargetFramework)</TargetFramework>
+    <RootNamespace>Ralven.Broker</RootNamespace>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>../Ralven.App/Assets/Ralven.ico</ApplicationIcon>
+    <AssemblyName>Ralven.Broker</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Ralven.Contracts/Ralven.Contracts.csproj" />
+    <ProjectReference Include="../Ralven.Core/Ralven.Core.csproj" />
+    <ProjectReference Include="../Ralven.Windows/Ralven.Windows.csproj" />
+  </ItemGroup>
+  <Target Name="GetBrokerOutputDirectory" DependsOnTargets="Build" Returns="@(_BrokerOutputDirectory)">
+    <ItemGroup>
+      <_BrokerOutputDirectory Include="$(TargetDir)" />
+    </ItemGroup>
+  </Target>
+</Project>

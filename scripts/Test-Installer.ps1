@@ -26,10 +26,10 @@ $defaultTasksLog = Join-Path $smokeRoot 'default-tasks.log'
 $upgradeLog = Join-Path $smokeRoot 'upgrade.log'
 $autoUpdateLog = Join-Path $smokeRoot 'auto-update.log'
 $uninstallLog = Join-Path $smokeRoot 'uninstall.log'
-$uninstallRegistryPath = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\{49338651-127F-4FD3-BEAD-88D8C9377672}_is1'
+$uninstallRegistryPath = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\{35FF816F-9EFD-42C8-A63B-CC5EA138805A}_is1'
 $runRegistryPath = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run'
-$runValueName = 'FiveMCleaner'
-$userDataMarkerRoot = Join-Path $env:LOCALAPPDATA "FiveMCleaner\.installer-smoke-$smokeId"
+$runValueName = 'Ralven'
+$userDataMarkerRoot = Join-Path $env:LOCALAPPDATA "Ralven\.installer-smoke-$smokeId"
 $userDataMarker = Join-Path $userDataMarkerRoot 'preserve-me.txt'
 $installed = $false
 $commonSilentArguments = @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART')
@@ -57,7 +57,7 @@ function Stop-SmokeAppProcesses {
     param([Parameter(Mandatory)][string]$InstallDirectory)
 
     $prefix = $InstallDirectory.TrimEnd('\')
-    $names = @('FiveMCleaner.exe', 'FiveMCleaner.Launcher.exe', 'FiveMCleaner.Broker.exe')
+    $names = @('Ralven.exe', 'Ralven.Launcher.exe', 'Ralven.Broker.exe')
     foreach ($name in $names) {
         $filter = "Name = '$name'"
         Get-CimInstance -ClassName Win32_Process -Filter $filter -ErrorAction SilentlyContinue |
@@ -77,12 +77,12 @@ function Remove-SmokeDesktopShortcut {
 
     $prefix = $InstallDirectory.TrimEnd('\')
     $candidates = @(
-        (Join-Path ([Environment]::GetFolderPath('Desktop')) 'Vemryx One.lnk'),
-        (Join-Path $env:USERPROFILE 'OneDrive\Desktop\Vemryx One.lnk'),
-        (Join-Path $env:USERPROFILE 'Desktop\Vemryx One.lnk'),
-        (Join-Path ([Environment]::GetFolderPath('Desktop')) 'FiveMCleaner.lnk'),
-        (Join-Path $env:USERPROFILE 'OneDrive\Desktop\FiveMCleaner.lnk'),
-        (Join-Path $env:USERPROFILE 'Desktop\FiveMCleaner.lnk')
+        (Join-Path ([Environment]::GetFolderPath('Desktop')) 'Ralven.lnk'),
+        (Join-Path $env:USERPROFILE 'OneDrive\Desktop\Ralven.lnk'),
+        (Join-Path $env:USERPROFILE 'Desktop\Ralven.lnk'),
+        (Join-Path ([Environment]::GetFolderPath('Desktop')) 'Ralven.lnk'),
+        (Join-Path $env:USERPROFILE 'OneDrive\Desktop\Ralven.lnk'),
+        (Join-Path $env:USERPROFILE 'Desktop\Ralven.lnk')
     ) | Select-Object -Unique
 
     $shell = $null
@@ -109,16 +109,16 @@ function Remove-SmokeDesktopShortcut {
 Assert-UnderArtifacts $smokeRoot
 
 if (-not $AllowExistingInstallation -and (Test-Path -LiteralPath $uninstallRegistryPath)) {
-    throw 'A real FiveMCleaner installation already exists; refusing to replace it during a smoke test.'
+    throw 'A real Ralven installation already exists; refusing to replace it during a smoke test.'
 }
 
 $existingRunValue = Get-RegistryValueOrNull -Path $runRegistryPath -Name $runValueName
 if (-not $AllowExistingInstallation -and $null -ne $existingRunValue) {
-    throw 'A FiveMCleaner startup entry already exists; refusing to overwrite it during a smoke test.'
+    throw 'A Ralven startup entry already exists; refusing to overwrite it during a smoke test.'
 }
 
 if ($AllowExistingInstallation) {
-    Write-Warning 'Existing FiveMCleaner registration is allowed for this smoke test by explicit operator request.'
+    Write-Warning 'Existing Ralven registration is allowed for this smoke test by explicit operator request.'
 }
 
 & (Join-Path $PSScriptRoot 'Verify-Installer.ps1') `
@@ -140,7 +140,7 @@ try {
         '/LANG=en',
         '/TASKS=desktopicon',
         "/DIR=$installDirectory",
-        "/GROUP=Vemryx One Smoke $smokeId",
+        "/GROUP=Ralven Smoke $smokeId",
         "/LOG=$defaultTasksLog"
     )
     Write-Host '1/6 Install with desktopicon only...' -ForegroundColor Cyan
@@ -164,7 +164,7 @@ try {
         '/LANG=ptbr',
         '/TASKS=desktopicon,startup',
         "/DIR=$installDirectory",
-        "/GROUP=Vemryx One Smoke $smokeId",
+        "/GROUP=Ralven Smoke $smokeId",
         "/LOG=$installLog"
     )
     $installProcess = Start-Process -FilePath $resolvedInstaller -ArgumentList $installArguments -WindowStyle Hidden -Wait -PassThru
@@ -172,7 +172,7 @@ try {
         throw "Silent install failed with exit code $($installProcess.ExitCode). See $installLog"
     }
 
-    $installedExecutable = Join-Path $installDirectory 'FiveMCleaner.Launcher.exe'
+    $installedExecutable = Join-Path $installDirectory 'Ralven.Launcher.exe'
     $uninstaller = Join-Path $installDirectory 'unins000.exe'
     foreach ($required in @($installedExecutable, $uninstaller)) {
         if (-not (Test-Path -LiteralPath $required -PathType Leaf)) {
@@ -185,7 +185,7 @@ try {
     }
 
     $uninstallRegistration = Get-ItemProperty -LiteralPath $uninstallRegistryPath
-    if ($uninstallRegistration.DisplayName -ne 'Vemryx One') {
+    if ($uninstallRegistration.DisplayName -ne 'Ralven') {
         throw "Unexpected uninstall DisplayName: $($uninstallRegistration.DisplayName)"
     }
     if (-not [string]::IsNullOrWhiteSpace($ExpectedVersion) -and
@@ -232,7 +232,7 @@ try {
         '/LANG=en',
         '/TASKS=',
         "/DIR=$installDirectory",
-        "/GROUP=Vemryx One Smoke $smokeId",
+        "/GROUP=Ralven Smoke $smokeId",
         "/LOG=$upgradeLog"
     )
     $upgradeProcess = Start-Process -FilePath $resolvedInstaller -ArgumentList $upgradeArguments -WindowStyle Hidden -Wait -PassThru
@@ -246,16 +246,16 @@ try {
     }
 
     $upgradedExecutableHash = (Get-FileHash -LiteralPath $installedExecutable -Algorithm SHA256).Hash
-    $sourceExecutableHash = (Get-FileHash -LiteralPath (Join-Path $resolvedPublish 'FiveMCleaner.Launcher.exe') -Algorithm SHA256).Hash
+    $sourceExecutableHash = (Get-FileHash -LiteralPath (Join-Path $resolvedPublish 'Ralven.Launcher.exe') -Algorithm SHA256).Hash
     if ($upgradedExecutableHash -ne $sourceExecutableHash) {
         throw 'Main executable hash mismatch after in-place upgrade.'
     }
 
     Write-Host '5/6 AUTOUPDATE contract (no app launch)...' -ForegroundColor Cyan
-    # Do not run /AUTOUPDATE=yes here: it relaunches FiveMCleaner.exe and is
+    # Do not run /AUTOUPDATE=yes here: it relaunches Ralven.exe and is
     # covered by Verify-Installer.ps1 + UpdateHandoff unit tests. Live relaunch
     # leaves a GUI process that blocks uninstall and pollutes the operator machine.
-    $issText = Get-Content -LiteralPath (Join-Path $workspace 'installer\VemryxOne.iss') -Raw
+    $issText = Get-Content -LiteralPath (Join-Path $workspace 'installer\Ralven.iss') -Raw
     if ($issText -notmatch 'IsAutomaticUpdateRelaunch' -or
         $issText -notmatch 'AUTOUPDATE\|no' -or
         $issText -notmatch 'Parameters: "--updated=') {
@@ -303,12 +303,12 @@ try {
     }
 
     if (-not (Test-Path -LiteralPath $userDataMarker -PathType Leaf)) {
-        throw 'Silent uninstall removed local user data; it must preserve %LOCALAPPDATA%\FiveMCleaner by default.'
+        throw 'Silent uninstall removed local user data; it must preserve %LOCALAPPDATA%\Ralven by default.'
     }
 
     # Interactive removal choice is still guarded by Verify-Installer.ps1.
-    if ((Get-Content -LiteralPath (Join-Path $workspace 'installer\VemryxOne.iss') -Raw) -notmatch
-        "DelTree\(ExpandConstant\('\{localappdata\}\\FiveMCleaner'\), True, True, True\)") {
+    if ((Get-Content -LiteralPath (Join-Path $workspace 'installer\Ralven.iss') -Raw) -notmatch
+        "DelTree\(ExpandConstant\('\{localappdata\}\\Ralven'\), True, True, True\)") {
         throw 'The explicit interactive removal path for user data is missing.'
     }
 

@@ -27,6 +27,8 @@ import { drawBarChart, drawDonutChart, drawLineChart, DONUT_COLORS } from './ren
 // form POSTs the admin password there. So it is honored only when the
 // dashboard itself is served from localhost -- a production host always
 // talks to the real Worker and ignores any `?api=`.
+// This hostname is the immutable identifier of the already-deployed Worker;
+// it is not a user-facing product name.
 const DEFAULT_API_BASE = 'https://fivemcleaner-telemetry.felipemarquesini10.workers.dev';
 const API_BASE = resolveApiBase(DEFAULT_API_BASE, location.hostname, new URLSearchParams(location.search));
 

@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>$(RalvenWindowsTargetFramework)</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+    <UseWPF>true</UseWPF>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <!-- Testhost precisa carregar PresentationCore para validar o sanitizador WPF. -->
+    <NoWarn>$(NoWarn);NETSDK1086</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Ralven.UpdateRuntime\Ralven.UpdateRuntime.csproj" />
+    <FrameworkReference Include="Microsoft.WindowsDesktop.App.WPF" />
+    <PackageReference Include="Microsoft.Testing.Platform" />
+    <PackageReference Include="xunit.v3.mtp-v2" />
+    <PackageReference Include="coverlet.MTP">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Ralven.App/Ralven.App.csproj" />
+    <ProjectReference Include="../../src/Ralven.Contracts/Ralven.Contracts.csproj" />
+    <ProjectReference Include="../../src/Ralven.Core/Ralven.Core.csproj" />
+    <ProjectReference Include="../../src/Ralven.Windows/Ralven.Windows.csproj" />
+    <ProjectReference Include="../../src/Ralven.Updater/Ralven.Updater.csproj" />
+  </ItemGroup>
+</Project>

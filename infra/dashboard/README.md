@@ -1,4 +1,4 @@
-# Vemryx One dashboard
+# Ralven dashboard
 
 Static admin dashboard for the telemetry and bug reports collected by
 [`infra/cloudflare-worker`](../cloudflare-worker/README.md). Plain HTML/CSS/JS,
@@ -10,7 +10,7 @@ attachment/screenshot, no R2) — see `infra/cloudflare-worker/README.md`.
 ## What's here
 
 - `index.html` — login screen + the dashboard itself (one page, toggled by
-  whether a session cookie is currently valid), branded with the Vemryx One
+  whether a session cookie is currently valid), branded with the Ralven
   logo, and organized into four sections: **Adoção** (usage/version/profile
   charts), **Hardware** (CPU/GPU/RAM breakdowns), **Diagnóstico de bugs**
   (error categories, actions most associated with failures, errors by
@@ -61,7 +61,7 @@ Access, no custom domain required).
 
 ## "Active users" honesty note
 
-Vemryx One's telemetry never includes a device or machine identifier (see
+Ralven's telemetry never includes a device or machine identifier (see
 `docs/telemetry.md`) — that is a deliberate privacy invariant, not a gap. As
 a direct consequence, this dashboard cannot show a true unique-user count;
 every "per day"/"in period" number is a count of *optimization runs*
@@ -77,6 +77,7 @@ npx wrangler pages deploy . --project-name=fivemcleaner-dashboard --branch=produ
 `assets/app.js` hardcodes the Worker's `workers.dev` URL as the default API
 base (no custom domain connects the two, so `location.origin` would point
 at the dashboard's own, wrong origin) — update that constant first if the
-Worker is ever redeployed under a different URL. No custom domain (e.g.
-`dashboard.fivemcleaner.com`) has been configured; ask before adding one, as
-it requires DNS changes to a real zone.
+Worker is ever redeployed under a different URL. The Pages project name and
+Worker hostname are retained external infrastructure identifiers, not public
+brand names. No custom domain has been configured; ask before adding one,
+because that requires DNS changes to a real zone.

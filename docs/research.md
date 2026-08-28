@@ -1,6 +1,6 @@
 # Base de pesquisa
 
-Esta página registra as evidências usadas para definir o escopo e as políticas do Vemryx One. A revisão atual foi fechada em **18 de julho de 2026**; itens dependentes de versão precisam ser revalidados antes de cada release.
+Esta página registra as evidências usadas para definir o escopo e as políticas do Ralven. A revisão atual foi fechada em **18 de julho de 2026**; itens dependentes de versão precisam ser revalidados antes de cada release.
 
 ## Como ler
 
@@ -155,7 +155,7 @@ Como referência secundária de custo visual, o guia da NVIDIA para GTAV identif
 
 Fonte: [Grand Theft Auto V PC Graphics & Performance Guide](https://www.nvidia.com/en-us/geforce/news/grand-theft-auto-v-pc-graphics-and-performance-guide/).
 
-Esses resultados são antigos e dependentes de hardware. Por isso, os presets do Vemryx One são hipóteses conservadoras e devem ser medidos em hardware real antes de receber alegações quantitativas.
+Esses resultados são antigos e dependentes de hardware. Por isso, os presets do Ralven são hipóteses conservadoras e devem ser medidos em hardware real antes de receber alegações quantitativas.
 
 ## Antivírus e integridade
 
@@ -165,10 +165,10 @@ Esses resultados são antigos e dependentes de hardware. Por isso, os presets do
 - [KERNELBASE e conflito com antivírus](https://support.cfx.re/hc/en-us/articles/5299951678748-FiveM-crashing-with-KERNELBASE-dll-RaiseException-error)
 - [Game integrity check failed](https://support.cfx.re/hc/en-us/articles/12505932916508-Game-integrity-check-failed-error-in-FiveM)
 
-**Inferência.** Para reduzir falsos positivos, o Vemryx One não deve injetar DLL, alterar memória de processos, patchar executáveis, ofuscar payloads, baixar scripts executáveis ou desativar ferramentas de segurança. Não existe garantia honesta de detecção zero em todos os antivírus.
+**Inferência.** Para reduzir falsos positivos, o Ralven não deve injetar DLL, alterar memória de processos, patchar executáveis, ofuscar payloads, baixar scripts executáveis ou desativar ferramentas de segurança. Não existe garantia honesta de detecção zero em todos os antivírus.
 
 ## Marca e representação
 
-O acordo do Cfx.re proíbe representação que sugira endosso ou afiliação. A comunicação pública deve apresentar o Vemryx One como projeto independente “para FiveM”, incluir disclaimer claro e evitar o logo oficial como marca própria.
+O acordo do Cfx.re proíbe representação que sugira endosso ou afiliação. A comunicação pública deve apresentar o Ralven como projeto independente “para FiveM”, incluir disclaimer claro e evitar o logo oficial como marca própria.
 
 Fonte: [Cfx.re Platform Service Agreement](https://runtime.fivem.net/fivem-service-agreement-4.pdf), seção “Representation”.
