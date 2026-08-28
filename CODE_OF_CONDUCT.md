@@ -1,72 +1,101 @@
 # Código de Conduta
 
-## Nosso compromisso
+## Compromisso
 
-Nós, membros, contribuidores e mantenedores, nos comprometemos a tornar a participação nesta comunidade uma experiência livre de assédio para todas as pessoas, independentemente de idade, aparência, deficiência visível ou invisível, etnia, características sexuais, identidade ou expressão de gênero, nível de experiência, educação, condição socioeconômica, nacionalidade, raça, religião ou identidade e orientação sexual.
+O Vemryx One busca manter uma comunidade técnica segura, respeitosa e
+profissional. Todas as pessoas que participam do projeto — contribuidores,
+usuários, mantenedores e visitantes — devem poder colaborar sem assédio,
+discriminação ou intimidação.
 
-Comprometemo-nos a agir e interagir de maneiras que contribuam para uma comunidade aberta, acolhedora, diversa, inclusiva e saudável.
+Esperamos respeito independentemente de idade, deficiência, aparência,
+etnia, identidade ou expressão de gênero, nível de experiência, nacionalidade,
+origem, raça, religião, orientação sexual, condição socioeconômica ou qualquer
+outra característica pessoal.
 
-## Padrões esperados
+## Comportamentos esperados
 
-Exemplos de comportamento positivo:
+Em discussões, contribuições e demais interações, esperamos que cada pessoa:
 
-- demonstrar empatia e gentileza;
-- respeitar opiniões, experiências e pontos de vista diferentes;
-- dar e aceitar feedback construtivo;
-- assumir responsabilidade, pedir desculpas e aprender com erros;
-- priorizar o bem da comunidade, não apenas interesses individuais.
+- trate as outras com respeito, empatia e boa-fé;
+- mantenha críticas técnicas focadas em ideias, código e resultados, nunca em
+  pessoas;
+- dê e receba feedback de forma clara, construtiva e profissional;
+- reconheça erros, corrija informações quando necessário e respeite decisões
+  de moderação;
+- proteja a privacidade e a segurança de quem participa do projeto;
+- contribua para um ambiente acessível, inclusivo e colaborativo.
 
-Comportamentos inaceitáveis incluem:
+## Comportamentos inaceitáveis
 
-- linguagem ou imagens sexualizadas e atenção sexual indesejada;
-- trolling, insultos, ataques pessoais ou comentários depreciativos;
-- assédio público ou privado;
-- publicar informações privadas de outra pessoa sem permissão explícita;
-- ameaçar, incentivar dano ou pressionar alguém a executar alterações inseguras;
-- qualquer conduta que seria inadequada em um ambiente profissional.
+Não são aceitos, em espaços públicos ou privados relacionados ao projeto:
 
-## Responsabilidades de aplicação
-
-Os mantenedores são responsáveis por esclarecer e fazer cumprir estes padrões. Eles podem remover, editar ou rejeitar comentários, commits, código, issues e outras contribuições incompatíveis com este Código de Conduta, explicando as decisões de moderação quando apropriado.
+- assédio, intimidação, perseguição ou ameaças;
+- insultos, ataques pessoais, linguagem discriminatória ou comentários
+  depreciativos;
+- conteúdo sexualizado ou atenção sexual indesejada;
+- publicação ou solicitação de dados pessoais sem consentimento explícito,
+  exceto o mínimo necessário para um relato confidencial e de boa-fé pelo
+  canal autorizado;
+- divulgação de vulnerabilidades, credenciais ou informações sensíveis fora do
+  fluxo responsável indicado em [SECURITY.md](SECURITY.md);
+- pressão para que alguém execute, aprove ou publique mudanças inseguras;
+- spam, manipulação de discussões ou qualquer conduta incompatível com um
+  ambiente profissional.
 
 ## Abrangência
 
-Este código se aplica aos espaços do projeto e também quando uma pessoa representa oficialmente o projeto em outro espaço, inclusive por conta oficial, endereço oficial ou participação designada em evento.
+Este Código de Conduta se aplica a issues, pull requests, revisões, discussões,
+repositórios, canais de comunicação e eventos do projeto. Também se aplica
+quando alguém representa oficialmente o Vemryx One em outro espaço.
 
-## Denúncias
+## Como relatar uma ocorrência
 
-Comportamentos abusivos, ameaçadores ou inaceitáveis devem ser relatados de forma privada pelo canal descrito em [SECURITY.md](SECURITY.md), identificando o assunto como **Conduta**. Não abra uma issue pública com dados pessoais ou detalhes da pessoa afetada.
+Relatos de conduta devem ser enviados de forma privada pelo canal descrito em
+[SECURITY.md](SECURITY.md), com o assunto **Conduta**. Não publique dados
+pessoais, evidências sensíveis ou detalhes que possam expor pessoas envolvidas.
+Se o canal privado não estiver disponível, abra somente uma issue pública sem
+detalhes para solicitar uma forma segura de contato.
 
-Os mantenedores revisarão o relato com prontidão, respeitarão a privacidade e a segurança de quem reportar e evitarão conflitos de interesse. Uma pessoa citada no relato não participará da decisão sobre o próprio caso.
+Inclua somente o necessário para permitir a avaliação: contexto, data
+aproximada, espaço em que ocorreu, pessoas envolvidas e eventuais evidências
+relevantes. O projeto tratará esses dados com discrição e compartilhará o menor
+volume de informação necessário para avaliar o caso.
 
-## Diretrizes de aplicação
+Uma pessoa envolvida no relato não participará da sua análise ou decisão. Não
+há retaliação aceitável contra quem fizer um relato de boa-fé ou colaborar com
+uma apuração.
 
-Os mantenedores usarão estas diretrizes ao avaliar consequências:
+## Aplicação
 
-### 1. Correção
+Os mantenedores podem orientar, moderar, editar ou remover conteúdo, limitar
+interações, suspender participação ou encerrar o acesso aos espaços do projeto,
+conforme a gravidade, recorrência, contexto e impacto da conduta.
 
-**Impacto:** linguagem inadequada ou comportamento considerado pouco profissional.
+As medidas podem incluir:
 
-**Resposta:** orientação privada e explicação do problema; um pedido público de desculpas pode ser solicitado.
+1. orientação privada e pedido de correção;
+2. advertência formal e limites temporários de interação;
+3. suspensão temporária;
+4. banimento permanente de espaços do projeto.
 
-### 2. Advertência
+Quando apropriado, os mantenedores comunicarão a decisão às pessoas afetadas
+sem expor informações pessoais ou comprometer a segurança de qualquer pessoa.
 
-**Impacto:** violação por incidente único ou sequência de ações.
+## Responsabilidade compartilhada
 
-**Resposta:** advertência com limites claros e proibição temporária de interação com as pessoas envolvidas.
+Quem participa do projeto também ajuda a preservar este ambiente. Se uma
+interação parecer inadequada, interrompa a escalada, evite expor pessoas e use
+o canal privado de relato. Discordâncias técnicas são bem-vindas; desrespeito
+não é uma forma aceitável de colaboração.
 
-### 3. Suspensão temporária
+## Atualizações
 
-**Impacto:** violação grave ou comportamento inadequado persistente.
-
-**Resposta:** suspensão temporária de qualquer interação ou representação do projeto.
-
-### 4. Banimento permanente
-
-**Impacto:** padrão de violações, assédio direcionado, agressão ou discriminação.
-
-**Resposta:** exclusão permanente de toda interação pública no projeto.
+Este Código pode ser ajustado para melhorar a segurança, a clareza e a
+aplicação consistente das regras. Alterações serão publicadas neste arquivo.
 
 ## Atribuição
 
-Este Código de Conduta adapta o [Contributor Covenant, versão 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct.html), disponibilizado sob a licença [Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0/).
+Este Código de Conduta adapta e modifica o
+[Contributor Covenant, versão 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct.html),
+disponibilizado sob a licença
+[Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0/).
