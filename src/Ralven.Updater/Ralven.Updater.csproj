@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>$(RalvenWindowsTargetFramework)</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <ApplicationIcon>../Ralven.App/Assets/Ralven.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>Ralven.Updater</AssemblyName>
+    <RootNamespace>Ralven.Updater</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Ralven.UpdateRuntime/Ralven.UpdateRuntime.csproj" />
+  </ItemGroup>
+</Project>

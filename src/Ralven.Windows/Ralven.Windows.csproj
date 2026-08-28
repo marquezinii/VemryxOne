@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>$(RalvenWindowsTargetFramework)</TargetFramework>
+    <RootNamespace>Ralven.Windows</RootNamespace>
+    <AssemblyName>Ralven.Windows</AssemblyName>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Management" />
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" />
+    <ProjectReference Include="../Ralven.Contracts/Ralven.Contracts.csproj" />
+    <ProjectReference Include="../Ralven.Core/Ralven.Core.csproj" />
+  </ItemGroup>
+</Project>

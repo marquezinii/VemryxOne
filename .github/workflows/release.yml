@@ -108,9 +108,12 @@ jobs:
         shell: pwsh
         run: |
           ./scripts/Verify-Safety.ps1 -SkipTests
-          dotnet test tests/Vemryx.One.Tests/Vemryx.One.Tests.csproj `
+          # Execute the xUnit v3 app directly; the .NET 10 test server reports zero tests here.
+          dotnet run --project tests/Ralven.Tests/Ralven.Tests.csproj `
             --configuration Release `
-            --no-build
+            --no-build `
+            -- `
+            --minimum-expected-tests 1
 
       - name: Write Google sign-in overlay
         shell: pwsh
@@ -119,7 +122,7 @@ jobs:
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
         run: |
           # Machine-local overlay (see RemoteServicesOptionsLoader / the
-          # Content glob in Vemryx.One.App.csproj) that a normal checkout
+          # Content glob in Ralven.App.csproj) that a normal checkout
           # never has. Written here, right before the publish that Build-
           # Installer.ps1 triggers, so the official installer ships with
           # "Continuar com o Google" enabled instead of silently hiding it.
@@ -131,13 +134,13 @@ jobs:
             googleOAuthClientId     = $env:GOOGLE_OAUTH_CLIENT_ID
             googleOAuthClientSecret = $env:GOOGLE_OAUTH_CLIENT_SECRET
           }
-          $overlay | ConvertTo-Json | Set-Content -LiteralPath ./src/Vemryx.One.App/Config/appsettings.Production.local.json -Encoding utf8
+          $overlay | ConvertTo-Json | Set-Content -LiteralPath ./src/Ralven.App/Config/appsettings.Production.local.json -Encoding utf8
 
       - name: Build hardened self-contained package and installer
         shell: pwsh
         env:
           ASSET_VERSION: ${{ steps.release.outputs.asset_version }}
-        # -Harden obfuscates Vemryx.One.Core / Vemryx.One.Windows inside the
+        # -Harden obfuscates Ralven.Core / Ralven.Windows inside the
         # published runtime before it is hashed and signed, so every public
         # release asset ships the hardened binaries. See docs/release-hardening.md.
         run: ./scripts/Build-Installer.ps1 -Version $env:ASSET_VERSION -Harden
@@ -153,9 +156,9 @@ jobs:
       - name: Upload unsigned build candidate
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: VemryxOne-unsigned-${{ steps.release.outputs.asset_version }}
+          name: Ralven-unsigned-${{ steps.release.outputs.asset_version }}
           path: |
-            artifacts/FiveMCleaner-win-x64/**
+            artifacts/Ralven-win-x64/**
             artifacts/installer/**
           if-no-files-found: error
           retention-days: 14
@@ -183,12 +186,12 @@ jobs:
       - name: Download unsigned build candidate
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
-          name: VemryxOne-unsigned-${{ needs.build_audit.outputs.asset_version }}
+          name: Ralven-unsigned-${{ needs.build_audit.outputs.asset_version }}
           path: artifacts
 
       - name: Build release signer without secrets
         shell: pwsh
-        run: dotnet build ./src/Vemryx.One.ReleaseTool/Vemryx.One.ReleaseTool.csproj --configuration Release
+        run: dotnet build ./src/Ralven.ReleaseTool/Ralven.ReleaseTool.csproj --configuration Release
 
       - name: Sign broker integrity manifest
         shell: pwsh
@@ -201,16 +204,16 @@ jobs:
               [string]::IsNullOrWhiteSpace($env:BROKER_INTEGRITY_SIGNING_PASSWORD)) {
             throw 'The protected signing environment requires the broker integrity signing key.'
           }
-          $privateKey = Join-Path $env:RUNNER_TEMP 'vemryx-one-broker-private.pem'
+          $privateKey = Join-Path $env:RUNNER_TEMP 'ralven-broker-private.pem'
           try {
             [IO.File]::WriteAllText($privateKey, $env:BROKER_INTEGRITY_SIGNING_PRIVATE_KEY, [Text.UTF8Encoding]::new($false))
-            $env:FIVEMCLEANER_SIGNING_PASSWORD = $env:BROKER_INTEGRITY_SIGNING_PASSWORD
-            $versionRoot = "./artifacts/FiveMCleaner-win-x64/Runtime/versions/$env:ASSET_VERSION"
-            dotnet run --project ./src/Vemryx.One.ReleaseTool/Vemryx.One.ReleaseTool.csproj --configuration Release --no-build -- `
+            $env:RALVEN_SIGNING_PASSWORD = $env:BROKER_INTEGRITY_SIGNING_PASSWORD
+            $versionRoot = "./artifacts/Ralven-win-x64/Runtime/versions/$env:ASSET_VERSION"
+            dotnet run --project ./src/Ralven.ReleaseTool/Ralven.ReleaseTool.csproj --configuration Release --no-build -- `
               sign-broker "$versionRoot/broker/SHA256SUMS.txt" $env:ASSET_VERSION $privateKey "$versionRoot/broker-integrity.json"
             if ($LASTEXITCODE -ne 0) { throw 'Signing the broker integrity manifest failed.' }
-            dotnet run --project ./src/Vemryx.One.ReleaseTool/Vemryx.One.ReleaseTool.csproj --configuration Release --no-build -- `
-              verify-broker "$versionRoot/broker-integrity.json" ./src/Vemryx.One.App/Assets/broker-integrity-public-key.pem
+            dotnet run --project ./src/Ralven.ReleaseTool/Ralven.ReleaseTool.csproj --configuration Release --no-build -- `
+              verify-broker "$versionRoot/broker-integrity.json" ./src/Ralven.App/Assets/broker-integrity-public-key.pem
             if ($LASTEXITCODE -ne 0) { throw 'The broker manifest does not match the embedded broker key.' }
           }
           finally { if (Test-Path -LiteralPath $privateKey) { Remove-Item -LiteralPath $privateKey -Force } }
@@ -221,9 +224,9 @@ jobs:
           ASSET_VERSION: ${{ needs.build_audit.outputs.asset_version }}
         run: |
           ./scripts/Finalize-BrokerIntegrity.ps1 -Version $env:ASSET_VERSION
-          ./scripts/Test-HardenedRuntime.ps1 -RuntimeDirectory ./artifacts/FiveMCleaner-win-x64 -Version $env:ASSET_VERSION
-          $installer = Resolve-Path "./artifacts/installer/VemryxOne-Setup-$env:ASSET_VERSION-win-x64.exe"
-          ./scripts/Test-Installer.ps1 -InstallerPath $installer -PublishDirectory ./artifacts/FiveMCleaner-win-x64 -ExpectedVersion $env:ASSET_VERSION
+          ./scripts/Test-HardenedRuntime.ps1 -RuntimeDirectory ./artifacts/Ralven-win-x64 -Version $env:ASSET_VERSION
+          $installer = Resolve-Path "./artifacts/installer/Ralven-Setup-$env:ASSET_VERSION-win-x64.exe"
+          ./scripts/Test-Installer.ps1 -InstallerPath $installer -PublishDirectory ./artifacts/Ralven-win-x64 -ExpectedVersion $env:ASSET_VERSION
 
       - name: Stage and sign release assets
         shell: pwsh
@@ -231,60 +234,54 @@ jobs:
           ASSET_VERSION: ${{ needs.build_audit.outputs.asset_version }}
           RELEASE_TAG: ${{ inputs.release_tag }}
           RELEASE_CHANNEL: ${{ inputs.channel }}
-          # The existing update trust anchor remains in use so released
-          # clients continue to accept the first signed runtime migration.
-          FIVEMCLEANER_SIGNING_PASSWORD: ${{ secrets.FIVEMCLEANER_SIGNING_PASSWORD }}
+          # The existing GitHub secret protects the unchanged signing trust
+          # anchor. Map it to the Ralven runtime variable so the repository
+          # rename does not require exposing or re-entering that secret.
+          RALVEN_SIGNING_PASSWORD: ${{ secrets.FIVEMCLEANER_SIGNING_PASSWORD }}
           RELEASE_SIGNING_PRIVATE_KEY: ${{ secrets.RELEASE_SIGNING_PRIVATE_KEY }}
         run: |
           New-Item -ItemType Directory -Force -Path ./artifacts/release | Out-Null
-          Copy-Item -LiteralPath "./artifacts/installer/VemryxOne-Setup-$env:ASSET_VERSION-win-x64.exe" -Destination ./artifacts/release
-          Copy-Item -LiteralPath "./artifacts/installer/VemryxOne-Setup-$env:ASSET_VERSION-win-x64.exe.sha256" -Destination ./artifacts/release
-          Copy-Item -LiteralPath "./artifacts/installer/VemryxOne-release-manifest-$env:ASSET_VERSION.json" -Destination ./artifacts/release
-          Copy-Item -LiteralPath "./artifacts/installer/FiveMCleaner-Setup-$env:ASSET_VERSION-win-x64.exe" -Destination ./artifacts/release
-          Copy-Item -LiteralPath "./artifacts/installer/FiveMCleaner-Setup-$env:ASSET_VERSION-win-x64.exe.sha256" -Destination ./artifacts/release
-          Copy-Item -LiteralPath ./artifacts/FiveMCleaner-win-x64.zip -Destination ./artifacts/release
-          Copy-Item -LiteralPath ./artifacts/FiveMCleaner-win-x64.zip.sha256 -Destination ./artifacts/release
-          Copy-Item -LiteralPath ./artifacts/FiveMCleaner-Runtime-win-x64.zip -Destination ./artifacts/release
-          Copy-Item -LiteralPath ./artifacts/FiveMCleaner-Runtime-win-x64.zip.sha256 -Destination ./artifacts/release
+          Copy-Item -LiteralPath "./artifacts/installer/Ralven-Setup-$env:ASSET_VERSION-win-x64.exe" -Destination ./artifacts/release
+          Copy-Item -LiteralPath "./artifacts/installer/Ralven-Setup-$env:ASSET_VERSION-win-x64.exe.sha256" -Destination ./artifacts/release
+          Copy-Item -LiteralPath "./artifacts/installer/Ralven-release-manifest-$env:ASSET_VERSION.json" -Destination ./artifacts/release
+          Copy-Item -LiteralPath ./artifacts/Ralven-win-x64.zip -Destination ./artifacts/release
+          Copy-Item -LiteralPath ./artifacts/Ralven-win-x64.zip.sha256 -Destination ./artifacts/release
+          Copy-Item -LiteralPath ./artifacts/Ralven-Runtime-win-x64.zip -Destination ./artifacts/release
+          Copy-Item -LiteralPath ./artifacts/Ralven-Runtime-win-x64.zip.sha256 -Destination ./artifacts/release
 
           # A landing page precisa de um endereço estável para iniciar o download
           # sem uma etapa intermediária. O updater usa exclusivamente o runtime ZIP
           # versionado autorizado pelo manifesto assinado abaixo.
           if ($env:RELEASE_CHANNEL -eq 'stable') {
             if ([string]::IsNullOrWhiteSpace($env:RELEASE_SIGNING_PRIVATE_KEY) -or
-                [string]::IsNullOrWhiteSpace($env:FIVEMCLEANER_SIGNING_PASSWORD)) {
+                [string]::IsNullOrWhiteSpace($env:RALVEN_SIGNING_PASSWORD)) {
               throw 'Stable releases require the protected update-manifest signing key.'
             }
-            $privateKey = Join-Path $env:RUNNER_TEMP 'vemryx-one-release-private.pem'
+            $privateKey = Join-Path $env:RUNNER_TEMP 'ralven-release-private.pem'
             try {
               [IO.File]::WriteAllText(
                 $privateKey,
                 $env:RELEASE_SIGNING_PRIVATE_KEY,
                 [Text.UTF8Encoding]::new($false))
               $minimum = (Get-Content -LiteralPath ./installer/minimum-update-version.txt -Raw).Trim()
-              # The signed bridge remains on the legacy redirect so already-installed
-              # 1.5.0 clients can accept this first release after the repository rename.
-              $packageUrl = "https://github.com/marquezinii/FiveMCleaner/releases/download/$env:RELEASE_TAG/FiveMCleaner-Runtime-win-x64.zip"
-              $signedManifest = './artifacts/release/FiveMCleaner-signed-update-manifest.json'
-              dotnet run --project ./src/Vemryx.One.ReleaseTool/Vemryx.One.ReleaseTool.csproj `
+              $packageUrl = "https://github.com/marquezinii/Ralven/releases/download/$env:RELEASE_TAG/Ralven-Runtime-win-x64.zip"
+              $signedManifest = './artifacts/release/Ralven-signed-update-manifest.json'
+              dotnet run --project ./src/Ralven.ReleaseTool/Ralven.ReleaseTool.csproj `
                 --configuration Release --no-build -- `
-                sign ./artifacts/FiveMCleaner-Runtime-win-x64.zip stable $env:ASSET_VERSION `
+                sign ./artifacts/Ralven-Runtime-win-x64.zip stable $env:ASSET_VERSION `
                 $minimum $packageUrl $privateKey $signedManifest
               if ($LASTEXITCODE -ne 0) { throw 'Signing the runtime manifest failed.' }
-              dotnet run --project ./src/Vemryx.One.ReleaseTool/Vemryx.One.ReleaseTool.csproj `
+              dotnet run --project ./src/Ralven.ReleaseTool/Ralven.ReleaseTool.csproj `
                 --configuration Release --no-build -- `
-                verify $signedManifest ./src/Vemryx.One.App/Assets/update-manifest-public-key.pem $minimum
+                verify $signedManifest ./src/Ralven.App/Assets/update-manifest-public-key.pem $minimum
               if ($LASTEXITCODE -ne 0) { throw 'The signed manifest does not match the embedded public key.' }
             }
             finally {
               if (Test-Path -LiteralPath $privateKey) { Remove-Item -LiteralPath $privateKey -Force }
             }
             Copy-Item `
-              -LiteralPath "./artifacts/installer/VemryxOne-Setup-$env:ASSET_VERSION-win-x64.exe" `
-              -Destination ./artifacts/release/VemryxOne-Setup-latest-win-x64.exe
-            Copy-Item `
-              -LiteralPath "./artifacts/installer/FiveMCleaner-Setup-$env:ASSET_VERSION-win-x64.exe" `
-              -Destination ./artifacts/release/FiveMCleaner-Setup-latest-win-x64.exe
+              -LiteralPath "./artifacts/installer/Ralven-Setup-$env:ASSET_VERSION-win-x64.exe" `
+              -Destination ./artifacts/release/Ralven-Setup-latest-win-x64.exe
           }
 
           $changelog = Get-Content -LiteralPath ./CHANGELOG.md -Raw -Encoding utf8
@@ -310,7 +307,7 @@ jobs:
       - name: Upload signed release candidate
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: VemryxOne-signed-${{ needs.build_audit.outputs.asset_version }}
+          name: Ralven-signed-${{ needs.build_audit.outputs.asset_version }}
           path: artifacts/release/**
           if-no-files-found: error
           retention-days: 14
@@ -338,7 +335,7 @@ jobs:
       - name: Download audited candidate
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
-          name: VemryxOne-signed-${{ needs.build_audit.outputs.asset_version }}
+          name: Ralven-signed-${{ needs.build_audit.outputs.asset_version }}
           path: release
 
       - name: Attest installer provenance
@@ -359,27 +356,24 @@ jobs:
           }
 
           $assets = @(
-            (Resolve-Path "./release/VemryxOne-Setup-$env:ASSET_VERSION-win-x64.exe").Path,
-            (Resolve-Path "./release/VemryxOne-Setup-$env:ASSET_VERSION-win-x64.exe.sha256").Path,
-            (Resolve-Path "./release/VemryxOne-release-manifest-$env:ASSET_VERSION.json").Path,
-            (Resolve-Path "./release/FiveMCleaner-Setup-$env:ASSET_VERSION-win-x64.exe").Path,
-            (Resolve-Path "./release/FiveMCleaner-Setup-$env:ASSET_VERSION-win-x64.exe.sha256").Path,
-            (Resolve-Path ./release/FiveMCleaner-win-x64.zip).Path,
-            (Resolve-Path ./release/FiveMCleaner-win-x64.zip.sha256).Path,
-            (Resolve-Path ./release/FiveMCleaner-Runtime-win-x64.zip).Path,
-            (Resolve-Path ./release/FiveMCleaner-Runtime-win-x64.zip.sha256).Path
+            (Resolve-Path "./release/Ralven-Setup-$env:ASSET_VERSION-win-x64.exe").Path,
+            (Resolve-Path "./release/Ralven-Setup-$env:ASSET_VERSION-win-x64.exe.sha256").Path,
+            (Resolve-Path "./release/Ralven-release-manifest-$env:ASSET_VERSION.json").Path,
+            (Resolve-Path ./release/Ralven-win-x64.zip).Path,
+            (Resolve-Path ./release/Ralven-win-x64.zip.sha256).Path,
+            (Resolve-Path ./release/Ralven-Runtime-win-x64.zip).Path,
+            (Resolve-Path ./release/Ralven-Runtime-win-x64.zip.sha256).Path
           )
           if ($env:RELEASE_CHANNEL -eq 'stable') {
-            $assets += (Resolve-Path ./release/VemryxOne-Setup-latest-win-x64.exe).Path
-            $assets += (Resolve-Path ./release/FiveMCleaner-Setup-latest-win-x64.exe).Path
-            $assets += (Resolve-Path ./release/FiveMCleaner-signed-update-manifest.json).Path
+            $assets += (Resolve-Path ./release/Ralven-Setup-latest-win-x64.exe).Path
+            $assets += (Resolve-Path ./release/Ralven-signed-update-manifest.json).Path
           }
           $arguments = @(
             'release', 'create', $env:RELEASE_TAG
           ) + $assets + @(
             '--repo', $env:GITHUB_REPOSITORY,
             '--verify-tag',
-            '--title', "Vemryx One $env:RELEASE_TAG",
+            '--title', "Ralven $env:RELEASE_TAG",
             '--notes-file', (Resolve-Path ./release/RELEASE_NOTES.md).Path
           )
           if ($env:RELEASE_CHANNEL -eq 'preview') {
@@ -405,12 +399,12 @@ jobs:
           try {
             npm ci
             $schemaQuery = @'
-SELECT
-  EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'telemetry_events') AS has_schema,
-  EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'd1_migrations') AS has_ledger,
-  EXISTS(SELECT 1 FROM pragma_table_info('telemetry_events') WHERE name = 'process_count_at_start') AS has_v5_telemetry,
-  EXISTS(SELECT 1 FROM pragma_table_info('account_profiles') WHERE name = 'terms_version') AS has_profile_terms;
-'@
+          SELECT
+            EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'telemetry_events') AS has_schema,
+            EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'd1_migrations') AS has_ledger,
+            EXISTS(SELECT 1 FROM pragma_table_info('telemetry_events') WHERE name = 'process_count_at_start') AS has_v5_telemetry,
+            EXISTS(SELECT 1 FROM pragma_table_info('account_profiles') WHERE name = 'terms_version') AS has_profile_terms;
+          '@
             $schemaState = npx.cmd wrangler d1 execute fivemcleaner-telemetry --remote --command $schemaQuery --json | ConvertFrom-Json
             if ($LASTEXITCODE -ne 0) { throw 'Inspecting the telemetry schema failed.' }
             $state = $schemaState[0].results[0]
@@ -419,19 +413,19 @@ SELECT
                 throw 'The legacy telemetry schema cannot be adopted because it is not at the known bootstrap version.'
               }
               $adoptionQuery = @'
-CREATE TABLE IF NOT EXISTS d1_migrations (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT UNIQUE,
-  applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-INSERT OR IGNORE INTO d1_migrations (name) VALUES
-  ('0000_initial_schema.sql'),
-  ('0001_account_username_terms.sql'),
-  ('0002_account_profiles.sql'),
-  ('0003_live_alert.sql'),
-  ('0004_telemetry_v5_fields.sql'),
-  ('0005_account_profile_terms.sql');
-'@
+          CREATE TABLE IF NOT EXISTS d1_migrations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT UNIQUE,
+            applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+          );
+          INSERT OR IGNORE INTO d1_migrations (name) VALUES
+            ('0000_initial_schema.sql'),
+            ('0001_account_username_terms.sql'),
+            ('0002_account_profiles.sql'),
+            ('0003_live_alert.sql'),
+            ('0004_telemetry_v5_fields.sql'),
+            ('0005_account_profile_terms.sql');
+          '@
               npx.cmd wrangler d1 execute fivemcleaner-telemetry --remote --command $adoptionQuery
               if ($LASTEXITCODE -ne 0) { throw 'Adopting the historical telemetry schema failed.' }
             }
@@ -441,7 +435,7 @@ INSERT OR IGNORE INTO d1_migrations (name) VALUES
             if ($LASTEXITCODE -ne 0) { throw 'Applying the updater telemetry migrations failed.' }
             npx.cmd wrangler d1 execute fivemcleaner-telemetry --remote --command "SELECT five_m_install_detected FROM telemetry_events LIMIT 1; SELECT terms_version FROM account_profiles LIMIT 1; SELECT message, active, updated_at FROM live_alert WHERE id = 1"
             if ($LASTEXITCODE -ne 0) { throw 'The post-migration D1 smoke test failed.' }
-            Get-Content -LiteralPath ../../release/FiveMCleaner-signed-update-manifest.json -Raw |
+            Get-Content -LiteralPath ../../release/Ralven-signed-update-manifest.json -Raw |
               npx.cmd wrangler secret put RELEASE_MANIFEST_JSON
             if ($LASTEXITCODE -ne 0) { throw 'Publishing the signed update feed failed.' }
             npx.cmd wrangler deploy

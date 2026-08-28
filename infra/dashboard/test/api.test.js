@@ -156,7 +156,7 @@ test('resolveApiBase refuses non-loopback or malformed destinations even on loca
 
 test('resolveApiBase never honors ?api= on a production host', () => {
   const override = 'https://evil.example';
-  for (const hostname of ['fivemcleaner.pages.dev', 'telemetry.example.workers.dev', 'dashboard.example.com']) {
+  for (const hostname of ['ralven.pages.dev', 'telemetry.example.workers.dev', 'dashboard.example.com']) {
     assert.equal(
       resolveApiBase(BASE, hostname, new URLSearchParams({ api: override })),
       BASE,
@@ -212,7 +212,7 @@ test('setLiveAlert posts message and active to /admin/live-alert', async () => {
 
   assert.equal(capturedUrl, `${BASE}/admin/live-alert`);
   assert.equal(capturedOptions.method, 'POST');
-  assert.equal(capturedOptions.headers['X-Vemryx-Csrf-Token'], 'csrf-token');
+  assert.equal(capturedOptions.headers['X-Ralven-Csrf-Token'], 'csrf-token');
   assert.deepEqual(JSON.parse(capturedOptions.body), { message: 'oi', active: true });
 });
 

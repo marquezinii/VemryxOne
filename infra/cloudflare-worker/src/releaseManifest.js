@@ -5,7 +5,7 @@
 
 export const MAX_MANIFEST_BYTES = 65_536;
 
-const RELEASE_DOWNLOAD_PREFIX = /^https:\/\/github\.com\/marquezinii\/FiveMCleaner\/releases\/download\//;
+const RELEASE_DOWNLOAD_PREFIX = /^https:\/\/github\.com\/marquezinii\/Ralven\/releases\/download\//;
 const SEMVER = /^\d+\.\d+\.\d+$/;
 const SHA256_HEX = /^[a-f0-9]{64}$/i;
 

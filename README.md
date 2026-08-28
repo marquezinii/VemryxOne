@@ -1,17 +1,18 @@
 <p align="center">
-  <img src="docs/assets/icon.png" alt="Ícone do Vemryx One" width="112">
+  <img src="docs/assets/icon.png" alt="Ícone do Ralven" width="112">
 </p>
 
-<h1 align="center">Vemryx One</h1>
+<h1 align="center">Ralven</h1>
 
 <p align="center">
-  Diagnóstico e manutenção assistida do Windows, com otimização especializada para <strong>FiveM sobre GTAV Legacy</strong>.
+  <strong>Mais desempenho. Menos complicação.</strong><br>
+  Diagnóstico e manutenção assistida do Windows, com otimização especializada para FiveM sobre GTAV Legacy.
 </p>
 
 <p align="center">
-  <a href="https://marquezinii.github.io/VemryxOne/"><strong>Baixar para Windows</strong></a>
+  <a href="https://marquezinii.github.io/Ralven/"><strong>Baixar para Windows</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://github.com/marquezinii/VemryxOne/releases">Releases</a>
+  <a href="https://github.com/marquezinii/Ralven/releases">Releases</a>
   &nbsp;·&nbsp;
   <a href="docs/safety.md">Segurança</a>
   &nbsp;·&nbsp;
@@ -19,16 +20,16 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/marquezinii/VemryxOne/actions/workflows/ci.yml"><img alt="Status da CI" src="https://img.shields.io/github/actions/workflow/status/marquezinii/VemryxOne/ci.yml?branch=main&style=flat-square&label=CI"></a>
-  <a href="https://github.com/marquezinii/VemryxOne/releases/latest"><img alt="Última release" src="https://img.shields.io/github/v/release/marquezinii/VemryxOne?style=flat-square&color=06b6d4"></a>
-  <img alt="Windows 10 e 11" src="https://img.shields.io/badge/Windows-10%20%7C%2011-2563eb?style=flat-square">
+  <a href="https://github.com/marquezinii/Ralven/actions/workflows/ci.yml"><img alt="Status da CI" src="https://img.shields.io/github/actions/workflow/status/marquezinii/Ralven/ci.yml?branch=main&style=flat-square&label=CI"></a>
+  <a href="https://github.com/marquezinii/Ralven/releases/latest"><img alt="Última release" src="https://img.shields.io/github/v/release/marquezinii/Ralven?style=flat-square&color=2D2E33"></a>
+  <img alt="Windows 10 e 11" src="https://img.shields.io/badge/Windows-10%20%7C%2011-2D2E33?style=flat-square">
   <img alt=".NET 10" src="https://img.shields.io/badge/.NET-10-512bd4?style=flat-square">
 </p>
 
-![Arte do Vemryx One](docs/assets/hero-vemryx-one.png)
+![Arte do Ralven](docs/assets/hero-ralven.png)
 
 > [!IMPORTANT]
-> O módulo FiveM do Vemryx One suporta somente **GTAV Legacy**. GTAV Enhanced é identificado e bloqueado com segurança até existir um adaptador dedicado, pesquisado e testado.
+> O módulo FiveM do Ralven suporta somente **GTAV Legacy**. GTAV Enhanced é identificado e bloqueado com segurança até existir um adaptador dedicado, pesquisado e testado.
 
 ## Seu PC em um lugar, FiveM com profundidade
 
@@ -52,7 +53,7 @@ Sistema e Aplicativos reúnem acessos seguros às superfícies nativas do Window
 Perfis são composições de ações conhecidas — não listas genéricas de "tweaks". Manutenção de dados é sempre opt-in; caches protegidos, entitlements, plugins e autenticação nunca são tratados como lixo.
 
 > [!WARNING]
-> Nenhum software pode prometer FPS, ping ou ausência de stutter em todo PC ou servidor. O Vemryx One não desativa Defender, Firewall, SmartScreen ou UAC; não injeta código; não modifica binários ou memória do jogo; e não usa prioridade Realtime, afinidade fixa ou debloat genérico.
+> Nenhum software pode prometer FPS, ping ou ausência de stutter em todo PC ou servidor. O Ralven não desativa Defender, Firewall, SmartScreen ou UAC; não injeta código; não modifica binários ou memória do jogo; e não usa prioridade Realtime, afinidade fixa ou debloat genérico.
 
 ## Segurança por projeto
 
@@ -77,7 +78,7 @@ Leia a [política de segurança](docs/safety.md) e as [evidências técnicas](do
 
 ## Instalação e atualização
 
-Baixe apenas pelas [Releases oficiais](https://github.com/marquezinii/VemryxOne/releases). Cada release `win-x64` inclui instalador, SHA-256, manifestos e pacotes gerados pelo mesmo workflow.
+Baixe apenas pelas [Releases oficiais](https://github.com/marquezinii/Ralven/releases). Cada release `win-x64` inclui instalador, SHA-256, manifestos e pacotes gerados pelo mesmo workflow.
 
 Após sua confirmação, a atualização verifica origem e integridade, preserva a versão anterior e só confirma a nova versão quando ela sinaliza saúde.
 
@@ -95,9 +96,9 @@ Veja [telemetria](docs/telemetry.md) e [relatos de bug](docs/bug-reports.md).
 Requisitos: Windows 10/11 x64, [.NET SDK 10.0.303](https://dotnet.microsoft.com/download/dotnet/10.0) e Node.js 24.19.0 LTS.
 
 ```powershell
-dotnet restore Vemryx.One.slnx
-dotnet build Vemryx.One.slnx --configuration Release --no-restore
-dotnet test Vemryx.One.slnx --configuration Release --no-build
+dotnet restore Ralven.slnx
+dotnet build Ralven.slnx --configuration Release --no-restore
+dotnet run --project tests/Ralven.Tests/Ralven.Tests.csproj --configuration Release --no-build -- --minimum-expected-tests 1
 .\scripts\Verify-Safety.ps1
 ```
 
@@ -122,8 +123,8 @@ Worker/Dashboard backend de conta, telemetria, bugs e operação privada
 Website         site público estático
 ```
 
-Consulte [docs/architecture.md](docs/architecture.md) para as fronteiras completas.
+Consulte [docs/architecture.md](docs/architecture.md) para as fronteiras completas e [`assets/brand`](assets/brand/) para a biblioteca oficial de identidade.
 
 ---
 
-Vemryx One é um projeto comunitário independente, sem afiliação, endosso ou patrocínio de Rockstar Games, Cfx.re ou FiveM. Aliases técnicos legados permanecem somente para manter instalações existentes atualizáveis durante a transição de marca.
+Ralven é um projeto comunitário independente, sem afiliação, endosso ou patrocínio de Rockstar Games, Cfx.re ou FiveM. Gerações anteriores estão sem suporte; apenas dados locais pessoais conhecidos podem ser importados de forma unidirecional na primeira abertura.

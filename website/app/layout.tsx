@@ -2,38 +2,38 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 const assetPrefix = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-const socialImagePath = `${assetPrefix || "/VemryxOne"}/og.png`;
+const socialImagePath = `${assetPrefix || "/Ralven"}/og.png`;
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://marquezinii.github.io/"),
-  title: "Vemryx One — Otimização transparente para FiveM",
+  title: "Ralven — Mais desempenho. Menos complicação.",
   description:
-    "Otimize Windows, FiveM e GTA V com perfis automáticos, progresso claro e rollback. Windows 11 recomendado, com compatibilidade legada para Windows 10 x64.",
-  applicationName: "Vemryx One",
+    "Diagnóstico, manutenção e otimização transparente do Windows, com recursos especializados para FiveM em GTA V Legacy.",
+  applicationName: "Ralven",
   keywords: [
-    "Vemryx One",
+    "Ralven",
     "FiveM",
     "otimização Windows",
-    "GTA V",
-    "FPS",
+    "GTA V Legacy",
+    "rollback",
     "Windows 11",
   ],
-  authors: [{ name: "Vemryx" }],
-  creator: "Vemryx",
+  authors: [{ name: "Ralven" }],
+  creator: "Ralven",
   openGraph: {
     type: "website",
     locale: "pt_BR",
     alternateLocale: "en_US",
-    title: "Vemryx One — Seu PC mais preparado para o FiveM",
+    title: "Ralven — Mais desempenho. Menos complicação.",
     description:
-      "Perfis automáticos, mudanças transparentes e rollback para Windows, FiveM e GTA V.",
-    siteName: "Vemryx One",
-    images: [{ url: socialImagePath, width: 1200, height: 630 }],
+      "Otimização transparente do Windows, com diagnóstico, progresso claro, rollback e recursos especializados para FiveM.",
+    siteName: "Ralven",
+    images: [{ url: socialImagePath, width: 1672, height: 941 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Vemryx One",
-    description: "Otimização transparente para FiveM no Windows.",
+    title: "Ralven",
+    description: "Otimização transparente do Windows, com recursos especializados para FiveM.",
     images: [socialImagePath],
   },
   icons: {

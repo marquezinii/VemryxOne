@@ -14,6 +14,15 @@ const migrationNames = (await readdir(migrationSource))
   .sort();
 const historicalBootstrapMigrations = migrationNames.filter((name) => /^000[0-5]_/.test(name));
 
+test('production config keeps the existing Cloudflare resource identifiers', async () => {
+  const config = await readFile(join(workerRoot, 'wrangler.toml'), 'utf8');
+
+  assert.match(config, /^name = "fivemcleaner-telemetry"\r?$/m);
+  assert.match(config, /^DASHBOARD_ORIGIN = "https:\/\/fivemcleaner-dashboard\.pages\.dev"\r?$/m);
+  assert.match(config, /^database_name = "fivemcleaner-telemetry"\r?$/m);
+  assert.match(config, /^database_id = "fe276121-a71a-4ba4-ab62-81cccdf601c6"\r?$/m);
+});
+
 function run(args, { expectSuccess = true } = {}) {
   const result = spawnSync(process.execPath, [wrangler, ...args], { cwd: workerRoot, encoding: 'utf8' });
   if (expectSuccess !== (result.status === 0)) {
@@ -108,7 +117,7 @@ const workerSchemaSmoke = `
 `;
 
 async function verifyUpgradeFrom(priorCount, t) {
-  const root = await mkdtemp(join(tmpdir(), 'vemryx-d1-migrations-'));
+  const root = await mkdtemp(join(tmpdir(), 'Ralven-d1-migrations-'));
   t.after(() => rm(root, { recursive: true, force: true }));
 
   const currentConfig = await createFixture(root, 'current', migrationNames);
@@ -128,7 +137,7 @@ for (let priorCount = 0; priorCount < migrationNames.length; priorCount += 1) {
 }
 
 test('D1 migrations adopt the historical schema.sql bootstrap before applying newer migrations', async (t) => {
-  const root = await mkdtemp(join(tmpdir(), 'vemryx-d1-legacy-bootstrap-'));
+  const root = await mkdtemp(join(tmpdir(), 'Ralven-d1-legacy-bootstrap-'));
   t.after(() => rm(root, { recursive: true, force: true }));
 
   const stateDirectory = join(root, 'state');
@@ -143,7 +152,7 @@ test('D1 migrations adopt the historical schema.sql bootstrap before applying ne
 });
 
 test('a failed D1 migration is atomic and is not recorded as applied', async (t) => {
-  const root = await mkdtemp(join(tmpdir(), 'vemryx-d1-atomicity-'));
+  const root = await mkdtemp(join(tmpdir(), 'Ralven-d1-atomicity-'));
   t.after(() => rm(root, { recursive: true, force: true }));
 
   const stateDirectory = join(root, 'state');

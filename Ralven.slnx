@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Ralven.App/Ralven.App.csproj" />
+    <Project Path="src/Ralven.Broker/Ralven.Broker.csproj" />
+    <Project Path="src/Ralven.Updater/Ralven.Updater.csproj" />
+    <Project Path="src/Ralven.Launcher/Ralven.Launcher.csproj" />
+    <Project Path="src/Ralven.ReleaseTool/Ralven.ReleaseTool.csproj" />
+    <Project Path="src/Ralven.UpdateRuntime/Ralven.UpdateRuntime.csproj" />
+    <Project Path="src/Ralven.Contracts/Ralven.Contracts.csproj" />
+    <Project Path="src/Ralven.Core/Ralven.Core.csproj" />
+    <Project Path="src/Ralven.Windows/Ralven.Windows.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Ralven.Tests/Ralven.Tests.csproj" />
+  </Folder>
+</Solution>

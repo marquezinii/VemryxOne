@@ -25,10 +25,10 @@ $ProgressPreference = 'SilentlyContinue'
 
 $workspace = [System.IO.Path]::GetFullPath((Split-Path -Parent $PSScriptRoot))
 $artifactsRoot = [System.IO.Path]::GetFullPath((Join-Path $workspace 'artifacts'))
-$publishDirectory = [System.IO.Path]::GetFullPath((Join-Path $artifactsRoot 'FiveMCleaner-win-x64'))
+$publishDirectory = [System.IO.Path]::GetFullPath((Join-Path $artifactsRoot 'Ralven-win-x64'))
 $installerOutput = [System.IO.Path]::GetFullPath((Join-Path $artifactsRoot 'installer'))
-$installerArtworkLight = [System.IO.Path]::GetFullPath((Join-Path $artifactsRoot 'installer-artwork\VemryxOne-wizard-side-light.png'))
-$installerArtworkDark = [System.IO.Path]::GetFullPath((Join-Path $artifactsRoot 'installer-artwork\VemryxOne-wizard-side-dark.png'))
+$installerArtworkLight = [System.IO.Path]::GetFullPath((Join-Path $artifactsRoot 'installer-artwork\Ralven-wizard-side-light.png'))
+$installerArtworkDark = [System.IO.Path]::GetFullPath((Join-Path $artifactsRoot 'installer-artwork\Ralven-wizard-side-dark.png'))
 $stagingOutput = [System.IO.Path]::GetFullPath((Join-Path $artifactsRoot ".installer-staging-$([Guid]::NewGuid().ToString('N'))"))
 $innoVersion = '7.0.2'
 $innoAssetName = "innosetup-$innoVersion-x64.exe"
@@ -198,13 +198,13 @@ try {
     }
 
     foreach ($requiredPayload in @(
-        'FiveMCleaner.Launcher.exe',
+        'Ralven.Launcher.exe',
         'Runtime\active.json',
-        "Runtime\versions\$Version\FiveMCleaner.exe",
-        "Runtime\versions\$Version\FiveMCleaner.runtimeconfig.json",
+        "Runtime\versions\$Version\Ralven.exe",
+        "Runtime\versions\$Version\Ralven.runtimeconfig.json",
         "Runtime\versions\$Version\coreclr.dll",
         "Runtime\versions\$Version\hostfxr.dll",
-        "Runtime\versions\$Version\broker\FiveMCleaner.Broker.exe"
+        "Runtime\versions\$Version\broker\Ralven.Broker.exe"
     )) {
         if (-not (Test-Path -LiteralPath (Join-Path $publishDirectory $requiredPayload) -PathType Leaf)) {
             throw "Publish payload is incomplete: $requiredPayload"
@@ -215,7 +215,7 @@ try {
     Write-Host "Compiling with $compiler" -ForegroundColor Cyan
 
     & (Join-Path $PSScriptRoot 'New-InstallerArtwork.ps1') `
-        -SourceIconPath (Join-Path $workspace 'src\Vemryx.One.App\Assets\VemryxOne.png') `
+        -SourceIconPath (Join-Path $workspace 'src\Ralven.App\Assets\Ralven.png') `
         -OutputPath $installerArtworkLight `
         -OutputPathDark $installerArtworkDark
     foreach ($artwork in @($installerArtworkLight, $installerArtworkDark)) {
@@ -224,7 +224,7 @@ try {
         }
     }
 
-    $installerScript = Join-Path $workspace 'installer\VemryxOne.iss'
+    $installerScript = Join-Path $workspace 'installer\Ralven.iss'
     $arguments = @(
         '/Qp',
         "/DAppVersion=$Version",
@@ -241,8 +241,7 @@ try {
         throw "Inno Setup compilation failed with exit code $LASTEXITCODE."
     }
 
-    $baseName = "VemryxOne-Setup-$Version-win-x64"
-    $legacyBaseName = "FiveMCleaner-Setup-$Version-win-x64"
+    $baseName = "Ralven-Setup-$Version-win-x64"
     $stagedInstaller = Join-Path $stagingOutput "$baseName.exe"
     $stagedContents = Join-Path $stagingOutput "$baseName.contents.txt"
     if (-not (Test-Path -LiteralPath $stagedInstaller -PathType Leaf)) {
@@ -252,17 +251,13 @@ try {
     $finalInstaller = Join-Path $installerOutput "$baseName.exe"
     $finalContents = Join-Path $installerOutput "$baseName.contents.txt"
     $finalHash = "$finalInstaller.sha256"
-    $legacyInstaller = Join-Path $installerOutput "$legacyBaseName.exe"
-    $legacyHash = "$legacyInstaller.sha256"
-    $releaseManifest = Join-Path $installerOutput "VemryxOne-release-manifest-$Version.json"
+    $releaseManifest = Join-Path $installerOutput "Ralven-release-manifest-$Version.json"
     $stagedHash = "$stagedInstaller.sha256"
-    $stagedReleaseManifest = Join-Path $stagingOutput "VemryxOne-release-manifest-$Version.json"
+    $stagedReleaseManifest = Join-Path $stagingOutput "Ralven-release-manifest-$Version.json"
     foreach ($path in @(
         $finalInstaller,
         $finalContents,
         $finalHash,
-        $legacyInstaller,
-        $legacyHash,
         $releaseManifest,
         $stagedHash,
         $stagedReleaseManifest
@@ -280,8 +275,8 @@ try {
     }
     $gitStatus = $gitStatusProbe
 
-    $portableArchive = Join-Path $artifactsRoot 'FiveMCleaner-win-x64.zip'
-    $runtimeArchive = Join-Path $artifactsRoot 'FiveMCleaner-Runtime-win-x64.zip'
+    $portableArchive = Join-Path $artifactsRoot 'Ralven-win-x64.zip'
+    $runtimeArchive = Join-Path $artifactsRoot 'Ralven-Runtime-win-x64.zip'
     if (-not (Test-Path -LiteralPath $portableArchive -PathType Leaf)) {
         throw "Portable archive not found: $portableArchive"
     }
@@ -293,7 +288,7 @@ try {
 
     $manifest = [ordered]@{
         schemaVersion = 1
-        product = 'Vemryx One'
+        product = 'Ralven'
         version = $Version
         runtime = 'win-x64'
         selfContained = $true
@@ -304,18 +299,13 @@ try {
         payload = [ordered]@{
             fileCount = $payloadFiles.Count
             sizeBytes = [long](($payloadFiles | Measure-Object -Property Length -Sum).Sum)
-            launcherExecutableSha256 = (Get-FileHash -LiteralPath (Join-Path $publishDirectory 'FiveMCleaner.Launcher.exe') -Algorithm SHA256).Hash.ToLowerInvariant()
-            mainExecutableSha256 = (Get-FileHash -LiteralPath (Join-Path $publishDirectory "Runtime\versions\$Version\FiveMCleaner.exe") -Algorithm SHA256).Hash.ToLowerInvariant()
-            brokerExecutableSha256 = (Get-FileHash -LiteralPath (Join-Path $publishDirectory "Runtime\versions\$Version\broker\FiveMCleaner.Broker.exe") -Algorithm SHA256).Hash.ToLowerInvariant()
+            launcherExecutableSha256 = (Get-FileHash -LiteralPath (Join-Path $publishDirectory 'Ralven.Launcher.exe') -Algorithm SHA256).Hash.ToLowerInvariant()
+            mainExecutableSha256 = (Get-FileHash -LiteralPath (Join-Path $publishDirectory "Runtime\versions\$Version\Ralven.exe") -Algorithm SHA256).Hash.ToLowerInvariant()
+            brokerExecutableSha256 = (Get-FileHash -LiteralPath (Join-Path $publishDirectory "Runtime\versions\$Version\broker\Ralven.Broker.exe") -Algorithm SHA256).Hash.ToLowerInvariant()
         }
         artifacts = @(
             [ordered]@{
                 name = [System.IO.Path]::GetFileName($finalInstaller)
-                sizeBytes = (Get-Item -LiteralPath $stagedInstaller).Length
-                sha256 = $installerHash
-            },
-            [ordered]@{
-                name = [System.IO.Path]::GetFileName($legacyInstaller)
                 sizeBytes = (Get-Item -LiteralPath $stagedInstaller).Length
                 sha256 = $installerHash
             },
@@ -349,15 +339,13 @@ try {
         if ($LASTEXITCODE -ne 0) { throw 'Fail-closed hardening verification failed for the installer.' }
     }
 
-    foreach ($path in @($finalInstaller, $finalContents, $finalHash, $legacyInstaller, $legacyHash, $releaseManifest)) {
+    foreach ($path in @($finalInstaller, $finalContents, $finalHash, $releaseManifest)) {
         if (Test-Path -LiteralPath $path) {
             Remove-Item -LiteralPath $path -Force
         }
     }
     Move-Item -LiteralPath $stagedInstaller -Destination $finalInstaller
     Move-Item -LiteralPath $stagedHash -Destination $finalHash
-    Copy-Item -LiteralPath $finalInstaller -Destination $legacyInstaller
-    Set-Content -LiteralPath $legacyHash -Value "$installerHash  $([System.IO.Path]::GetFileName($legacyInstaller))" -Encoding ascii
     Move-Item -LiteralPath $stagedReleaseManifest -Destination $releaseManifest
     if (Test-Path -LiteralPath $stagedContents -PathType Leaf) {
         Move-Item -LiteralPath $stagedContents -Destination $finalContents

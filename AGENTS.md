@@ -1,4 +1,4 @@
-# AGENTS.md — Vemryx One
+# AGENTS.md — Ralven
 
 Instruções operacionais para agentes de IA trabalhando neste repositório.
 
@@ -8,7 +8,7 @@ enfraquecer os invariantes de segurança definidos aqui ou em `docs/safety.md`.
 
 ## 1. Missão
 
-O Vemryx One é uma aplicação Windows para diagnóstico, manutenção e otimização
+O Ralven é uma aplicação Windows para diagnóstico, manutenção e otimização
 transparente, conservadora e reversível de **FiveM sobre GTAV Legacy**.
 
 O objetivo não é acumular “tweaks”. Uma mudança só pertence ao produto quando
@@ -75,16 +75,16 @@ Preserve as responsabilidades atuais:
 
 | Área | Responsabilidade |
 | --- | --- |
-| `src/Vemryx.One.App` | WPF, navegação, apresentação, interação e serviços de aplicação |
-| `src/Vemryx.One.Contracts` | DTOs, IDs, estados, erros e contratos compartilhados |
-| `src/Vemryx.One.Core` | casos de uso, políticas, perfis, planejamento, transação e rollback |
-| `src/Vemryx.One.Windows` | descoberta e integrações específicas de Windows/FiveM |
-| `src/Vemryx.One.Broker` | operações administrativas tipadas e allowlisted |
-| `src/Vemryx.One.Launcher` | inicialização e supervisão de saúde pós-update |
-| `src/Vemryx.One.Updater` | staging, ativação e rollback de atualização |
-| `src/Vemryx.One.UpdateRuntime` | primitivas compartilhadas do updater |
-| `src/Vemryx.One.ReleaseTool` | geração e validação de artefatos de release |
-| `tests/Vemryx.One.Tests` | testes de contratos, políticas, segurança e regressões |
+| `src/Ralven.App` | WPF, navegação, apresentação, interação e serviços de aplicação |
+| `src/Ralven.Contracts` | DTOs, IDs, estados, erros e contratos compartilhados |
+| `src/Ralven.Core` | casos de uso, políticas, perfis, planejamento, transação e rollback |
+| `src/Ralven.Windows` | descoberta e integrações específicas de Windows/FiveM |
+| `src/Ralven.Broker` | operações administrativas tipadas e allowlisted |
+| `src/Ralven.Launcher` | inicialização e supervisão de saúde pós-update |
+| `src/Ralven.Updater` | staging, ativação e rollback de atualização |
+| `src/Ralven.UpdateRuntime` | primitivas compartilhadas do updater |
+| `src/Ralven.ReleaseTool` | geração e validação de artefatos de release |
+| `tests/Ralven.Tests` | testes de contratos, políticas, segurança e regressões |
 | `infra/cloudflare-worker` | backend remoto suportado |
 | `infra/dashboard` | painel privado |
 | `installer` | instalador Windows |
@@ -252,7 +252,7 @@ necessária para segurança, UI ou rollback.
 
 ## 10. Broker
 
-`Vemryx.One.Broker` é código de alta criticidade.
+`Ralven.Broker` é código de alta criticidade.
 
 O broker:
 
@@ -350,9 +350,9 @@ Não introduza texto localizado hardcoded.
 
 Ao adicionar/alterar texto público, mantenha a chave correspondente em:
 
-- `src/Vemryx.One.App/Resources/Strings.resx`
-- `src/Vemryx.One.App/Resources/Strings.pt-BR.resx`
-- `src/Vemryx.One.App/Resources/Strings.es.resx`
+- `src/Ralven.App/Resources/Strings.resx`
+- `src/Ralven.App/Resources/Strings.pt-BR.resx`
+- `src/Ralven.App/Resources/Strings.es.resx`
 
 Use o mecanismo de localização existente no XAML/código.
 
@@ -443,15 +443,15 @@ real, estado específico da máquina ou rede externa. Use interfaces/doubles.
 Comandos base:
 
 ```powershell
-dotnet restore Vemryx.One.slnx
-dotnet build Vemryx.One.slnx --configuration Release --no-restore
-dotnet test Vemryx.One.slnx --configuration Release --no-build
+dotnet restore Ralven.slnx
+dotnet build Ralven.slnx --configuration Release --no-restore
+dotnet run --project tests/Ralven.Tests/Ralven.Tests.csproj --configuration Release --no-build -- --minimum-expected-tests 1
 ```
 
 Execução local do app:
 
 ```powershell
-dotnet run --project src/Vemryx.One.App/Vemryx.One.App.csproj
+dotnet run --project src/Ralven.App/Ralven.App.csproj
 ```
 
 Para Worker/site/dashboard, inspecione os scripts reais do respectivo projeto.
@@ -619,7 +619,7 @@ Antes de encerrar:
 - [ ] diff revisado;
 - [ ] commit profissional criado;
 - [ ] branch/worktree corretos;
-- [ ] atalho `Vemryx One - Desenvolvimento` reconstruído conforme
+- [ ] atalho `Ralven - Desenvolvimento` reconstruído conforme
       `AI_RULES.md`, quando o ambiente permitir.
 
 ## 26. Relatório final

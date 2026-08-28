@@ -1,10 +1,12 @@
 export type Language = "pt" | "en";
 
 export const DOWNLOAD_URL =
-  "https://github.com/marquezinii/VemryxOne/releases/latest/download/VemryxOne-Setup-latest-win-x64.exe";
-export const GITHUB_URL = "https://github.com/marquezinii/VemryxOne";
+  "https://github.com/marquezinii/Ralven/releases/latest/download/Ralven-Setup-latest-win-x64.exe";
+export const GITHUB_URL = "https://github.com/marquezinii/Ralven";
 export const DISCORD_URL = "https://discord.gg/bazcuQB9n6";
-export const VEMRYX_URL = "https://vemryx.com/";
+// Ralven does not have a verified custom domain yet. Keep public navigation
+// on the canonical repository instead of publishing an invented URL.
+export const BRAND_HOME_URL = GITHUB_URL;
 export const ICON_URL = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/icon.png`;
 
 export const copy = {
@@ -24,10 +26,10 @@ export const copy = {
     headerDownload: "Baixar",
     discordLabel: "Entre no nosso Discord oficial",
     hero: {
-      eyebrow: "CENTRAL OFICIAL DE DOWNLOAD",
-      titleStart: "Seu PC mais preparado.",
-      titleAccent: "Seu FiveM mais fluido.",
-      body: "Uma experiência premium para preparar o Windows, o FiveM e o GTA V Legacy com decisões técnicas claras, progresso ao vivo e mudanças que podem ser revisadas.",
+      eyebrow: "RALVEN · OTIMIZAÇÃO TRANSPARENTE",
+      titleStart: "Mais desempenho.",
+      titleAccent: "Menos complicação.",
+      body: "Diagnóstico, manutenção e otimização transparente do Windows, com decisões técnicas claras, progresso real, rollback e recursos especializados para FiveM em GTA V Legacy.",
       download: "Download do instalador",
       github: "Ver código no GitHub",
       releaseNote: "Download pelo GitHub Releases · sem cadastro",
@@ -59,7 +61,7 @@ export const copy = {
     },
     quickFacts: [
       ["01 clique", "para iniciar"],
-      ["03 perfis", "decididos pelo app"],
+      ["03 perfis", "com escopos claros"],
       ["Local", "telemetria opcional"],
       ["Reversível", "com snapshots"],
     ],
@@ -104,7 +106,7 @@ export const copy = {
         },
       ],
       estimateTitle: "Estimativa honesta, baseada no seu PC",
-      estimateBody: "O Vemryx One usa o hardware e o estado detectado para contextualizar o potencial de cada perfil. Quando não existe um benchmark real, ele informa “ganho não medido” — nunca inventa FPS.",
+      estimateBody: "O Ralven usa o hardware e o estado detectado para contextualizar o potencial de cada perfil. Quando não existe um benchmark real, ele informa “ganho não medido” — nunca inventa FPS.",
       estimateTag: "SEM NÚMEROS FALSOS",
     },
     process: {
@@ -137,7 +139,7 @@ export const copy = {
     transparency: {
       eyebrow: "CONTROLE SEM COMPLEXIDADE",
       title: "Nada escondido atrás do botão.",
-      body: "O Vemryx One foi projetado para automatizar trabalho técnico sem transformar o Windows em uma caixa-preta.",
+      body: "O Ralven foi projetado para automatizar trabalho técnico sem transformar o Windows em uma caixa-preta.",
       items: [
         {
           title: "Snapshot antes de mudar",
@@ -161,7 +163,7 @@ export const copy = {
     streamers: {
       eyebrow: "PRONTO PARA QUEM JOGA E TRANSMITE",
       title: "Sua live continua sendo prioridade.",
-      body: "Se OBS Studio, Streamlabs ou TikTok LIVE Studio estiver instalado ou aberto, o Vemryx One reconhece o ambiente e preserva ferramentas de transmissão. Ele não encerra esses processos nem altera cenas, perfis, gravações ou chats.",
+      body: "Se OBS Studio, Streamlabs ou TikTok LIVE Studio estiver instalado ou aberto, o Ralven reconhece o ambiente e preserva ferramentas de transmissão. Ele não encerra esses processos nem altera cenas, perfis, gravações ou chats.",
       note: "A proteção para streaming faz parte dos três perfis — não é um modo separado que você precisa lembrar de ativar.",
       platforms: ["OBS Studio", "Streamlabs", "TikTok LIVE Studio"],
       safeTitle: "O que fica protegido",
@@ -195,9 +197,9 @@ export const copy = {
     safety: {
       eyebrow: "SEGURANÇA SEM MARKETING VAZIO",
       title: "Forte no que faz. Transparente sobre os limites.",
-      body: "O Vemryx One usa APIs e configurações documentadas do Windows, publica o código-fonte e evita técnicas que costumam gerar bloqueios ou colocar o sistema em risco.",
+      body: "O Ralven usa APIs e configurações documentadas do Windows, publica o código-fonte e evita técnicas que costumam gerar bloqueios ou colocar o sistema em risco.",
       cards: [
-        ["Código-fonte disponível", "Você pode auditar o código sob a licença source-available do Vemryx One."],
+        ["Código-fonte disponível", "Você pode auditar o código sob a licença source-available do Ralven."],
         ["Sem evasão", "O app não usa ofuscação para evitar detecção, exclusões no antivírus, injeção ou truques para esconder comportamento. A distribuição ofusca partes internas de Core e Windows; o código-fonte continua disponível para auditoria."],
         ["Hash verificável", "Confira o SHA-256 publicado na release antes de instalar."],
       ],
@@ -209,7 +211,7 @@ export const copy = {
       title: "Sem letra miúda.",
       items: [
         [
-          "O Vemryx One garante mais FPS?",
+          "O Ralven garante mais FPS?",
           "Não existe ganho universal: hardware, servidor, temperatura e outros fatores influenciam o resultado. O app melhora configurações relevantes, mostra uma estimativa contextual e distingue claramente estimativa de medição real.",
         ],
         [
@@ -235,7 +237,7 @@ export const copy = {
       ],
     },
     finalCta: {
-      eyebrow: "VEMRYX ONE",
+      eyebrow: "Ralven",
       title: "Um clique. Um plano claro. Seu PC no controle.",
       body: "Baixe a versão estável mais recente e deixe o aplicativo decidir com segurança o que faz sentido para o seu computador.",
       download: "Baixar instalador",
@@ -243,13 +245,13 @@ export const copy = {
       note: "Grátis · código-fonte disponível · Windows x64",
     },
     footer: {
-      tagline: "Otimização transparente para FiveM no Windows.",
+      tagline: "Diagnóstico e otimização transparente para Windows e FiveM.",
       product: "Produto",
       trust: "Transparência",
       community: "Comunidade",
       discord: "Discord oficial",
-      owner: "Vemryx",
-      rights: "© 2026 Vemryx One. Todos os direitos reservados.",
+      owner: "Ralven",
+      rights: "© 2026 Ralven. Todos os direitos reservados.",
       noTracking: "Este site não usa cookies, analytics ou formulários.",
     },
   },
@@ -269,10 +271,10 @@ export const copy = {
     headerDownload: "Download",
     discordLabel: "Join our official Discord",
     hero: {
-      eyebrow: "OFFICIAL DOWNLOAD CENTER",
-      titleStart: "A better prepared PC.",
-      titleAccent: "A smoother FiveM.",
-      body: "A premium experience for preparing Windows, FiveM and GTA V Legacy with clear technical decisions, live progress and changes you can review.",
+      eyebrow: "RALVEN · TRANSPARENT OPTIMIZATION",
+      titleStart: "More performance.",
+      titleAccent: "Less complexity.",
+      body: "Transparent Windows diagnostics, maintenance and optimization with clear technical decisions, real progress, rollback and specialized support for FiveM on GTA V Legacy.",
       download: "Download installer",
       github: "View code on GitHub",
       releaseNote: "Download via GitHub Releases · no account required",
@@ -304,7 +306,7 @@ export const copy = {
     },
     quickFacts: [
       ["01 click", "to start"],
-      ["03 profiles", "decided by the app"],
+      ["03 profiles", "with clear scopes"],
       ["Local", "optional telemetry"],
       ["Reversible", "with snapshots"],
     ],
@@ -349,7 +351,7 @@ export const copy = {
         },
       ],
       estimateTitle: "An honest estimate, based on your PC",
-      estimateBody: "Vemryx One uses detected hardware and system state to contextualize each profile's potential. When no real benchmark exists, it says “gain not measured” — it never invents FPS.",
+      estimateBody: "Ralven uses detected hardware and system state to contextualize each profile's potential. When no real benchmark exists, it says “gain not measured” — it never invents FPS.",
       estimateTag: "NO MADE-UP NUMBERS",
     },
     process: {
@@ -382,7 +384,7 @@ export const copy = {
     transparency: {
       eyebrow: "CONTROL WITHOUT COMPLEXITY",
       title: "Nothing hidden behind the button.",
-      body: "Vemryx One automates technical work without turning Windows into a black box.",
+      body: "Ralven automates technical work without turning Windows into a black box.",
       items: [
         {
           title: "Snapshot before changes",
@@ -406,7 +408,7 @@ export const copy = {
     streamers: {
       eyebrow: "READY FOR PLAYERS WHO STREAM",
       title: "Your broadcast remains a priority.",
-      body: "If OBS Studio, Streamlabs or TikTok LIVE Studio is installed or open, Vemryx One recognizes the environment and preserves streaming tools. It does not close these processes or alter scenes, profiles, recordings or chats.",
+      body: "If OBS Studio, Streamlabs or TikTok LIVE Studio is installed or open, Ralven recognizes the environment and preserves streaming tools. It does not close these processes or alter scenes, profiles, recordings or chats.",
       note: "Streaming protection is part of all three profiles — not a separate mode you must remember to enable.",
       platforms: ["OBS Studio", "Streamlabs", "TikTok LIVE Studio"],
       safeTitle: "What stays protected",
@@ -440,9 +442,9 @@ export const copy = {
     safety: {
       eyebrow: "SECURITY WITHOUT EMPTY MARKETING",
       title: "Powerful where it matters. Clear about limits.",
-      body: "Vemryx One uses documented Windows APIs and settings, publishes its source code and avoids techniques that commonly cause blocks or put the system at risk.",
+      body: "Ralven uses documented Windows APIs and settings, publishes its source code and avoids techniques that commonly cause blocks or put the system at risk.",
       cards: [
-        ["Source available", "You can inspect the code under the Vemryx One license."],
+        ["Source available", "You can inspect the code under the Ralven license."],
         ["No evasion", "No obfuscation to evade detection, antivirus exclusions, injection or tricks to hide behavior. The distribution obfuscates internal Core and Windows parts; the source code remains available for audit."],
         ["Verifiable hash", "Check the SHA-256 published with the release before installing."],
       ],
@@ -454,7 +456,7 @@ export const copy = {
       title: "No fine print.",
       items: [
         [
-          "Does Vemryx One guarantee more FPS?",
+          "Does Ralven guarantee more FPS?",
           "There is no universal gain: hardware, server, temperature and other factors affect results. The app improves relevant settings, provides a contextual estimate and clearly separates estimates from real measurements.",
         ],
         [
@@ -480,7 +482,7 @@ export const copy = {
       ],
     },
     finalCta: {
-      eyebrow: "VEMRYX ONE",
+      eyebrow: "Ralven",
       title: "One click. One clear plan. Your PC in control.",
       body: "Download the latest stable version and let the app safely decide what makes sense for your computer.",
       download: "Download installer",
@@ -488,13 +490,13 @@ export const copy = {
       note: "Free · source available · Windows x64",
     },
     footer: {
-      tagline: "Transparent optimization for FiveM on Windows.",
+      tagline: "Transparent diagnostics and optimization for Windows and FiveM.",
       product: "Product",
       trust: "Transparency",
       community: "Community",
       discord: "Official Discord",
-      owner: "Vemryx",
-      rights: "© 2026 Vemryx One. All rights reserved.",
+      owner: "Ralven",
+      rights: "© 2026 Ralven. All rights reserved.",
       noTracking: "This website uses no cookies, analytics or forms.",
     },
   },

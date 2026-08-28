@@ -55,7 +55,7 @@ em `account_profiles`, sempre indexado pelo UID já validado do token, nunca
 por um valor enviado pelo cliente. A criação do perfil exige ID token com
 `email_verified=true` e a aceitação da versão vigente dos termos; até ambos
 existirem, a conta fica em `ProfileCompletionRequired`, não em `SignedIn`.
-`AccountProfileService` (`Vemryx.One.App/Services`) chama essa rota depois
+`AccountProfileService` (`Ralven.App/Services`) chama essa rota depois
 da confirmação de e-mail; se o usuário escolhido já existir, a resposta é
 `409 username-taken` e a conta Firebase já criada é preservada — a janela de
 conta pede outro nome de usuário em vez de descartar o cadastro. A exclusão
@@ -65,12 +65,12 @@ falha.
 
 | Projeto                  | Responsabilidade                                                    | Não deve conhecer                                        |
 | ------------------------ | ------------------------------------------------------------------- | -------------------------------------------------------- |
-| `Vemryx.One.App`       | WPF, navegação, prévia, progresso e confirmação                     | APIs administrativas ou detalhes de registro             |
-| `Vemryx.One.Contracts` | DTOs, IDs, estados (inclusive transacionais), erros e contratos entre processos | WPF ou implementação Windows                  |
-| `Vemryx.One.Core`      | casos de uso, composição de perfis, políticas, transação e rollback | controles visuais ou comandos shell                      |
-| `Vemryx.One.Windows`   | descoberta de hardware/instalação e adaptadores Windows/FiveM       | decisão de qual perfil o usuário deve escolher           |
-| `Vemryx.One.Broker`    | executor elevado com allowlist mínima                               | navegação, telemetria ou lógica de produto ampla         |
-| `Vemryx.One.Tests`     | contratos, políticas, falhas, rollback e doubles de sistema         | dependência de uma instalação real para testes unitários |
+| `Ralven.App`       | WPF, navegação, prévia, progresso e confirmação                     | APIs administrativas ou detalhes de registro             |
+| `Ralven.Contracts` | DTOs, IDs, estados (inclusive transacionais), erros e contratos entre processos | WPF ou implementação Windows                  |
+| `Ralven.Core`      | casos de uso, composição de perfis, políticas, transação e rollback | controles visuais ou comandos shell                      |
+| `Ralven.Windows`   | descoberta de hardware/instalação e adaptadores Windows/FiveM       | decisão de qual perfil o usuário deve escolher           |
+| `Ralven.Broker`    | executor elevado com allowlist mínima                               | navegação, telemetria ou lógica de produto ampla         |
+| `Ralven.Tests`     | contratos, políticas, falhas, rollback e doubles de sistema         | dependência de uma instalação real para testes unitários |
 
 ## Fronteira de confiança
 
@@ -143,7 +143,7 @@ Isso é o que torna a validação possível: tanto o broker elevado quanto `Wind
 
 ### Resultado
 
-`ActionExecutionOutcome` (`Vemryx.One.Contracts`) é o estado semântico usado por progresso e relatório:
+`ActionExecutionOutcome` (`Ralven.Contracts`) é o estado semântico usado por progresso e relatório:
 
 - `Verified` — máquina já estava no estado desejado; nenhuma escrita ocorreu;
 - `Applied` — alteração e pós-condição confirmadas;
@@ -158,13 +158,13 @@ Esse enum é independente do estado transacional do journal
 (`ActionJournalState`), que continua controlando elegibilidade de
 rollback, e do estado da transação inteira (`TransactionState`).
 
-Os três vivem em `Vemryx.One.Contracts` (`OptimizationEnums.cs` e
+Os três vivem em `Ralven.Contracts` (`OptimizationEnums.cs` e
 `TransactionEnums.cs`) porque são vocabulário compartilhado entre App, Windows
-e Broker — antes App e Broker importavam `Vemryx.One.Windows.Engine` só para
+e Broker — antes App e Broker importavam `Ralven.Windows.Engine` só para
 enxergar o estado da transação.
 
 **Contrato durável.** Os três são persistidos *pelo nome* (camelCase) em
-`%LOCALAPPDATA%\FiveMCleaner\Transactions\{id}.json`, que sobrevive à versão
+`%LOCALAPPDATA%\Ralven\Transactions\{id}.json`, que sobrevive à versão
 que o escreveu. Renomear, remover ou renumerar um membro torna journals
 existentes ilegíveis e destrói silenciosamente a capacidade de rollback de quem
 já tem o aplicativo instalado. Membros só podem ser **acrescentados ao final**.
@@ -254,7 +254,7 @@ usando
 por ambiente (`Config/appsettings.{Development,Production}.json`, com
 `appsettings.json` como base sem DSN) — nenhum identificador remoto fica
 hardcoded em código-fonte. `AppEnvironment.Resolve()` decide entre
-Development/Production (variável `FIVEMCLEANER_ENVIRONMENT`, com fallback
+Development/Production (variável `RALVEN_ENVIRONMENT`, com fallback
 por configuração de build), permitindo separar no Sentry os erros do
 desenvolvedor dos erros de usuários finais sem duplicar DSN nem projeto.
 Todo evento passa por `CrashReportSanitizer` (reaproveitando
@@ -370,7 +370,7 @@ ativado/restaurado por sessão, prioridade de processo restaurada ao
 fechar, afinidade de CPU, core parking, timer resolution solicitado
 enquanto o jogo está aberto — **não foi implementada porque pressupõe um
 processo de vigilância de ciclo de vida do FiveM/GTA V (detectar
-início/fim em tempo real) que este produto não tem**. O Vemryx One é
+início/fim em tempo real) que este produto não tem**. O Ralven é
 hoje "aplicar uma vez, verificar, confirmar, reverter se necessário", não
 um serviço residente que reage a um processo abrindo/fechando. Ver
 `docs/graphics-optimizations-backlog.md`, seção 13, para a lista completa
@@ -387,11 +387,11 @@ Cancelamento:
 
 ## Persistência
 
-O MVP grava somente sob `%LOCALAPPDATA%\FiveMCleaner`:
+O MVP grava somente sob `%LOCALAPPDATA%\Ralven`:
 
 - `Transactions/<id>.json`: plano, estados por ação e snapshots pequenos necessários ao rollback;
 - `Requests/<id>.json`: solicitação efêmera e de uso único consumida atomicamente pelo broker;
-- `settings.json`: preferências do próprio Vemryx One;
+- `settings.json`: preferências do próprio Ralven;
 - `crash.log`: exceções fatais locais, criado apenas quando necessário.
 
 Esses arquivos têm durabilidades diferentes e isso muda o que pode ser alterado:
@@ -430,7 +430,7 @@ Testes de integração que alteram Windows ou FiveM devem ser opt-in, isolados e
 
 O processo WPF não instala sua própria atualização. Após a confirmação do
 usuário, ele baixa e verifica o setup oficial, copia o
-`FiveMCleaner.Updater.exe` self-contained para `%LOCALAPPDATA%\FiveMCleaner\Updater`
+`Ralven.Updater.exe` self-contained para `%LOCALAPPDATA%\Ralven\Updater`
 e encerra. O atualizador aceita apenas um contrato fixo: instalador sob
 `Updates`, tamanho, SHA-256, PID do processo pai e log sob `Logs`; ele repete a
 verificação de integridade, espera o PID terminar sem encerrar processos de

@@ -41,7 +41,7 @@ jobs:
       - name: Restore with NuGet vulnerability gate
         shell: pwsh
         run: >-
-          dotnet restore Vemryx.One.slnx
+          dotnet restore Ralven.slnx
           -p:NuGetAudit=true
           -p:NuGetAuditMode=all
           -p:WarningsAsErrors=NU1901%3BNU1902%3BNU1903%3BNU1904
@@ -51,10 +51,14 @@ jobs:
         run: ./scripts/Verify-Safety.ps1 -SkipTests
 
       - name: Test
+        # xUnit v3 is a self-contained test executable. Direct execution avoids
+        # the .NET 10 dotnet-test server path that currently reports zero tests.
         run: >-
-          dotnet test tests/Vemryx.One.Tests/Vemryx.One.Tests.csproj
+          dotnet run --project tests/Ralven.Tests/Ralven.Tests.csproj
           --configuration Release
           --no-build
+          --
+          --minimum-expected-tests 1
           --results-directory TestResults
           --report-xunit-trx
           --report-xunit-trx-filename tests.trx
@@ -63,7 +67,7 @@ jobs:
           --coverlet-file-prefix coverage
 
       - name: Check NuGet vulnerabilities
-        run: dotnet list Vemryx.One.slnx package --vulnerable --include-transitive
+        run: dotnet list Ralven.slnx package --vulnerable --include-transitive
 
       - name: Upload test results
         if: always()
@@ -102,18 +106,18 @@ jobs:
           [xml]$props = Get-Content -LiteralPath ./Directory.Build.props -Raw
           $version = [string]$props.Project.PropertyGroup.Version
           dotnet tool run sbom-tool generate `
-            -b ./artifacts/FiveMCleaner-win-x64 `
+            -b ./artifacts/Ralven-win-x64 `
             -bc . `
-            -pn "Vemryx One" `
+            -pn "Ralven" `
             -pv $version `
-            -ps "Vemryx" `
-            -nsb https://github.com/marquezinii/VemryxOne
+            -ps "Ralven" `
+            -nsb https://github.com/marquezinii/Ralven
 
       - name: Upload SPDX SBOM
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: sbom-spdx-${{ github.run_id }}
-          path: artifacts/FiveMCleaner-win-x64/_manifest/**
+          path: artifacts/Ralven-win-x64/_manifest/**
           if-no-files-found: error
           retention-days: 30
 

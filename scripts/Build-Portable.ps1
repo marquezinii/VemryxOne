@@ -7,7 +7,7 @@ param(
     [string]$Configuration = 'Release',
 
     # Public release hardening. When set, the internal-logic assemblies
-    # (Vemryx.One.Core / Vemryx.One.Windows) are obfuscated in the published
+    # (Ralven.Core / Ralven.Windows) are obfuscated in the published
     # output BEFORE any checksum, so the runtime ZIP, broker SHA256SUMS, release
     # manifest and signed update manifest all cover the hardened binaries.
     # Off by default: development and CI test builds stay un-obfuscated.
@@ -19,10 +19,10 @@ $ErrorActionPreference = 'Stop'
 $workspace = Split-Path -Parent $PSScriptRoot
 $artifactsRoot = [System.IO.Path]::GetFullPath((Join-Path $workspace 'artifacts'))
 $stagingRoot = [System.IO.Path]::GetFullPath((Join-Path $artifactsRoot ".staging-$([Guid]::NewGuid().ToString('N'))"))
-$finalRoot = [System.IO.Path]::GetFullPath((Join-Path $artifactsRoot "FiveMCleaner-$Runtime"))
-$archivePath = [System.IO.Path]::GetFullPath((Join-Path $artifactsRoot "FiveMCleaner-$Runtime.zip"))
+$finalRoot = [System.IO.Path]::GetFullPath((Join-Path $artifactsRoot "Ralven-$Runtime"))
+$archivePath = [System.IO.Path]::GetFullPath((Join-Path $artifactsRoot "Ralven-$Runtime.zip"))
 $archiveHashPath = "$archivePath.sha256"
-$runtimeArchivePath = [System.IO.Path]::GetFullPath((Join-Path $artifactsRoot "FiveMCleaner-Runtime-$Runtime.zip"))
+$runtimeArchivePath = [System.IO.Path]::GetFullPath((Join-Path $artifactsRoot "Ralven-Runtime-$Runtime.zip"))
 $runtimeArchiveHashPath = "$runtimeArchivePath.sha256"
 
 . (Join-Path $PSScriptRoot 'Installer.Common.ps1')
@@ -42,14 +42,14 @@ try {
     $brokerOutput = Join-Path $stagingRoot 'broker'
     $launcherOutput = Join-Path $stagingRoot 'launcher'
     $appOutput = Join-Path $stagingRoot 'app'
-    $pathMap = "$workspace=/_/VemryxOne"
+    $pathMap = "$workspace=/_/Ralven"
     $version = Get-ProjectVersion -Workspace $workspace
     if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "Invalid stable version: $version" }
 
     $publishTargets = @(
-        @{ Name = 'Broker'; Project = '.\src\Vemryx.One.Broker\Vemryx.One.Broker.csproj'; SingleFile = 'false'; SkipProjectReferences = $false; Output = $brokerOutput }
-        @{ Name = 'Launcher'; Project = '.\src\Vemryx.One.Launcher\Vemryx.One.Launcher.csproj'; SingleFile = 'true'; SkipProjectReferences = $false; Output = $launcherOutput }
-        @{ Name = 'App'; Project = '.\src\Vemryx.One.App\Vemryx.One.App.csproj'; SingleFile = 'false'; SkipProjectReferences = $true; Output = $appOutput }
+        @{ Name = 'Broker'; Project = '.\src\Ralven.Broker\Ralven.Broker.csproj'; SingleFile = 'false'; SkipProjectReferences = $false; Output = $brokerOutput }
+        @{ Name = 'Launcher'; Project = '.\src\Ralven.Launcher\Ralven.Launcher.csproj'; SingleFile = 'true'; SkipProjectReferences = $false; Output = $launcherOutput }
+        @{ Name = 'App'; Project = '.\src\Ralven.App\Ralven.App.csproj'; SingleFile = 'false'; SkipProjectReferences = $true; Output = $appOutput }
     )
     foreach ($target in $publishTargets) {
         $publishArguments = @(
@@ -75,10 +75,10 @@ try {
         if ($Harden) {
             # For Broker/App this is unused (harmless) - only the Launcher
             # project defines the HardenBundledAssemblies target this
-            # property gates. See Vemryx.One.Launcher.csproj for why the
+            # property gates. See Ralven.Launcher.csproj for why the
             # single-file bundle needs its own in-MSBuild hardening hook
             # instead of the publish-then-harden-in-place used below.
-            $publishArguments += '-p:VemryxOneHarden=true'
+            $publishArguments += '-p:RalvenHarden=true'
         }
         & dotnet @publishArguments
         if ($LASTEXITCODE -ne 0) { throw "$($target.Name) publish failed." }
@@ -91,7 +91,7 @@ try {
         # release workflow signs) derives from these files, so obfuscating
         # here is what makes the signed, shipped runtime the obfuscated one.
         # The Launcher's single-file bundle was already hardened during its
-        # own publish above, via Vemryx.One.Launcher.csproj's
+        # own publish above, via Ralven.Launcher.csproj's
         # HardenBundledAssemblies target.
         $mappingRoot = Join-Path $artifactsRoot 'obfuscation-maps'
         & (Join-Path $PSScriptRoot 'Invoke-Obfuscation.ps1') -PublishDirectory $brokerOutput -MappingOutputDirectory $mappingRoot
@@ -106,9 +106,9 @@ try {
         Remove-Item -LiteralPath $copiedBroker -Recurse -Force
     }
     foreach ($orphanName in @(
-        'FiveMCleaner.Broker.exe',
-        'FiveMCleaner.Broker.deps.json',
-        'FiveMCleaner.Broker.runtimeconfig.json'
+        'Ralven.Broker.exe',
+        'Ralven.Broker.deps.json',
+        'Ralven.Broker.runtimeconfig.json'
     )) {
         $orphanPath = Join-Path $appOutput $orphanName
         if (Test-Path -LiteralPath $orphanPath) {
@@ -162,7 +162,7 @@ try {
         Remove-Item -LiteralPath $finalRoot -Recurse -Force
     }
     New-Item -ItemType Directory -Path $finalRoot | Out-Null
-    Copy-Item -LiteralPath (Join-Path $launcherOutput 'FiveMCleaner.Launcher.exe') -Destination $finalRoot
+    Copy-Item -LiteralPath (Join-Path $launcherOutput 'Ralven.Launcher.exe') -Destination $finalRoot
     $versionRoot = Join-Path $finalRoot "Runtime\versions\$version"
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $versionRoot) | Out-Null
     Move-Item -LiteralPath $appOutput -Destination $versionRoot

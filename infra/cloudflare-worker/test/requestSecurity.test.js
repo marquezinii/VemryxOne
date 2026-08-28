@@ -140,7 +140,7 @@ test('live-alert route accepts only a session-bound CSRF token from the exact da
       Origin: DASHBOARD_ORIGIN,
       Cookie: `${SESSION_COOKIE_NAME}=${sessionId}`,
       'Content-Type': 'application/json',
-      'X-Vemryx-Csrf-Token': csrfToken,
+      'X-Ralven-Csrf-Token': csrfToken,
     },
     body: JSON.stringify({ message: 'Atualização oficial', active: true }),
   }), env);

@@ -52,8 +52,8 @@ try {
     ) -join '|'
 
     $scanRoots = @(
-        'src/Vemryx.One.Windows',
-        'src/Vemryx.One.Broker'
+        'src/Ralven.Windows',
+        'src/Ralven.Broker'
     )
     # GtaVLaunchParametersActions.cs is a reviewed, documented exception (see
     # docs/safety.md "Escopo de edição gráfica" / GTA V launch parameters):
@@ -70,8 +70,8 @@ try {
     }
 
     $contractRoots = @(
-        'src/Vemryx.One.Contracts',
-        'src/Vemryx.One.Core'
+        'src/Ralven.Contracts',
+        'src/Ralven.Core'
     )
     $commandFields = @(
         Find-CSharpSourceMatches `
@@ -82,11 +82,13 @@ try {
         throw "A command-like field leaked into plan contracts:`n$($commandFields -join [Environment]::NewLine)"
     }
 
-    dotnet build '.\Vemryx.One.slnx' --configuration Release
+    dotnet build '.\Ralven.slnx' --configuration Release
     if ($LASTEXITCODE -ne 0) { throw 'Release build failed.' }
 
     if (-not $SkipTests) {
-        dotnet test '.\tests\Vemryx.One.Tests\Vemryx.One.Tests.csproj' --configuration Release --no-build
+        # xUnit v3 runs as an executable; the .NET 10 dotnet-test server path
+        # currently reports zero tests for this WPF test project.
+        dotnet run --project '.\tests\Ralven.Tests\Ralven.Tests.csproj' --configuration Release --no-build -- --minimum-expected-tests 1
         if ($LASTEXITCODE -ne 0) { throw 'Tests failed.' }
     }
 
