@@ -5,12 +5,12 @@
 
 ## 1. Snapshot
 
-- **Produto:** Vemryx One, aplicativo desktop Windows para otimização transparente, reversível e orientada por diagnóstico do FiveM para **GTAV Legacy**.
+- **Produto:** Ralven, aplicativo desktop Windows para otimização transparente, reversível e orientada por diagnóstico do FiveM para **GTAV Legacy**.
 - **Integração:** `dev/proxima-versao` é a branch de integração da próxima versão; `main` representa a linha pública/estável. O fluxo de branches, worktrees, Pull Requests, integração e release é definido em `AI_RULES.md`.
-- **Último estado consolidado neste documento-fonte:** 24/08/2026, após a publicação estável da identidade Vemryx One. Antes de qualquer trabalho, confirme o estado real com Git e os testes atuais.
+- **Último estado consolidado neste documento-fonte:** 28/08/2026, após a integração da geração Ralven. Antes de qualquer trabalho, confirme o estado real com Git e os testes atuais.
 - **Release pública atual:** `v1.5.0`, publicada em 24/08/2026 a partir do commit integrado em `main`. O runtime assinado, instalador, hashes, manifesto e feed estável do updater foram publicados e validados.
-- **Próxima release pública:** usar `v1.5.2`. A tag protegida `v1.5.1` existe, mas não possui GitHub Release pública; ela não é um baseline de publicação. A próxima release deve incluir as correções de identidade pública Vemryx One e da ponte de atualização já integradas, levantando mudanças desde `v1.5.0` e preservando os aliases legados estritamente necessários.
-- **Atalho de desenvolvimento:** `Vemryx One - Desenvolvimento` usa `scripts\Start-DevelopmentApp.ps1`. Conforme `AI_RULES.md`, deve ser reconstruído com `scripts\Install-DevelopmentShortcut.ps1 -Build` (executado a partir do checkout/worktree da própria tarefa) ao final de toda tarefa que gerar mudanças no app — isolada ou de integração —, exceto tarefas de instalador/updater. O script espelha a árvore de trabalho atual para a pasta irmã fixa `VemryxOne-dev-shortcut` e aponta o atalho para essa cópia estável, então ele nunca fica órfão quando um worktree de tarefa é removido após o merge.
+- **Próxima release pública:** a última release continua `v1.5.0`; Ralven ainda não foi publicado. A versão da nova geração só é definida no fluxo oficial de release, a partir das mudanças desde `v1.5.0`, sem aliases de execução, instalação ou atualização para gerações sem suporte.
+- **Atalho de desenvolvimento:** `Ralven - Desenvolvimento` usa `scripts\Start-DevelopmentApp.ps1`. Conforme `AI_RULES.md`, deve ser reconstruído com `scripts\Install-DevelopmentShortcut.ps1 -Build` quando aplicável. O script espelha a árvore para a pasta irmã fixa `Ralven-dev-shortcut`, sem ficar órfão após a remoção de um worktree.
 
 ## 2. Objetivo e invariantes de segurança
 
@@ -31,19 +31,19 @@ Documentos normativos: `docs/safety.md` e `docs/architecture.md`.
 
 ### Solução .NET
 
-`Vemryx.One.slnx` separa responsabilidades. A árvore de `src/` possui nove projetos principais:
+`Ralven.slnx` separa responsabilidades. A árvore de `src/` possui nove projetos principais:
 
-- `Vemryx.One.App` — WPF, navegação, localização, tema, conta, apresentação, progresso e interação.
-- `Vemryx.One.Contracts` — DTOs, IDs, enums e contratos compartilhados; os estados persistidos de transação e journal são contratos duráveis append-only.
-- `Vemryx.One.Core` — catálogo de ações, perfis, planejamento e regras independentes de Windows/UI; o planejamento é puro e recebe explicitamente suas entradas variáveis.
-- `Vemryx.One.Windows` — descoberta e adaptadores Windows, filesystem, registro, diagnósticos e ações permitidas.
-- `Vemryx.One.Broker` — processo administrativo efêmero e allowlisted; sem shell/comandos arbitrários.
-- `Vemryx.One.Launcher` — inicialização/ativação do runtime e coordenação do fluxo de atualização.
-- `Vemryx.One.Updater` — atualização independente e staging/aplicação da atualização.
-- `Vemryx.One.UpdateRuntime` — contratos/estado durável usados pela cadeia de atualização e recuperação.
-- `Vemryx.One.ReleaseTool` — suporte à preparação/validação de artefatos de release.
+- `Ralven.App` — WPF, navegação, localização, tema, conta, apresentação, progresso e interação.
+- `Ralven.Contracts` — DTOs, IDs, enums e contratos compartilhados; os estados persistidos de transação e journal são contratos duráveis append-only.
+- `Ralven.Core` — catálogo de ações, perfis, planejamento e regras independentes de Windows/UI; o planejamento é puro e recebe explicitamente suas entradas variáveis.
+- `Ralven.Windows` — descoberta e adaptadores Windows, filesystem, registro, diagnósticos e ações permitidas.
+- `Ralven.Broker` — processo administrativo efêmero e allowlisted; sem shell/comandos arbitrários.
+- `Ralven.Launcher` — inicialização/ativação do runtime e coordenação do fluxo de atualização.
+- `Ralven.Updater` — atualização independente e staging/aplicação da atualização.
+- `Ralven.UpdateRuntime` — contratos/estado durável usados pela cadeia de atualização e recuperação.
+- `Ralven.ReleaseTool` — suporte à preparação/validação de artefatos de release.
 
-Testes .NET ficam em `tests/Vemryx.One.Tests/`.
+Testes .NET ficam em `tests/Ralven.Tests/`.
 
 A toolchain integrada usa .NET 10 LTS com SDK 10.0.303, C# 14 fixo e NuGet Central Package Management em `Directory.Packages.props`. Os testes usam xUnit v3 sobre Microsoft Testing Platform, com cobertura via `coverlet.MTP`.
 
@@ -60,7 +60,7 @@ Node 24.19 LTS é o baseline versionado para site, Worker e dashboard.
 
 ### Persistência local
 
-Preferências, journals, solicitações efêmeras, filas e logs locais ficam sob `%LOCALAPPDATA%\FiveMCleaner`; não gravar dados mutáveis na pasta de instalação.
+Preferências, journals, solicitações efêmeras, filas e logs locais ficam sob `%LOCALAPPDATA%\Ralven`; não gravar dados mutáveis na pasta de instalação. Na primeira abertura, o importador allowlisted pode copiar dados pessoais compatíveis de gerações sem suporte, sem sobrescrever nem alterar a origem.
 
 ## 4. Estado funcional relevante
 
@@ -116,15 +116,15 @@ Preferências, journals, solicitações efêmeras, filas e logs locais ficam sob
 - Cadeia de atualização é independente/transacional, com staging, validações de origem/integridade, estado durável, health receipt, recuperação/rollback e proteção contra downgrade conforme documentação específica.
 - Launcher/Updater tratam locks transitórios e corridas de processo; broker e fluxos elevados possuem timeouts para evitar bloqueio indefinido. Espera pelo processo pai é compartilhada entre Launcher e Updater via `ParentProcessWait` (UpdateRuntime); hashing/extração/verificação de pacote roda fora da UI thread com `CancellationToken` propagado; comparação de hash do manifesto é em tempo constante; `RecoveryCoordinator` completa journals órfãos quando o piso anti-downgrade já avançou por outro caminho.
 - Instalador Inno Setup 7 é self-contained `win-x64`, usa setup x64 e mantém tarefas como atalho e startup configuráveis no modo interativo.
-- Em upgrades, a aplicação migra após a abertura da janela somente atalhos FiveMCleaner confirmados da própria instalação para Vemryx One; mantém atalhos personalizados, a escolha prévia de grupo no Menu Iniciar e os contratos legados de executável, dados e updater.
-- Pipeline de endurecimento por ofuscação da release (`scripts/Invoke-Obfuscation.ps1`, config em `build/obfuscation/VemryxOne.Obfuscar.xml`): ofusca Core/Windows embutidos no bundle single-file do Launcher; `scripts/Test-HardenedRuntime.ps1`/`scripts/Test-NoUnobfuscatedAssemblies.ps1` validam determinismo e ausência de assemblies não ofuscados; gate fail-closed integrado a `scripts/Build-Portable.ps1`/`Build-Installer.ps1` e ao workflow de release. Ver `docs/release-hardening.md`.
+- Não existem aliases de executável, instalador ou atualização para gerações sem suporte. O importador inicial conserva apenas dados pessoais compatíveis, é unidirecional, allowlisted e protegido contra reparse points; ver `RALVEN_MIGRATION.md`.
+- Pipeline de endurecimento por ofuscação da release (`scripts/Invoke-Obfuscation.ps1`, config em `build/obfuscation/Ralven.Obfuscar.xml`): ofusca Core/Windows embutidos no bundle single-file do Launcher; `scripts/Test-HardenedRuntime.ps1`/`scripts/Test-NoUnobfuscatedAssemblies.ps1` validam determinismo e ausência de assemblies não ofuscados; gate fail-closed integrado a `scripts/Build-Portable.ps1`/`Build-Installer.ps1` e ao workflow de release. Ver `docs/release-hardening.md`.
 - Site público, README, instalador, manifesto/checksums e release devem permanecer coerentes com a versão realmente publicada.
 
 ## 5. Pendências e decisões abertas
 
 Somente itens ainda relevantes devem permanecer aqui. Quando resolvidos e integrados, remova-os em vez de criar uma cronologia.
 
-1. **Ideia futura — watcher de sessão FiveM/GTA** (não é uma decisão bloqueada, é backlog de funcionalidade): ajustes que precisariam ser aplicados/restaurados durante o ciclo de vida do jogo (prioridade, afinidade, core parking, timer resolution e semelhantes) são um candidato de funcionalidade futura. Continuam fora do catálogo até existir uma arquitetura segura de monitoramento e reversão mesmo se o Vemryx One for encerrado. Ver `docs/graphics-optimizations-backlog.md` para o design ainda a amadurecer.
+1. **Ideia futura — watcher de sessão FiveM/GTA** (não é uma decisão bloqueada, é backlog de funcionalidade): ajustes que precisariam ser aplicados/restaurados durante o ciclo de vida do jogo (prioridade, afinidade, core parking, timer resolution e semelhantes) são um candidato de funcionalidade futura. Continuam fora do catálogo até existir uma arquitetura segura de monitoramento e reversão mesmo se o Ralven for encerrado. Ver `docs/graphics-optimizations-backlog.md` para o design ainda a amadurecer.
 2. **GTAV Enhanced** — sem suporte operacional; requer adaptador/projeto específico antes de habilitar qualquer ação.
 3. **Authenticode público** — executáveis e instalador ainda não possuem assinatura de publisher confiável; a implementação depende de certificado/conta externa e deve assinar antes dos hashes e manifestos finais.
 4. **Próximas majors do frontend** — TypeScript 7 ainda excede o peer range suportado pelo `typescript-eslint` vigente, e ESLint 10 ainda não é aceito por plugins do stack Next. O estado suportado permanece TypeScript 6 e ESLint 9 até os peers oficiais convergirem.
@@ -135,9 +135,9 @@ Somente itens ainda relevantes devem permanecer aqui. Quando resolvidos e integr
 
 Estes números são **referência do último estado validado**, não substituem testes da branch atual.
 
-- **24/08/2026 — release pública v1.5.0:** build Release sem warnings, **1.000 testes .NET**, `dotnet format --verify-no-changes`, verificação de segurança, contrato do instalador, smoke pós-ofuscação e instalação/upgrade/desinstalação aprovados. Worker (**199 testes**), dashboard (**49 testes**) e site (lint, typecheck, build e **3 testes**) também passaram sem vulnerabilidades. A CI remota e o workflow estável aprovaram SBOM, empacotamento endurecido, assinatura, proveniência, GitHub Release e publicação do feed estável assinado do updater.
+- **28/08/2026 — integração Ralven:** build Release sem warnings, **1.011 testes .NET**, `scripts/Verify-Safety.ps1`, site (lint, typecheck, build e **3 testes**), Worker (**215 testes**) e dashboard (**50 testes**) aprovados; as cinco verificações remotas do PR, incluindo SBOM, também aprovaram. Node 24.19 LTS continua sendo o baseline versionado para as superfícies Node.
 
-- **25/08/2026 — integração atual:** build Release sem warnings, **1.014 testes .NET**, `dotnet format --verify-no-changes`, `scripts/Verify-Safety.ps1`, `scripts/Verify-Installer.ps1 -ScriptOnly` e `git diff --check` aprovados; todos os checks remotos do PR (build/test .NET, Worker, dashboard, site e SBOM) aprovaram. O CI da branch de integração é a confirmação remota complementar deste baseline.
+- **24/08/2026 — release pública v1.5.0:** build Release sem warnings, **1.000 testes .NET**, `dotnet format --verify-no-changes`, verificação de segurança, contrato do instalador, smoke pós-ofuscação e instalação/upgrade/desinstalação aprovados. Worker (**199 testes**), dashboard (**49 testes**) e site (lint, typecheck, build e **3 testes**) também passaram sem vulnerabilidades. A CI remota e o workflow estável aprovaram SBOM, empacotamento endurecido, assinatura, proveniência, GitHub Release e publicação do feed estável assinado do updater.
 
 Ao alterar uma superfície, execute a validação aplicável novamente e use os resultados atuais no PR. Nunca use estes números para afirmar que código posterior foi testado.
 
@@ -146,10 +146,10 @@ Ao alterar uma superfície, execute a validação aplicável novamente e use os 
 Na raiz:
 
 ```powershell
-dotnet restore Vemryx.One.slnx
-dotnet build Vemryx.One.slnx --configuration Release --no-restore
-dotnet test Vemryx.One.slnx --configuration Release --no-build
-dotnet format Vemryx.One.slnx --verify-no-changes
+dotnet restore Ralven.slnx
+dotnet build Ralven.slnx --configuration Release --no-restore
+dotnet run --project tests/Ralven.Tests/Ralven.Tests.csproj --configuration Release --no-build -- --minimum-expected-tests 1
+dotnet format Ralven.slnx --verify-no-changes
 .\scripts\Verify-Safety.ps1
 git diff --check
 .\scripts\Start-DevelopmentApp.ps1
