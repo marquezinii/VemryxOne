@@ -30,8 +30,8 @@ Não faz parte desta tarefa publicar release, alterar versão, criar tag, promov
 - [x] website, Worker e dashboard;
 - [x] documentação canônica e inventário de codebase;
 - [x] build, testes, safety, installer contract e capturas dark/light;
-- [ ] commit, push e PR para `dev/proxima-versao`;
-- [ ] rename do repositório GitHub para `marquezinii/Ralven`.
+- [x] commit, push e PR para `dev/proxima-versao`;
+- [x] rename do repositório GitHub para `marquezinii/Ralven`.
 
 ## Restrições operacionais deste turno
 
@@ -49,3 +49,10 @@ validado sem ser instalado, e nenhuma infraestrutura remota foi implantada.
 - testes de site, Worker e dashboard aprovados, incluindo dry-run do Worker;
 - capturas reais dark/light inspecionadas e contraste do CTA desabilitado
   corrigido no estilo compartilhado.
+
+## Handoff
+
+- commit principal: `480a370`;
+- branch: `feat/ralven-rebrand`;
+- PR: <https://github.com/marquezinii/Ralven/pull/99>;
+- repositório: <https://github.com/marquezinii/Ralven>.
