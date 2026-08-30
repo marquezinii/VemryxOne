@@ -63,6 +63,19 @@ remove primeiro o perfil pelo UID autenticado e só então a conta Firebase;
 se o Firebase recusar a exclusão, o perfil é restaurado antes de informar a
 falha.
 
+## Cobrança e entitlements
+
+A fundação de cobrança fica no Worker e no D1, separada da autenticação
+Firebase e das políticas de otimização. O aplicativo pode ler apenas o snapshot
+server-side de acesso da própria UID em `GET /account/entitlements`; IDs e
+estados do provedor não são contratos do cliente. Notificações do Mercado Pago
+são autenticadas por HMAC e sempre reconciliadas contra o recurso canônico e um
+checkout intent criado pelo servidor. O corpo da notificação, um redirect de
+checkout ou o estado `authorized` de uma assinatura não concedem Pro. Veja
+[Cobrança e acesso pago](billing.md) para o contrato e os bloqueadores de
+ativação. Enquanto um checkout ou assinatura local existir, a exclusão do perfil
+é bloqueada; o fluxo futuro deve cancelar no provedor antes de remover o vínculo.
+
 | Projeto                  | Responsabilidade                                                    | Não deve conhecer                                        |
 | ------------------------ | ------------------------------------------------------------------- | -------------------------------------------------------- |
 | `Ralven.App`       | WPF, navegação, prévia, progresso e confirmação                     | APIs administrativas ou detalhes de registro             |

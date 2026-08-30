@@ -108,9 +108,20 @@ export async function createAccountProfile(db, uid, profile) {
   }
 }
 
-/** Deletes only the Firebase UID owner's profile. The caller's verified UID is the scope. */
+/** Deletes the verified UID's profile only when no billing flow is linked. */
 export async function deleteAccountProfile(db, uid) {
-  await db.prepare('DELETE FROM account_profiles WHERE uid = ?').bind(uid).run();
+  await db.prepare(
+    `DELETE FROM account_profiles
+     WHERE uid = ?
+       AND NOT EXISTS (
+         SELECT 1 FROM billing_checkout_intents WHERE account_uid = ?
+       )`,
+  ).bind(uid, uid).run();
+
+  const billing = await db.prepare(
+    'SELECT 1 AS blocked FROM billing_checkout_intents WHERE account_uid = ? LIMIT 1',
+  ).bind(uid).first();
+  return billing === null;
 }
 
 /**

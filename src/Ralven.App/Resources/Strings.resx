@@ -1094,6 +1094,14 @@
   <data name="Settings.Account.SignOut" xml:space="preserve"><value>Sign out</value></data>
   <data name="Settings.Account.NewPasswordLabel" xml:space="preserve"><value>New password</value></data>
   <data name="Settings.Account.Title" xml:space="preserve"><value>Account</value></data>
+  <data name="Settings.Account.Plan.Title" xml:space="preserve"><value>Plan</value></data>
+  <data name="Settings.Account.Plan.Free" xml:space="preserve"><value>Free</value></data>
+  <data name="Settings.Account.Plan.FreeDetail" xml:space="preserve"><value>No active Pro access is linked to this account.</value></data>
+  <data name="Settings.Account.Plan.ProUntil" xml:space="preserve"><value>Pro until {0}</value></data>
+  <data name="Settings.Account.Plan.ProDetail" xml:space="preserve"><value>Pro access confirmed by Ralven servers.</value></data>
+  <data name="Settings.Account.Plan.Unavailable" xml:space="preserve"><value>Couldn't confirm your plan</value></data>
+  <data name="Settings.Account.Plan.UnavailableDetail" xml:space="preserve"><value>Your current access couldn't be verified. No Pro feature is unlocked while this status is unavailable.</value></data>
+  <data name="Settings.Account.Plan.Refresh" xml:space="preserve"><value>Refresh</value></data>
   <data name="Settings.Account.ChangePhoto" xml:space="preserve"><value>Change photo</value></data>
   <data name="Settings.Account.Unavailable" xml:space="preserve"><value>Account access is not available in this installation.</value></data>
   <data name="Report.ViewHistoryButton" xml:space="preserve"><value>View history</value></data>

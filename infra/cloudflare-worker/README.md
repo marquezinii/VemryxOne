@@ -56,6 +56,10 @@ summary, optional email, optional plain-text log excerpt capped at 100 KB).
   startup plus once an hour (`GET /live-alert`, public, rate limited). See
   `docs/superpowers/specs/2026-08-17-live-alerts-design.md`.
 - `src/auth/` — the custom admin authentication (see below).
+- `src/billing/` — provider webhook verification/reconciliation and the
+  authenticated, provider-neutral entitlement read model. This is a safe
+  foundation only: no public checkout or automatic Pro grant exists yet. See
+  [`docs/billing.md`](../../docs/billing.md).
 - `src/stats/` — `queries.js` (pure SQL+params builders, one per dashboard
   chart) and `csv.js` (pure CSV serialization for the export feature).
   Available `:name` values: `runs-per-day`, `os-versions`, `app-versions`,
@@ -189,6 +193,32 @@ lookup (`LIVE_ALERT_LIMITER`, 30/60s per IP) — it is read-only, unauthenticate
 by necessity (every installed app reads it), and never exposes anything more
 sensitive than the one message an admin chose to broadcast.
 
+## Billing foundation
+
+`GET /account/entitlements` uses the same verified Firebase UID as the profile
+routes and returns only the current tier, entitlement keys and validity. Missing
+or expired access is a normal `free` response; provider identifiers are never
+returned.
+
+`POST /billing/mercado-pago/webhook` verifies the Mercado Pago signature over
+the signed request envelope, fetches `GET /preapproval/{id}` with a Worker-only
+Access Token, and matches the canonical reference, BRL amount and currency to a
+server-side checkout intent before updating billing state. It deliberately does
+not trust or persist the webhook body and does not grant Pro in this foundation.
+Both required credentials are Worker secrets:
+
+```bash
+wrangler secret put MERCADO_PAGO_ACCESS_TOKEN
+wrangler secret put MERCADO_PAGO_WEBHOOK_SECRET
+```
+
+Do not apply the billing migration or configure production credentials until
+the activation blockers in [`docs/billing.md`](../../docs/billing.md) are
+resolved. Until a provider cancellation flow exists, account deletion returns
+`409 billing-cancellation-required` when a local checkout or subscription is
+linked, so it cannot remove the only mapping while the provider may continue
+charging.
+
 Legacy Worker product tables (`user_accounts` / sessions), if still present on
 remote D1 from the pre-Firebase system, are not migrated. There are no real
 users to preserve; cleanup is a separate authorized deploy/migration task.
@@ -213,6 +243,8 @@ npm run hash-admin-password       # prints the ADMIN_PASSWORD_HASH value
 wrangler secret put ADMIN_PASSWORD_HASH
 wrangler secret put IP_HASH_SECRET   # any long random string
 wrangler secret put ADMIN_CSRF_SECRET # distinct long random string
+wrangler secret put MERCADO_PAGO_ACCESS_TOKEN
+wrangler secret put MERCADO_PAGO_WEBHOOK_SECRET
 
 wrangler d1 migrations apply fivemcleaner-telemetry --remote   # captures a D1 backup; touches the real database — ask first
 wrangler deploy   # touches Cloudflare — ask first

@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using Ralven.App;
 using Ralven.App.Services;
 using Ralven.Contracts;
 using Ralven.Core.Catalog;
@@ -78,6 +79,92 @@ public sealed partial class LocalizedInterfaceContractTests
         Assert.Contains("ms-windows-store://downloadsandupdates", applicationsPage, StringComparison.Ordinal);
         Assert.DoesNotContain("Arguments =", systemPage + applicationsPage, StringComparison.Ordinal);
         Assert.DoesNotContain("runas", systemPage + applicationsPage, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void AccountPlan_ShowsServerEntitlementStatesWithCompleteLocalization()
+    {
+        var root = TestHelpers.FindRepositoryRoot();
+        var appDirectory = Path.Combine(root, "src", "Ralven.App");
+        var mainWindow = File.ReadAllText(Path.Combine(appDirectory, "MainWindow.xaml"));
+        var accountCode = File.ReadAllText(Path.Combine(appDirectory, "MainWindow.Account.xaml.cs"));
+
+        Assert.Contains("AccountEntitlementValueText", mainWindow, StringComparison.Ordinal);
+        Assert.Contains("AccountEntitlementRefresh_Click", mainWindow, StringComparison.Ordinal);
+        Assert.Matches(
+            "x:Name=\"AccountEntitlementValueText\"[^>]*AutomationProperties.LiveSetting=\"Polite\"",
+            mainWindow);
+        Assert.Contains("SyncAccountEntitlementAsync", accountCode, StringComparison.Ordinal);
+        Assert.Contains("ClearAccountEntitlement", accountCode, StringComparison.Ordinal);
+
+        var keys = new[]
+        {
+            "Settings.Account.Plan.Title",
+            "Settings.Account.Plan.Free",
+            "Settings.Account.Plan.FreeDetail",
+            "Settings.Account.Plan.ProUntil",
+            "Settings.Account.Plan.ProDetail",
+            "Settings.Account.Plan.Unavailable",
+            "Settings.Account.Plan.UnavailableDetail",
+            "Settings.Account.Plan.Refresh",
+        };
+        var localizations = new[]
+        {
+            new LocalizationService(CultureInfo.GetCultureInfo("en-US")),
+            new LocalizationService(CultureInfo.GetCultureInfo("pt-BR")),
+            new LocalizationService(CultureInfo.GetCultureInfo("es")),
+        };
+
+        foreach (var localization in localizations)
+        {
+            foreach (var key in keys)
+            {
+                Assert.NotEqual(key, localization.GetString(key));
+            }
+        }
+    }
+
+    [Fact]
+    public void AccountPlan_RejectsStaleOrForeignEntitlementResponses()
+    {
+        var firstUser = new FirebaseUser("uid-1", "first@example.com", true);
+        var secondUser = new FirebaseUser("uid-2", "second@example.com", true);
+
+        Assert.True(MainWindow.IsCurrentAccountEntitlementResponse(
+            4,
+            4,
+            firstUser.Uid,
+            new AuthenticationSnapshot(AuthenticationState.SignedIn, firstUser)));
+        Assert.False(MainWindow.IsCurrentAccountEntitlementResponse(
+            3,
+            4,
+            firstUser.Uid,
+            new AuthenticationSnapshot(AuthenticationState.SignedIn, firstUser)));
+        Assert.False(MainWindow.IsCurrentAccountEntitlementResponse(
+            4,
+            4,
+            firstUser.Uid,
+            new AuthenticationSnapshot(AuthenticationState.SignedIn, secondUser)));
+        Assert.False(MainWindow.IsCurrentAccountEntitlementResponse(
+            4,
+            4,
+            firstUser.Uid,
+            new AuthenticationSnapshot(AuthenticationState.SignedOut, null)));
+    }
+
+    [Fact]
+    public void AccountPlan_ProAccessExpiresAtTheServerValidityBoundary()
+    {
+        var validUntil = DateTimeOffset.Parse(
+            "2026-09-30T12:00:00.000Z",
+            CultureInfo.InvariantCulture);
+        var snapshot = new AccountEntitlementSnapshot(AccountEntitlementTier.Pro, validUntil);
+
+        Assert.True(MainWindow.IsEffectiveProEntitlement(snapshot, validUntil.AddTicks(-1)));
+        Assert.False(MainWindow.IsEffectiveProEntitlement(snapshot, validUntil));
+        Assert.False(MainWindow.IsEffectiveProEntitlement(
+            new AccountEntitlementSnapshot(AccountEntitlementTier.Free),
+            validUntil.AddTicks(-1)));
     }
 
     [Fact]

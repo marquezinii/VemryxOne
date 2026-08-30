@@ -34,6 +34,9 @@
 ##                          CSRF tokens
 ##   RELEASE_MANIFEST_JSON -- signed stable feed generated and published by
 ##                            the official stable-release workflow
+##   MERCADO_PAGO_ACCESS_TOKEN -- token server-side usado somente para consultar
+##                                recursos canônicos da API do Mercado Pago
+##   MERCADO_PAGO_WEBHOOK_SECRET -- segredo HMAC da URL de webhook de assinaturas
 ##
 ## DASHBOARD_ORIGIN below is a plain, non-secret var -- the exact origin the
 ## dashboard is served from, so CORS headers are only ever sent back to that
