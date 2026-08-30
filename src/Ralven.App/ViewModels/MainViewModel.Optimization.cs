@@ -15,6 +15,7 @@ public sealed partial class MainViewModel
 {
     public bool CanRevertLastOptimization => ComparisonRegressionSuspected
         && !IsBusy
+        && !isWindowsGamingBusy
         && lastTransactionId is { } id
         && HistoryItems.Any(item => item.TransactionId == id && item.CanRollback);
 
@@ -22,7 +23,9 @@ public sealed partial class MainViewModel
 
     public string GtaVBenchmarkStatusLabel { get => gtaVBenchmarkStatusLabel; private set => SetProperty(ref gtaVBenchmarkStatusLabel, value); }
 
-    public bool CanRunGtaVBenchmark => !IsBusy && !IsGtaVBenchmarkRunning;
+    public bool CanRunGtaVBenchmark => !IsBusy
+        && !isWindowsGamingBusy
+        && !IsGtaVBenchmarkRunning;
 
     public string ProfilePresentationBenefits { get => profilePresentationBenefits; private set => SetProperty(ref profilePresentationBenefits, value); }
 
@@ -346,7 +349,7 @@ public sealed partial class MainViewModel
     public async Task<bool> RollbackAsync(HistoryDisplayItem item)
     {
         ArgumentNullException.ThrowIfNull(item);
-        if (IsBusy || !item.CanRollback)
+        if (IsBusy || isWindowsGamingBusy || !item.CanRollback)
         {
             return false;
         }
@@ -358,10 +361,16 @@ public sealed partial class MainViewModel
         StartOperationTiming();
         var progress = new Progress<AppProgressUpdate>(ApplyProgress);
         var completedSuccessfully = false;
+        var rolledBackWindowsGamingTransaction = false;
         try
         {
             var restored = await service.RollbackAsync(item.TransactionId, progress, operationCancellation.Token);
             completedSuccessfully = restored;
+            if (restored && windowsGamingTransactionId == item.TransactionId)
+            {
+                windowsGamingTransactionId = null;
+                rolledBackWindowsGamingTransaction = true;
+            }
             ApplyHistory(await service.LoadHistoryAsync());
             return restored;
         }
@@ -380,6 +389,10 @@ public sealed partial class MainViewModel
             operationCancellation.Dispose();
             operationCancellation = null;
             IsBusy = false;
+            if (rolledBackWindowsGamingTransaction)
+            {
+                await RefreshWindowsGamingSettingsAsync();
+            }
         }
     }
 

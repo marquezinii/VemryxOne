@@ -8,7 +8,10 @@ Uma ação aceita pelo produto precisa respeitar todos os itens abaixo:
 
 1. **Escopo conhecido** — instalação e edição foram identificadas sem ambiguidade.
 2. **Legacy somente** — GTAV Enhanced retorna bloqueio seguro.
-3. **Processos encerrados** — nenhuma escrita ou limpeza ocorre com processos FiveM ativos.
+3. **Processos encerrados** — nenhuma nova escrita ou limpeza começa com
+   processos FiveM ativos. A única exceção é a compensação imediata e estreita
+   do snapshot criado pela própria execução que acabou de falhar, descrita em
+   "Controles de jogos do Windows"; ela apenas restaura o estado prévio.
 4. **Alvo canônico** — o caminho final foi resolvido e permanece dentro do diretório esperado.
 5. **Privilégio mínimo** — elevação acontece apenas para uma operação administrativa tipada.
 6. **Prévia completa** — o usuário vê o que será alterado, por quê, risco e rollback.
@@ -41,6 +44,38 @@ O projeto não aceita implementações que:
 - escondam ações, usem ofuscação para ocultar ações ou payloads, ou baixem código executável depois da instalação;
 - contornem anti-cheat, pure mode ou verificações de integridade;
 - operem em FiveM/GTAV Enhanced enquanto esse adaptador estiver bloqueado.
+
+## Controles de jogos do Windows
+
+O painel **Sistema > Jogos do Windows** é uma exceção explícita ao antigo
+comportamento somente de atalhos da página Sistema, não uma autorização para
+alterações genéricas no Windows. Seu escopo é fixo:
+
+- lê e altera somente `HKCU\Software\Microsoft\GameBar\AutoGameModeEnabled`
+  e `HKCU\Software\Microsoft\Windows\CurrentVersion\GameDVR\HistoricalCaptureEnabled`;
+- aceita somente valores `DWORD` ausentes, `0` ou `1`; tipo ou conteúdo
+  inesperado torna o painel indisponível, sem tentativa de correção;
+- mostra o estado detectado e exige confirmação antes da escrita;
+- bloqueia aplicação e restauração enquanto o FiveM estiver ativo e repete essa
+  verificação na fronteira de cada escrita; se não puder confirmar que o
+  processo está encerrado, não inicia uma nova alteração;
+- se o FiveM iniciar depois de uma escrita da mesma execução e a etapa seguinte
+  falhar, o motor pode restaurar imediatamente apenas o snapshot recém-aplicado
+  por essa execução. Essa compensação estreita evita deixar uma alteração
+  parcial; não autoriza nova aplicação nem restauração solicitada pelo usuário
+  ou pelo Histórico enquanto o FiveM estiver aberto;
+- roda como usuário padrão, sem broker ou elevação;
+- executa as duas ações tipadas em uma transação estrita e registra o estado
+  anterior de cada valor; uma falha aciona tentativa de reversão e o resultado
+  real, inclusive conflito ou falha de restauração, permanece no Histórico;
+- a restauração não sobrescreve um valor alterado posteriormente por outro
+  programa e, por isso, pode terminar com conflito em vez de prometer sucesso;
+- não remove a Game Bar, não impede gravação manual e não promete ganho
+  universal de FPS ou desempenho.
+
+O painel nunca aceita caminho, hive, nome de valor, ação ou comando fornecido
+pela UI. Qualquer novo ajuste geral do Windows exige ação própria, evidência,
+detecção, confirmação, validação, reversibilidade e testes independentes.
 
 ## Escopo de edição gráfica
 

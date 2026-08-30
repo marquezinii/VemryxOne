@@ -24,7 +24,7 @@ public sealed partial class MainViewModel
         {
             if (SetProperty(ref isUpdateDownloading, value))
             {
-                OnPropertyChanged(nameof(CanDownloadUpdate));
+                RaiseCommandState();
             }
         }
     }
@@ -36,7 +36,7 @@ public sealed partial class MainViewModel
         {
             if (SetProperty(ref isInstallingUpdate, value))
             {
-                OnPropertyChanged(nameof(CanDownloadUpdate));
+                RaiseCommandState();
             }
         }
     }
@@ -50,7 +50,8 @@ public sealed partial class MainViewModel
     public bool CanDownloadUpdate => availableUpdate is not null
         && !IsUpdateDownloading
         && !IsInstallingUpdate
-        && !IsBusy;
+        && !IsBusy
+        && !isWindowsGamingBusy;
 
     /// <summary>
     /// Non-null only on the launch that immediately follows a successful
@@ -288,7 +289,10 @@ public sealed partial class MainViewModel
     public async Task<bool> InstallDownloadedUpdateAsync(DownloadedUpdate downloaded)
     {
         ArgumentNullException.ThrowIfNull(downloaded);
-        if (silentUpdateInstaller is null || IsInstallingUpdate || IsBusy)
+        if (silentUpdateInstaller is null
+            || IsInstallingUpdate
+            || IsBusy
+            || isWindowsGamingBusy)
         {
             return false;
         }

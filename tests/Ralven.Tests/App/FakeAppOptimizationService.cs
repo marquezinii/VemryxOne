@@ -15,14 +15,32 @@ namespace Ralven.Tests.App;
 public sealed class FakeAppOptimizationService : IAppOptimizationService
 {
     private readonly bool settingsFileExists;
+    private readonly IReadOnlyList<AppHistoryRecord> history;
+    private readonly bool isFiveMRunning;
+    private readonly Task<AppGtaVBenchmarkResult>? benchmarkResult;
+    private readonly bool? rollbackResult;
+    private readonly AppProgressUpdate? rollbackProgressUpdate;
     public AppSettings? SavedSettings { get; private set; }
     public int SaveCallCount { get; private set; }
 
-    public FakeAppOptimizationService(AppSettings initialSettings, bool settingsFileExists, Exception? diagnosticException = null)
+    public FakeAppOptimizationService(
+        AppSettings initialSettings,
+        bool settingsFileExists,
+        Exception? diagnosticException = null,
+        IReadOnlyList<AppHistoryRecord>? history = null,
+        bool isFiveMRunning = false,
+        Task<AppGtaVBenchmarkResult>? benchmarkResult = null,
+        bool? rollbackResult = null,
+        AppProgressUpdate? rollbackProgressUpdate = null)
     {
         InitialSettings = initialSettings;
         this.settingsFileExists = settingsFileExists;
         DiagnosticException = diagnosticException;
+        this.history = history ?? [];
+        this.isFiveMRunning = isFiveMRunning;
+        this.benchmarkResult = benchmarkResult;
+        this.rollbackResult = rollbackResult;
+        this.rollbackProgressUpdate = rollbackProgressUpdate;
     }
 
     public AppSettings InitialSettings { get; }
@@ -45,11 +63,11 @@ public sealed class FakeAppOptimizationService : IAppOptimizationService
 
     public Task<AppDiagnostic> DiagnoseAsync(CancellationToken cancellationToken = default) =>
         DiagnosticException is null
-            ? Task.FromResult(CreateMinimalDiagnostic())
+            ? Task.FromResult(CreateMinimalDiagnostic(isFiveMRunning))
             : Task.FromException<AppDiagnostic>(DiagnosticException);
 
     public Task<IReadOnlyList<AppHistoryRecord>> LoadHistoryAsync(CancellationToken cancellationToken = default) =>
-        Task.FromResult<IReadOnlyList<AppHistoryRecord>>([]);
+        Task.FromResult(history);
 
     public Task<AppOptimizationResult> ExecuteAsync(
         OptimizationPlanDto plan,
@@ -60,18 +78,31 @@ public sealed class FakeAppOptimizationService : IAppOptimizationService
     public Task<bool> RollbackAsync(
         Guid transactionId,
         IProgress<AppProgressUpdate> progress,
-        CancellationToken cancellationToken = default) =>
-        throw new NotSupportedException();
+        CancellationToken cancellationToken = default)
+    {
+        if (rollbackResult is null)
+        {
+            throw new NotSupportedException();
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+        if (rollbackProgressUpdate is not null)
+        {
+            progress.Report(rollbackProgressUpdate);
+        }
+
+        return Task.FromResult(rollbackResult.Value);
+    }
 
     public Task<AppGtaVBenchmarkResult> RunGtaVBenchmarkAsync(
         int iterations,
         CancellationToken cancellationToken = default) =>
-        throw new NotSupportedException();
+        benchmarkResult ?? throw new NotSupportedException();
 
-    private static AppDiagnostic CreateMinimalDiagnostic() => new()
+    private static AppDiagnostic CreateMinimalDiagnostic(bool isFiveMRunning) => new()
     {
         Edition = FiveMEdition.Legacy,
-        IsFiveMRunning = false,
+        IsFiveMRunning = isFiveMRunning,
         GtaVDetected = false,
         GtaVIsRunning = false,
         GtaVGraphicsSettingsPath = string.Empty,

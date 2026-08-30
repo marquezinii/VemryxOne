@@ -419,7 +419,9 @@ public sealed class WindowsOptimizationActionFactory
                 dependencies.ProcessInspector,
                 dependencies.FileTree),
             OptimizationActionIds.EnableGameMode => new GameModeRegistryAction(
-                dependencies.Registry),
+                dependencies.Registry,
+                dependencies.ProcessInspector,
+                environment.FiveMInstallationRoot),
             OptimizationActionIds.PreferHighPerformanceGpu => new GpuPreferenceRegistryAction(
                 dependencies.Registry,
                 environment.FiveMExecutablePath,
@@ -429,7 +431,9 @@ public sealed class WindowsOptimizationActionFactory
                 dependencies.Registry,
                 environment.FiveMExecutablePath),
             OptimizationActionIds.DisableBackgroundCapture => new GameDvrRegistryAction(
-                dependencies.Registry),
+                dependencies.Registry,
+                dependencies.ProcessInspector,
+                environment.FiveMInstallationRoot),
             OptimizationActionIds.ToggleFullscreenOptimizations => new FullscreenOptimizationsRegistryAction(
                 dependencies.Registry,
                 environment.FiveMExecutablePath,

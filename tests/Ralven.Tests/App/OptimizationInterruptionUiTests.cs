@@ -16,6 +16,37 @@ public sealed class OptimizationInterruptionUiTests
     }
 
     [Fact]
+    public void MainWindow_BlocksCloseAndKeepsTrayAccessDuringWindowsGamingMutation()
+    {
+        var root = FindRepositoryRoot();
+        var traySource = File.ReadAllText(Path.Combine(
+            root,
+            "src",
+            "Ralven.App",
+            "MainWindow.Tray.xaml.cs"));
+        var viewModelSource = File.ReadAllText(Path.Combine(
+            root,
+            "src",
+            "Ralven.App",
+            "ViewModels",
+            "MainViewModel.System.cs"));
+
+        Assert.Contains(
+            "if (viewModel.IsWindowsGamingBusy && !systemSessionEnding)",
+            traySource,
+            StringComparison.Ordinal);
+        Assert.Contains("public bool IsWindowsGamingBusy", viewModelSource, StringComparison.Ordinal);
+
+        var exitGuard = traySource.LastIndexOf(
+            "if (viewModel.IsWindowsGamingBusy)",
+            StringComparison.Ordinal);
+        Assert.True(exitGuard >= 0);
+        var reactivate = traySource.IndexOf("RequestActivation();", exitGuard, StringComparison.Ordinal);
+        var hideTray = traySource.IndexOf("trayIcon.Hide();", reactivate, StringComparison.Ordinal);
+        Assert.True(reactivate > exitGuard && hideTray > reactivate);
+    }
+
+    [Fact]
     public void OptimizerPlan_ShowsUserFacingRiskAndPrivilegeChips()
     {
         var root = FindRepositoryRoot();

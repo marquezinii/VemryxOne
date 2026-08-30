@@ -3,6 +3,7 @@ using Ralven.Contracts;
 using Ralven.Core.Catalog;
 using Ralven.Windows.Actions;
 using Ralven.Windows.Engine;
+using Ralven.Windows.Infrastructure;
 using Xunit;
 
 namespace Ralven.Tests.Windows;
@@ -273,6 +274,93 @@ public sealed class WindowsTransactionEngineTests
         Assert.Equal(ActionJournalState.Failed, journals.Get(transactionId).Actions[1].State);
     }
 
+    [Fact]
+    public async Task IsolatedExecution_WhenJournalFailsAfterWrite_RollsBackWithoutPersistence()
+    {
+        var action = new TestGameModeAction();
+        var journals = new FailAfterChangedEntryJournalStore();
+        var engine = new WindowsTransactionEngine(
+            new WindowsActionCatalog([action]),
+            journals);
+
+        await Assert.ThrowsAsync<IOException>(() => engine.ExecuteAsync(
+            [action],
+            Context(Guid.NewGuid(), elevated: false),
+            new WindowsTransactionOptions
+            {
+                IncludeStandardUserActions = true,
+                IncludeAdministratorActions = false,
+                IsolateFailures = true
+            },
+            TestContext.Current.CancellationToken));
+
+        Assert.Equal(1, action.RollbackCount);
+    }
+
+    [Fact]
+    public async Task IsolatedCancellation_WhenJournalFailsAfterWrite_RollsBackWithoutPersistence()
+    {
+        using var cancellation = new CancellationTokenSource();
+        var action = new TestGameModeAction();
+        var journals = new CancelAndFailAfterChangedEntryJournalStore(cancellation);
+        var engine = new WindowsTransactionEngine(
+            new WindowsActionCatalog([action]),
+            journals);
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => engine.ExecuteAsync(
+            [action],
+            Context(Guid.NewGuid(), elevated: false),
+            new WindowsTransactionOptions
+            {
+                IncludeStandardUserActions = true,
+                IncludeAdministratorActions = false,
+                IsolateFailures = true
+            },
+            cancellation.Token));
+
+        Assert.Equal(1, action.RollbackCount);
+    }
+
+    [Fact]
+    public async Task Execute_RejectsCallerSuppliedImmediateRecoveryContext()
+    {
+        var action = new TestGameModeAction();
+        var engine = new WindowsTransactionEngine(
+            new WindowsActionCatalog([action]),
+            new InMemoryJournalStore());
+        var forgedContext = Context(Guid.NewGuid(), elevated: false) with
+        {
+            IsImmediateFailureRecovery = true
+        };
+
+        await Assert.ThrowsAsync<ArgumentException>(() => engine.ExecuteAsync(
+            [action],
+            forgedContext,
+            cancellationToken: TestContext.Current.CancellationToken));
+
+        Assert.Equal(0, action.ApplyCount);
+    }
+
+    [Fact]
+    public async Task StrictExecution_WhenCommittingSaveFails_RestoresTheAppliedRegistryValue()
+    {
+        var registry = new FakeRegistryStore();
+        registry.Write(GameModeRegistryAction.Address, RegistryValueState.FromDword(0));
+        var action = new GameModeRegistryAction(registry, new FakeProcessInspector());
+        var engine = new WindowsTransactionEngine(
+            new WindowsActionCatalog([action]),
+            new FailOnCommittingJournalStore());
+
+        var result = await engine.ExecuteAsync(
+            [action],
+            Context(Guid.NewGuid(), elevated: false),
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(TransactionState.RolledBack, result.State);
+        Assert.NotNull(result.Error);
+        Assert.Equal(0, registry.Read(GameModeRegistryAction.Address).NumericValue);
+    }
+
     private static WindowsActionContext Context(Guid transactionId, bool elevated)
     {
         return new WindowsActionContext
@@ -359,5 +447,93 @@ public sealed class WindowsTransactionEngineTests
 
         public override ActionMetadataDto Metadata { get; } = WindowsActionMetadata.For(
             OptimizationActionIds.DisableBackgroundCapture);
+    }
+
+    private sealed class FailAfterChangedEntryJournalStore : IWindowsTransactionJournalStore
+    {
+        private bool persistentlyFailing;
+
+        public Task SaveAsync(
+            WindowsTransactionJournal journal,
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (persistentlyFailing || journal.Actions.Any(entry => entry.Changed))
+            {
+                persistentlyFailing = true;
+                throw new IOException("Simulated persistent journal failure after a write.");
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public Task<WindowsTransactionJournal?> LoadAsync(
+            Guid transactionId,
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult<WindowsTransactionJournal?>(null);
+        }
+    }
+
+    private sealed class FailOnCommittingJournalStore : IWindowsTransactionJournalStore
+    {
+        private bool persistentlyFailing;
+
+        public Task SaveAsync(
+            WindowsTransactionJournal journal,
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (persistentlyFailing || journal.Actions.Any(entry =>
+                    entry.State == ActionJournalState.Committing))
+            {
+                persistentlyFailing = true;
+                throw new IOException("Simulated persistent failure while committing.");
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public Task<WindowsTransactionJournal?> LoadAsync(
+            Guid transactionId,
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult<WindowsTransactionJournal?>(null);
+        }
+    }
+
+    private sealed class CancelAndFailAfterChangedEntryJournalStore(
+        CancellationTokenSource cancellation) : IWindowsTransactionJournalStore
+    {
+        private bool persistentlyFailing;
+
+        public Task SaveAsync(
+            WindowsTransactionJournal journal,
+            CancellationToken cancellationToken)
+        {
+            if (!persistentlyFailing && journal.Actions.Any(entry => entry.Changed))
+            {
+                persistentlyFailing = true;
+                cancellation.Cancel();
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+
+            if (persistentlyFailing)
+            {
+                throw new IOException("Simulated persistent journal failure after cancellation.");
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public Task<WindowsTransactionJournal?> LoadAsync(
+            Guid transactionId,
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult<WindowsTransactionJournal?>(null);
+        }
     }
 }

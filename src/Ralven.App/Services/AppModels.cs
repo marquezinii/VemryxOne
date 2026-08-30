@@ -194,6 +194,12 @@ public sealed record OptimizationComparisonResult
     public required IReadOnlyList<string> RegressionReasons { get; init; }
 }
 
+public enum AppHistoryKind
+{
+    Optimization = 0,
+    WindowsGaming = 1
+}
+
 public sealed record AppHistoryRecord
 {
     public required Guid TransactionId { get; init; }
@@ -201,6 +207,8 @@ public sealed record AppHistoryRecord
     public required DateTimeOffset CreatedAt { get; init; }
 
     public required OptimizationProfile Profile { get; init; }
+
+    public AppHistoryKind Kind { get; init; }
 
     public required string State { get; init; }
 

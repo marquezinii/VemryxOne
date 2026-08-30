@@ -41,6 +41,13 @@ public sealed record WindowsActionContext
 
     public required bool IsElevated { get; init; }
 
+    /// <summary>
+    /// True only while the engine is restoring snapshots created by the same
+    /// execution after that execution failed or was cancelled. User-requested
+    /// rollback never sets this flag.
+    /// </summary>
+    public bool IsImmediateFailureRecovery { get; internal init; }
+
     public IProgress<WindowsActionProgress>? Progress { get; init; }
 }
 

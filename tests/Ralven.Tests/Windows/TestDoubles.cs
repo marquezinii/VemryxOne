@@ -7,7 +7,8 @@ namespace Ralven.Tests.Windows;
 
 internal sealed class FakeRegistryStore : IRegistryStore
 {
-    private readonly Dictionary<RegistryAddress, RegistryValueState> values = [];
+    private readonly Dictionary<RegistryAddress, RegistryValueState> values = new(
+        RegistryAddressComparer.Instance);
 
     public RegistryValueState Read(RegistryAddress address)
     {
@@ -25,6 +26,30 @@ internal sealed class FakeRegistryStore : IRegistryStore
     {
         values.Remove(address);
     }
+
+    private sealed class RegistryAddressComparer : IEqualityComparer<RegistryAddress>
+    {
+        public static RegistryAddressComparer Instance { get; } = new();
+
+        public bool Equals(RegistryAddress? left, RegistryAddress? right)
+        {
+            return ReferenceEquals(left, right)
+                || (left is not null
+                    && right is not null
+                    && left.Hive == right.Hive
+                    && left.SubKey.Equals(right.SubKey, StringComparison.OrdinalIgnoreCase)
+                    && left.ValueName.Equals(right.ValueName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public int GetHashCode(RegistryAddress address)
+        {
+            var hash = new HashCode();
+            hash.Add(address.Hive);
+            hash.Add(address.SubKey, StringComparer.OrdinalIgnoreCase);
+            hash.Add(address.ValueName, StringComparer.OrdinalIgnoreCase);
+            return hash.ToHashCode();
+        }
+    }
 }
 
 internal sealed class FakeProcessInspector(bool running = false) : IFiveMProcessInspector
@@ -34,6 +59,12 @@ internal sealed class FakeProcessInspector(bool running = false) : IFiveMProcess
     public int CallCount { get; private set; }
 
     public string? LastInstallationRoot { get; private set; }
+
+    public bool IsAnyRunning()
+    {
+        CallCount++;
+        return Running;
+    }
 
     public bool IsRunningFrom(string installationRoot)
     {

@@ -94,7 +94,7 @@ public sealed class WindowsActionHandlerTests
     public async Task RegistryRollback_RestoresMissingValue()
     {
         var registry = new FakeRegistryStore();
-        var action = new GameModeRegistryAction(registry);
+        var action = new GameModeRegistryAction(registry, new FakeProcessInspector());
         var context = Context();
 
         var result = await action.ApplyAsync(context, CancellationToken.None);
@@ -116,7 +116,7 @@ public sealed class WindowsActionHandlerTests
             @"Software\Microsoft\GameBar",
             "AutoGameModeEnabled");
         registry.Write(address, RegistryValueState.FromDword(0));
-        var action = new GameModeRegistryAction(registry);
+        var action = new GameModeRegistryAction(registry, new FakeProcessInspector());
         var context = Context();
         var result = await action.ApplyAsync(context, CancellationToken.None);
         registry.Write(address, RegistryValueState.FromDword(2));
@@ -131,7 +131,7 @@ public sealed class WindowsActionHandlerTests
     public async Task RegistryRollback_RejectsSnapshotOutsideActionAllowlist()
     {
         var registry = new FakeRegistryStore();
-        var action = new GameModeRegistryAction(registry);
+        var action = new GameModeRegistryAction(registry, new FakeProcessInspector());
         var context = Context();
         var maliciousAddress = new RegistryAddress(
             RegistryHive.CurrentUser,
@@ -156,12 +156,44 @@ public sealed class WindowsActionHandlerTests
     public async Task RegistryRollback_RejectsEmptySnapshot()
     {
         var registry = new FakeRegistryStore();
-        var action = new GameModeRegistryAction(registry);
+        var action = new GameModeRegistryAction(registry, new FakeProcessInspector());
         var emptySnapshot = WindowsActionSnapshot.Serialize(
             new RegistryMutationSnapshot([]));
 
         await Assert.ThrowsAsync<InvalidDataException>(() =>
             action.RollbackAsync(Context(), emptySnapshot, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task GameModeAction_WhenFiveMIsRunning_DoesNotWrite()
+    {
+        var registry = new FakeRegistryStore();
+        registry.Write(GameModeRegistryAction.Address, RegistryValueState.FromDword(0));
+        var action = new GameModeRegistryAction(
+            registry,
+            new FakeProcessInspector(running: true));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            action.ApplyAsync(Context(), CancellationToken.None));
+
+        Assert.Equal(0, registry.Read(GameModeRegistryAction.Address).NumericValue);
+    }
+
+    [Fact]
+    public async Task GameModeRollback_WhenFiveMStarts_PreservesTheAppliedValue()
+    {
+        var registry = new FakeRegistryStore();
+        registry.Write(GameModeRegistryAction.Address, RegistryValueState.FromDword(0));
+        var processInspector = new FakeProcessInspector();
+        var action = new GameModeRegistryAction(registry, processInspector);
+        var context = Context();
+        var applied = await action.ApplyAsync(context, CancellationToken.None);
+        processInspector.Running = true;
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            action.RollbackAsync(context, applied.SnapshotJson, CancellationToken.None));
+
+        Assert.Equal(1, registry.Read(GameModeRegistryAction.Address).NumericValue);
     }
 
     [Fact]
@@ -184,7 +216,7 @@ public sealed class WindowsActionHandlerTests
         registry.Write(manualCapture, RegistryValueState.FromDword(1));
         registry.Write(legacyToggle, RegistryValueState.FromDword(1));
 
-        var result = await new GameDvrRegistryAction(registry)
+        var result = await new GameDvrRegistryAction(registry, new FakeProcessInspector())
             .ApplyAsync(Context(), CancellationToken.None);
 
         Assert.True(result.Changed);

@@ -287,10 +287,11 @@ public sealed partial class MainViewModel
         {
             HistoryItems.Add(new HistoryDisplayItem(
                 record.TransactionId,
-                localization.Format("History.ProfileTitle", ProfileName(record.Profile)),
+                HistoryTitle(record),
                 record.CreatedAt.LocalDateTime.ToString("g", localization.CurrentCulture),
                 localization.Format("History.AdjustmentsState", record.ChangedActions, record.State),
-                record.CanRollback));
+                record.CanRollback,
+                record.Kind));
         }
 
         // A composição vazia (silhueta do núcleo + texto) vive na própria
@@ -308,9 +309,10 @@ public sealed partial class MainViewModel
     /// </summary>
     private void ApplyLastOptimization(IReadOnlyList<AppHistoryRecord> records)
     {
-        var latest = records.Count == 0
-            ? null
-            : records.OrderByDescending(item => item.CreatedAt).First();
+        var latest = records
+            .Where(item => item.Kind == AppHistoryKind.Optimization)
+            .OrderByDescending(item => item.CreatedAt)
+            .FirstOrDefault();
 
         HasLastOptimization = latest is not null;
         if (latest is null)
@@ -321,12 +323,19 @@ public sealed partial class MainViewModel
             return;
         }
 
-        LastOptimizationTitle = localization.Format("History.ProfileTitle", ProfileName(latest.Profile));
+        LastOptimizationTitle = HistoryTitle(latest);
         LastOptimizationDateLabel = latest.CreatedAt.LocalDateTime.ToString("g", localization.CurrentCulture);
         LastOptimizationSummary = localization.Format(
             "History.AdjustmentsState",
             latest.ChangedActions,
             latest.State);
+    }
+
+    private string HistoryTitle(AppHistoryRecord record)
+    {
+        return record.Kind == AppHistoryKind.WindowsGaming
+            ? localization.GetString("History.WindowsGamingTitle")
+            : localization.Format("History.ProfileTitle", ProfileName(record.Profile));
     }
 
     /// <summary>

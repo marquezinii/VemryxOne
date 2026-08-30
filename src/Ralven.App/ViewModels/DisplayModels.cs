@@ -1,3 +1,4 @@
+using Ralven.App.Services;
 using Ralven.Contracts;
 
 namespace Ralven.App.ViewModels;
@@ -22,7 +23,8 @@ public sealed record HistoryDisplayItem(
     string Title,
     string DateLabel,
     string Summary,
-    bool CanRollback);
+    bool CanRollback,
+    AppHistoryKind Kind = AppHistoryKind.Optimization);
 
 /// <summary>
 /// One streaming-readiness check on the overview. <paramref name="IconKey"/> is

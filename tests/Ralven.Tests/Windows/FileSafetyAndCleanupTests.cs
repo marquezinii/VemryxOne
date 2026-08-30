@@ -7,6 +7,29 @@ namespace Ralven.Tests.Windows;
 
 public sealed class FileSafetyAndCleanupTests
 {
+    [Fact]
+    public void FiveMProcessImage_RequiresMatchingNameAndInstallationLayout()
+    {
+        var installationRoot = Path.GetFullPath(@"C:\Games\FiveM");
+        Assert.True(WindowsFiveMProcessInspector.LooksLikeFiveMExecutablePath(
+            "FiveM_b3258_GTAProcess",
+            @"C:\Games\FiveM\FiveM.app\data\cache\subprocess\FiveM_b3258_GTAProcess.exe"));
+        Assert.True(WindowsFiveMProcessInspector.IsVerifiedFiveMExecutablePath(
+            "FiveM_b3258_GTAProcess",
+            @"C:\Games\FiveM\FiveM_b3258_GTAProcess.exe",
+            installationRoot));
+        Assert.False(WindowsFiveMProcessInspector.LooksLikeFiveMExecutablePath(
+            "FiveM_b3258_GTAProcess",
+            @"C:\Temp\FiveM_b3258_GTAProcess.exe"));
+        Assert.False(WindowsFiveMProcessInspector.IsVerifiedFiveMExecutablePath(
+            "FiveM_b3258_GTAProcess",
+            @"C:\Temp\FiveM_b3258_GTAProcess.exe",
+            installationRoot));
+        Assert.False(WindowsFiveMProcessInspector.LooksLikeFiveMExecutablePath(
+            "not-fivem",
+            @"C:\Games\FiveM\FiveM.app\not-fivem.exe"));
+    }
+
     [Theory]
     [InlineData("FiveM", true)]
     [InlineData("FiveM_b3258_GTAProcess", true)]
