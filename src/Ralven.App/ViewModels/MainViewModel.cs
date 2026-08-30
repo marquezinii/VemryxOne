@@ -158,7 +158,8 @@ public sealed partial class MainViewModel : BindableBase, IDisposable
         ILiveSystemMetricsProvider? liveSystemMetricsProvider = null,
         ILiveAlertService? liveAlertService = null,
         WindowsGamingControlsService? windowsGamingControls = null,
-        Func<string, FiveMSessionPresence>? fiveMSessionProbe = null)
+        Func<string, FiveMSessionPresence>? fiveMSessionProbe = null,
+        IWindowsSystemHealthInspector? windowsSystemHealthInspector = null)
     {
         this.service = service ?? throw new ArgumentNullException(nameof(service));
         this.localization = localization ?? LocalizationService.Current;
@@ -170,6 +171,8 @@ public sealed partial class MainViewModel : BindableBase, IDisposable
         this.liveSystemMetricsProvider = liveSystemMetricsProvider ?? new WindowsLiveSystemMetricsProvider();
         this.windowsGamingControls = windowsGamingControls ?? new WindowsGamingControlsService();
         this.fiveMSessionProbe = fiveMSessionProbe ?? WindowsFiveMSessionProbe.Probe;
+        this.windowsSystemHealthInspector = windowsSystemHealthInspector
+            ?? new WindowsSystemHealthInspector();
         StepLedger.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasStepLedgerItems));
         ResetLocalizedPlaceholders();
         RefreshProfilePresentation();
@@ -243,6 +246,7 @@ public sealed partial class MainViewModel : BindableBase, IDisposable
                 AppVersion,
                 ReleaseNotesCatalog.Versions);
             ApplyDiagnostic(await diagnosticTask);
+            SetSystemPcStatus("System.Pc.Status.Ready");
             ApplyHistory(await historyTask);
             if (checkForUpdates && releaseUpdateService is not null)
             {
@@ -269,6 +273,9 @@ public sealed partial class MainViewModel : BindableBase, IDisposable
         catch (Exception exception)
         {
             diagnosticFailed = true;
+            SetSystemPcStatus(diagnostic is null
+                ? "System.Pc.Status.Unavailable"
+                : "System.Pc.Status.Stale");
             RecommendationTitle = localization.GetString("Diagnosis.Partial");
             RecommendationText = localization.DescribeException(exception);
         }
@@ -289,14 +296,19 @@ public sealed partial class MainViewModel : BindableBase, IDisposable
         }
 
         isInitializing = true;
+        SetSystemPcStatus("System.Pc.Status.Refreshing");
         RaiseCommandState();
         try
         {
             ApplyDiagnostic(await service.DiagnoseAsync());
+            SetSystemPcStatus("System.Pc.Status.Ready");
         }
         catch (Exception exception)
         {
             diagnosticFailed = true;
+            SetSystemPcStatus(diagnostic is null
+                ? "System.Pc.Status.Unavailable"
+                : "System.Pc.Status.Stale");
             RecommendationTitle = localization.GetString("Diagnosis.CouldNotScanAgain");
             RecommendationText = localization.DescribeException(exception);
         }
@@ -319,6 +331,7 @@ public sealed partial class MainViewModel : BindableBase, IDisposable
         OnPropertyChanged(nameof(CanRefreshWindowsGamingSettings));
         OnPropertyChanged(nameof(CanApplyWindowsGamingSettings));
         OnPropertyChanged(nameof(CanRestoreWindowsGamingSettings));
+        OnPropertyChanged(nameof(CanRefreshWindowsSystemHealth));
         // Updating restarts the app, so the button has to follow IsBusy.
         OnPropertyChanged(nameof(CanDownloadUpdate));
     }

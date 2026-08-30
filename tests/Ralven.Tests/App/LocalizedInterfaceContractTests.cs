@@ -70,6 +70,7 @@ public sealed partial class LocalizedInterfaceContractTests
         var appDirectory = Path.Combine(root, "src", "Ralven.App");
         var mainWindow = File.ReadAllText(Path.Combine(appDirectory, "MainWindow.xaml"));
         var systemPage = File.ReadAllText(Path.Combine(appDirectory, "Views", "Pages", "SystemPage.xaml.cs"));
+        var systemMarkup = File.ReadAllText(Path.Combine(appDirectory, "Views", "Pages", "SystemPage.xaml"));
         var applicationsPage = File.ReadAllText(Path.Combine(appDirectory, "Views", "Pages", "ApplicationsPage.xaml.cs"));
 
         Assert.Contains("Tag=\"System\"", mainWindow, StringComparison.Ordinal);
@@ -78,6 +79,14 @@ public sealed partial class LocalizedInterfaceContractTests
         Assert.Contains("ms-settings:windowsupdate", systemPage, StringComparison.Ordinal);
         Assert.Contains("ApplyWindowsGamingSettingsAsync", systemPage, StringComparison.Ordinal);
         Assert.Contains("RestoreWindowsGamingSettingsAsync", systemPage, StringComparison.Ordinal);
+        Assert.Contains("WindowsAntivirusHealthLabel", systemMarkup, StringComparison.Ordinal);
+        Assert.Contains("WindowsFirewallHealthLabel", systemMarkup, StringComparison.Ordinal);
+        Assert.Contains("WindowsAutomaticUpdatesHealthLabel", systemMarkup, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding CpuName}\"", systemMarkup, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding GpuDetail}\"", systemMarkup, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding RamLabel}\"", systemMarkup, StringComparison.Ordinal);
+        Assert.Contains("RefreshWindowsSystemHealthAsync", systemPage, StringComparison.Ordinal);
+        Assert.Contains("RefreshDiagnosticAsync", systemPage, StringComparison.Ordinal);
         Assert.Contains("ms-settings:appsfeatures", applicationsPage, StringComparison.Ordinal);
         Assert.Contains("ms-windows-store://downloadsandupdates", applicationsPage, StringComparison.Ordinal);
         Assert.DoesNotContain("Arguments =", systemPage + applicationsPage, StringComparison.Ordinal);

@@ -1,11 +1,13 @@
 using Ralven.App.Services;
 using Ralven.Contracts;
+using Ralven.Windows.Infrastructure;
 
 namespace Ralven.App.ViewModels;
 
 public sealed partial class MainViewModel
 {
     private readonly WindowsGamingControlsService windowsGamingControls;
+    private readonly IWindowsSystemHealthInspector windowsSystemHealthInspector;
     private WindowsGamingSettingsDto windowsGamingSettings = new(
         WindowsGamingSettingState.Unknown,
         WindowsGamingSettingState.Unknown);
@@ -14,8 +16,13 @@ public sealed partial class MainViewModel
     private WindowsGamingControlsBlockReason windowsGamingBlockReason =
         WindowsGamingControlsBlockReason.ProcessInspectionUnavailable;
     private string windowsGamingStatusKey = "System.Gaming.Status.Ready";
+    private WindowsSystemHealthSnapshot? windowsSystemHealth;
+    private bool isWindowsSystemHealthBusy;
+    private string windowsSystemHealthStatusKey = "System.Health.Status.Loading";
 
     public bool IsWindowsGamingBusy => isWindowsGamingBusy;
+
+    public bool IsWindowsSystemHealthBusy => isWindowsSystemHealthBusy;
 
     public string WindowsGameModeStateLabel => DescribeWindowsGamingState(
         windowsGamingSettings.GameMode);
@@ -25,9 +32,36 @@ public sealed partial class MainViewModel
 
     public string WindowsGamingStatusMessage => localization.GetString(windowsGamingStatusKey);
 
+    public string WindowsAntivirusHealthLabel => DescribeWindowsSecurityHealth(
+        windowsSystemHealth?.Antivirus.State);
+
+    public string WindowsFirewallHealthLabel => DescribeWindowsSecurityHealth(
+        windowsSystemHealth?.Firewall.State);
+
+    public string WindowsAutomaticUpdatesHealthLabel => DescribeWindowsSecurityHealth(
+        windowsSystemHealth?.AutomaticUpdates.State);
+
+    public string WindowsSystemHealthStatusMessage => localization.GetString(
+        windowsSystemHealthStatusKey);
+
+    public string WindowsSystemHealthUpdatedLabel => windowsSystemHealth is null
+        ? localization.GetString("System.Health.Updated.Pending")
+        : localization.Format(
+            "System.Health.UpdatedAt",
+            windowsSystemHealth.ObservedAtUtc.ToLocalTime().ToString(
+                "HH:mm",
+                localization.CurrentCulture));
+
     public bool CanRefreshWindowsGamingSettings => !IsBusy
         && !isInitializing
         && !isWindowsGamingBusy
+        && !IsUpdateDownloading
+        && !IsInstallingUpdate
+        && !IsGtaVBenchmarkRunning;
+
+    public bool CanRefreshWindowsSystemHealth => !IsBusy
+        && !isInitializing
+        && !isWindowsSystemHealthBusy
         && !IsUpdateDownloading
         && !IsInstallingUpdate
         && !IsGtaVBenchmarkRunning;
@@ -71,6 +105,40 @@ public sealed partial class MainViewModel
         {
             SetWindowsGamingBusy(false);
             RefreshWindowsGamingPresentation();
+        }
+    }
+
+    public async Task RefreshWindowsSystemHealthAsync()
+    {
+        if (!CanRefreshWindowsSystemHealth)
+        {
+            return;
+        }
+
+        SetWindowsSystemHealthBusy(true);
+        windowsSystemHealthStatusKey = "System.Health.Status.Reading";
+        RefreshWindowsSystemHealthPresentation();
+        try
+        {
+            windowsSystemHealth = await windowsSystemHealthInspector.InspectAsync();
+            windowsSystemHealthStatusKey = !windowsSystemHealth.Antivirus.IsAvailable
+                && !windowsSystemHealth.Firewall.IsAvailable
+                && !windowsSystemHealth.AutomaticUpdates.IsAvailable
+                    ? "System.Health.Status.Unavailable"
+                    : windowsSystemHealth.IsPartial
+                        ? "System.Health.Status.Partial"
+                        : "System.Health.Status.Ready";
+        }
+        catch (Exception exception) when (exception is not (
+            OutOfMemoryException or StackOverflowException or AccessViolationException))
+        {
+            windowsSystemHealth = null;
+            windowsSystemHealthStatusKey = "System.Health.Status.Unavailable";
+        }
+        finally
+        {
+            SetWindowsSystemHealthBusy(false);
+            RefreshWindowsSystemHealthPresentation();
         }
     }
 
@@ -182,12 +250,51 @@ public sealed partial class MainViewModel
         }
     }
 
+    private void SetWindowsSystemHealthBusy(bool value)
+    {
+        if (isWindowsSystemHealthBusy != value)
+        {
+            isWindowsSystemHealthBusy = value;
+            OnPropertyChanged(nameof(IsWindowsSystemHealthBusy));
+            RaiseCommandState();
+        }
+    }
+
     private void RefreshWindowsGamingPresentation()
     {
         OnPropertyChanged(nameof(WindowsGameModeStateLabel));
         OnPropertyChanged(nameof(WindowsBackgroundCaptureStateLabel));
         OnPropertyChanged(nameof(WindowsGamingStatusMessage));
         RaiseCommandState();
+    }
+
+    private void RefreshWindowsSystemHealthPresentation()
+    {
+        OnPropertyChanged(nameof(WindowsAntivirusHealthLabel));
+        OnPropertyChanged(nameof(WindowsFirewallHealthLabel));
+        OnPropertyChanged(nameof(WindowsAutomaticUpdatesHealthLabel));
+        OnPropertyChanged(nameof(WindowsSystemHealthStatusMessage));
+        OnPropertyChanged(nameof(WindowsSystemHealthUpdatedLabel));
+        RaiseCommandState();
+    }
+
+    private string DescribeWindowsSecurityHealth(WindowsSecurityHealthState? state)
+    {
+        if (state is null
+            && windowsSystemHealthStatusKey == "System.Health.Status.Unavailable")
+        {
+            return localization.GetString("System.Health.State.Unavailable");
+        }
+
+        return localization.GetString(state switch
+        {
+            WindowsSecurityHealthState.Good => "System.Health.State.Good",
+            WindowsSecurityHealthState.NotMonitored => "System.Health.State.NotMonitored",
+            WindowsSecurityHealthState.Poor => "System.Health.State.Attention",
+            WindowsSecurityHealthState.Snoozed => "System.Health.State.Snoozed",
+            WindowsSecurityHealthState.Unavailable => "System.Health.State.Unavailable",
+            _ => "System.Health.State.Waiting"
+        });
     }
 
     private string DescribeWindowsGamingState(WindowsGamingSettingState state)
@@ -241,5 +348,20 @@ public sealed partial class MainViewModel
                 "System.Gaming.Status.ProcessCheckFailed",
             _ => "System.Gaming.Status.Ready"
         };
+    }
+}
+
+internal sealed class SyntheticWindowsSystemHealthInspector : IWindowsSystemHealthInspector
+{
+    public Task<WindowsSystemHealthSnapshot> InspectAsync(
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var good = new WindowsSecurityProviderHealth(WindowsSecurityHealthState.Good, 0);
+        return Task.FromResult(new WindowsSystemHealthSnapshot(
+            good,
+            good,
+            good,
+            DateTimeOffset.UtcNow));
     }
 }

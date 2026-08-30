@@ -403,6 +403,8 @@ public sealed partial class MainViewModel
         RefreshFiveMSessionMonitorPresentation();
         ApplyLastOptimization(historyRecords);
         RefreshWindowsGamingPresentation();
+        RefreshWindowsSystemHealthPresentation();
+        OnPropertyChanged(nameof(SystemPcStatusMessage));
     }
 
     private void RefreshLocalizedState()

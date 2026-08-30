@@ -17,10 +17,20 @@ Este documento descreve a arquitetura-alvo e os limites entre componentes. Uma c
 
 O shell separa a experiência em **Visão geral**, **Sistema**, **Aplicativos** e
 **FiveM**. Aplicativos ainda encaminha o usuário para superfícies nativas do
-Windows e da Microsoft Store. Sistema preserva os atalhos para Windows Update,
-Segurança e informações do PC, mas também oferece um painel dedicado de jogos
-do Windows: ele lê o Modo de Jogo e a gravação histórica em segundo plano e,
-com confirmação explícita, aplica somente as duas ações tipadas já existentes.
+Windows e da Microsoft Store. Sistema apresenta internamente o diagnóstico de
+hardware já coletado pelo aplicativo e consulta, somente para leitura, a saúde
+agregada de antivírus, firewall e configuração de atualizações automáticas pela
+API nativa da Central de Segurança do Windows. Os atalhos para as superfícies
+nativas permanecem como ações secundárias. A mesma área oferece um painel
+dedicado de jogos do Windows: ele lê o Modo de Jogo e a gravação histórica em
+segundo plano e, com confirmação explícita, aplica somente as duas ações tipadas
+já existentes.
+
+`WindowsSystemHealthInspector` faz três consultas independentes e preserva
+resultados parciais. Falha da API ou serviço indisponível resulta em estado
+indisponível, nunca em uma afirmação de proteção boa ou ruim. A leitura de
+configuração automática não afirma que não existem atualizações pendentes; essa
+consulta não usa broker, elevação, PowerShell, linha de comando ou rede.
 
 Esse painel não recebe IDs ou comandos escolhidos pela interface. O serviço de
 aplicação constrói uma lista fixa com `GameModeRegistryAction` e
