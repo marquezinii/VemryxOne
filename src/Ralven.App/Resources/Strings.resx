@@ -8,10 +8,17 @@
   <data name="Navigation.Overview" xml:space="preserve"><value>Overview</value></data>
   <data name="Navigation.System" xml:space="preserve"><value>System</value></data>
   <data name="Navigation.Applications" xml:space="preserve"><value>Applications</value></data>
-  <data name="Navigation.FiveM" xml:space="preserve"><value>FiveM</value></data>
+  <data name="Navigation.Games" xml:space="preserve"><value>Games</value></data>
   <data name="Navigation.Optimizer" xml:space="preserve"><value>Optimizer</value></data>
   <data name="Navigation.History" xml:space="preserve"><value>History</value></data>
   <data name="Navigation.Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Games.Title" xml:space="preserve"><value>Games</value></data>
+  <data name="Games.Subtitle" xml:space="preserve"><value>Choose a supported game to open its dedicated diagnostics and optimization experience.</value></data>
+  <data name="Games.FiveM.Title" xml:space="preserve"><value>FiveM</value></data>
+  <data name="Games.FiveM.Edition" xml:space="preserve"><value>GTAV Legacy</value></data>
+  <data name="Games.FiveM.Description" xml:space="preserve"><value>Detect the local environment, review a transparent plan and apply conservative, reversible optimizations for FiveM on GTAV Legacy.</value></data>
+  <data name="Games.FiveM.Action" xml:space="preserve"><value>Open FiveM optimizer</value></data>
+  <data name="Games.FiveM.ActionTooltip" xml:space="preserve"><value>Open diagnostics and optimization for FiveM on GTAV Legacy</value></data>
   <data name="Safety.Active" xml:space="preserve"><value>Protection active</value></data>
   <data name="Safety.SnapshotRollback" xml:space="preserve"><value>Snapshot and rollback before changes.</value></data>
   <data name="BugReport.Link" xml:space="preserve"><value>Report a bug</value></data>

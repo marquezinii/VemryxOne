@@ -37,6 +37,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
     private readonly QueuedCloudflareTelemetryService? queuedCloudflareTelemetry;
     private SystemPage? systemPage;
     private ApplicationsPage? applicationsPage;
+    private GamesPage? gamesPage;
     private OptimizerPage? optimizerPage;
     private HistoryPage? historyPage;
     private readonly IFirebaseAuthService? accountService;
