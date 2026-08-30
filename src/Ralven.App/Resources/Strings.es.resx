@@ -846,6 +846,14 @@
   <data name="Settings.Account.SignOut" xml:space="preserve"><value>Cerrar sesión</value></data>
   <data name="Settings.Account.NewPasswordLabel" xml:space="preserve"><value>Nueva contraseña</value></data>
   <data name="Settings.Account.Title" xml:space="preserve"><value>Cuenta</value></data>
+  <data name="Settings.Account.Plan.Title" xml:space="preserve"><value>Plan</value></data>
+  <data name="Settings.Account.Plan.Free" xml:space="preserve"><value>Gratuito</value></data>
+  <data name="Settings.Account.Plan.FreeDetail" xml:space="preserve"><value>No hay ningún acceso Pro activo vinculado a esta cuenta.</value></data>
+  <data name="Settings.Account.Plan.ProUntil" xml:space="preserve"><value>Pro hasta {0}</value></data>
+  <data name="Settings.Account.Plan.ProDetail" xml:space="preserve"><value>Acceso Pro confirmado por los servidores de Ralven.</value></data>
+  <data name="Settings.Account.Plan.Unavailable" xml:space="preserve"><value>No se pudo confirmar tu plan</value></data>
+  <data name="Settings.Account.Plan.UnavailableDetail" xml:space="preserve"><value>No se pudo verificar tu acceso actual. Ninguna función Pro se habilita mientras este estado no esté disponible.</value></data>
+  <data name="Settings.Account.Plan.Refresh" xml:space="preserve"><value>Actualizar</value></data>
   <data name="Settings.Account.ChangePhoto" xml:space="preserve"><value>Cambiar foto</value></data>
   <data name="Settings.Account.Unavailable" xml:space="preserve"><value>El acceso a la cuenta no está disponible en esta instalación.</value></data>
   <data name="Report.ViewHistoryButton" xml:space="preserve"><value>Ver historial</value></data>

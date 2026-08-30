@@ -21,6 +21,8 @@ namespace Ralven.App;
 public partial class MainWindow
 {
     private readonly AccountAvatarStore avatarStore = new();
+    private AccountEntitlementSnapshot accountEntitlement = new(AccountEntitlementTier.Unavailable);
+    private int accountEntitlementSyncVersion;
 
     private void OpenAccountFromSettings_Click(object sender, RoutedEventArgs e) => OpenAccountWindow();
 
@@ -38,6 +40,7 @@ public partial class MainWindow
             AccountSettingsUnavailablePanel.Visibility = Visibility.Visible;
             AccountSettingsSignedOutPanel.Visibility = Visibility.Collapsed;
             AccountSettingsSignedInPanel.Visibility = Visibility.Collapsed;
+            ApplyAccountEntitlementPresentation();
             return;
         }
 
@@ -56,6 +59,7 @@ public partial class MainWindow
         {
             ApplyAvatar(null, AccountAvatarEllipse, AccountFallbackIcon);
             ApplyAvatar(null, AccountSettingsAvatarEllipse, AccountSettingsFallbackIcon);
+            ApplyAccountEntitlementPresentation();
             return;
         }
 
@@ -82,6 +86,82 @@ public partial class MainWindow
         var avatar = avatarStore.TryLoad(user.Uid);
         ApplyAvatar(avatar, AccountAvatarEllipse, AccountFallbackIcon);
         ApplyAvatar(avatar, AccountSettingsAvatarEllipse, AccountSettingsFallbackIcon);
+        ApplyAccountEntitlementPresentation();
+    }
+
+    private async void AccountEntitlementRefresh_Click(object sender, RoutedEventArgs e)
+    {
+        if (accountService?.Current is not { State: AuthenticationState.SignedIn, User: { } user })
+        {
+            return;
+        }
+
+        await SyncAccountEntitlementAsync(user.Uid);
+    }
+
+    private async Task SyncAccountEntitlementAsync(string expectedUid)
+    {
+        var version = Interlocked.Increment(ref accountEntitlementSyncVersion);
+        await Dispatcher.InvokeAsync(() => AccountEntitlementRefreshButton.IsEnabled = false);
+
+        var snapshot = new AccountEntitlementSnapshot(AccountEntitlementTier.Unavailable);
+        try
+        {
+            var idToken = await accountService!.GetIdTokenAsync().ConfigureAwait(false);
+            if (idToken is not null && entitlementService is not null)
+            {
+                snapshot = await entitlementService.FetchAsync(idToken).ConfigureAwait(false);
+            }
+        }
+        catch (Exception exception) when (exception is not (
+            OutOfMemoryException or StackOverflowException or AccessViolationException))
+        {
+            snapshot = new AccountEntitlementSnapshot(AccountEntitlementTier.Unavailable);
+        }
+
+        await Dispatcher.InvokeAsync(() =>
+        {
+            if (version != Volatile.Read(ref accountEntitlementSyncVersion)
+                || accountService?.Current is not { State: AuthenticationState.SignedIn, User: { } currentUser }
+                || !string.Equals(currentUser.Uid, expectedUid, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            accountEntitlement = snapshot;
+            ApplyAccountEntitlementPresentation();
+            AccountEntitlementRefreshButton.IsEnabled = true;
+        });
+    }
+
+    private void ClearAccountEntitlement()
+    {
+        Interlocked.Increment(ref accountEntitlementSyncVersion);
+        accountEntitlement = new AccountEntitlementSnapshot(AccountEntitlementTier.Unavailable);
+        AccountEntitlementRefreshButton.IsEnabled = true;
+        ApplyAccountEntitlementPresentation();
+    }
+
+    private void ApplyAccountEntitlementPresentation()
+    {
+        var localization = LocalizationService.Current;
+        switch (accountEntitlement.Tier)
+        {
+            case AccountEntitlementTier.Free:
+                AccountEntitlementValueText.Text = localization.GetString("Settings.Account.Plan.Free");
+                AccountEntitlementDetailText.Text = localization.GetString("Settings.Account.Plan.FreeDetail");
+                break;
+            case AccountEntitlementTier.Pro when accountEntitlement.ValidUntil is { } validUntil:
+                AccountEntitlementValueText.Text = localization.Format(
+                    "Settings.Account.Plan.ProUntil",
+                    validUntil.ToLocalTime().ToString("d", localization.CurrentCulture));
+                AccountEntitlementDetailText.Text = localization.GetString("Settings.Account.Plan.ProDetail");
+                break;
+            default:
+                AccountEntitlementValueText.Text = localization.GetString("Settings.Account.Plan.Unavailable");
+                AccountEntitlementDetailText.Text = localization.GetString("Settings.Account.Plan.UnavailableDetail");
+                break;
+        }
     }
 
     /// <summary>Sets <paramref name="username"/> on the Settings card once <see cref="SyncAccountFirstNameAsync"/> has read the profile.</summary>
@@ -361,11 +441,14 @@ public partial class MainWindow
             {
                 viewModel.SetAccountFirstName(null);
                 ApplyAccountSettingsUsername(null);
+                ClearAccountEntitlement();
             });
             return;
         }
 
-        await SyncAccountFirstNameAsync();
+        await Task.WhenAll(
+            SyncAccountFirstNameAsync(),
+            SyncAccountEntitlementAsync(snapshot.User.Uid));
     }
 
     /// <summary>

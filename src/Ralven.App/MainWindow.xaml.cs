@@ -40,6 +40,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
     private HistoryPage? historyPage;
     private readonly IFirebaseAuthService? accountService;
     private readonly IAccountProfileService profileService;
+    private readonly CloudflareAccountEntitlementService? entitlementService;
     private readonly IGoogleOAuthClient googleOAuth;
     private HwndSource? windowSource;
     private bool allowClose;
@@ -73,9 +74,16 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         var runtimeEnvironment = AppEnvironment.Resolve();
         remoteServicesOptions = RemoteServicesOptionsLoader.Load(runtimeEnvironment, AppContext.BaseDirectory);
 
-        profileService = TryCreateHttpsEndpoint(remoteServicesOptions.AccountProfileEndpoint, out var profileEndpoint)
-            ? new CloudflareAccountProfileService(profileEndpoint)
-            : new DisabledAccountProfileService();
+        if (TryCreateHttpsEndpoint(remoteServicesOptions.AccountProfileEndpoint, out var profileEndpoint))
+        {
+            profileService = new CloudflareAccountProfileService(profileEndpoint);
+            entitlementService = new CloudflareAccountEntitlementService(profileEndpoint);
+        }
+        else
+        {
+            profileService = new DisabledAccountProfileService();
+            entitlementService = null;
+        }
 
         // Demo runs never poll the live alert -- same trade as telemetry below.
         ILiveAlertService? liveAlertService = !demoMode

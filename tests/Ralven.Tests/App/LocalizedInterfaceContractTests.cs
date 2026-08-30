@@ -81,6 +81,46 @@ public sealed partial class LocalizedInterfaceContractTests
     }
 
     [Fact]
+    public void AccountPlan_ShowsServerEntitlementStatesWithCompleteLocalization()
+    {
+        var root = TestHelpers.FindRepositoryRoot();
+        var appDirectory = Path.Combine(root, "src", "Ralven.App");
+        var mainWindow = File.ReadAllText(Path.Combine(appDirectory, "MainWindow.xaml"));
+        var accountCode = File.ReadAllText(Path.Combine(appDirectory, "MainWindow.Account.xaml.cs"));
+
+        Assert.Contains("AccountEntitlementValueText", mainWindow, StringComparison.Ordinal);
+        Assert.Contains("AccountEntitlementRefresh_Click", mainWindow, StringComparison.Ordinal);
+        Assert.Contains("SyncAccountEntitlementAsync", accountCode, StringComparison.Ordinal);
+        Assert.Contains("ClearAccountEntitlement", accountCode, StringComparison.Ordinal);
+
+        var keys = new[]
+        {
+            "Settings.Account.Plan.Title",
+            "Settings.Account.Plan.Free",
+            "Settings.Account.Plan.FreeDetail",
+            "Settings.Account.Plan.ProUntil",
+            "Settings.Account.Plan.ProDetail",
+            "Settings.Account.Plan.Unavailable",
+            "Settings.Account.Plan.UnavailableDetail",
+            "Settings.Account.Plan.Refresh",
+        };
+        var localizations = new[]
+        {
+            new LocalizationService(CultureInfo.GetCultureInfo("en-US")),
+            new LocalizationService(CultureInfo.GetCultureInfo("pt-BR")),
+            new LocalizationService(CultureInfo.GetCultureInfo("es")),
+        };
+
+        foreach (var localization in localizations)
+        {
+            foreach (var key in keys)
+            {
+                Assert.NotEqual(key, localization.GetString(key));
+            }
+        }
+    }
+
+    [Fact]
     public void EveryOptimizationAction_HasLocalizedNameAndDescription()
     {
         var english = new LocalizationService(
