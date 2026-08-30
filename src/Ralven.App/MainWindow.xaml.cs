@@ -358,6 +358,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 
     private void MainWindow_Closed(object? sender, EventArgs e)
     {
+        applicationsPage?.Dispose();
         viewModel.Dispose();
         windowSource?.RemoveHook(WindowMessageHook);
         System.Windows.Application.Current.SessionEnding -= Application_SessionEnding;

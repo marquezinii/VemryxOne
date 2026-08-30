@@ -65,19 +65,47 @@
   <data name="System.Gaming.RestoreConfirm.Title" xml:space="preserve"><value>Restore previous settings?</value></data>
   <data name="System.Gaming.RestoreConfirm.Message" xml:space="preserve"><value>Ralven will attempt to restore only the values changed by this operation. A value modified afterward by another program will not be overwritten.</value></data>
   <data name="Applications.Title" xml:space="preserve"><value>Applications</value></data>
-  <data name="Applications.Subtitle" xml:space="preserve"><value>Reach the native Windows controls for installed, startup and Store applications.</value></data>
+  <data name="Applications.Subtitle" xml:space="preserve"><value>Inspect installed and startup applications directly in Ralven. Windows-owned changes remain one click away when the platform requires them.</value></data>
   <data name="Applications.Installed.Title" xml:space="preserve"><value>Installed applications</value></data>
   <data name="Applications.Installed.Description" xml:space="preserve"><value>Review installed applications, their disk usage and the uninstall options provided by Windows.</value></data>
-  <data name="Applications.Installed.Action" xml:space="preserve"><value>Manage installed applications</value></data>
+  <data name="Applications.Installed.Action" xml:space="preserve"><value>Open Windows app controls</value></data>
   <data name="Applications.Startup.Title" xml:space="preserve"><value>Startup applications</value></data>
   <data name="Applications.Startup.Description" xml:space="preserve"><value>Choose which applications may start with your Windows session.</value></data>
-  <data name="Applications.Startup.Action" xml:space="preserve"><value>Review startup applications</value></data>
+  <data name="Applications.Startup.Action" xml:space="preserve"><value>Open Windows startup controls</value></data>
   <data name="Applications.StoreUpdates.Title" xml:space="preserve"><value>Microsoft Store updates</value></data>
-  <data name="Applications.StoreUpdates.Description" xml:space="preserve"><value>Open the Store library to check updates for applications installed from Microsoft Store.</value></data>
+  <data name="Applications.StoreUpdates.Description" xml:space="preserve"><value>Microsoft Store owns library updates and keeps the trusted confirmation flow for installing them.</value></data>
   <data name="Applications.StoreUpdates.Action" xml:space="preserve"><value>Open Store updates</value></data>
   <data name="Applications.Defaults.Title" xml:space="preserve"><value>Default applications</value></data>
-  <data name="Applications.Defaults.Description" xml:space="preserve"><value>Choose the applications Windows uses to open links and supported file types.</value></data>
+  <data name="Applications.Defaults.Description" xml:space="preserve"><value>Windows protects default-app choices and requires its own confirmation surface.</value></data>
   <data name="Applications.Defaults.Action" xml:space="preserve"><value>Review default applications</value></data>
+  <data name="Applications.Inventory.Status.Title" xml:space="preserve"><value>Local inventory</value></data>
+  <data name="Applications.Inventory.Status.Loading" xml:space="preserve"><value>Reading installed and startup applications…</value></data>
+  <data name="Applications.Inventory.Status.Ready" xml:space="preserve"><value>Inventory read locally. No application was changed.</value></data>
+  <data name="Applications.Inventory.Status.Partial" xml:space="preserve"><value>Some protected locations could not be read. The visible results are partial.</value></data>
+  <data name="Applications.Inventory.Status.Unavailable" xml:space="preserve"><value>Ralven could not read the application inventory. Nothing was changed.</value></data>
+  <data name="Applications.Inventory.Status.UpdatedAt" xml:space="preserve"><value>Updated at {0}</value></data>
+  <data name="Applications.Inventory.ReadOnly" xml:space="preserve"><value>This inventory is read-only. Ralven does not execute uninstall commands or change third-party startup entries.</value></data>
+  <data name="Applications.Inventory.InstalledTab" xml:space="preserve"><value>Installed</value></data>
+  <data name="Applications.Inventory.StartupTab" xml:space="preserve"><value>Startup</value></data>
+  <data name="Applications.Inventory.Search" xml:space="preserve"><value>Search this inventory</value></data>
+  <data name="Applications.Inventory.Refresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="Applications.Inventory.InstalledCount" xml:space="preserve"><value>installed applications</value></data>
+  <data name="Applications.Inventory.StartupCount" xml:space="preserve"><value>startup entries</value></data>
+  <data name="Applications.Inventory.Column.Application" xml:space="preserve"><value>Application</value></data>
+  <data name="Applications.Inventory.Column.Publisher" xml:space="preserve"><value>Publisher</value></data>
+  <data name="Applications.Inventory.Column.Version" xml:space="preserve"><value>Version</value></data>
+  <data name="Applications.Inventory.Column.Size" xml:space="preserve"><value>Estimated size</value></data>
+  <data name="Applications.Inventory.Column.Scope" xml:space="preserve"><value>Scope</value></data>
+  <data name="Applications.Inventory.Column.Source" xml:space="preserve"><value>Source</value></data>
+  <data name="Applications.Inventory.Scope.CurrentUser" xml:space="preserve"><value>This user</value></data>
+  <data name="Applications.Inventory.Scope.LocalMachine" xml:space="preserve"><value>All users</value></data>
+  <data name="Applications.Inventory.Source.RegistryRun" xml:space="preserve"><value>Registry · Run</value></data>
+  <data name="Applications.Inventory.Source.RegistryRunOnce" xml:space="preserve"><value>Registry · Run once</value></data>
+  <data name="Applications.Inventory.Source.StartupFolder" xml:space="preserve"><value>Startup folder</value></data>
+  <data name="Applications.Inventory.Empty.Installed" xml:space="preserve"><value>No visible installed application matches this search.</value></data>
+  <data name="Applications.Inventory.Empty.Startup" xml:space="preserve"><value>No startup entry matches this search.</value></data>
+  <data name="Applications.Platform.Title" xml:space="preserve"><value>Windows-owned actions</value></data>
+  <data name="Applications.Platform.Description" xml:space="preserve"><value>Uninstalling, changing defaults and accepting Store updates remain on trusted Windows surfaces while Ralven's internal management expands.</value></data>
   <data name="Greeting.Morning.WithName" xml:space="preserve"><value>Good morning, {0}. What shall we do today?</value></data>
   <data name="Greeting.Morning.NoName" xml:space="preserve"><value>Good morning. What shall we do today?</value></data>
   <data name="Greeting.Afternoon.WithName" xml:space="preserve"><value>Good afternoon, {0}. What shall we do today?</value></data>
