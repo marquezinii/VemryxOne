@@ -14,9 +14,9 @@ function fakeDb(rows = []) {
           calls.push({ sql, params });
           return {
             async first() {
-              const [uid, validFromCutoff, validUntilCutoff] = params;
+              const [uid, entitlementKey, validFromCutoff, validUntilCutoff] = params;
               const row = rows.find(candidate => candidate.account_uid === uid
-                && candidate.entitlement_key === 'ralven_pro'
+                && candidate.entitlement_key === entitlementKey
                 && ['active', 'grace_period'].includes(candidate.state)
                 && candidate.valid_from <= validFromCutoff
                 && candidate.valid_until > validUntilCutoff);
@@ -53,12 +53,12 @@ test('fetchAccountEntitlements grants only current active or grace-period Ralven
     });
 
     const [{ sql, params }] = db.calls;
-    assert.match(sql, /entitlement_key = 'ralven_pro'/);
+    assert.match(sql, /entitlement_key = \?/);
     assert.match(sql, /state IN \('active', 'grace_period'\)/);
     assert.match(sql, /valid_from <= \?/);
     assert.match(sql, /valid_until > \?/);
     assert.doesNotMatch(sql, /provider|subscription/i);
-    assert.deepEqual(params, ['firebase-uid-123', NOW, NOW]);
+    assert.deepEqual(params, ['firebase-uid-123', 'ralven_pro', NOW, NOW]);
   }
 });
 

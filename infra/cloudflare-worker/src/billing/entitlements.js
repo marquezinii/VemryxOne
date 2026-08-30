@@ -16,13 +16,13 @@ export async function fetchAccountEntitlements(db, uid, nowIso = new Date().toIS
       `SELECT entitlement_key, valid_until
        FROM account_entitlements
        WHERE account_uid = ?
-         AND entitlement_key = '${PRO_ENTITLEMENT}'
+         AND entitlement_key = ?
          AND state IN ('active', 'grace_period')
          AND valid_from <= ?
          AND valid_until > ?
        LIMIT 1`,
     )
-    .bind(uid, nowIso, nowIso)
+    .bind(uid, PRO_ENTITLEMENT, nowIso, nowIso)
     .first();
 
   return row === null

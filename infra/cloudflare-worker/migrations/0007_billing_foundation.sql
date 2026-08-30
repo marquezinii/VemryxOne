@@ -49,7 +49,8 @@ CREATE TABLE IF NOT EXISTS billing_subscriptions (
     provider_subscription_id TEXT NOT NULL CHECK (length(provider_subscription_id) BETWEEN 1 AND 128),
     offer_key TEXT NOT NULL CHECK (length(offer_key) BETWEEN 1 AND 64),
     state TEXT NOT NULL CHECK (state IN ('pending', 'authorized', 'paused', 'cancelled')),
-    provider_updated_at TEXT NOT NULL,
+    provider_updated_at TEXT NOT NULL
+        CHECK (length(provider_updated_at) = 24 AND substr(provider_updated_at, 5, 1) = '-' AND substr(provider_updated_at, 8, 1) = '-' AND substr(provider_updated_at, 11, 1) = 'T' AND substr(provider_updated_at, 14, 1) = ':' AND substr(provider_updated_at, 17, 1) = ':' AND substr(provider_updated_at, 20, 1) = '.' AND substr(provider_updated_at, 24, 1) = 'Z'),
     last_event_id INTEGER REFERENCES billing_webhook_events (id),
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
@@ -71,9 +72,12 @@ CREATE TABLE IF NOT EXISTS account_entitlements (
     entitlement_key TEXT NOT NULL CHECK (length(entitlement_key) BETWEEN 1 AND 64),
     state TEXT NOT NULL CHECK (state IN ('active', 'grace_period', 'expired', 'revoked')),
     subscription_id TEXT NOT NULL,
-    valid_from TEXT NOT NULL,
-    valid_until TEXT NOT NULL,
-    provider_updated_at TEXT NOT NULL,
+    valid_from TEXT NOT NULL
+        CHECK (length(valid_from) = 24 AND substr(valid_from, 5, 1) = '-' AND substr(valid_from, 8, 1) = '-' AND substr(valid_from, 11, 1) = 'T' AND substr(valid_from, 14, 1) = ':' AND substr(valid_from, 17, 1) = ':' AND substr(valid_from, 20, 1) = '.' AND substr(valid_from, 24, 1) = 'Z'),
+    valid_until TEXT NOT NULL
+        CHECK (length(valid_until) = 24 AND substr(valid_until, 5, 1) = '-' AND substr(valid_until, 8, 1) = '-' AND substr(valid_until, 11, 1) = 'T' AND substr(valid_until, 14, 1) = ':' AND substr(valid_until, 17, 1) = ':' AND substr(valid_until, 20, 1) = '.' AND substr(valid_until, 24, 1) = 'Z'),
+    provider_updated_at TEXT NOT NULL
+        CHECK (length(provider_updated_at) = 24 AND substr(provider_updated_at, 5, 1) = '-' AND substr(provider_updated_at, 8, 1) = '-' AND substr(provider_updated_at, 11, 1) = 'T' AND substr(provider_updated_at, 14, 1) = ':' AND substr(provider_updated_at, 17, 1) = ':' AND substr(provider_updated_at, 20, 1) = '.' AND substr(provider_updated_at, 24, 1) = 'Z'),
     last_event_id INTEGER REFERENCES billing_webhook_events (id),
     updated_at TEXT NOT NULL,
     PRIMARY KEY (account_uid, entitlement_key),

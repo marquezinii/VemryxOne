@@ -111,6 +111,13 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         // default.
         RefreshAccountSettingsCard();
 
+        // Plan.Title and the Refresh button follow the language automatically
+        // through their {Binding [key], Source={StaticResource
+        // LocalizedStrings}} markup, but the entitlement value/detail text is
+        // set imperatively (it depends on server state, not just a static
+        // key), so it needs its own re-render on language change.
+        LocalizationService.Current.LanguageChanged += MainWindow_LanguageChanged;
+
         var telemetry = CreateTelemetryServices(demoMode, remoteServicesOptions, runtimeEnvironment);
         queuedCloudflareTelemetry = telemetry.Queued;
 
@@ -355,12 +362,16 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         System.Windows.Application.Current.SessionEnding -= Application_SessionEnding;
         viewModel.UpdateAvailableDetected -= ViewModel_UpdateAvailableDetected;
         viewModel.PropertyChanged -= ViewModel_PropertyChanged;
+        LocalizationService.Current.LanguageChanged -= MainWindow_LanguageChanged;
         themeManager.Dispose();
         trayIcon.Dispose();
         CancelAccountEntitlementExpiry();
         accountService?.Dispose();
         (releaseUpdateService as IDisposable)?.Dispose();
     }
+
+    private void MainWindow_LanguageChanged(object? sender, AppLanguageChangedEventArgs e) =>
+        ApplyAccountEntitlementPresentation();
 
     private void Application_SessionEnding(object? sender, SessionEndingCancelEventArgs e)
     {
