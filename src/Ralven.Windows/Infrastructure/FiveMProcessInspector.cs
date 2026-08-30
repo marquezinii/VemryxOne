@@ -93,23 +93,27 @@ public sealed class WindowsFiveMProcessInspector : IFiveMProcessInspector
         {
             using (process)
             {
-                var processName = GetProcessName(process);
+                var processName = GetProcessNameOrEmpty(process);
                 if (!LooksLikeFiveMProcessName(processName))
                 {
                     continue;
                 }
 
-                var executablePath = GetExecutablePath(process);
-                if (!IsVerifiedFiveMExecutablePath(
+                var executablePath = TryGetExecutablePath(process);
+                if (executablePath is null)
+                {
+                    // O nome continua disponível quando MainModule é negado por uma
+                    // diferença de elevação. Nesse caso, bloquear é a decisão segura.
+                    return true;
+                }
+
+                if (IsVerifiedFiveMExecutablePath(
                         processName,
                         executablePath,
                         normalizedInstallationRoot))
                 {
-                    throw new InvalidOperationException(
-                        "A FiveM-named process did not have an executable image related to a verified FiveM layout.");
+                    return true;
                 }
-
-                return true;
             }
         }
 
@@ -124,7 +128,7 @@ public sealed class WindowsFiveMProcessInspector : IFiveMProcessInspector
                 StringComparison.OrdinalIgnoreCase);
     }
 
-    private static string GetProcessName(Process process)
+    private static string GetProcessNameOrEmpty(Process process)
     {
         try
         {
@@ -134,26 +138,20 @@ public sealed class WindowsFiveMProcessInspector : IFiveMProcessInspector
             or System.ComponentModel.Win32Exception
             or NotSupportedException)
         {
-            throw new InvalidOperationException(
-                "The running processes could not be inspected safely.",
-                exception);
+            return string.Empty;
         }
     }
 
-    private static string GetExecutablePath(Process process)
+    private static string? TryGetExecutablePath(Process process)
     {
         try
         {
-            return process.MainModule?.FileName
-                ?? throw new InvalidOperationException(
-                    "The candidate FiveM process has no executable image path.");
+            return process.MainModule?.FileName;
         }
         catch (Exception exception) when (exception is System.ComponentModel.Win32Exception
             or NotSupportedException)
         {
-            throw new InvalidOperationException(
-                "The candidate FiveM process executable image could not be inspected.",
-                exception);
+            return null;
         }
     }
 }

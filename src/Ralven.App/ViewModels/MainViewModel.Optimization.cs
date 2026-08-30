@@ -361,10 +361,16 @@ public sealed partial class MainViewModel
         StartOperationTiming();
         var progress = new Progress<AppProgressUpdate>(ApplyProgress);
         var completedSuccessfully = false;
+        var rolledBackWindowsGamingTransaction = false;
         try
         {
             var restored = await service.RollbackAsync(item.TransactionId, progress, operationCancellation.Token);
             completedSuccessfully = restored;
+            if (restored && windowsGamingTransactionId == item.TransactionId)
+            {
+                windowsGamingTransactionId = null;
+                rolledBackWindowsGamingTransaction = true;
+            }
             ApplyHistory(await service.LoadHistoryAsync());
             return restored;
         }
@@ -383,6 +389,10 @@ public sealed partial class MainViewModel
             operationCancellation.Dispose();
             operationCancellation = null;
             IsBusy = false;
+            if (rolledBackWindowsGamingTransaction)
+            {
+                await RefreshWindowsGamingSettingsAsync();
+            }
         }
     }
 

@@ -5,7 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:primitives="clr-namespace:System.Windows.Controls.Primitives;assembly=PresentationFramework"
              mc:Ignorable="d" d:DesignWidth="1400" d:DesignHeight="820"
-             Loaded="SystemPage_Loaded">
+             IsVisibleChanged="SystemPage_IsVisibleChanged">
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <Grid Margin="28,24,28,28">
             <Grid.RowDefinitions>

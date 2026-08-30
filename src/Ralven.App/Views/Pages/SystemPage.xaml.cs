@@ -19,9 +19,9 @@ public partial class SystemPage : UserControl
     private void OpenSecurity_Click(object sender, RoutedEventArgs e) => OpenSettings("ms-settings:windowsdefender");
     private void OpenAbout_Click(object sender, RoutedEventArgs e) => OpenSettings("ms-settings:about");
 
-    private async void SystemPage_Loaded(object sender, RoutedEventArgs e)
+    private async void SystemPage_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-        if (DataContext is MainViewModel viewModel)
+        if (IsVisible && DataContext is MainViewModel viewModel)
         {
             await viewModel.RefreshWindowsGamingSettingsAsync();
         }
