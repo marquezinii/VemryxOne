@@ -16,7 +16,7 @@ Ralven não é um pacote genérico de tweaks. Cada mutação tem escopo tipado, 
 
 - visão geral com diagnóstico local e métricas reais;
 - acessos seguros a superfícies nativas de Sistema e Aplicativos;
-- diagnóstico e otimização especializada de FiveM/GTAV Legacy;
+- catálogo de Jogos com diagnóstico e otimização especializada de FiveM/GTAV Legacy;
 - planos Leve, Médio e Agressivo com prévia e confirmação;
 - execução transacional, journal, histórico e rollback;
 - conta opcional, telemetria por consentimento e relato explícito de bugs;

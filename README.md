@@ -33,7 +33,7 @@
 
 ## Seu PC em um lugar, FiveM com profundidade
 
-Sistema reúne atalhos seguros e um controle local de jogos do Windows: ele mostra o estado do Modo de Jogo e da gravação histórica em segundo plano antes de aplicar os dois ajustes compatíveis, sem exigir FiveM instalado ou acesso administrativo. Por segurança, aplicar ou restaurar exige que o FiveM esteja encerrado. Aplicativos mantém acesso às superfícies nativas do Windows. A categoria FiveM preserva o fluxo especializado: detecta o ambiente, monta um plano compreensível e mostra o que será alterado antes de executar. Cada ação declara escopo, pré-condições, risco, resultado e rollback quando aplicável.
+Sistema reúne atalhos seguros e um controle local de jogos do Windows: ele mostra o estado do Modo de Jogo e da gravação histórica em segundo plano antes de aplicar os dois ajustes compatíveis, sem exigir FiveM instalado ou acesso administrativo. Por segurança, aplicar ou restaurar exige que o FiveM esteja encerrado. Aplicativos mantém acesso às superfícies nativas do Windows. Jogos reúne os títulos compatíveis e hoje oferece FiveM sobre GTAV Legacy, preservando o fluxo especializado: detecta o ambiente, monta um plano compreensível e mostra o que será alterado antes de executar. Cada ação declara escopo, pré-condições, risco, resultado e rollback quando aplicável.
 
 | Você vê | O que isso significa |
 | --- | --- |
@@ -69,7 +69,7 @@ Leia a [política de segurança](docs/safety.md) e as [evidências técnicas](do
 | --- | --- |
 | Sistema | Leitura e ajuste confirmado do Modo de Jogo e da gravação histórica em segundo plano, além de atalhos para Windows Update, Segurança do Windows e informações do PC. |
 | Aplicativos | Acesso a aplicativos instalados, inicialização, atualizações da Microsoft Store e aplicativos padrão. |
-| FiveM | Prévia, perfis, progresso real, cancelamento seguro, resultado por ação e rollback. |
+| Jogos | Catálogo interno com FiveM sobre GTAV Legacy: prévia, perfis, progresso real, cancelamento seguro, resultado por ação e rollback. |
 | Conta | Cadastro, login, Google com OAuth 2.0 + PKCE, verificação de e-mail, recuperação, senha, troca de credenciais e exclusão. |
 | Privacidade | ID token somente em memória, refresh token protegido por DPAPI e telemetria limitada por consentimento. |
 | Relatos de bug | Envio explícito com campos validados, e-mail e trecho de log opcionais — sem anexos automáticos. |

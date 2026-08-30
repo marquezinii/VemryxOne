@@ -16,7 +16,9 @@ Este documento descreve a arquitetura-alvo e os limites entre componentes. Uma c
 ## Áreas de produto
 
 O shell separa a experiência em **Visão geral**, **Sistema**, **Aplicativos** e
-**FiveM**. Aplicativos ainda encaminha o usuário para superfícies nativas do
+**Jogos**. Jogos abre um catálogo interno que hoje contém somente FiveM sobre
+GTAV Legacy; o card leva ao otimizador especializado existente e mantém Jogos
+como a categoria ativa. Aplicativos ainda encaminha o usuário para superfícies nativas do
 Windows e da Microsoft Store. Sistema preserva os atalhos para Windows Update,
 Segurança e informações do PC, mas também oferece um painel dedicado de jogos
 do Windows: ele lê o Modo de Jogo e a gravação histórica em segundo plano e,

@@ -50,7 +50,8 @@ public partial class MainWindow
                 {
                     "System" => (Element: (UIElement)SystemPage, Nav: SystemNav),
                     "Applications" => (Element: (UIElement)ApplicationsPage, Nav: ApplicationsNav),
-                    "Optimizer" => (Element: (UIElement)OptimizerPage, Nav: OptimizerNav),
+                    "Games" => (Element: (UIElement)GamesPage, Nav: GamesNav),
+                    "Optimizer" => (Element: (UIElement)OptimizerPage, Nav: GamesNav),
                     "History" => (HistoryPage, HistoryNav),
                     "Settings" => (SettingsPage, SettingsNav),
                     _ => (DashboardPage, DashboardNav)
