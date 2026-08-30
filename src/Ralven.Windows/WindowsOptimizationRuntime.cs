@@ -562,17 +562,18 @@ public sealed class WindowsOptimizationActionFactory
         }
 
         if (!plan.IsExecutable
-            || plan.Edition != FiveMEdition.Legacy
+            || !IsSupportedScopeAndEdition(plan.Scope, plan.Edition)
             || plan.Blocks.Count != 0
             || plan.Actions.Count == 0)
         {
-            throw new InvalidOperationException("Only an executable FiveM Legacy plan can be resolved.");
+            throw new InvalidOperationException("Only an executable plan with a supported scope and edition can be resolved.");
         }
 
         var canonical = PlanBuilder.Build(
             PlanBuilder.CanonicalRequestFor(plan),
             PlanBuildContext.For(plan));
         if (!canonical.IsExecutable
+            || canonical.Scope != plan.Scope
             || canonical.Actions.Count != plan.Actions.Count
             || canonical.RequiresElevation != plan.RequiresElevation
             || canonical.ContainsNonReversibleActions != plan.ContainsNonReversibleActions
@@ -596,6 +597,15 @@ public sealed class WindowsOptimizationActionFactory
             }
         }
     }
+
+    private static bool IsSupportedScopeAndEdition(
+        OptimizationScope scope,
+        FiveMEdition edition) => scope switch
+        {
+            OptimizationScope.FiveMLegacy => edition == FiveMEdition.Legacy,
+            OptimizationScope.GeneralWindows => Enum.IsDefined(edition),
+            _ => false
+        };
 
     private static WindowsOptimizationEnvironment ValidateEnvironment(
         WindowsOptimizationEnvironment environment)

@@ -42,6 +42,7 @@ public sealed partial class MainViewModel : BindableBase, IDisposable
     private IReadOnlyList<AppHistoryRecord> historyRecords = [];
     private OptimizationPlanDto? currentPlan;
     private OptimizationProfile selectedProfile = OptimizationProfile.Balanced;
+    private OptimizationScope optimizationScope = OptimizationScope.GeneralWindows;
     private bool isBusy;
     private bool isInitializing = true;
     private double progressPercent;
@@ -211,9 +212,11 @@ public sealed partial class MainViewModel : BindableBase, IDisposable
     public bool CanStart => !IsBusy
         && !isWindowsGamingBusy
         && !isInitializing
+        && diagnostic is not null
+        && !diagnosticFailed
         && currentPlan?.IsExecutable == true
-        && diagnostic?.IsFiveMRunning != true
-        && diagnostic?.GtaVIsRunning != true
+        && !diagnostic.IsFiveMRunning
+        && !diagnostic.GtaVIsRunning
         && !IsFiveMSessionActive;
 
     public bool CanCancel => IsBusy && operationCancellation is not null;

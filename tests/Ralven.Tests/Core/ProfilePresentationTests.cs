@@ -52,4 +52,33 @@ public sealed class ProfilePresentationTests
         Assert.Throws<ArgumentOutOfRangeException>(
             () => ProfilePresentationProvider.For((OptimizationProfile)99));
     }
+
+    [Fact]
+    public void For_CanFilterFactsByScopeWithoutChangingLegacyOverload()
+    {
+        var legacy = ProfilePresentationProvider.For(OptimizationProfile.Light);
+        var explicitlyLegacy = ProfilePresentationProvider.For(
+            OptimizationProfile.Light,
+            OptimizationScope.FiveMLegacy);
+        var general = ProfilePresentationProvider.For(
+            OptimizationProfile.Light,
+            OptimizationScope.GeneralWindows);
+
+        Assert.Equal(legacy.Profile, explicitlyLegacy.Profile);
+        Assert.Equal(legacy.ImpactLevel, explicitlyLegacy.ImpactLevel);
+        Assert.Equal(legacy.AnalyzedCategories, explicitlyLegacy.AnalyzedCategories);
+        Assert.Equal(legacy.ContainsNonReversible, explicitlyLegacy.ContainsNonReversible);
+        Assert.Equal(legacy.RequiresElevation, explicitlyLegacy.RequiresElevation);
+        Assert.Equal(legacy.MaximumRisk, explicitlyLegacy.MaximumRisk);
+        Assert.DoesNotContain(ActionCategory.FiveMGraphics, general.AnalyzedCategories);
+        Assert.Equal(
+            ActionCatalog.Current.Actions
+                .Where(action =>
+                    action.Supports(OptimizationProfile.Light) &&
+                    action.Supports(OptimizationScope.GeneralWindows))
+                .Select(action => action.Category)
+                .Distinct()
+                .OrderBy(category => (int)category),
+            general.AnalyzedCategories);
+    }
 }

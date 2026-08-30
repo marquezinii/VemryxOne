@@ -662,13 +662,13 @@ public sealed class HardwareStabilityDiagnosisAction : ReadOnlyDiagnosticAction
 }
 
 /// <summary>
-/// The nine-way bottleneck classification requested for the benchmark/
+/// The bottleneck classification requested for the benchmark/
 /// comparison feature. It only reuses signals already read by the other
 /// diagnostics in this file — no new system access beyond the background
 /// process CPU reader — and returns the first category whose threshold
 /// fires, in the priority order documented in <see cref="Classify"/>.
-/// "Servidor limitado" is a conclusion by elimination (no local signal
-/// stood out), never a direct measurement of the FiveM server.
+/// When no local signal stands out, it reports exactly that instead of
+/// guessing an external bottleneck.
 /// </summary>
 public sealed class BottleneckClassificationAction : ReadOnlyDiagnosticAction
 {
@@ -736,7 +736,7 @@ public sealed class BottleneckClassificationAction : ReadOnlyDiagnosticAction
             && process.CpuPercent / logicalProcessors >= BackgroundProcessCpuThresholdPercent)
         {
             return $"Gargalo provável: processo em segundo plano. '{process.ProcessName}' está consumindo "
-                + "CPU de forma relevante além do FiveM/GTA V.";
+                + "CPU de forma relevante enquanto o sistema está sob análise.";
         }
 
         // 3. Rede: perda/erro de pacotes local.
@@ -744,7 +744,7 @@ public sealed class BottleneckClassificationAction : ReadOnlyDiagnosticAction
             && (input.NetworkHealth.DiscardedPackets > 0 || input.NetworkHealth.ErrorPackets > 0))
         {
             return "Gargalo provável: rede. Há descarte ou erro de pacotes na placa de rede ativa, "
-                + "o que pode causar jitter ou perda de conexão com o servidor.";
+                + "o que pode causar jitter ou perda de conexão em aplicativos e jogos.";
         }
 
         // 4. Disco: tempo ativo elevado.
@@ -790,9 +790,9 @@ public sealed class BottleneckClassificationAction : ReadOnlyDiagnosticAction
                 + "reduzir opções gráficas tende a ajudar pouco nesse caso.";
         }
 
-        // 9. Servidor (por eliminação): nenhum sinal local se destacou.
-        return "Nenhum gargalo local evidente foi encontrado; se o desempenho ainda estiver ruim, "
-            + "os recursos do servidor FiveM (scripts e mapas) podem ser o fator limitante.";
+        // Nenhum sinal local se destacou. Isso não autoriza inferir uma causa externa.
+        return "Nenhum gargalo local evidente foi encontrado nesta amostra; repita a medição durante "
+            + "a carga afetada para comparar os sinais.";
     }
 }
 

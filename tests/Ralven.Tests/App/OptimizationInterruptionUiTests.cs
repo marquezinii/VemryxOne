@@ -69,6 +69,22 @@ public sealed class OptimizationInterruptionUiTests
         Assert.Contains("Text=\"{Binding EmptyPlanMessage, Mode=OneWay}\"", source, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void MainNavigation_ExposesGeneralOptimizerAndKeepsFiveMUnderGames()
+    {
+        var root = FindRepositoryRoot();
+        var mainWindow = File.ReadAllText(Path.Combine(root, "src", "Ralven.App", "MainWindow.xaml"));
+        var navigation = File.ReadAllText(Path.Combine(root, "src", "Ralven.App", "MainWindow.Navigation.xaml.cs"));
+        var games = File.ReadAllText(Path.Combine(root, "src", "Ralven.App", "Views", "Pages", "GamesPage.xaml.cs"));
+        var capture = File.ReadAllText(Path.Combine(root, "src", "Ralven.App", "MainWindow.Capture.xaml.cs"));
+
+        Assert.Contains("x:Name=\"OptimizerNav\"", mainWindow, StringComparison.Ordinal);
+        Assert.Contains("Tag=\"Optimizer\"", mainWindow, StringComparison.Ordinal);
+        Assert.Contains("RequestNavigateToOptimizer(OptimizationScope.GeneralWindows)", navigation, StringComparison.Ordinal);
+        Assert.Contains("RequestNavigateToOptimizer(OptimizationScope.FiveMLegacy)", games, StringComparison.Ordinal);
+        Assert.Contains("\"FiveMOptimizer\"", capture, StringComparison.Ordinal);
+    }
+
     private static string FindRepositoryRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);

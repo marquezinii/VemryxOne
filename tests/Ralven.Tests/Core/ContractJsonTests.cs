@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Ralven.Contracts;
 using Ralven.Core.Planning;
@@ -26,9 +27,26 @@ public sealed class ContractJsonTests
         var restored = RalvenJson.DeserializeRequest(json);
 
         Assert.Contains("\"profile\":\"balanced\"", json, StringComparison.Ordinal);
+        Assert.Contains("\"scope\":\"fiveMLegacy\"", json, StringComparison.Ordinal);
         Assert.Contains("\"edition\":\"legacy\"", json, StringComparison.Ordinal);
         Assert.Contains("\"serverCacheRepair\":\"whenOversized\"", json, StringComparison.Ordinal);
         Assert.Equal(request, restored);
+    }
+
+    [Fact]
+    public void Request_WithoutScopeRetainsLegacyBehavior()
+    {
+        const string json = """
+            {
+              "profile": "light",
+              "edition": "legacy",
+              "options": {}
+            }
+            """;
+
+        var restored = RalvenJson.DeserializeRequest(json);
+
+        Assert.Equal(OptimizationScope.FiveMLegacy, restored.Scope);
     }
 
     [Fact]
@@ -50,6 +68,7 @@ public sealed class ContractJsonTests
         Assert.Equal(original.CatalogVersion, restored.CatalogVersion);
         Assert.Equal(original.ProductName, restored.ProductName);
         Assert.Equal(original.ProductSubtitle, restored.ProductSubtitle);
+        Assert.Equal(original.Scope, restored.Scope);
         Assert.Equal(original.Profile, restored.Profile);
         Assert.Equal(original.Edition, restored.Edition);
         Assert.Equal(
@@ -58,6 +77,24 @@ public sealed class ContractJsonTests
         Assert.NotEmpty(original.Notices);
         Assert.Equal(original.Notices, restored.Notices);
         Assert.Equal(original.Options, restored.Options);
+    }
+
+    [Fact]
+    public void Plan_WithoutScopeRetainsLegacyBehavior()
+    {
+        var original = PlanBuilder.Build(
+            new OptimizationPlanRequestDto
+            {
+                Profile = OptimizationProfile.Light,
+                Edition = FiveMEdition.Legacy
+            },
+            PlanBuildContext.New(TimeProvider.System));
+        var root = JsonNode.Parse(RalvenJson.SerializePlan(original))!.AsObject();
+        root.Remove("scope");
+
+        var restored = RalvenJson.DeserializePlan(root.ToJsonString());
+
+        Assert.Equal(OptimizationScope.FiveMLegacy, restored.Scope);
     }
 
     [Fact]

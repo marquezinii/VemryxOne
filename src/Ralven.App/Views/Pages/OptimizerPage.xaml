@@ -191,9 +191,10 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel VerticalAlignment="Center" Margin="0,0,32,0">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding [Optimizer.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource PageTitleText}" />
+                        <TextBlock Text="{Binding OptimizerTitle}" Style="{StaticResource PageTitleText}" />
                         <TextBlock Text="{Binding PlanHeader}" Style="{StaticResource TickLabelText}" VerticalAlignment="Bottom" Margin="14,0,0,5" />
                     </StackPanel>
+                    <TextBlock Text="{Binding OptimizerSubtitle}" Style="{StaticResource SecondaryText}" Margin="0,8,0,0" TextWrapping="Wrap" MaxWidth="680" />
                     <Rectangle Style="{StaticResource TitleAccentRule}" Margin="0,10,0,0" />
                 </StackPanel>
 

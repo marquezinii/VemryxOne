@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>Mais desempenho. Menos complicação.</strong><br>
-  Diagnóstico e manutenção assistida do Windows, com otimização especializada para FiveM sobre GTAV Legacy.
+  Gerenciamento, diagnóstico e otimização transparente do Windows, com uma área especializada para FiveM sobre GTAV Legacy.
 </p>
 
 <p align="center">
@@ -33,11 +33,11 @@
 
 ## Seu PC em um lugar, FiveM com profundidade
 
-Sistema mostra dentro do Ralven as informações locais do PC e a saúde agregada de antivírus, firewall e atualizações automáticas informada pela Central de Segurança do Windows. A mesma área mantém o controle local de jogos do Windows: ela mostra o estado do Modo de Jogo e da gravação histórica em segundo plano antes de aplicar os dois ajustes compatíveis, sem exigir FiveM instalado ou acesso administrativo. Por segurança, aplicar ou restaurar exige que o FiveM esteja encerrado. Aplicativos lista dentro do Ralven os programas desktop registrados e os itens de inicialização, com busca e estado parcial explícito; alterações continuam nas superfícies confiáveis do Windows. Jogos reúne os títulos compatíveis e hoje oferece FiveM sobre GTAV Legacy, preservando o fluxo especializado: detecta o ambiente, monta um plano compreensível e mostra o que será alterado antes de executar. Cada ação declara escopo, pré-condições, risco, resultado e rollback quando aplicável.
+Otimizar analisa e ajusta o Windows sem exigir FiveM ou GTA V. O plano geral reúne diagnósticos locais de hardware, armazenamento, drivers, tela, rede, memória e estabilidade com ações conservadoras já tipadas, como Modo de Jogo, captura em segundo plano, energia, efeitos visuais e temporários antigos. Sistema mostra dentro do Ralven as informações locais do PC e a saúde agregada de antivírus, firewall e atualizações automáticas informada pela Central de Segurança do Windows. Aplicativos lista os programas desktop registrados e os itens de inicialização, com busca e estado parcial explícito; alterações continuam nas superfícies confiáveis do Windows. Jogos reúne os títulos compatíveis e hoje oferece FiveM sobre GTAV Legacy, preservando o fluxo especializado: detecta o ambiente, monta um plano próprio e mostra o que será alterado antes de executar. Cada ação declara em qual escopo pode entrar, suas pré-condições, risco, resultado e rollback quando aplicável.
 
 | Você vê | O que isso significa |
 | --- | --- |
-| Diagnóstico local | FiveM/GTA V, CPU, GPU, memória, armazenamento, rede, energia, drivers, processos e gargalos prováveis. |
+| Diagnóstico local | CPU, GPU, memória, armazenamento, rede, energia, drivers, tela, estabilidade e, no módulo especializado, FiveM/GTA V. |
 | Plano antes da execução | Perfil, ações, impacto, privilégios e condições de cada alteração ficam explícitos. |
 | Execução verificável | Snapshot, validação, journal local, progresso real e recuperação fazem parte do fluxo. |
 | Histórico útil | Resultado por ação, relatório técnico sanitizado e comparação local antes/depois. |
@@ -67,9 +67,10 @@ Leia a [política de segurança](docs/safety.md) e as [evidências técnicas](do
 
 | Área | Disponível hoje |
 | --- | --- |
+| Otimizar | Plano geral do Windows independente de FiveM/GTA, com diagnóstico, prévia, confirmação, progresso real, resultado por ação e rollback. |
 | Sistema | Informações internas do PC, saúde agregada informada pelo Windows e leitura/ajuste confirmado do Modo de Jogo e da gravação histórica; atalhos nativos ficam como ações secundárias. |
 | Aplicativos | Inventário interno somente leitura de programas desktop e inicialização, com busca, contagens e acessos secundários às superfícies do Windows e da Microsoft Store. |
-| Jogos | Catálogo interno com FiveM sobre GTAV Legacy: prévia, perfis, progresso real, cancelamento seguro, resultado por ação e rollback. |
+| Jogos | Catálogo interno com FiveM sobre GTAV Legacy e seu plano especializado, sem reutilizar ações do jogo no escopo geral. |
 | Conta | Cadastro, login, Google com OAuth 2.0 + PKCE, verificação de e-mail, recuperação, senha, troca de credenciais e exclusão. |
 | Privacidade | ID token somente em memória, refresh token protegido por DPAPI e telemetria limitada por consentimento. |
 | Relatos de bug | Envio explícito com campos validados, e-mail e trecho de log opcionais — sem anexos automáticos. |

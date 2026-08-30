@@ -14,8 +14,6 @@ public sealed class HardwareProfileAdvisorTests
             availableMemoryGiB: 12,
             logicalProcessorCount: 16,
             freeDiskGiB: 100,
-            FiveMEdition.Legacy,
-            legacyCacheBytes: 2L * 1024 * 1024 * 1024,
             gpuWasIdentified: true);
 
         Assert.Equal(OptimizationProfile.Light, result.RecommendedProfile);
@@ -31,8 +29,6 @@ public sealed class HardwareProfileAdvisorTests
             availableMemoryGiB: 1.5,
             logicalProcessorCount: 4,
             freeDiskGiB: 9,
-            FiveMEdition.Legacy,
-            legacyCacheBytes: 10L * 1024 * 1024 * 1024,
             gpuWasIdentified: true);
 
         Assert.Equal(OptimizationProfile.Aggressive, result.RecommendedProfile);
@@ -48,8 +44,6 @@ public sealed class HardwareProfileAdvisorTests
             availableMemoryGiB: 6,
             logicalProcessorCount: 8,
             freeDiskGiB: 40,
-            FiveMEdition.Legacy,
-            legacyCacheBytes: 1,
             gpuWasIdentified: true);
 
         Assert.Equal(OptimizationProfile.Balanced, result.RecommendedProfile);
@@ -57,18 +51,16 @@ public sealed class HardwareProfileAdvisorTests
     }
 
     [Fact]
-    public void Assess_PenalizesUnknownEditionAndGpuWithoutThrowing()
+    public void Assess_UsesOnlyGeneralPcCapacitySignals()
     {
         var result = HardwareProfileAdvisor.Assess(
             totalMemoryGiB: 16,
             availableMemoryGiB: 6,
             logicalProcessorCount: 8,
             freeDiskGiB: 40,
-            FiveMEdition.Unknown,
-            legacyCacheBytes: 0,
             gpuWasIdentified: false);
 
-        Assert.InRange(result.ReadinessScore, 0, 74);
+        Assert.Equal(76, result.ReadinessScore);
         Assert.Equal(OptimizationProfile.Balanced, result.RecommendedProfile);
     }
 }

@@ -14,6 +14,19 @@ public enum FiveMEdition
     Enhanced
 }
 
+/// <summary>Product surface an optimization plan is allowed to target.</summary>
+public enum OptimizationScope
+{
+    /// <summary>
+    /// FiveM over GTA V Legacy. Kept as zero so requests and plans written
+    /// before scopes existed retain their original behavior.
+    /// </summary>
+    FiveMLegacy = 0,
+
+    /// <summary>Windows-wide optimization that does not require FiveM or GTA V.</summary>
+    GeneralWindows = 1
+}
+
 public enum ActionCategory
 {
     Safety,

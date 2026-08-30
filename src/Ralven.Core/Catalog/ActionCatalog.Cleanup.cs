@@ -19,7 +19,7 @@ public sealed partial class ActionCatalog
                 AllProfiles,
                 requiresFiveMStopped: false,
                 progressWeight: 18,
-                expectedImpact: "Libera espaço; não promete aumento direto de FPS.",
+                expectedImpact: "Libera espaço; não promete melhora direta de desempenho.",
                 ActionOptionGate.CleanUserTemporaryFiles,
                 detectionSummary: "Percorre a pasta Temp do usuário buscando arquivos além do período de retenção.",
                 confirmationSummary: "Confirma que os arquivos antigos selecionados não existem mais após a limpeza.",

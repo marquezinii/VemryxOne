@@ -175,13 +175,10 @@ public sealed partial class MainViewModel
             ? localization.GetString("Diagnosis.CloseFiveMSafely")
             : value.GtaVIsRunning
                 ? localization.GetString("Diagnosis.CloseGtaVSafely")
-            : localization.Format("Diagnosis.RecommendedProfile", ProfileName(value.RecommendedProfile));
-        RecommendationText = value.Edition switch
-        {
-            FiveMEdition.Legacy => localization.GetString("Diagnosis.LegacyReady"),
-            FiveMEdition.Enhanced => localization.GetString("Diagnosis.EnhancedUnsupported"),
-            _ => localization.GetString("Diagnosis.InstallLegacy")
-        };
+                : localization.Format(
+                    "Diagnosis.RecommendedProfile",
+                    ProfileName(value.RecommendedProfile));
+        RecommendationText = localization.GetString("Diagnosis.GeneralReady");
         ApplyStreamingReadiness(value);
         RefreshFiveMSessionMonitorAvailability();
     }

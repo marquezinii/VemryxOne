@@ -27,6 +27,7 @@ public sealed class OptimizationActionDefinition
         string confirmationSummary,
         string undoSummary,
         string riskLimitations,
+        IReadOnlyList<OptimizationScope> supportedScopes,
         bool attemptWithoutElevationFirst = false)
     {
         Id = id;
@@ -51,6 +52,7 @@ public sealed class OptimizationActionDefinition
         ConfirmationSummary = confirmationSummary;
         UndoSummary = undoSummary;
         RiskLimitations = riskLimitations;
+        SupportedScopes = supportedScopes.ToArray();
         AttemptWithoutElevationFirst = attemptWithoutElevationFirst;
     }
 
@@ -96,6 +98,8 @@ public sealed class OptimizationActionDefinition
 
     public string RiskLimitations { get; }
 
+    public IReadOnlyList<OptimizationScope> SupportedScopes { get; }
+
     public bool AttemptWithoutElevationFirst { get; }
 
     internal ActionOptionGate OptionGate { get; }
@@ -103,6 +107,11 @@ public sealed class OptimizationActionDefinition
     public bool Supports(OptimizationProfile profile)
     {
         return SupportedProfiles.Contains(profile);
+    }
+
+    public bool Supports(OptimizationScope scope)
+    {
+        return SupportedScopes.Contains(scope);
     }
 
     public bool SupportsWindows(SupportedWindowsVersions detected)

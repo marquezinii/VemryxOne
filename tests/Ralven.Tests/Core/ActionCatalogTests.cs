@@ -11,7 +11,7 @@ public sealed class ActionCatalogTests
     {
         var catalog = ActionCatalog.Current;
 
-        Assert.Equal(14, ActionCatalog.CurrentVersion);
+        Assert.Equal(15, ActionCatalog.CurrentVersion);
         Assert.NotEmpty(catalog.Actions);
 
         Assert.All(catalog.Actions, action =>
@@ -26,6 +26,8 @@ public sealed class ActionCatalogTests
             Assert.True(action.ProgressWeight > 0);
             Assert.NotEmpty(action.SupportedProfiles);
             Assert.Equal(action.SupportedProfiles.Count, action.SupportedProfiles.Distinct().Count());
+            Assert.NotEmpty(action.SupportedScopes);
+            Assert.Equal(action.SupportedScopes.Count, action.SupportedScopes.Distinct().Count());
 
             Assert.False(string.IsNullOrWhiteSpace(action.DetectionSummary));
             Assert.False(string.IsNullOrWhiteSpace(action.ConfirmationSummary));
@@ -36,6 +38,52 @@ public sealed class ActionCatalogTests
             Assert.All(action.Prerequisites, prerequisiteId =>
                 Assert.True(catalog.TryGet(prerequisiteId, out _)));
         });
+    }
+
+    [Fact]
+    public void GeneralWindowsScope_IsAnExplicitFailClosedAllowlist()
+    {
+        var generalIds = ActionCatalog.Current.Actions
+            .Where(action => action.Supports(OptimizationScope.GeneralWindows))
+            .Select(action => action.Id)
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+
+        var expected = new[]
+        {
+            OptimizationActionIds.DiagnoseBottleneck,
+            OptimizationActionIds.DetectOverlaysAndCaptureSoftware,
+            OptimizationActionIds.DiagnoseNetworkHealth,
+            OptimizationActionIds.DiagnoseThermalThrottling,
+            OptimizationActionIds.DiagnosePagefileCommit,
+            OptimizationActionIds.DetectGpuVendor,
+            OptimizationActionIds.DiagnoseCpuDetails,
+            OptimizationActionIds.DiagnoseGpuDetails,
+            OptimizationActionIds.DiagnoseRamDetails,
+            OptimizationActionIds.DiagnoseStorageHealth,
+            OptimizationActionIds.DiagnoseDriverVersions,
+            OptimizationActionIds.DiagnoseDisplayConfiguration,
+            OptimizationActionIds.DiagnoseSessionSettings,
+            OptimizationActionIds.DiagnoseThrottlingSignal,
+            OptimizationActionIds.DiagnoseResourceUsage,
+            OptimizationActionIds.DiagnosePciLink,
+            OptimizationActionIds.DiagnoseHardwareStability,
+            OptimizationActionIds.ClassifyBottleneck,
+            OptimizationActionIds.CleanUserTemporaryFiles,
+            OptimizationActionIds.EnableGameMode,
+            OptimizationActionIds.DisableBackgroundCapture,
+            OptimizationActionIds.EnableSessionPerformancePowerPlan,
+            OptimizationActionIds.AdjustPciExpressPowerManagement,
+            OptimizationActionIds.ReduceWindowsVisualEffects,
+            OptimizationActionIds.GuideDriverReinstall,
+            OptimizationActionIds.DiagnoseHybridLaptop,
+            OptimizationActionIds.GuideMousePollingRate
+        }.Order(StringComparer.Ordinal);
+
+        Assert.Equal(expected, generalIds);
+
+        Assert.All(ActionCatalog.Current.Actions, action =>
+            Assert.True(action.Supports(OptimizationScope.FiveMLegacy)));
     }
 
     [Fact]

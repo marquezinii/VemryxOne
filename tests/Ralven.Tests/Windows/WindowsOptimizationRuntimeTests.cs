@@ -69,6 +69,50 @@ public sealed class WindowsOptimizationRuntimeTests
         Assert.Throws<InvalidOperationException>(() => runtime.ResolveActions(tampered));
     }
 
+    [Theory]
+    [InlineData(FiveMEdition.Unknown)]
+    [InlineData(FiveMEdition.Legacy)]
+    [InlineData(FiveMEdition.Enhanced)]
+    public void ResolveActions_AcceptsCanonicalGeneralWindowsPlanRegardlessOfFiveMEdition(
+        FiveMEdition edition)
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+        var (runtime, _, _) = WindowsTestRuntime.Create(temporaryDirectory);
+        var plan = BuildPlan(OptimizationProfile.Balanced, OptimizationScope.GeneralWindows, edition);
+
+        var actions = runtime.ResolveActions(plan);
+
+        Assert.NotEmpty(actions);
+        Assert.Equal(
+            plan.Actions.Select(action => action.Metadata.Id),
+            actions.Select(action => action.Metadata.Id));
+    }
+
+    [Fact]
+    public void ResolveActions_RejectsTamperedScope()
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+        var (runtime, _, _) = WindowsTestRuntime.Create(temporaryDirectory);
+        var plan = BuildPlan(
+            OptimizationProfile.Balanced,
+            OptimizationScope.GeneralWindows,
+            FiveMEdition.Legacy);
+
+        Assert.Throws<InvalidOperationException>(() =>
+            runtime.ResolveActions(plan with { Scope = OptimizationScope.FiveMLegacy }));
+    }
+
+    [Fact]
+    public void ResolveActions_RejectsFiveMLegacyScopeForEnhancedEdition()
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+        var (runtime, _, _) = WindowsTestRuntime.Create(temporaryDirectory);
+        var plan = BuildPlan(OptimizationProfile.Balanced);
+
+        Assert.Throws<InvalidOperationException>(() =>
+            runtime.ResolveActions(plan with { Edition = FiveMEdition.Enhanced }));
+    }
+
     [Fact]
     public void AdministratorResolver_ReturnsOnlyCoreAdministratorActions()
     {
@@ -145,13 +189,17 @@ public sealed class WindowsOptimizationRuntimeTests
             ignoreCase: true);
     }
 
-    private static OptimizationPlanDto BuildPlan(OptimizationProfile profile)
+    private static OptimizationPlanDto BuildPlan(
+        OptimizationProfile profile,
+        OptimizationScope scope = OptimizationScope.FiveMLegacy,
+        FiveMEdition edition = FiveMEdition.Legacy)
     {
         return PlanBuilder.Build(
             new OptimizationPlanRequestDto
             {
+                Scope = scope,
                 Profile = profile,
-                Edition = FiveMEdition.Legacy,
+                Edition = edition,
                 Options = new OptimizationOptionsDto
                 {
                     ServerCacheRepair = CacheRepairPolicy.RepairNow,

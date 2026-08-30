@@ -156,8 +156,6 @@ public sealed class AppOptimizationService : IAppOptimizationService
                 availableMemoryGiB,
                 logicalProcessorCount,
                 freeDiskGiB,
-                installation.Edition,
-                cacheBytes,
                 gpuWasIdentified);
 
             var notices = BuildDiagnosticNotices(gtaV, cacheBytes, freeDiskGiB);
@@ -504,7 +502,7 @@ public sealed class AppOptimizationService : IAppOptimizationService
         ReportPreparing(progress);
 
         var beforeSnapshot = resourceComparison.TryCaptureSnapshot();
-        var runtime = CreateRuntimeForDetectedInstallation();
+        var runtime = CreateRuntimeForPlan(plan);
         var localResult = await ExecuteLocalPhaseAsync(
             runtime,
             plan,
@@ -868,6 +866,28 @@ public sealed class AppOptimizationService : IAppOptimizationService
         return WindowsOptimizationRuntime.Create(
             environment,
             WindowsOptimizationDependencies.CreateDefault(environment));
+    }
+
+    internal WindowsOptimizationRuntime CreateRuntimeForPlan(OptimizationPlanDto plan)
+    {
+        ArgumentNullException.ThrowIfNull(plan);
+
+        if (plan.Scope == OptimizationScope.GeneralWindows)
+        {
+            var environment = WindowsOptimizationEnvironment.DetectDefault();
+            return WindowsOptimizationRuntime.Create(
+                environment,
+                WindowsOptimizationDependencies.CreateDefault(environment));
+        }
+
+        if (plan.Scope != OptimizationScope.FiveMLegacy
+            || string.IsNullOrWhiteSpace(detectedLegacyRoot))
+        {
+            throw new InvalidOperationException(
+                "A detected FiveM Legacy installation is required for this optimization scope.");
+        }
+
+        return CreateRuntimeForDetectedInstallation();
     }
 
     internal static bool HandleRollbackFailure(

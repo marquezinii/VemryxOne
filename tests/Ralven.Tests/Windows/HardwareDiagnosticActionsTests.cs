@@ -440,14 +440,15 @@ public sealed class BottleneckClassificationActionTests
     }
 
     [Fact]
-    public void Classify_FallsBackToServerByEliminationWhenNothingElseFires()
+    public void Classify_ReportsNoLocalSignalWithoutGuessingExternalCause()
     {
         var input = new BottleneckClassificationInput(
             HealthyResources, HealthyUsage, NoThermalData, HealthyNetwork, BigVramGpu, null);
 
         var message = BottleneckClassificationAction.Classify(input);
 
-        Assert.Contains("servidor FiveM", message, StringComparison.Ordinal);
+        Assert.Contains("Nenhum gargalo local evidente", message, StringComparison.Ordinal);
+        Assert.DoesNotContain("servidor", message, StringComparison.OrdinalIgnoreCase);
     }
 }
 

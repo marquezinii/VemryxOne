@@ -38,12 +38,12 @@ public sealed class BottleneckDiagnosisAction : ReadOnlyDiagnosticAction
     {
         if (DiagnosticSignals.IsMemoryUnderPressure(snapshot))
         {
-            return "Gargalo provável: memória RAM sob pressão. Feche outros programas antes de jogar.";
+            return "Gargalo provável: memória RAM sob pressão. Feche programas sem uso antes da próxima carga pesada.";
         }
 
         if (snapshot.LogicalProcessorCount <= 4)
         {
-            return "Gargalo provável: poucos processadores lógicos, o que pode limitar servidores com muitos recursos/scripts.";
+            return "Gargalo provável: poucos processadores lógicos, o que pode limitar jogos e aplicativos com alta demanda de CPU.";
         }
 
         if (snapshot.SystemDriveFreeBytes / (double)DiagnosticSignals.GiB < 8)
@@ -237,8 +237,8 @@ public sealed class NetworkHealthDiagnosisAction : ReadOnlyDiagnosticAction
         if (snapshot.DiscardedPackets > 0 || snapshot.ErrorPackets > 0)
         {
             return $"Sinais locais de instabilidade de rede: {snapshot.DiscardedPackets} pacote(s) descartado(s) "
-                + $"e {snapshot.ErrorPackets} com erro na(s) placa(s) ativa(s). Isso não mede jitter até o "
-                + "servidor do FiveM; use netgraph dentro do jogo para isso.";
+                + $"e {snapshot.ErrorPackets} com erro na(s) placa(s) ativa(s). Isso não mede latência ou "
+                + "jitter até um serviço remoto; confirme pela ferramenta do aplicativo ou jogo afetado.";
         }
 
         return "Nenhum sinal local de perda de pacotes foi encontrado nas placas de rede ativas.";

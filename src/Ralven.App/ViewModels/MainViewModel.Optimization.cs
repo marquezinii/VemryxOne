@@ -13,6 +13,18 @@ namespace Ralven.App.ViewModels;
 
 public sealed partial class MainViewModel
 {
+    public OptimizationScope OptimizationScope => optimizationScope;
+
+    public bool IsGeneralWindowsOptimization => optimizationScope == OptimizationScope.GeneralWindows;
+
+    public string OptimizerTitle => localization.GetString(IsGeneralWindowsOptimization
+        ? "Optimizer.General.Title"
+        : "Optimizer.FiveM.Title");
+
+    public string OptimizerSubtitle => localization.GetString(IsGeneralWindowsOptimization
+        ? "Optimizer.General.Subtitle"
+        : "Optimizer.FiveM.Subtitle");
+
     public bool CanRevertLastOptimization => ComparisonRegressionSuspected
         && !IsBusy
         && !isWindowsGamingBusy
@@ -90,7 +102,9 @@ public sealed partial class MainViewModel
         ? localization.GetString(diagnosticFailed
             ? "Plan.Empty.DiagnosticUnavailable"
             : "Plan.Empty.DiagnosticInProgress")
-        : diagnostic.Edition == FiveMEdition.Legacy
+        : IsGeneralWindowsOptimization
+            ? localization.GetString("Plan.Empty.GeneralNoSafeActions")
+            : diagnostic.Edition == FiveMEdition.Legacy
             ? localization.GetString("Plan.Empty.NoSafeActions")
             : localization.GetString("Plan.Empty.LegacyRequired");
 
@@ -132,6 +146,26 @@ public sealed partial class MainViewModel
         : localization.GetString("Plan.Elevation.CurrentUser");
 
     public string SelectedProfileName => ProfileName(selectedProfile);
+
+    public void SetOptimizationScope(OptimizationScope scope)
+    {
+        if (IsBusy || optimizationScope == scope)
+        {
+            return;
+        }
+
+        optimizationScope = scope;
+        ApplyReport(null);
+        ApplyComparison(null);
+        lastTransactionId = null;
+        StepLedger.Clear();
+        OnPropertyChanged(nameof(OptimizationScope));
+        OnPropertyChanged(nameof(IsGeneralWindowsOptimization));
+        OnPropertyChanged(nameof(OptimizerTitle));
+        OnPropertyChanged(nameof(OptimizerSubtitle));
+        OnPropertyChanged(nameof(EmptyPlanMessage));
+        RefreshPlan();
+    }
 
     public void SelectProfile(OptimizationProfile profile)
     {
@@ -214,9 +248,9 @@ public sealed partial class MainViewModel
         RefreshPlan();
         if (!CanStart || currentPlan is null)
         {
-            ProgressHeadline = diagnostic?.IsFiveMRunning == true
+            ProgressHeadline = OptimizationScope == OptimizationScope.FiveMLegacy && diagnostic?.IsFiveMRunning == true
                 ? localization.GetString("Plan.CloseFiveM")
-                : diagnostic?.GtaVIsRunning == true
+                : OptimizationScope == OptimizationScope.FiveMLegacy && diagnostic?.GtaVIsRunning == true
                     ? localization.GetString("Plan.CloseGtaV")
                     : localization.GetString("Plan.Unavailable");
             return false;
@@ -398,7 +432,9 @@ public sealed partial class MainViewModel
 
     private void RefreshPlan()
     {
-        var edition = diagnostic?.Edition ?? FiveMEdition.Unknown;
+        var edition = optimizationScope == OptimizationScope.FiveMLegacy
+            ? diagnostic?.Edition ?? FiveMEdition.Unknown
+            : FiveMEdition.Unknown;
         var options = new OptimizationOptionsDto
         {
             CleanUserTemporaryFiles = true,
@@ -408,18 +444,21 @@ public sealed partial class MainViewModel
                 OptimizationProfile.Balanced => 14,
                 _ => 7
             },
-            RemoveOldFiveMCrashDumps = true,
+            RemoveOldFiveMCrashDumps = optimizationScope == OptimizationScope.FiveMLegacy,
             DiagnosticRetentionDays = selectedProfile == OptimizationProfile.Aggressive ? 7 : 14,
-            ServerCacheRepair = selectedProfile == OptimizationProfile.Light
+            ServerCacheRepair = optimizationScope == OptimizationScope.GeneralWindows
+                ? CacheRepairPolicy.Off
+                : selectedProfile == OptimizationProfile.Light
                 ? CacheRepairPolicy.Off
                 : CacheRepairPolicy.WhenOversized,
             ServerCacheThresholdGiB = 8,
             EnableGameMode = true,
-            PreferHighPerformanceGpu = true,
+            PreferHighPerformanceGpu = optimizationScope == OptimizationScope.FiveMLegacy,
             DisableBackgroundCapture = true,
             UseSessionPerformancePowerPlan = selectedProfile != OptimizationProfile.Light,
-            ApplyLegacyGraphicsPreset = true,
-            ApplyGtaVGraphicsPreset = diagnostic?.GtaVDetected == true,
+            ApplyLegacyGraphicsPreset = optimizationScope == OptimizationScope.FiveMLegacy,
+            ApplyGtaVGraphicsPreset = optimizationScope == OptimizationScope.FiveMLegacy
+                && diagnostic?.GtaVDetected == true,
             ReduceWindowsVisualEffects = selectedProfile == OptimizationProfile.Aggressive
         };
 
@@ -427,6 +466,7 @@ public sealed partial class MainViewModel
             new OptimizationPlanRequestDto
             {
                 Profile = selectedProfile,
+                Scope = optimizationScope,
                 Edition = edition,
                 Options = options
             },
@@ -447,14 +487,17 @@ public sealed partial class MainViewModel
         OnPropertyChanged(nameof(EmptyPlanMessage));
         OnPropertyChanged(nameof(SafetySummary));
         OnPropertyChanged(nameof(AboutVersionDeveloper));
+        OnPropertyChanged(nameof(OptimizerTitle));
+        OnPropertyChanged(nameof(OptimizerSubtitle));
         RefreshProfilePresentation();
         RaiseCommandState();
     }
 
     private void RefreshProfilePresentation()
     {
-        var presentation = ProfilePresentationProvider.For(selectedProfile);
-        ProfilePresentationBenefits = localization.GetString($"Profiles.Presentation.{selectedProfile}.Benefits");
+        var presentation = ProfilePresentationProvider.For(selectedProfile, optimizationScope);
+        ProfilePresentationBenefits = localization.GetString(
+            $"Profiles.Presentation.{optimizationScope}.{selectedProfile}.Benefits");
         ProfilePresentationImpact = localization.GetString($"Profiles.Presentation.Impact.{presentation.ImpactLevel}");
         ProfilePresentationCategories = string.Join(
             "  •  ",
@@ -541,6 +584,7 @@ public sealed partial class MainViewModel
             currentPlan?.Options.DiagnosticRetentionDays ?? 14),
         "server-cache-will-be-rebuilt" => localization.GetString("Plan.Notice.ServerCacheRepair"),
         "performance-power-requires-ac" => localization.GetString("Plan.Notice.AcPower"),
+        "aggressive-windows-prioritizes-performance" => localization.GetString("Plan.Notice.AggressiveWindows"),
         "aggressive-prioritizes-performance" => localization.GetString("Plan.Notice.AggressiveVisual"),
         _ => notice.Message
     };

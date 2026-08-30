@@ -15,6 +15,7 @@ Ralven não é um pacote genérico de tweaks. Cada mutação tem escopo tipado, 
 ## Capacidades atuais
 
 - visão geral com diagnóstico local e métricas reais;
+- otimizador geral do Windows que funciona sem FiveM ou GTA V e reutiliza o mesmo catálogo tipado, prévia, execução transacional, histórico e rollback;
 - inventário interno somente leitura de aplicativos e inicialização, além de acessos seguros a superfícies nativas do Windows;
 - catálogo de Jogos com diagnóstico e otimização especializada de FiveM/GTAV Legacy;
 - planos Leve, Médio e Agressivo com prévia e confirmação;
@@ -37,6 +38,7 @@ Os nomes de gerações sem suporte aparecem apenas no importador local de dados,
 - precisão técnica em linguagem clara;
 - dados reais, sem depoimentos, benchmarks ou métricas fabricadas;
 - FiveM continua profundo sem limitar as conveniências gerais do Windows;
+- o escopo geral nunca recebe ações específicas de FiveM/GTA por inferência, prefixo ou fallback;
 - privacidade, segurança e acessibilidade não são simplificadas pelo design.
 
 ## Acessibilidade

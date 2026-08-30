@@ -2,6 +2,8 @@ namespace Ralven.Contracts;
 
 public sealed record OptimizationPlanRequestDto
 {
+    public OptimizationScope Scope { get; init; } = OptimizationScope.FiveMLegacy;
+
     public required OptimizationProfile Profile { get; init; }
 
     public required FiveMEdition Edition { get; init; }

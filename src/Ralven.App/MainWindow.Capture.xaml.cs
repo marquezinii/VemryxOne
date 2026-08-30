@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Ralven.App.Services;
+using Ralven.Contracts;
 
 namespace Ralven.App;
 
@@ -51,7 +52,8 @@ public partial class MainWindow
                     "System" => (Element: (UIElement)SystemPage, Nav: SystemNav),
                     "Applications" => (Element: (UIElement)ApplicationsPage, Nav: ApplicationsNav),
                     "Games" => (Element: (UIElement)GamesPage, Nav: GamesNav),
-                    "Optimizer" => (Element: (UIElement)OptimizerPage, Nav: GamesNav),
+                    "Optimizer" => ConfigureOptimizerCapture(OptimizationScope.GeneralWindows, OptimizerNav),
+                    "FiveMOptimizer" => ConfigureOptimizerCapture(OptimizationScope.FiveMLegacy, GamesNav),
                     "History" => (HistoryPage, HistoryNav),
                     "Settings" => (SettingsPage, SettingsNav),
                     _ => (DashboardPage, DashboardNav)
@@ -92,5 +94,13 @@ public partial class MainWindow
             // alive after the window closes, making the release gate hang.
             System.Windows.Application.Current.Shutdown(0);
         }
+    }
+
+    private (UIElement Element, Wpf.Ui.Controls.NavigationViewItem Nav) ConfigureOptimizerCapture(
+        OptimizationScope scope,
+        Wpf.Ui.Controls.NavigationViewItem navigationItem)
+    {
+        viewModel.SetOptimizationScope(scope);
+        return (OptimizerPage, navigationItem);
     }
 }
