@@ -725,6 +725,24 @@
   <data name="Dashboard.LivePerformance.Network" xml:space="preserve"><value>NETWORK</value></data>
   <data name="Dashboard.LivePerformance.ChartDescription" xml:space="preserve"><value>CPU and GPU usage history for the last minute.</value></data>
   <data name="Dashboard.LivePerformance.LocalOnly" xml:space="preserve"><value>Read locally. Nothing is sent over the internet.</value></data>
+  <data name="Dashboard.SessionMonitor.Title" xml:space="preserve"><value>FiveM session</value></data>
+  <data name="Dashboard.SessionMonitor.Description" xml:space="preserve"><value>Local, read-only process detection. No game data is accessed or sent.</value></data>
+  <data name="Dashboard.SessionMonitor.Start" xml:space="preserve"><value>Start monitoring</value></data>
+  <data name="Dashboard.SessionMonitor.Stop" xml:space="preserve"><value>Stop monitoring</value></data>
+  <data name="Dashboard.SessionMonitor.Unavailable" xml:space="preserve"><value>MONITOR UNAVAILABLE</value></data>
+  <data name="Dashboard.SessionMonitor.UnavailableDetail" xml:space="preserve"><value>Run the local scan to validate a FiveM installation for GTAV Legacy.</value></data>
+  <data name="Dashboard.SessionMonitor.Off" xml:space="preserve"><value>MONITOR OFF</value></data>
+  <data name="Dashboard.SessionMonitor.OffDetail" xml:space="preserve"><value>Start it manually when you want Ralven to follow the session while the app stays open or in the tray.</value></data>
+  <data name="Dashboard.SessionMonitor.Waiting" xml:space="preserve"><value>WAITING FOR FIVEM</value></data>
+  <data name="Dashboard.SessionMonitor.WaitingDetail" xml:space="preserve"><value>Open FiveM. Ralven validates the process image every five seconds.</value></data>
+  <data name="Dashboard.SessionMonitor.Active" xml:space="preserve"><value>SESSION DETECTED</value></data>
+  <data name="Dashboard.SessionMonitor.ActiveDetail" xml:space="preserve"><value>Verified locally for {0}. Monitoring remains read-only.</value></data>
+  <data name="Dashboard.SessionMonitor.ConfirmingEnd" xml:space="preserve"><value>CONFIRMING SESSION END</value></data>
+  <data name="Dashboard.SessionMonitor.ConfirmingEndDetail" xml:space="preserve"><value>The process disappeared once. A second confirmed reading is required.</value></data>
+  <data name="Dashboard.SessionMonitor.Completed" xml:space="preserve"><value>SESSION ENDED</value></data>
+  <data name="Dashboard.SessionMonitor.CompletedDetail" xml:space="preserve"><value>The session was observed for about {0}. Monitoring remains ready for the next one.</value></data>
+  <data name="Dashboard.SessionMonitor.ReadUnavailable" xml:space="preserve"><value>READING UNAVAILABLE</value></data>
+  <data name="Dashboard.SessionMonitor.ReadUnavailableDetail" xml:space="preserve"><value>The local process validation could not be completed. The previous state was preserved.</value></data>
   <data name="Dashboard.SystemOverview.Description" xml:space="preserve"><value>Detected hardware available to FiveM and GTA V.</value></data>
   <data name="Dashboard.Eyebrow" xml:space="preserve"><value>LOCAL DIAGNOSIS</value></data>
   <data name="Dashboard.LastScan" xml:space="preserve"><value>Last scan at {0}</value></data>

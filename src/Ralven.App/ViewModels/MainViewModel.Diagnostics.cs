@@ -179,6 +179,7 @@ public sealed partial class MainViewModel
             _ => localization.GetString("Diagnosis.InstallLegacy")
         };
         ApplyStreamingReadiness(value);
+        RefreshFiveMSessionMonitorAvailability();
     }
 
     /// <summary>
