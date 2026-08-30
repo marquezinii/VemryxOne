@@ -65,7 +65,7 @@ public sealed partial class LocalizedInterfaceContractTests
     }
 
     [Fact]
-    public void GeneralExpansion_UsesNativeWindowsSurfacesAndGamesCatalog()
+    public void GeneralExpansion_UsesInternalCatalogsAndTrustedWindowsActions()
     {
         var root = TestHelpers.FindRepositoryRoot();
         var appDirectory = Path.Combine(root, "src", "Ralven.App");
@@ -74,7 +74,14 @@ public sealed partial class LocalizedInterfaceContractTests
         var capture = File.ReadAllText(Path.Combine(appDirectory, "MainWindow.Capture.xaml.cs"));
         var gamesPage = File.ReadAllText(Path.Combine(appDirectory, "Views", "Pages", "GamesPage.xaml"));
         var systemPage = File.ReadAllText(Path.Combine(appDirectory, "Views", "Pages", "SystemPage.xaml.cs"));
+        var applicationsView = File.ReadAllText(Path.Combine(appDirectory, "Views", "Pages", "ApplicationsPage.xaml"));
         var applicationsPage = File.ReadAllText(Path.Combine(appDirectory, "Views", "Pages", "ApplicationsPage.xaml.cs"));
+        var inspector = File.ReadAllText(Path.Combine(
+            root,
+            "src",
+            "Ralven.Windows",
+            "Infrastructure",
+            "WindowsApplicationInventoryInspector.cs"));
 
         Assert.Contains("Tag=\"System\"", mainWindow, StringComparison.Ordinal);
         Assert.Contains("Tag=\"Applications\"", mainWindow, StringComparison.Ordinal);
@@ -91,8 +98,13 @@ public sealed partial class LocalizedInterfaceContractTests
         Assert.Contains("ms-settings:windowsupdate", systemPage, StringComparison.Ordinal);
         Assert.Contains("ApplyWindowsGamingSettingsAsync", systemPage, StringComparison.Ordinal);
         Assert.Contains("RestoreWindowsGamingSettingsAsync", systemPage, StringComparison.Ordinal);
+        Assert.Contains("ItemsSource=\"{Binding InstalledApplications}\"", applicationsView, StringComparison.Ordinal);
+        Assert.Contains("ItemsSource=\"{Binding StartupItems}\"", applicationsView, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding SearchText", applicationsView, StringComparison.Ordinal);
         Assert.Contains("ms-settings:appsfeatures", applicationsPage, StringComparison.Ordinal);
         Assert.Contains("ms-windows-store://downloadsandupdates", applicationsPage, StringComparison.Ordinal);
+        Assert.DoesNotContain("UninstallString", inspector, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("StartupApproved", inspector, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Arguments =", systemPage + applicationsPage, StringComparison.Ordinal);
         Assert.DoesNotContain("runas", systemPage + applicationsPage, StringComparison.OrdinalIgnoreCase);
     }

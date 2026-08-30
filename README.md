@@ -33,7 +33,7 @@
 
 ## Seu PC em um lugar, FiveM com profundidade
 
-Sistema reúne atalhos seguros e um controle local de jogos do Windows: ele mostra o estado do Modo de Jogo e da gravação histórica em segundo plano antes de aplicar os dois ajustes compatíveis, sem exigir FiveM instalado ou acesso administrativo. Por segurança, aplicar ou restaurar exige que o FiveM esteja encerrado. Aplicativos mantém acesso às superfícies nativas do Windows. Jogos reúne os títulos compatíveis e hoje oferece FiveM sobre GTAV Legacy, preservando o fluxo especializado: detecta o ambiente, monta um plano compreensível e mostra o que será alterado antes de executar. Cada ação declara escopo, pré-condições, risco, resultado e rollback quando aplicável.
+Sistema reúne atalhos seguros e um controle local de jogos do Windows: ele mostra o estado do Modo de Jogo e da gravação histórica em segundo plano antes de aplicar os dois ajustes compatíveis, sem exigir FiveM instalado ou acesso administrativo. Por segurança, aplicar ou restaurar exige que o FiveM esteja encerrado. Aplicativos lista dentro do Ralven os programas desktop registrados e os itens de inicialização, com busca e estado parcial explícito; alterações continuam nas superfícies confiáveis do Windows. Jogos reúne os títulos compatíveis e hoje oferece FiveM sobre GTAV Legacy, preservando o fluxo especializado: detecta o ambiente, monta um plano compreensível e mostra o que será alterado antes de executar. Cada ação declara escopo, pré-condições, risco, resultado e rollback quando aplicável.
 
 | Você vê | O que isso significa |
 | --- | --- |
@@ -68,7 +68,7 @@ Leia a [política de segurança](docs/safety.md) e as [evidências técnicas](do
 | Área | Disponível hoje |
 | --- | --- |
 | Sistema | Leitura e ajuste confirmado do Modo de Jogo e da gravação histórica em segundo plano, além de atalhos para Windows Update, Segurança do Windows e informações do PC. |
-| Aplicativos | Acesso a aplicativos instalados, inicialização, atualizações da Microsoft Store e aplicativos padrão. |
+| Aplicativos | Inventário interno somente leitura de programas desktop e inicialização, com busca, contagens e acessos secundários às superfícies do Windows e da Microsoft Store. |
 | Jogos | Catálogo interno com FiveM sobre GTAV Legacy: prévia, perfis, progresso real, cancelamento seguro, resultado por ação e rollback. |
 | Conta | Cadastro, login, Google com OAuth 2.0 + PKCE, verificação de e-mail, recuperação, senha, troca de credenciais e exclusão. |
 | Privacidade | ID token somente em memória, refresh token protegido por DPAPI e telemetria limitada por consentimento. |

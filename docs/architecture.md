@@ -16,13 +16,17 @@ Este documento descreve a arquitetura-alvo e os limites entre componentes. Uma c
 ## Áreas de produto
 
 O shell separa a experiência em **Visão geral**, **Sistema**, **Aplicativos** e
-**Jogos**. Jogos abre um catálogo interno que hoje contém somente FiveM sobre
-GTAV Legacy; o card leva ao otimizador especializado existente e mantém Jogos
-como a categoria ativa. Aplicativos ainda encaminha o usuário para superfícies nativas do
-Windows e da Microsoft Store. Sistema preserva os atalhos para Windows Update,
-Segurança e informações do PC, mas também oferece um painel dedicado de jogos
-do Windows: ele lê o Modo de Jogo e a gravação histórica em segundo plano e,
-com confirmação explícita, aplica somente as duas ações tipadas já existentes.
+**Jogos**. Aplicativos apresenta dentro do Ralven um inventário local somente
+leitura dos programas desktop registrados e dos itens de inicialização em
+`Run`, `RunOnce` e pastas Startup. Busca, contagens e resultados parciais ficam
+na própria página; as superfícies do Windows e da Microsoft Store permanecem
+como ações secundárias para alterações que o Ralven não executa. Jogos abre um
+catálogo interno que hoje contém somente FiveM sobre GTAV Legacy; o card leva ao
+otimizador especializado existente e mantém Jogos como a categoria ativa. Sistema
+preserva os atalhos para Windows Update, Segurança e informações do PC, mas
+também oferece um painel dedicado de jogos do Windows: ele lê o Modo de Jogo e
+a gravação histórica em segundo plano e, com confirmação explícita, aplica
+somente as duas ações tipadas já existentes.
 
 Esse painel não recebe IDs ou comandos escolhidos pela interface. O serviço de
 aplicação constrói uma lista fixa com `GameModeRegistryAction` e
@@ -35,6 +39,11 @@ falha nessa verificação bloqueia a alteração. Apenas a compensação imediat
 snapshot criado pela própria execução falha pode restaurar o estado anterior;
 uma restauração solicitada depois continua bloqueada com o FiveM aberto. O painel não amplia o planejador
 de perfis, não usa o broker e não cria um executor genérico de registro.
+
+`WindowsApplicationInventoryInspector`, em `Ralven.Windows`, faz a leitura como
+usuário padrão e devolve um snapshot normalizado com completude separada por
+área. Ele não lê nem executa `UninstallString`, não lê nem escreve
+`StartupApproved`, não altera o registro e não atravessa o broker.
 
 Integração com catálogos de pacotes, como WinGet, ainda não faz parte desta
 fundação. Quando existir, cada operação deverá usar contratos tipados, origem
