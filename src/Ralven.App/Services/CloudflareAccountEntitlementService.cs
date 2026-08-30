@@ -30,15 +30,20 @@ public sealed class CloudflareAccountEntitlementService
 
     private readonly HttpClient httpClient;
     private readonly Uri endpoint;
+    private readonly TimeProvider timeProvider;
 
     public CloudflareAccountEntitlementService(Uri accountProfileEndpoint)
-        : this(SharedClient, accountProfileEndpoint)
+        : this(SharedClient, accountProfileEndpoint, TimeProvider.System)
     {
     }
 
-    internal CloudflareAccountEntitlementService(HttpClient httpClient, Uri accountProfileEndpoint)
+    internal CloudflareAccountEntitlementService(
+        HttpClient httpClient,
+        Uri accountProfileEndpoint,
+        TimeProvider? timeProvider = null)
     {
         this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        this.timeProvider = timeProvider ?? TimeProvider.System;
         CloudflareTransportDefaults.ValidateHttpsEndpoint(
             accountProfileEndpoint,
             "Endpoint de conta inválido.");
@@ -104,7 +109,8 @@ public sealed class CloudflareAccountEntitlementService
                     body.ValidUntil,
                     CultureInfo.InvariantCulture,
                     DateTimeStyles.RoundtripKind,
-                    out var validUntil))
+                    out var validUntil)
+                && validUntil > timeProvider.GetUtcNow())
             {
                 return new AccountEntitlementSnapshot(AccountEntitlementTier.Pro, validUntil);
             }

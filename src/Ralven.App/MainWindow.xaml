@@ -307,7 +307,10 @@
                                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                                                 <StackPanel Margin="0,0,24,0">
                                                     <TextBlock Text="{Binding [Settings.Account.Plan.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyStrongText}" />
-                                                    <TextBlock x:Name="AccountEntitlementValueText" Style="{StaticResource SecondaryText}" Margin="0,4,0,0" />
+                                                    <TextBlock x:Name="AccountEntitlementValueText"
+                                                               Style="{StaticResource SecondaryText}"
+                                                               Margin="0,4,0,0"
+                                                               AutomationProperties.LiveSetting="Polite" />
                                                     <TextBlock x:Name="AccountEntitlementDetailText" Style="{StaticResource CaptionText}" Margin="0,3,0,0" TextWrapping="Wrap" />
                                                 </StackPanel>
                                                 <Button Grid.Column="1"

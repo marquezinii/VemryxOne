@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using Ralven.App;
 using Ralven.App.Services;
 using Ralven.Contracts;
 using Ralven.Core.Catalog;
@@ -90,6 +91,9 @@ public sealed partial class LocalizedInterfaceContractTests
 
         Assert.Contains("AccountEntitlementValueText", mainWindow, StringComparison.Ordinal);
         Assert.Contains("AccountEntitlementRefresh_Click", mainWindow, StringComparison.Ordinal);
+        Assert.Matches(
+            "x:Name=\"AccountEntitlementValueText\"[^>]*AutomationProperties.LiveSetting=\"Polite\"",
+            mainWindow);
         Assert.Contains("SyncAccountEntitlementAsync", accountCode, StringComparison.Ordinal);
         Assert.Contains("ClearAccountEntitlement", accountCode, StringComparison.Ordinal);
 
@@ -118,6 +122,49 @@ public sealed partial class LocalizedInterfaceContractTests
                 Assert.NotEqual(key, localization.GetString(key));
             }
         }
+    }
+
+    [Fact]
+    public void AccountPlan_RejectsStaleOrForeignEntitlementResponses()
+    {
+        var firstUser = new FirebaseUser("uid-1", "first@example.com", true);
+        var secondUser = new FirebaseUser("uid-2", "second@example.com", true);
+
+        Assert.True(MainWindow.IsCurrentAccountEntitlementResponse(
+            4,
+            4,
+            firstUser.Uid,
+            new AuthenticationSnapshot(AuthenticationState.SignedIn, firstUser)));
+        Assert.False(MainWindow.IsCurrentAccountEntitlementResponse(
+            3,
+            4,
+            firstUser.Uid,
+            new AuthenticationSnapshot(AuthenticationState.SignedIn, firstUser)));
+        Assert.False(MainWindow.IsCurrentAccountEntitlementResponse(
+            4,
+            4,
+            firstUser.Uid,
+            new AuthenticationSnapshot(AuthenticationState.SignedIn, secondUser)));
+        Assert.False(MainWindow.IsCurrentAccountEntitlementResponse(
+            4,
+            4,
+            firstUser.Uid,
+            new AuthenticationSnapshot(AuthenticationState.SignedOut, null)));
+    }
+
+    [Fact]
+    public void AccountPlan_ProAccessExpiresAtTheServerValidityBoundary()
+    {
+        var validUntil = DateTimeOffset.Parse(
+            "2026-09-30T12:00:00.000Z",
+            CultureInfo.InvariantCulture);
+        var snapshot = new AccountEntitlementSnapshot(AccountEntitlementTier.Pro, validUntil);
+
+        Assert.True(MainWindow.IsEffectiveProEntitlement(snapshot, validUntil.AddTicks(-1)));
+        Assert.False(MainWindow.IsEffectiveProEntitlement(snapshot, validUntil));
+        Assert.False(MainWindow.IsEffectiveProEntitlement(
+            new AccountEntitlementSnapshot(AccountEntitlementTier.Free),
+            validUntil.AddTicks(-1)));
     }
 
     [Fact]

@@ -357,6 +357,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         viewModel.PropertyChanged -= ViewModel_PropertyChanged;
         themeManager.Dispose();
         trayIcon.Dispose();
+        CancelAccountEntitlementExpiry();
         accountService?.Dispose();
         (releaseUpdateService as IDisposable)?.Dispose();
     }

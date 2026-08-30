@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Automation;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using Ralven.App.Services;
 using Ralven.App.Views;
 namespace Ralven.App;
@@ -22,6 +23,7 @@ public partial class MainWindow
 {
     private readonly AccountAvatarStore avatarStore = new();
     private AccountEntitlementSnapshot accountEntitlement = new(AccountEntitlementTier.Unavailable);
+    private DispatcherTimer? accountEntitlementExpiryTimer;
     private int accountEntitlementSyncVersion;
 
     private void OpenAccountFromSettings_Click(object sender, RoutedEventArgs e) => OpenAccountWindow();
@@ -121,22 +123,96 @@ public partial class MainWindow
 
         await Dispatcher.InvokeAsync(() =>
         {
-            if (version != Volatile.Read(ref accountEntitlementSyncVersion)
-                || accountService?.Current is not { State: AuthenticationState.SignedIn, User: { } currentUser }
-                || !string.Equals(currentUser.Uid, expectedUid, StringComparison.Ordinal))
+            if (!IsCurrentAccountEntitlementResponse(
+                    version,
+                    Volatile.Read(ref accountEntitlementSyncVersion),
+                    expectedUid,
+                    accountService?.Current))
             {
                 return;
             }
 
             accountEntitlement = snapshot;
             ApplyAccountEntitlementPresentation();
+            ScheduleAccountEntitlementExpiry();
             AccountEntitlementRefreshButton.IsEnabled = true;
         });
+    }
+
+    internal static bool IsCurrentAccountEntitlementResponse(
+        int responseVersion,
+        int currentVersion,
+        string expectedUid,
+        AuthenticationSnapshot? current)
+    {
+        return responseVersion == currentVersion
+            && current is { State: AuthenticationState.SignedIn, User: { } user }
+            && string.Equals(user.Uid, expectedUid, StringComparison.Ordinal);
+    }
+
+    internal static bool IsEffectiveProEntitlement(
+        AccountEntitlementSnapshot snapshot,
+        DateTimeOffset now)
+    {
+        return snapshot is { Tier: AccountEntitlementTier.Pro, ValidUntil: { } validUntil }
+            && validUntil > now;
+    }
+
+    private void ScheduleAccountEntitlementExpiry()
+    {
+        CancelAccountEntitlementExpiry();
+        if (!IsEffectiveProEntitlement(accountEntitlement, TimeProvider.System.GetUtcNow())
+            || accountEntitlement.ValidUntil is not { } validUntil)
+        {
+            return;
+        }
+
+        accountEntitlementExpiryTimer = new DispatcherTimer(DispatcherPriority.Background)
+        {
+            Interval = NextAccountEntitlementExpiryCheck(validUntil)
+        };
+        accountEntitlementExpiryTimer.Tick += AccountEntitlementExpiryTimer_Tick;
+        accountEntitlementExpiryTimer.Start();
+    }
+
+    private void AccountEntitlementExpiryTimer_Tick(object? sender, EventArgs e)
+    {
+        if (IsEffectiveProEntitlement(accountEntitlement, TimeProvider.System.GetUtcNow())
+            && accountEntitlement.ValidUntil is { } validUntil)
+        {
+            accountEntitlementExpiryTimer!.Interval = NextAccountEntitlementExpiryCheck(validUntil);
+            return;
+        }
+
+        CancelAccountEntitlementExpiry();
+        accountEntitlement = new AccountEntitlementSnapshot(AccountEntitlementTier.Unavailable);
+        ApplyAccountEntitlementPresentation();
+    }
+
+    private static TimeSpan NextAccountEntitlementExpiryCheck(DateTimeOffset validUntil)
+    {
+        var remaining = validUntil - TimeProvider.System.GetUtcNow();
+        return remaining <= TimeSpan.Zero
+            ? TimeSpan.FromMilliseconds(1)
+            : remaining > TimeSpan.FromDays(1) ? TimeSpan.FromDays(1) : remaining;
+    }
+
+    private void CancelAccountEntitlementExpiry()
+    {
+        if (accountEntitlementExpiryTimer is null)
+        {
+            return;
+        }
+
+        accountEntitlementExpiryTimer.Stop();
+        accountEntitlementExpiryTimer.Tick -= AccountEntitlementExpiryTimer_Tick;
+        accountEntitlementExpiryTimer = null;
     }
 
     private void ClearAccountEntitlement()
     {
         Interlocked.Increment(ref accountEntitlementSyncVersion);
+        CancelAccountEntitlementExpiry();
         accountEntitlement = new AccountEntitlementSnapshot(AccountEntitlementTier.Unavailable);
         AccountEntitlementRefreshButton.IsEnabled = true;
         ApplyAccountEntitlementPresentation();
@@ -151,7 +227,9 @@ public partial class MainWindow
                 AccountEntitlementValueText.Text = localization.GetString("Settings.Account.Plan.Free");
                 AccountEntitlementDetailText.Text = localization.GetString("Settings.Account.Plan.FreeDetail");
                 break;
-            case AccountEntitlementTier.Pro when accountEntitlement.ValidUntil is { } validUntil:
+            case AccountEntitlementTier.Pro when
+                IsEffectiveProEntitlement(accountEntitlement, TimeProvider.System.GetUtcNow())
+                && accountEntitlement.ValidUntil is { } validUntil:
                 AccountEntitlementValueText.Text = localization.Format(
                     "Settings.Account.Plan.ProUntil",
                     validUntil.ToLocalTime().ToString("d", localization.CurrentCulture));
