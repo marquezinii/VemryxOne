@@ -9,6 +9,12 @@ public partial class MainWindow
 
     private void MainWindow_Closing(object? sender, CancelEventArgs e)
     {
+        if (viewModel.IsWindowsGamingBusy && !systemSessionEnding)
+        {
+            e.Cancel = true;
+            return;
+        }
+
         if (viewModel.IsBusy && !systemSessionEnding)
         {
             e.Cancel = true;
@@ -68,6 +74,12 @@ public partial class MainWindow
 
     private void TrayIcon_ExitRequested(object? sender, EventArgs e)
     {
+        if (viewModel.IsWindowsGamingBusy)
+        {
+            RequestActivation();
+            return;
+        }
+
         allowClose = true;
         trayIcon.Hide();
         Close();

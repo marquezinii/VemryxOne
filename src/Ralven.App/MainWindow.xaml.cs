@@ -113,7 +113,8 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
             releaseUpdateService: releaseUpdateService,
             telemetry: telemetry.Service,
             silentUpdateInstaller: silentUpdateInstaller,
-            liveAlertService: liveAlertService);
+            liveAlertService: liveAlertService,
+            windowsGamingControls: new WindowsGamingControlsService(demoMode));
         if (!string.IsNullOrWhiteSpace(commandLine.JustUpdatedVersion))
         {
             viewModel.ReportCompletedUpdate(commandLine.JustUpdatedVersion);

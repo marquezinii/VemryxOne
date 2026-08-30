@@ -74,7 +74,7 @@ public sealed class WindowsRegistryStore : IRegistryStore
         ArgumentNullException.ThrowIfNull(address);
         using var baseKey = RegistryKey.OpenBaseKey(address.Hive, RegistryView.Default);
         using var key = baseKey.OpenSubKey(address.SubKey, writable: false);
-        if (key is null || !key.GetValueNames().Contains(address.ValueName, StringComparer.Ordinal))
+        if (key is null || !ContainsValueName(key.GetValueNames(), address.ValueName))
         {
             return RegistryValueState.Missing;
         }
@@ -106,6 +106,15 @@ public sealed class WindowsRegistryStore : IRegistryStore
         using var baseKey = RegistryKey.OpenBaseKey(address.Hive, RegistryView.Default);
         using var key = baseKey.OpenSubKey(address.SubKey, writable: true);
         key?.DeleteValue(address.ValueName, throwOnMissingValue: false);
+    }
+
+    internal static bool ContainsValueName(
+        IEnumerable<string> valueNames,
+        string requestedValueName)
+    {
+        ArgumentNullException.ThrowIfNull(valueNames);
+        ArgumentException.ThrowIfNullOrWhiteSpace(requestedValueName);
+        return valueNames.Contains(requestedValueName, StringComparer.OrdinalIgnoreCase);
     }
 
     private static RegistryValueState FromRegistryValue(RegistryValueKind kind, object? value)

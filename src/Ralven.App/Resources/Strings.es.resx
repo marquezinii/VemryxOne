@@ -32,6 +32,38 @@
   <data name="System.About.Title" xml:space="preserve"><value>Información de la PC</value></data>
   <data name="System.About.Description" xml:space="preserve"><value>Consulta la edición y versión de Windows, el procesador, la memoria instalada y las especificaciones del dispositivo.</value></data>
   <data name="System.About.Action" xml:space="preserve"><value>Ver información de la PC</value></data>
+  <data name="System.Gaming.Title" xml:space="preserve"><value>Juegos de Windows</value></data>
+  <data name="System.Gaming.Description" xml:space="preserve"><value>Analiza y aplica localmente dos ajustes de juegos compatibles de Windows, sin depender de FiveM ni de acceso administrativo.</value></data>
+  <data name="System.Gaming.GameMode" xml:space="preserve"><value>Modo Juego</value></data>
+  <data name="System.Gaming.BackgroundCapture" xml:space="preserve"><value>Grabación histórica en segundo plano</value></data>
+  <data name="System.Gaming.Target.Enabled" xml:space="preserve"><value>Destino recomendado: activado</value></data>
+  <data name="System.Gaming.Target.Disabled" xml:space="preserve"><value>Destino recomendado: desactivado</value></data>
+  <data name="System.Gaming.Refresh" xml:space="preserve"><value>Actualizar estado</value></data>
+  <data name="System.Gaming.Apply" xml:space="preserve"><value>Aplicar ajustes</value></data>
+  <data name="System.Gaming.Restore" xml:space="preserve"><value>Restaurar</value></data>
+  <data name="System.Gaming.State.Unknown" xml:space="preserve"><value>Esperando lectura</value></data>
+  <data name="System.Gaming.State.Enabled" xml:space="preserve"><value>Activado</value></data>
+  <data name="System.Gaming.State.Disabled" xml:space="preserve"><value>Desactivado</value></data>
+  <data name="System.Gaming.State.NotConfigured" xml:space="preserve"><value>No configurado explícitamente</value></data>
+  <data name="System.Gaming.State.Unavailable" xml:space="preserve"><value>Lectura no disponible</value></data>
+  <data name="System.Gaming.Status.Reading" xml:space="preserve"><value>Leyendo los ajustes actuales de Windows...</value></data>
+  <data name="System.Gaming.Status.Ready" xml:space="preserve"><value>Revisa los estados detectados antes de aplicar. No se promete una mejora universal de rendimiento.</value></data>
+  <data name="System.Gaming.Status.Configured" xml:space="preserve"><value>Los dos ajustes ya están en los destinos recomendados.</value></data>
+  <data name="System.Gaming.Status.Unavailable" xml:space="preserve"><value>Ralven no pudo leer uno o más valores de forma segura. No hay cambios disponibles.</value></data>
+  <data name="System.Gaming.Status.FiveMRunning" xml:space="preserve"><value>Cierra FiveM antes de aplicar o restaurar estos ajustes. Ralven vuelve a comprobarlo justo antes de cambiar Windows.</value></data>
+  <data name="System.Gaming.Status.ProcessCheckFailed" xml:space="preserve"><value>Ralven no pudo confirmar que FiveM está cerrado. No se cambiará ningún ajuste de Windows.</value></data>
+  <data name="System.Gaming.Status.Applying" xml:space="preserve"><value>Aplicando los dos ajustes compatibles y registrando los valores actuales...</value></data>
+  <data name="System.Gaming.Status.Applied" xml:space="preserve"><value>Ajustes aplicados. Puedes solicitar la restauración aquí o desde Historial; no se sobrescribirá un valor cambiado después por otro programa.</value></data>
+  <data name="System.Gaming.Status.Failed" xml:space="preserve"><value>No se pudieron confirmar los ajustes. Ralven intentó deshacer cualquier cambio parcial; consulta el resultado en Historial.</value></data>
+  <data name="System.Gaming.Status.Restoring" xml:space="preserve"><value>Intentando restaurar los valores anteriores...</value></data>
+  <data name="System.Gaming.Status.Restored" xml:space="preserve"><value>Se restauraron los ajustes anteriores de juegos de Windows.</value></data>
+  <data name="System.Gaming.Status.RestoreFailed" xml:space="preserve"><value>No se pudieron restaurar por completo los ajustes anteriores. Consulta los detalles en Historial; no se sobrescribió un valor en conflicto.</value></data>
+  <data name="System.Gaming.Confirm.Title" xml:space="preserve"><value>¿Aplicar los ajustes de juegos de Windows?</value></data>
+  <data name="System.Gaming.Confirm.Message" xml:space="preserve"><value>Se activará el Modo Juego y se desactivará la grabación histórica en segundo plano. Los valores anteriores se guardarán localmente para que Ralven pueda intentar restaurarlos. No se eliminarán Game Bar ni las grabaciones manuales.</value></data>
+  <data name="System.Gaming.Confirm.Cancel" xml:space="preserve"><value>Cancelar</value></data>
+  <data name="System.Gaming.Confirm.Apply" xml:space="preserve"><value>Aplicar ajustes</value></data>
+  <data name="System.Gaming.RestoreConfirm.Title" xml:space="preserve"><value>¿Restaurar los ajustes anteriores?</value></data>
+  <data name="System.Gaming.RestoreConfirm.Message" xml:space="preserve"><value>Ralven intentará restaurar solamente los valores modificados por esta operación. Un valor cambiado después por otro programa no será sobrescrito.</value></data>
   <data name="Applications.Title" xml:space="preserve"><value>Aplicaciones</value></data>
   <data name="Applications.Subtitle" xml:space="preserve"><value>Accede a los controles nativos de Windows para aplicaciones instaladas, inicio y Microsoft Store.</value></data>
   <data name="Applications.Installed.Title" xml:space="preserve"><value>Aplicaciones instaladas</value></data>
@@ -252,6 +284,7 @@
   <data name="Diagnosis.InstallLegacy" xml:space="preserve"><value>Selecciona una instalación válida de Legacy o instala FiveM para habilitar la optimización.</value></data>
   <data name="Diagnosis.FreeDisk" xml:space="preserve"><value>{0} GB libres</value></data>
   <data name="History.ProfileTitle" xml:space="preserve"><value>Perfil {0}</value></data>
+  <data name="History.WindowsGamingTitle" xml:space="preserve"><value>Ajustes de juegos de Windows</value></data>
   <data name="History.AdjustmentsState" xml:space="preserve"><value>{0} ajustes • {1}</value></data>
   <data name="History.Empty.Title" xml:space="preserve"><value>Aún no hay optimizaciones</value></data>
   <data name="History.Empty.Date" xml:space="preserve"><value>Historial local</value></data>
@@ -613,6 +646,8 @@
   <data name="Runtime.AdminPhaseFailedPreserved" xml:space="preserve"><value>La optimización se completó, pero Windows no permitió habilitar el plan de energía de alto rendimiento: {0} Todos los demás cambios se conservaron.</value></data>
   <data name="Runtime.RollbackJournalError" xml:space="preserve"><value>El diario conservó un error de reversión para diagnósticos.</value></data>
   <data name="Runtime.RollbackConflict" xml:space="preserve"><value>La reversión local encontró un conflicto y conservó el estado más reciente del usuario.</value></data>
+  <data name="Runtime.RestoreBlockedFiveM" xml:space="preserve"><value>FiveM está abierto ahora. Ciérralo y vuelve a intentar la restauración.</value></data>
+  <data name="Runtime.RestoreProcessCheckFailed" xml:space="preserve"><value>Ralven no puede confirmar ahora que FiveM está cerrado. Confirma que está cerrado y vuelve a intentar la restauración.</value></data>
   <data name="Runtime.Interrupted.RolledBack" xml:space="preserve"><value>{0} Las configuraciones locales reversibles se restauraron; las limpiezas confirmadas permanecen en Historial.</value></data>
   <data name="Runtime.Interrupted.AdminPending" xml:space="preserve"><value>{0} El Historial muestra una restauración administrativa pendiente; usa Deshacer para completarla con UAC.</value></data>
   <data name="Runtime.Interrupted.RollbackFailed" xml:space="preserve"><value>{0} La reversión local encontró un conflicto y conservó el diario para diagnósticos.</value></data>

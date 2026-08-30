@@ -401,6 +401,7 @@ public sealed partial class MainViewModel
 
         NotifyLivePerformanceStateChanged();
         ApplyLastOptimization(historyRecords);
+        RefreshWindowsGamingPresentation();
     }
 
     private void RefreshLocalizedState()

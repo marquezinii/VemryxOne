@@ -59,9 +59,14 @@ public partial class HistoryPage : UserControl
             return;
         }
 
+        var isWindowsGaming = item.Kind == AppHistoryKind.WindowsGaming;
         var decision = System.Windows.MessageBox.Show(
-            LocalizationService.Current.GetString("Dialog.Rollback.Message"),
-            LocalizationService.Current.GetString("Dialog.Rollback.Title"),
+            LocalizationService.Current.GetString(isWindowsGaming
+                ? "System.Gaming.RestoreConfirm.Message"
+                : "Dialog.Rollback.Message"),
+            LocalizationService.Current.GetString(isWindowsGaming
+                ? "System.Gaming.RestoreConfirm.Title"
+                : "Dialog.Rollback.Title"),
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
         if (decision == MessageBoxResult.Yes)

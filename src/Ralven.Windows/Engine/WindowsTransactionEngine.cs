@@ -40,6 +40,8 @@ public sealed record WindowsTransactionResult
 
     public required IReadOnlyList<string> AppliedActionIds { get; init; }
 
+    public required IReadOnlyList<string> ChangedActionIds { get; init; }
+
     public required IReadOnlyList<string> DeferredAdministratorActionIds { get; init; }
 
     public string? Error { get; init; }
@@ -126,6 +128,13 @@ public sealed class WindowsTransactionEngine
         if (context.TransactionId == Guid.Empty)
         {
             throw new ArgumentException("TransactionId cannot be empty.", nameof(context));
+        }
+
+        if (context.IsImmediateFailureRecovery)
+        {
+            throw new ArgumentException(
+                "Immediate failure recovery can only be initiated by the transaction engine.",
+                nameof(context));
         }
 
         var actions = requestedActions.ToArray();
@@ -334,6 +343,7 @@ public sealed class WindowsTransactionEngine
         WindowsActionContext context,
         Exception exception)
     {
+        var recoveryErrors = new List<Exception>();
         journal.Error = exception.ToString();
         journal.State = TransactionState.Failed;
         var current = journal.Actions.LastOrDefault(entry =>
@@ -347,25 +357,103 @@ public sealed class WindowsTransactionEngine
             current.CompletedAtUtc = DateTimeOffset.UtcNow;
         }
 
-        await journalStore.SaveAsync(journal, CancellationToken.None).ConfigureAwait(false);
+        await TrySaveDuringRecoveryAsync(journal, recoveryErrors).ConfigureAwait(false);
         if (options.RollbackOnFailure)
         {
+            var recoveryContext = context with { IsImmediateFailureRecovery = true };
             var rollbackCandidates = applied
-                .Where(item => CanRollback(item.Entry))
+                .Where(item => CanRecoverAppliedAction(item.Entry))
                 .ToArray();
-            await RollbackAppliedAsync(
-                journal,
-                rollbackCandidates,
-                context,
-                TransactionState.RolledBack,
-                CancellationToken.None).ConfigureAwait(false);
+            try
+            {
+                await RollbackAppliedAsync(
+                    journal,
+                    rollbackCandidates,
+                    recoveryContext,
+                    TransactionState.RolledBack,
+                    CancellationToken.None).ConfigureAwait(false);
+            }
+            catch (Exception rollbackException) when (rollbackException is not StackOverflowException)
+            {
+                recoveryErrors.Add(rollbackException);
+                recoveryErrors.AddRange(await RollbackWithoutPersistenceAsync(
+                    rollbackCandidates,
+                    recoveryContext).ConfigureAwait(false));
+
+                journal.State = rollbackCandidates.All(item =>
+                    item.Entry.State == ActionJournalState.RolledBack)
+                    ? TransactionState.RolledBack
+                    : TransactionState.RollbackFailed;
+            }
+        }
+
+        if (recoveryErrors.Count > 0)
+        {
+            var errorCountBeforeFinalSave = recoveryErrors.Count;
+            var combined = new AggregateException([exception, .. recoveryErrors]);
+            journal.Error = combined.ToString();
+            await TrySaveDuringRecoveryAsync(journal, recoveryErrors).ConfigureAwait(false);
+            if (recoveryErrors.Count > errorCountBeforeFinalSave)
+            {
+                combined = new AggregateException([exception, .. recoveryErrors]);
+                journal.Error = combined.ToString();
+            }
         }
 
         return CreateResult(
             journal,
             applied.Select(item => item.Action.Metadata.Id).ToArray(),
             GetDeferredAdministratorIds(journal),
-            exception.Message);
+            recoveryErrors.Count == 0
+                ? exception.Message
+                : new AggregateException([exception, .. recoveryErrors]).Message);
+    }
+
+    private async Task TrySaveDuringRecoveryAsync(
+        WindowsTransactionJournal journal,
+        ICollection<Exception> recoveryErrors)
+    {
+        try
+        {
+            await journalStore.SaveAsync(journal, CancellationToken.None).ConfigureAwait(false);
+        }
+        catch (Exception persistenceException) when (persistenceException is not StackOverflowException)
+        {
+            recoveryErrors.Add(persistenceException);
+        }
+    }
+
+    private static async Task<IReadOnlyList<Exception>> RollbackWithoutPersistenceAsync(
+        IReadOnlyList<(IWindowsOptimizationAction Action, WindowsActionJournalEntry Entry)> applied,
+        WindowsActionContext context)
+    {
+        var rollbackErrors = new List<Exception>();
+        foreach (var item in applied.Reverse().Where(item =>
+                     item.Entry.State != ActionJournalState.RolledBack))
+        {
+            try
+            {
+                item.Entry.State = ActionJournalState.RollingBack;
+                await item.Action.RollbackAsync(
+                    context,
+                    item.Entry.SnapshotJson,
+                    CancellationToken.None).ConfigureAwait(false);
+                item.Entry.State = ActionJournalState.RolledBack;
+                item.Entry.Outcome = ActionExecutionOutcome.RolledBack;
+                item.Entry.Error = null;
+                item.Entry.CompletedAtUtc = DateTimeOffset.UtcNow;
+            }
+            catch (Exception rollbackException) when (rollbackException is not StackOverflowException)
+            {
+                item.Entry.State = ActionJournalState.RollbackFailed;
+                item.Entry.Outcome = ActionExecutionOutcome.RollbackFailed;
+                item.Entry.Error = rollbackException.ToString();
+                item.Entry.CompletedAtUtc = DateTimeOffset.UtcNow;
+                rollbackErrors.Add(rollbackException);
+            }
+        }
+
+        return rollbackErrors;
     }
 
     public async Task<WindowsTransactionResult> RollbackAsync(
@@ -535,6 +623,20 @@ public sealed class WindowsTransactionEngine
         return true;
     }
 
+    private static bool CanRecoverAppliedAction(WindowsActionJournalEntry entry)
+    {
+        if (!entry.Changed
+            || string.IsNullOrWhiteSpace(entry.SnapshotJson)
+            || entry.State == ActionJournalState.RolledBack)
+        {
+            return false;
+        }
+
+        return entry.State != ActionJournalState.Committed
+            || entry.Reversibility is not (
+                ActionReversibility.Irreversible or ActionReversibility.RebuildableData);
+    }
+
     private void ValidateJournalForRollback(
         WindowsTransactionJournal journal,
         Guid requestedTransactionId)
@@ -665,6 +767,11 @@ public sealed class WindowsTransactionEngine
             TransactionId = journal.TransactionId,
             State = journal.State,
             AppliedActionIds = appliedActionIds,
+            ChangedActionIds = journal.Actions
+                .Where(entry => entry.Changed)
+                .OrderBy(entry => entry.Sequence)
+                .Select(entry => entry.ActionId)
+                .ToArray(),
             DeferredAdministratorActionIds = deferredAdministratorActionIds,
             Error = error
         };
@@ -813,10 +920,37 @@ public sealed class WindowsTransactionEngine
             await journalStore.SaveAsync(journal, cancellationToken).ConfigureAwait(false);
             return item.Entry.Changed ? IsolatedItemResult.Applied : IsolatedItemResult.Verified;
         }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        catch (OperationCanceledException cancellationException) when (
+            cancellationToken.IsCancellationRequested)
         {
-            await IsolatedRollbackSelfAsync(journal, item, context).ConfigureAwait(false);
-            await FinalizeCancelledIsolatedRunAsync(journal).ConfigureAwait(false);
+            var recoveryErrors = new List<Exception>();
+            try
+            {
+                await IsolatedRollbackSelfAsync(journal, item, context).ConfigureAwait(false);
+            }
+            catch (Exception rollbackPipelineException) when (
+                rollbackPipelineException is not StackOverflowException)
+            {
+                recoveryErrors.Add(rollbackPipelineException);
+                recoveryErrors.AddRange(await RollbackWithoutPersistenceAsync(
+                    [item],
+                    context with { IsImmediateFailureRecovery = true }).ConfigureAwait(false));
+            }
+
+            if (recoveryErrors.Count > 0)
+            {
+                item.Entry.Error = new AggregateException(
+                    [cancellationException, .. recoveryErrors]).ToString();
+            }
+
+            recoveryErrors.AddRange(await FinalizeCancelledIsolatedRunAsync(journal)
+                .ConfigureAwait(false));
+            if (recoveryErrors.Count > 0)
+            {
+                item.Entry.Error = new AggregateException(
+                    [cancellationException, .. recoveryErrors]).ToString();
+            }
+
             throw;
         }
         catch (UnauthorizedAccessException) when (
@@ -840,9 +974,28 @@ public sealed class WindowsTransactionEngine
             item.Entry.State = ActionJournalState.Failed;
             item.Entry.Outcome = ActionExecutionOutcome.Failed;
             item.Entry.CompletedAtUtc = DateTimeOffset.UtcNow;
-            await journalStore.SaveAsync(journal, CancellationToken.None).ConfigureAwait(false);
+            var recoveryErrors = new List<Exception>();
+            try
+            {
+                await journalStore.SaveAsync(journal, CancellationToken.None).ConfigureAwait(false);
+                await IsolatedRollbackSelfAsync(journal, item, context).ConfigureAwait(false);
+            }
+            catch (Exception rollbackPipelineException) when (
+                rollbackPipelineException is not StackOverflowException)
+            {
+                recoveryErrors.Add(rollbackPipelineException);
+                recoveryErrors.AddRange(await RollbackWithoutPersistenceAsync(
+                    [item],
+                    context with { IsImmediateFailureRecovery = true }).ConfigureAwait(false));
+            }
 
-            await IsolatedRollbackSelfAsync(journal, item, context).ConfigureAwait(false);
+            if (recoveryErrors.Count > 0)
+            {
+                item.Entry.Error = new AggregateException(
+                    [exception, .. recoveryErrors]).ToString();
+                await TrySaveDuringRecoveryAsync(journal, recoveryErrors).ConfigureAwait(false);
+            }
+
             return item.Action.Metadata.IsCritical
                 ? IsolatedItemResult.FailedCritical
                 : IsolatedItemResult.Failed;
@@ -894,7 +1047,10 @@ public sealed class WindowsTransactionEngine
         {
             item.Entry.State = ActionJournalState.RollingBack;
             await journalStore.SaveAsync(journal, CancellationToken.None).ConfigureAwait(false);
-            await item.Action.RollbackAsync(context, item.Entry.SnapshotJson, CancellationToken.None)
+            await item.Action.RollbackAsync(
+                context with { IsImmediateFailureRecovery = true },
+                item.Entry.SnapshotJson,
+                CancellationToken.None)
                 .ConfigureAwait(false);
             item.Entry.State = ActionJournalState.RolledBack;
             item.Entry.Outcome = ActionExecutionOutcome.RolledBack;
@@ -923,7 +1079,8 @@ public sealed class WindowsTransactionEngine
     /// This mirrors the same "mark remaining as skipped, compute the final
     /// state, persist" sequence used when a critical failure aborts the run.
     /// </summary>
-    private async Task FinalizeCancelledIsolatedRunAsync(WindowsTransactionJournal journal)
+    private async Task<IReadOnlyList<Exception>> FinalizeCancelledIsolatedRunAsync(
+        WindowsTransactionJournal journal)
     {
         foreach (var entry in journal.Actions.Where(entry =>
                      entry.State is ActionJournalState.Pending
@@ -935,7 +1092,9 @@ public sealed class WindowsTransactionEngine
 
         journal.State = DetermineIsolatedFinalState(journal);
         journal.Error = "A operação foi cancelada pelo usuário.";
-        await journalStore.SaveAsync(journal, CancellationToken.None).ConfigureAwait(false);
+        var recoveryErrors = new List<Exception>();
+        await TrySaveDuringRecoveryAsync(journal, recoveryErrors).ConfigureAwait(false);
+        return recoveryErrors;
     }
 
     private static string? FindUnmetPrerequisite(

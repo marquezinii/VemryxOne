@@ -74,10 +74,57 @@ public sealed partial class LocalizedInterfaceContractTests
         Assert.Contains("Tag=\"Applications\"", mainWindow, StringComparison.Ordinal);
         Assert.Contains("[Navigation.FiveM]", mainWindow, StringComparison.Ordinal);
         Assert.Contains("ms-settings:windowsupdate", systemPage, StringComparison.Ordinal);
+        Assert.Contains("ApplyWindowsGamingSettingsAsync", systemPage, StringComparison.Ordinal);
+        Assert.Contains("RestoreWindowsGamingSettingsAsync", systemPage, StringComparison.Ordinal);
         Assert.Contains("ms-settings:appsfeatures", applicationsPage, StringComparison.Ordinal);
         Assert.Contains("ms-windows-store://downloadsandupdates", applicationsPage, StringComparison.Ordinal);
         Assert.DoesNotContain("Arguments =", systemPage + applicationsPage, StringComparison.Ordinal);
         Assert.DoesNotContain("runas", systemPage + applicationsPage, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void WindowsGamingControls_UseNativeButtonsAndCoordinateWithOptimizerBusyState()
+    {
+        var root = TestHelpers.FindRepositoryRoot();
+        var appDirectory = Path.Combine(root, "src", "Ralven.App");
+        var page = File.ReadAllText(Path.Combine(appDirectory, "Views", "Pages", "SystemPage.xaml"));
+        var controls = File.ReadAllText(Path.Combine(appDirectory, "Themes", "Controls.xaml"));
+        var viewModel = File.ReadAllText(Path.Combine(appDirectory, "ViewModels", "MainViewModel.System.cs"));
+        var mainViewModel = File.ReadAllText(Path.Combine(appDirectory, "ViewModels", "MainViewModel.cs"));
+        var historyViewModel = File.ReadAllText(Path.Combine(
+            appDirectory,
+            "ViewModels",
+            "MainViewModel.Diagnostics.cs"));
+        var historyPage = File.ReadAllText(Path.Combine(
+            appDirectory,
+            "Views",
+            "Pages",
+            "HistoryPage.xaml.cs"));
+
+        Assert.Contains("System.Gaming.Title", page, StringComparison.Ordinal);
+        Assert.Contains("AutomationProperties.LiveSetting=\"Polite\"", page, StringComparison.Ordinal);
+        Assert.Contains("IsEnabled=\"{Binding CanApplyWindowsGamingSettings}\"", page, StringComparison.Ordinal);
+        Assert.Contains("IsEnabled=\"{Binding CanRestoreWindowsGamingSettings}\"", page, StringComparison.Ordinal);
+        Assert.Contains(
+            "<Setter Property=\"Foreground\" Value=\"{DynamicResource AppTextOnAccentBrush}\" />",
+            controls,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "<Setter Property=\"Foreground\" Value=\"{DynamicResource TextTertiaryBrush}\" />",
+            controls,
+            StringComparison.Ordinal);
+        Assert.Contains("!IsBusy", viewModel, StringComparison.Ordinal);
+        Assert.Contains("!isWindowsGamingBusy", mainViewModel, StringComparison.Ordinal);
+        Assert.Contains(
+            "item.Kind == AppHistoryKind.WindowsGaming",
+            historyPage,
+            StringComparison.Ordinal);
+        Assert.Contains("System.Gaming.RestoreConfirm.Message", historyPage, StringComparison.Ordinal);
+        Assert.Contains("System.Gaming.RestoreConfirm.Title", historyPage, StringComparison.Ordinal);
+        Assert.Contains(
+            ".Where(item => item.Kind == AppHistoryKind.Optimization)",
+            historyViewModel,
+            StringComparison.Ordinal);
     }
 
     [Fact]

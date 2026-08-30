@@ -34,13 +34,35 @@ public sealed class AppOptimizationService : IAppOptimizationService
         bool demoMode = false,
         bool useSyntheticDiagnostic = false,
         ILocalizationService? localization = null)
+        : this(demoMode, useSyntheticDiagnostic, localization, appDataDirectoryOverride: null)
+    {
+    }
+
+    internal AppOptimizationService(
+        string appDataDirectory,
+        ILocalizationService? localization = null)
+        : this(
+            demoMode: false,
+            useSyntheticDiagnostic: false,
+            localization,
+            appDataDirectory)
+    {
+    }
+
+    private AppOptimizationService(
+        bool demoMode,
+        bool useSyntheticDiagnostic,
+        ILocalizationService? localization,
+        string? appDataDirectoryOverride)
     {
         this.demoMode = demoMode;
         this.useSyntheticDiagnostic = useSyntheticDiagnostic;
         this.localization = localization ?? LocalizationService.Current;
-        appDataDirectory = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            ProductIdentity.Name);
+        appDataDirectory = appDataDirectoryOverride is null
+            ? Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                ProductIdentity.Name)
+            : Path.GetFullPath(appDataDirectoryOverride);
         journalDirectory = Path.Combine(appDataDirectory, "Transactions");
         logsDirectory = Path.Combine(appDataDirectory, "Logs");
         settingsPath = Path.Combine(appDataDirectory, "settings.json");
@@ -329,21 +351,29 @@ public sealed class AppOptimizationService : IAppOptimizationService
                 var changed = journal.Actions.Count(action => action.Changed);
                 var canRollback = journal.Actions.Any(action =>
                     action.Changed
-                    && action.State == ActionJournalState.Committed
-                    && action.Reversibility is not (
-                        ActionReversibility.Irreversible
-                        or ActionReversibility.RebuildableData));
+                    && !string.IsNullOrWhiteSpace(action.SnapshotJson)
+                    && action.State is (
+                        ActionJournalState.Committed
+                        or ActionJournalState.RollbackFailed)
+                    && (action.State != ActionJournalState.Committed
+                        || action.Reversibility is not (
+                            ActionReversibility.Irreversible
+                            or ActionReversibility.RebuildableData)));
                 records.Add(new AppHistoryRecord
                 {
                     TransactionId = journal.TransactionId,
                     CreatedAt = journal.CreatedAtUtc,
                     Profile = profile,
+                    Kind = IsWindowsGamingControlsTransaction(journal)
+                        ? AppHistoryKind.WindowsGaming
+                        : AppHistoryKind.Optimization,
                     State = TranslateState(journal.State),
                     ChangedActions = changed,
                     CanRollback = canRollback && journal.State is
                         TransactionState.Committed
                         or TransactionState.AwaitingElevationRollback
                         or TransactionState.AwaitingStandardRollback
+                        or TransactionState.RollbackFailed
                 });
             }
             catch (Exception exception) when (exception is JsonException
@@ -738,7 +768,10 @@ public sealed class AppOptimizationService : IAppOptimizationService
             cancellationToken).ConfigureAwait(false);
         if (localResult.State == TransactionState.RollbackFailed)
         {
-            throw new InvalidOperationException(localization.GetString("Runtime.RollbackConflict"));
+            return HandleRollbackFailure(
+                new WindowsFiveMProcessInspector(),
+                localization,
+                progress);
         }
 
         if (localResult.State == TransactionState.AwaitingElevationRollback)
@@ -835,6 +868,35 @@ public sealed class AppOptimizationService : IAppOptimizationService
         return WindowsOptimizationRuntime.Create(
             environment,
             WindowsOptimizationDependencies.CreateDefault(environment));
+    }
+
+    internal static bool HandleRollbackFailure(
+        IFiveMProcessInspector processInspector,
+        ILocalizationService localization,
+        IProgress<AppProgressUpdate> progress)
+    {
+        ArgumentNullException.ThrowIfNull(processInspector);
+        ArgumentNullException.ThrowIfNull(localization);
+        ArgumentNullException.ThrowIfNull(progress);
+
+        var blockReason = WindowsGamingControlsService.GetMutationBlockReason(processInspector);
+        if (blockReason != WindowsGamingControlsBlockReason.None)
+        {
+            var detailKey = blockReason == WindowsGamingControlsBlockReason.FiveMRunning
+                ? "Runtime.RestoreBlockedFiveM"
+                : "Runtime.RestoreProcessCheckFailed";
+            progress.Report(new AppProgressUpdate
+            {
+                Timestamp = DateTimeOffset.UtcNow,
+                Kind = AppProgressKind.Warning,
+                Percent = 100,
+                Headline = localization.GetString(detailKey),
+                Detail = localization.GetString(detailKey)
+            });
+            return false;
+        }
+
+        throw new InvalidOperationException(localization.GetString("Runtime.RollbackConflict"));
     }
 
     private static async Task<WindowsTransactionResult?> TryRollbackLocalPhaseAsync(
@@ -1200,6 +1262,17 @@ public sealed class AppOptimizationService : IAppOptimizationService
                 || action.ActionId.Contains("power", StringComparison.Ordinal))
                 ? OptimizationProfile.Balanced
                 : OptimizationProfile.Light;
+    }
+
+    private static bool IsWindowsGamingControlsTransaction(WindowsTransactionJournal journal)
+    {
+        return journal.Actions.Count == 2
+            && journal.Actions.Select(action => action.ActionId).ToHashSet(StringComparer.Ordinal)
+                .SetEquals(
+                [
+                    OptimizationActionIds.EnableGameMode,
+                    OptimizationActionIds.DisableBackgroundCapture
+                ]);
     }
 
     private string TranslateState(TransactionState state) => localization.GetString(state switch

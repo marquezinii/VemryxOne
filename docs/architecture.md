@@ -16,10 +16,23 @@ Este documento descreve a arquitetura-alvo e os limites entre componentes. Uma c
 ## Áreas de produto
 
 O shell separa a experiência em **Visão geral**, **Sistema**, **Aplicativos** e
-**FiveM**. Sistema e Aplicativos apenas encaminham o usuário para superfícies
-nativas do Windows e da Microsoft Store; não executam comandos, não pedem
-elevação e não alteram configurações diretamente. O catálogo transacional de
-ações continua restrito ao domínio FiveM/GTAV Legacy existente.
+**FiveM**. Aplicativos ainda encaminha o usuário para superfícies nativas do
+Windows e da Microsoft Store. Sistema preserva os atalhos para Windows Update,
+Segurança e informações do PC, mas também oferece um painel dedicado de jogos
+do Windows: ele lê o Modo de Jogo e a gravação histórica em segundo plano e,
+com confirmação explícita, aplica somente as duas ações tipadas já existentes.
+
+Esse painel não recebe IDs ou comandos escolhidos pela interface. O serviço de
+aplicação constrói uma lista fixa com `GameModeRegistryAction` e
+`GameDvrRegistryAction`, executa-a como usuário padrão pelo mesmo motor
+transacional e armazenamento local de histórico, e valida o estado depois da
+escrita. O fluxo não exige que o FiveM esteja instalado, mas a aplicação e a
+restauração são bloqueadas enquanto algum processo do FiveM estiver ativo. A
+presença do processo é verificada novamente na fronteira de cada escrita e uma
+falha nessa verificação bloqueia a alteração. Apenas a compensação imediata do
+snapshot criado pela própria execução falha pode restaurar o estado anterior;
+uma restauração solicitada depois continua bloqueada com o FiveM aberto. O painel não amplia o planejador
+de perfis, não usa o broker e não cria um executor genérico de registro.
 
 Integração com catálogos de pacotes, como WinGet, ainda não faz parte desta
 fundação. Quando existir, cada operação deverá usar contratos tipados, origem

@@ -155,7 +155,8 @@ public sealed partial class MainViewModel : BindableBase, IDisposable
         IAnonymousTelemetryService? telemetry = null,
         ISilentUpdateInstaller? silentUpdateInstaller = null,
         ILiveSystemMetricsProvider? liveSystemMetricsProvider = null,
-        ILiveAlertService? liveAlertService = null)
+        ILiveAlertService? liveAlertService = null,
+        WindowsGamingControlsService? windowsGamingControls = null)
     {
         this.service = service ?? throw new ArgumentNullException(nameof(service));
         this.localization = localization ?? LocalizationService.Current;
@@ -165,6 +166,7 @@ public sealed partial class MainViewModel : BindableBase, IDisposable
         this.telemetry = telemetry ?? DisabledAnonymousTelemetryService.Instance;
         this.liveAlertService = liveAlertService;
         this.liveSystemMetricsProvider = liveSystemMetricsProvider ?? new WindowsLiveSystemMetricsProvider();
+        this.windowsGamingControls = windowsGamingControls ?? new WindowsGamingControlsService();
         StepLedger.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasStepLedgerItems));
         ResetLocalizedPlaceholders();
         RefreshProfilePresentation();
@@ -198,9 +200,10 @@ public sealed partial class MainViewModel : BindableBase, IDisposable
 
     public bool IsOptimizerIdle => !IsBusy && !IsReportAvailable;
 
-    public bool CanRefresh => !IsBusy && !isInitializing;
+    public bool CanRefresh => !IsBusy && !isInitializing && !isWindowsGamingBusy;
 
     public bool CanStart => !IsBusy
+        && !isWindowsGamingBusy
         && !isInitializing
         && currentPlan?.IsExecutable == true
         && diagnostic?.IsFiveMRunning != true
@@ -309,6 +312,9 @@ public sealed partial class MainViewModel : BindableBase, IDisposable
         OnPropertyChanged(nameof(CanCancel));
         OnPropertyChanged(nameof(CanRevertLastOptimization));
         OnPropertyChanged(nameof(CanRunGtaVBenchmark));
+        OnPropertyChanged(nameof(CanRefreshWindowsGamingSettings));
+        OnPropertyChanged(nameof(CanApplyWindowsGamingSettings));
+        OnPropertyChanged(nameof(CanRestoreWindowsGamingSettings));
         // Updating restarts the app, so the button has to follow IsBusy.
         OnPropertyChanged(nameof(CanDownloadUpdate));
     }

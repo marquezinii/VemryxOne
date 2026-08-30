@@ -35,6 +35,30 @@ public abstract class AllowlistedRegistryAction : WindowsOptimizationAction
         return mutation.DesiredValue;
     }
 
+    protected virtual void ValidateCurrentValueForApply(
+        RegistryMutation mutation,
+        RegistryValueState currentValue)
+    {
+    }
+
+    protected virtual void ValidateMutationSafety(WindowsActionContext context)
+    {
+    }
+
+    protected static void EnsureFiveMStopped(
+        IFiveMProcessInspector processInspector,
+        string? installationRoot)
+    {
+        var isRunning = string.IsNullOrWhiteSpace(installationRoot)
+            ? processInspector.IsAnyRunning()
+            : processInspector.IsRunningFrom(installationRoot);
+        if (isRunning)
+        {
+            throw new InvalidOperationException(
+                "FiveM must be closed before Windows gaming settings can be changed.");
+        }
+    }
+
     protected virtual bool IsAllowedRollbackEntry(
         RegistryAddress address,
         RegistryValueState previousValue,
@@ -60,12 +84,14 @@ public abstract class AllowlistedRegistryAction : WindowsOptimizationAction
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 var previous = Registry.Read(mutation.Address);
+                ValidateCurrentValueForApply(mutation, previous);
                 var desired = ResolveDesiredValue(mutation, previous);
                 if (desired is null || Equivalent(previous, desired))
                 {
                     continue;
                 }
 
+                ValidateMutationSafety(context);
                 Registry.Write(mutation.Address, desired);
                 applied.Add(new RegistryMutationSnapshotEntry(
                     mutation.Address,
@@ -75,7 +101,10 @@ public abstract class AllowlistedRegistryAction : WindowsOptimizationAction
         }
         catch
         {
-            RestoreEntries(applied, requireAppliedValue: false);
+            RestoreEntries(
+                applied,
+                requireAppliedValue: false,
+                context with { IsImmediateFailureRecovery = true });
             throw;
         }
 
@@ -98,7 +127,7 @@ public abstract class AllowlistedRegistryAction : WindowsOptimizationAction
         var snapshot = WindowsActionSnapshot.Deserialize<RegistryMutationSnapshot>(snapshotJson);
         cancellationToken.ThrowIfCancellationRequested();
         ValidateRollbackSnapshot(snapshot);
-        RestoreEntries(snapshot.Entries, requireAppliedValue: true);
+        RestoreEntries(snapshot.Entries, requireAppliedValue: true, context);
         return Task.CompletedTask;
     }
 
@@ -135,7 +164,8 @@ public abstract class AllowlistedRegistryAction : WindowsOptimizationAction
 
     private void RestoreEntries(
         IEnumerable<RegistryMutationSnapshotEntry> entries,
-        bool requireAppliedValue)
+        bool requireAppliedValue,
+        WindowsActionContext context)
     {
         var conflicts = new List<RegistryAddress>();
         foreach (var entry in entries.Reverse())
@@ -152,10 +182,12 @@ public abstract class AllowlistedRegistryAction : WindowsOptimizationAction
 
             if (entry.PreviousValue.Exists)
             {
+                ValidateMutationSafety(context);
                 Registry.Write(entry.Address, entry.PreviousValue);
             }
             else
             {
+                ValidateMutationSafety(context);
                 Registry.Delete(entry.Address);
             }
         }
@@ -194,14 +226,23 @@ public abstract class AllowlistedRegistryAction : WindowsOptimizationAction
 
 public sealed class GameModeRegistryAction : AllowlistedRegistryAction
 {
-    private static readonly RegistryAddress Address = new(
+    private readonly IFiveMProcessInspector processInspector;
+    private readonly string? installationRoot;
+
+    internal static readonly RegistryAddress Address = new(
         RegistryHive.CurrentUser,
         @"Software\Microsoft\GameBar",
         "AutoGameModeEnabled");
 
-    public GameModeRegistryAction(IRegistryStore registry)
+    public GameModeRegistryAction(
+        IRegistryStore registry,
+        IFiveMProcessInspector processInspector,
+        string? installationRoot = null)
         : base(registry)
     {
+        this.processInspector = processInspector
+            ?? throw new ArgumentNullException(nameof(processInspector));
+        this.installationRoot = installationRoot;
     }
 
     public override ActionMetadataDto Metadata { get; } = WindowsActionMetadata.For(
@@ -211,13 +252,48 @@ public sealed class GameModeRegistryAction : AllowlistedRegistryAction
     {
         return [new RegistryMutation(Address, RegistryValueState.FromDword(1))];
     }
+
+    protected override void ValidateCurrentValueForApply(
+        RegistryMutation mutation,
+        RegistryValueState currentValue)
+    {
+        if (currentValue.Exists
+            && (currentValue.Kind != RegistryValueKind.DWord
+                || currentValue.NumericValue is not (0 or 1)))
+        {
+            throw new InvalidDataException(
+                "Game Mode has an unsupported registry value and will not be overwritten.");
+        }
+    }
+
+    protected override void ValidateMutationSafety(WindowsActionContext context)
+    {
+        if (!context.IsImmediateFailureRecovery)
+        {
+            EnsureFiveMStopped(processInspector, installationRoot);
+        }
+    }
 }
 
 public sealed class GameDvrRegistryAction : AllowlistedRegistryAction
 {
-    public GameDvrRegistryAction(IRegistryStore registry)
+    private readonly IFiveMProcessInspector processInspector;
+    private readonly string? installationRoot;
+
+    internal static readonly RegistryAddress HistoricalCaptureAddress = new(
+        RegistryHive.CurrentUser,
+        @"Software\Microsoft\Windows\CurrentVersion\GameDVR",
+        "HistoricalCaptureEnabled");
+
+    public GameDvrRegistryAction(
+        IRegistryStore registry,
+        IFiveMProcessInspector processInspector,
+        string? installationRoot = null)
         : base(registry)
     {
+        this.processInspector = processInspector
+            ?? throw new ArgumentNullException(nameof(processInspector));
+        this.installationRoot = installationRoot;
     }
 
     public override ActionMetadataDto Metadata { get; } = WindowsActionMetadata.For(
@@ -228,13 +304,29 @@ public sealed class GameDvrRegistryAction : AllowlistedRegistryAction
         var disabled = RegistryValueState.FromDword(0);
         return
         [
-            new RegistryMutation(
-                new RegistryAddress(
-                    RegistryHive.CurrentUser,
-                    @"Software\Microsoft\Windows\CurrentVersion\GameDVR",
-                    "HistoricalCaptureEnabled"),
-                disabled)
+            new RegistryMutation(HistoricalCaptureAddress, disabled)
         ];
+    }
+
+    protected override void ValidateCurrentValueForApply(
+        RegistryMutation mutation,
+        RegistryValueState currentValue)
+    {
+        if (currentValue.Exists
+            && (currentValue.Kind != RegistryValueKind.DWord
+                || currentValue.NumericValue is not (0 or 1)))
+        {
+            throw new InvalidDataException(
+                "Historical capture has an unsupported registry value and will not be overwritten.");
+        }
+    }
+
+    protected override void ValidateMutationSafety(WindowsActionContext context)
+    {
+        if (!context.IsImmediateFailureRecovery)
+        {
+            EnsureFiveMStopped(processInspector, installationRoot);
+        }
     }
 }
 

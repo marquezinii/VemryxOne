@@ -4,12 +4,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:primitives="clr-namespace:System.Windows.Controls.Primitives;assembly=PresentationFramework"
-             mc:Ignorable="d" d:DesignWidth="1400" d:DesignHeight="820">
+             mc:Ignorable="d" d:DesignWidth="1400" d:DesignHeight="820"
+             Loaded="SystemPage_Loaded">
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <Grid Margin="28,24,28,28">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <Border Grid.Row="0" Style="{StaticResource TitleBlockSurface}">
@@ -20,8 +22,97 @@
                 </StackPanel>
             </Border>
 
-            <primitives:UniformGrid Grid.Row="1" Columns="2" VerticalAlignment="Top">
-                <Border Style="{StaticResource FeatureCardSurface}" Margin="0,0,16,16">
+            <Border Grid.Row="1"
+                    Style="{StaticResource FeatureCardSurface}"
+                    Margin="0,0,0,16"
+                    VerticalAlignment="Top"
+                    AutomationProperties.Name="{Binding [System.Gaming.Title], Source={StaticResource LocalizedStrings}}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Style="{StaticResource FeatureIconSurface}">
+                            <Path Style="{StaticResource Icon20}" Data="{StaticResource IconGame}" Stroke="{DynamicResource AccentTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding [System.Gaming.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SectionText}" />
+                            <TextBlock Text="{Binding [System.Gaming.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,6,0,0" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Border Grid.Row="1" Style="{StaticResource AlertRowInfoStyle}" Margin="0,18,0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Margin="0,0,12,0">
+                                <TextBlock Text="{Binding [System.Gaming.GameMode], Source={StaticResource LocalizedStrings}}" Style="{StaticResource CaptionText}" />
+                                <TextBlock Text="{Binding WindowsGameModeStateLabel}"
+                                           Style="{StaticResource BodyText}"
+                                           FontWeight="SemiBold"
+                                           Margin="0,4,0,0"
+                                           AutomationProperties.LiveSetting="Polite" />
+                                <TextBlock Text="{Binding [System.Gaming.Target.Enabled], Source={StaticResource LocalizedStrings}}" Style="{StaticResource CaptionText}" Margin="0,3,0,0" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                                <TextBlock Text="{Binding [System.Gaming.BackgroundCapture], Source={StaticResource LocalizedStrings}}" Style="{StaticResource CaptionText}" />
+                                <TextBlock Text="{Binding WindowsBackgroundCaptureStateLabel}"
+                                           Style="{StaticResource BodyText}"
+                                           FontWeight="SemiBold"
+                                           Margin="0,4,0,0"
+                                           AutomationProperties.LiveSetting="Polite" />
+                                <TextBlock Text="{Binding [System.Gaming.Target.Disabled], Source={StaticResource LocalizedStrings}}" Style="{StaticResource CaptionText}" Margin="0,3,0,0" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <Grid Grid.Row="2" Margin="0,14,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding WindowsGamingStatusMessage}"
+                                   Style="{StaticResource SecondaryText}"
+                                   TextWrapping="Wrap"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,20,0"
+                                   AutomationProperties.LiveSetting="Polite" />
+                        <WrapPanel Grid.Column="1" HorizontalAlignment="Right">
+                            <Button Content="{Binding [System.Gaming.Refresh], Source={StaticResource LocalizedStrings}}"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    MinHeight="40"
+                                    Padding="14,0"
+                                    Margin="0,0,8,0"
+                                    IsEnabled="{Binding CanRefreshWindowsGamingSettings}"
+                                    Click="RefreshWindowsGaming_Click" />
+                            <Button Content="{Binding [System.Gaming.Apply], Source={StaticResource LocalizedStrings}}"
+                                    Style="{StaticResource PrimaryButtonStyle}"
+                                    MinHeight="40"
+                                    Padding="14,0"
+                                    Margin="0,0,8,0"
+                                    IsEnabled="{Binding CanApplyWindowsGamingSettings}"
+                                    Click="ApplyWindowsGaming_Click" />
+                            <Button Content="{Binding [System.Gaming.Restore], Source={StaticResource LocalizedStrings}}"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    MinHeight="40"
+                                    Padding="14,0"
+                                    IsEnabled="{Binding CanRestoreWindowsGamingSettings}"
+                                    Click="RestoreWindowsGaming_Click" />
+                        </WrapPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <primitives:UniformGrid Grid.Row="2" Columns="3" VerticalAlignment="Top">
+                <Border Style="{StaticResource FeatureCardSurface}" Margin="0,0,16,0">
                     <Grid>
                         <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
                         <Border Style="{StaticResource FeatureIconSurface}">
@@ -29,22 +120,9 @@
                         </Border>
                         <StackPanel Grid.Row="1" Margin="0,18,0,0">
                             <TextBlock Text="{Binding [System.WindowsUpdate.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SectionText}" />
-                            <TextBlock Text="{Binding [System.WindowsUpdate.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,8,0,0" />
+                            <TextBlock Text="{Binding [System.WindowsUpdate.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,8,0,0" TextWrapping="Wrap" />
                         </StackPanel>
                         <Button Grid.Row="2" Content="{Binding [System.WindowsUpdate.Action], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryButtonStyle}" HorizontalAlignment="Left" Margin="0,22,0,0" Click="OpenWindowsUpdate_Click" />
-                    </Grid>
-                </Border>
-                <Border Style="{StaticResource FeatureCardSurface}" Margin="0,0,0,16">
-                    <Grid>
-                        <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
-                        <Border Style="{StaticResource FeatureIconSurface}">
-                            <Path Style="{StaticResource Icon20}" Data="{StaticResource IconStorage}" Stroke="{DynamicResource AccentTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
-                        <StackPanel Grid.Row="1" Margin="0,18,0,0">
-                            <TextBlock Text="{Binding [System.Storage.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SectionText}" />
-                            <TextBlock Text="{Binding [System.Storage.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,8,0,0" />
-                        </StackPanel>
-                        <Button Grid.Row="2" Content="{Binding [System.Storage.Action], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryButtonStyle}" HorizontalAlignment="Left" Margin="0,22,0,0" Click="OpenStorage_Click" />
                     </Grid>
                 </Border>
                 <Border Style="{StaticResource FeatureCardSurface}" Margin="0,0,16,0">
@@ -55,7 +133,7 @@
                         </Border>
                         <StackPanel Grid.Row="1" Margin="0,18,0,0">
                             <TextBlock Text="{Binding [System.Security.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SectionText}" />
-                            <TextBlock Text="{Binding [System.Security.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,8,0,0" />
+                            <TextBlock Text="{Binding [System.Security.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,8,0,0" TextWrapping="Wrap" />
                         </StackPanel>
                         <Button Grid.Row="2" Content="{Binding [System.Security.Action], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryButtonStyle}" HorizontalAlignment="Left" Margin="0,22,0,0" Click="OpenSecurity_Click" />
                     </Grid>
@@ -68,7 +146,7 @@
                         </Border>
                         <StackPanel Grid.Row="1" Margin="0,18,0,0">
                             <TextBlock Text="{Binding [System.About.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SectionText}" />
-                            <TextBlock Text="{Binding [System.About.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,8,0,0" />
+                            <TextBlock Text="{Binding [System.About.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,8,0,0" TextWrapping="Wrap" />
                         </StackPanel>
                         <Button Grid.Row="2" Content="{Binding [System.About.Action], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryButtonStyle}" HorizontalAlignment="Left" Margin="0,22,0,0" Click="OpenAbout_Click" />
                     </Grid>
