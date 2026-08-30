@@ -8,6 +8,7 @@ using Ralven.App.Services;
 using Ralven.Contracts;
 using Ralven.Core.Catalog;
 using Ralven.Core.Planning;
+using Ralven.Windows.Infrastructure;
 
 namespace Ralven.App.ViewModels;
 
@@ -155,7 +156,8 @@ public sealed partial class MainViewModel : BindableBase, IDisposable
         IAnonymousTelemetryService? telemetry = null,
         ISilentUpdateInstaller? silentUpdateInstaller = null,
         ILiveSystemMetricsProvider? liveSystemMetricsProvider = null,
-        ILiveAlertService? liveAlertService = null)
+        ILiveAlertService? liveAlertService = null,
+        Func<string, FiveMSessionPresence>? fiveMSessionProbe = null)
     {
         this.service = service ?? throw new ArgumentNullException(nameof(service));
         this.localization = localization ?? LocalizationService.Current;
@@ -165,6 +167,7 @@ public sealed partial class MainViewModel : BindableBase, IDisposable
         this.telemetry = telemetry ?? DisabledAnonymousTelemetryService.Instance;
         this.liveAlertService = liveAlertService;
         this.liveSystemMetricsProvider = liveSystemMetricsProvider ?? new WindowsLiveSystemMetricsProvider();
+        this.fiveMSessionProbe = fiveMSessionProbe ?? WindowsFiveMSessionProbe.Probe;
         StepLedger.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasStepLedgerItems));
         ResetLocalizedPlaceholders();
         RefreshProfilePresentation();
@@ -204,7 +207,8 @@ public sealed partial class MainViewModel : BindableBase, IDisposable
         && !isInitializing
         && currentPlan?.IsExecutable == true
         && diagnostic?.IsFiveMRunning != true
-        && diagnostic?.GtaVIsRunning != true;
+        && diagnostic?.GtaVIsRunning != true
+        && !IsFiveMSessionActive;
 
     public bool CanCancel => IsBusy && operationCancellation is not null;
 
@@ -315,6 +319,7 @@ public sealed partial class MainViewModel : BindableBase, IDisposable
 
     public void Dispose()
     {
+        StopFiveMSessionMonitor();
         liveMetricsEnabled = false;
         liveMetricsTimer?.Stop();
         liveMetricsTimer = null;
