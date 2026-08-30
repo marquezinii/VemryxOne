@@ -65,19 +65,47 @@
   <data name="System.Gaming.RestoreConfirm.Title" xml:space="preserve"><value>¿Restaurar los ajustes anteriores?</value></data>
   <data name="System.Gaming.RestoreConfirm.Message" xml:space="preserve"><value>Ralven intentará restaurar solamente los valores modificados por esta operación. Un valor cambiado después por otro programa no será sobrescrito.</value></data>
   <data name="Applications.Title" xml:space="preserve"><value>Aplicaciones</value></data>
-  <data name="Applications.Subtitle" xml:space="preserve"><value>Accede a los controles nativos de Windows para aplicaciones instaladas, inicio y Microsoft Store.</value></data>
+  <data name="Applications.Subtitle" xml:space="preserve"><value>Inspecciona las aplicaciones instaladas y de inicio directamente en Ralven. Los cambios que pertenecen a Windows siguen a un clic cuando la plataforma lo exige.</value></data>
   <data name="Applications.Installed.Title" xml:space="preserve"><value>Aplicaciones instaladas</value></data>
   <data name="Applications.Installed.Description" xml:space="preserve"><value>Revisa las aplicaciones instaladas, el espacio usado y las opciones de desinstalación proporcionadas por Windows.</value></data>
-  <data name="Applications.Installed.Action" xml:space="preserve"><value>Administrar aplicaciones instaladas</value></data>
+  <data name="Applications.Installed.Action" xml:space="preserve"><value>Abrir controles de aplicaciones de Windows</value></data>
   <data name="Applications.Startup.Title" xml:space="preserve"><value>Aplicaciones de inicio</value></data>
   <data name="Applications.Startup.Description" xml:space="preserve"><value>Elige qué aplicaciones pueden iniciarse junto con tu sesión de Windows.</value></data>
-  <data name="Applications.Startup.Action" xml:space="preserve"><value>Revisar aplicaciones de inicio</value></data>
+  <data name="Applications.Startup.Action" xml:space="preserve"><value>Abrir controles de inicio de Windows</value></data>
   <data name="Applications.StoreUpdates.Title" xml:space="preserve"><value>Actualizaciones de Microsoft Store</value></data>
-  <data name="Applications.StoreUpdates.Description" xml:space="preserve"><value>Abre la biblioteca de Store para comprobar actualizaciones de las aplicaciones instaladas desde allí.</value></data>
+  <data name="Applications.StoreUpdates.Description" xml:space="preserve"><value>Microsoft Store controla las actualizaciones de la biblioteca y mantiene el flujo confiable de confirmación para instalarlas.</value></data>
   <data name="Applications.StoreUpdates.Action" xml:space="preserve"><value>Abrir actualizaciones de Store</value></data>
   <data name="Applications.Defaults.Title" xml:space="preserve"><value>Aplicaciones predeterminadas</value></data>
-  <data name="Applications.Defaults.Description" xml:space="preserve"><value>Elige las aplicaciones que usa Windows para abrir enlaces y tipos de archivo compatibles.</value></data>
+  <data name="Applications.Defaults.Description" xml:space="preserve"><value>Windows protege las elecciones de aplicaciones predeterminadas y exige su propia pantalla de confirmación.</value></data>
   <data name="Applications.Defaults.Action" xml:space="preserve"><value>Revisar aplicaciones predeterminadas</value></data>
+  <data name="Applications.Inventory.Status.Title" xml:space="preserve"><value>Inventario local</value></data>
+  <data name="Applications.Inventory.Status.Loading" xml:space="preserve"><value>Leyendo aplicaciones instaladas y de inicio…</value></data>
+  <data name="Applications.Inventory.Status.Ready" xml:space="preserve"><value>Inventario leído localmente. No se modificó ninguna aplicación.</value></data>
+  <data name="Applications.Inventory.Status.Partial" xml:space="preserve"><value>No se pudieron leer algunas ubicaciones protegidas. Los resultados visibles son parciales.</value></data>
+  <data name="Applications.Inventory.Status.Unavailable" xml:space="preserve"><value>Ralven no pudo leer el inventario de aplicaciones. No se modificó nada.</value></data>
+  <data name="Applications.Inventory.Status.UpdatedAt" xml:space="preserve"><value>Actualizado a las {0}</value></data>
+  <data name="Applications.Inventory.ReadOnly" xml:space="preserve"><value>Este inventario es de solo lectura. Ralven no ejecuta comandos de desinstalación ni cambia el inicio de aplicaciones de terceros.</value></data>
+  <data name="Applications.Inventory.InstalledTab" xml:space="preserve"><value>Instaladas</value></data>
+  <data name="Applications.Inventory.StartupTab" xml:space="preserve"><value>Inicio</value></data>
+  <data name="Applications.Inventory.Search" xml:space="preserve"><value>Buscar en este inventario</value></data>
+  <data name="Applications.Inventory.Refresh" xml:space="preserve"><value>Actualizar</value></data>
+  <data name="Applications.Inventory.InstalledCount" xml:space="preserve"><value>aplicaciones instaladas</value></data>
+  <data name="Applications.Inventory.StartupCount" xml:space="preserve"><value>entradas de inicio</value></data>
+  <data name="Applications.Inventory.Column.Application" xml:space="preserve"><value>Aplicación</value></data>
+  <data name="Applications.Inventory.Column.Publisher" xml:space="preserve"><value>Editor</value></data>
+  <data name="Applications.Inventory.Column.Version" xml:space="preserve"><value>Versión</value></data>
+  <data name="Applications.Inventory.Column.Size" xml:space="preserve"><value>Tamaño estimado</value></data>
+  <data name="Applications.Inventory.Column.Scope" xml:space="preserve"><value>Ámbito</value></data>
+  <data name="Applications.Inventory.Column.Source" xml:space="preserve"><value>Origen</value></data>
+  <data name="Applications.Inventory.Scope.CurrentUser" xml:space="preserve"><value>Este usuario</value></data>
+  <data name="Applications.Inventory.Scope.LocalMachine" xml:space="preserve"><value>Todos los usuarios</value></data>
+  <data name="Applications.Inventory.Source.RegistryRun" xml:space="preserve"><value>Registro · Ejecutar</value></data>
+  <data name="Applications.Inventory.Source.RegistryRunOnce" xml:space="preserve"><value>Registro · Ejecutar una vez</value></data>
+  <data name="Applications.Inventory.Source.StartupFolder" xml:space="preserve"><value>Carpeta de inicio</value></data>
+  <data name="Applications.Inventory.Empty.Installed" xml:space="preserve"><value>Ninguna aplicación instalada visible coincide con la búsqueda.</value></data>
+  <data name="Applications.Inventory.Empty.Startup" xml:space="preserve"><value>Ninguna entrada de inicio coincide con la búsqueda.</value></data>
+  <data name="Applications.Platform.Title" xml:space="preserve"><value>Acciones controladas por Windows</value></data>
+  <data name="Applications.Platform.Description" xml:space="preserve"><value>Desinstalar, cambiar aplicaciones predeterminadas y aceptar actualizaciones de Store siguen en superficies confiables de Windows mientras se amplía la administración interna de Ralven.</value></data>
   <data name="Greeting.Morning.WithName" xml:space="preserve"><value>Buenos días, {0}. ¿Qué haremos hoy?</value></data>
   <data name="Greeting.Morning.NoName" xml:space="preserve"><value>Buenos días. ¿Qué haremos hoy?</value></data>
   <data name="Greeting.Afternoon.WithName" xml:space="preserve"><value>Buenas tardes, {0}. ¿Qué haremos hoy?</value></data>

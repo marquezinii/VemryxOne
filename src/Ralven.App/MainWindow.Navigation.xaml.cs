@@ -1,9 +1,11 @@
 using System.Diagnostics;
 using System.Windows;
 using Ralven.App.Services;
+using Ralven.App.ViewModels;
 using Ralven.App.Views;
 using Ralven.App.Views.Pages;
 using Ralven.Contracts;
+using Ralven.Windows.Infrastructure;
 
 namespace Ralven.App;
 
@@ -11,9 +13,19 @@ public partial class MainWindow
 {
     // Keep the dashboard as the only page created during InitializeComponent. Every other page is created only when first selected.
     private SystemPage SystemPage => systemPage ??= CreateDeferredPage<SystemPage>();
-    private ApplicationsPage ApplicationsPage => applicationsPage ??= CreateDeferredPage<ApplicationsPage>();
+    private ApplicationsPage ApplicationsPage => applicationsPage ??= CreateApplicationsPage();
     private OptimizerPage OptimizerPage => optimizerPage ??= CreateDeferredPage<OptimizerPage>();
     private HistoryPage HistoryPage => historyPage ??= CreateDeferredPage<HistoryPage>();
+
+    private ApplicationsPage CreateApplicationsPage()
+    {
+        IWindowsApplicationInventoryInspector inspector = demoMode
+            ? new SyntheticWindowsApplicationInventoryInspector()
+            : new WindowsApplicationInventoryInspector();
+        var page = new ApplicationsPage(inspector) { Visibility = Visibility.Collapsed };
+        PageContentHost.Children.Add(page);
+        return page;
+    }
 
     private T CreateDeferredPage<T>() where T : UIElement, new()
     {
