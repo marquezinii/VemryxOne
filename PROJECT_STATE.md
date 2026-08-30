@@ -7,7 +7,7 @@
 
 - **Produto:** Ralven, aplicativo desktop Windows para otimização transparente, reversível e orientada por diagnóstico do FiveM para **GTAV Legacy**.
 - **Integração:** `dev/proxima-versao` é a branch de integração da próxima versão; `main` representa a linha pública/estável. O fluxo de branches, worktrees, Pull Requests, integração e release é definido em `AI_RULES.md`.
-- **Último estado consolidado neste documento-fonte:** 28/08/2026, após a integração da geração Ralven. Antes de qualquer trabalho, confirme o estado real com Git e os testes atuais.
+- **Último estado consolidado neste documento-fonte:** 30/08/2026, após integrar revisão de plano detalhada, fundação de cobrança (Worker), monitor de sessão FiveM e controles de jogos do Windows. Antes de qualquer trabalho, confirme o estado real com Git e os testes atuais.
 - **Release pública atual:** `v1.5.0`, publicada em 24/08/2026 a partir do commit integrado em `main`. O runtime assinado, instalador, hashes, manifesto e feed estável do updater foram publicados e validados.
 - **Próxima release pública:** a última release continua `v1.5.0`; Ralven ainda não foi publicado. A versão da nova geração só é definida no fluxo oficial de release, a partir das mudanças desde `v1.5.0`, sem aliases de execução, instalação ou atualização para gerações sem suporte.
 - **Atalho de desenvolvimento:** `Ralven - Desenvolvimento` usa `scripts\Start-DevelopmentApp.ps1`. Conforme `AI_RULES.md`, deve ser reconstruído com `scripts\Install-DevelopmentShortcut.ps1 -Build` quando aplicável. O script espelha a árvore para a pasta irmã fixa `Ralven-dev-shortcut`, sem ficar órfão após a remoção de um worktree.
@@ -69,6 +69,9 @@ Preferências, journals, solicitações efêmeras, filas e logs locais ficam sob
 - Aplicação WPF com WPF-UI/Fluent, Mica, tema claro/escuro/sistema e localização.
 - Janela principal inicia/restaura maximizada e preserva comportamento de bandeja.
 - Visão geral apresenta diagnóstico/prontidão e monitoramento local de recursos; coleta pausa quando a superfície não está ativa.
+- Visão geral também monitora localmente início/fim de sessão do FiveM (`FiveMSessionStateTracker`/`FiveMSessionProbe`), por leitura passiva de processo/janela, sem hook, leitura de memória ou ação mutável automática; continua ativo com o app minimizado/na bandeja (decisão de produto), pois esse é o cenário normal de uso.
+- Aba **Sistema** tem painel de controles reais de jogos do Windows (Modo de Jogos, captura em segundo plano) sobre chaves HKCU allowlisted, com snapshot/journal/rollback via `WindowsTransactionEngine` e refresh ao voltar para a página.
+- Revisão do plano do Otimizador detalha por ação: como é detectada, o que a confirmação verifica, como é desfeita e riscos/limitações; texto cai no conteúdo do catálogo quando a chave de localização não existe.
 - Redesenho visual completo (20/08, direção "Câmara Âmbar"): tokens de tema (`Themes/Tokens/*.xaml`), `Controls.xaml`, `Surfaces.xaml`, `Typography.xaml` e as páginas Visão geral/Otimizador/Histórico foram redesenhadas; `ArcProgress`/`CoreVisual`/`CoreVisualPalette` (cena 3D antiga do Otimizador) foram removidos nesse redesenho.
 - Aba **Otimizador**: trilha Preparar → Executar → Resultado, seleção Leve/Médio/Agressivo, resumo do computador, execução/progresso e resultado.
 - Animações do Otimizador evitam `ScaleTransform` em elementos interativos, seguindo a regra já adotada para impedir deslocamento de listas no hover.
@@ -99,6 +102,7 @@ Preferências, journals, solicitações efêmeras, filas e logs locais ficam sob
 - Exclusão de conta remove o perfil Worker/D1 antes da conta Firebase e tenta compensar a remoção do perfil se a exclusão Firebase falhar.
 - Segredos/configuração local de Google não são versionados; overlays `Config/appsettings.{Development,Production}.local.json` são git-ignorados.
 - Gerenciamento de conta fica em Configurações. Avatar é normalizado e armazenado **somente localmente** por enquanto; não existe backend de avatar.
+- Card de conta mostra o plano (Free/Pro) lido de `GET /account/entitlements` (`CloudflareAccountEntitlementService`), autenticado pelo mesmo ID Token Firebase; nenhum dado de provedor de pagamento é exposto ao cliente.
 
 ### Telemetria, bugs e backend
 
@@ -110,6 +114,7 @@ Preferências, journals, solicitações efêmeras, filas e logs locais ficam sob
 - Sentry é usado para crash reporting somente após consentimento explícito, com sanitização/configuração centralizada e sem transformar o SDK em dependência das camadas Core/Windows/Broker.
 - Dashboard administrativo possui filtros, visão de telemetria e bugs e tratamento defensivo de falhas de rede/respostas inválidas.
 - Cookies administrativos cross-site usam `SameSite=None`; toda mutação `POST /admin/*` exige a origem exata do dashboard, e o dashboard publica CSP restritiva/anti-frame.
+- Fundação de cobrança (Mercado Pago) no Worker/D1: `billing_checkout_intents`, `billing_webhook_events` (idempotente por `provider_request_id`) e `billing_subscriptions` alimentam `account_entitlements`, o snapshot de acesso lido por `GET /account/entitlements`. O webhook verifica a assinatura HMAC do envelope assinado (request id + resource id) em tempo constante, nunca confia no corpo da requisição e busca o estado real no provedor antes de qualquer gravação; ver `docs/billing.md`.
 
 ### Atualização e distribuição
 
@@ -124,18 +129,18 @@ Preferências, journals, solicitações efêmeras, filas e logs locais ficam sob
 
 Somente itens ainda relevantes devem permanecer aqui. Quando resolvidos e integrados, remova-os em vez de criar uma cronologia.
 
-1. **Ideia futura — watcher de sessão FiveM/GTA** (não é uma decisão bloqueada, é backlog de funcionalidade): ajustes que precisariam ser aplicados/restaurados durante o ciclo de vida do jogo (prioridade, afinidade, core parking, timer resolution e semelhantes) são um candidato de funcionalidade futura. Continuam fora do catálogo até existir uma arquitetura segura de monitoramento e reversão mesmo se o Ralven for encerrado. Ver `docs/graphics-optimizations-backlog.md` para o design ainda a amadurecer.
+1. **Ideia futura — reaplicar tweaks durante a sessão FiveM/GTA** (backlog de funcionalidade, não decisão bloqueada): o monitor local de sessão (§4) só observa presença/ausência; ajustes que precisariam ser aplicados/restaurados durante o ciclo de vida do jogo (prioridade, afinidade, core parking, timer resolution e semelhantes) continuam fora do catálogo até existir arquitetura segura de reversão mesmo se o Ralven for encerrado. Ver `docs/graphics-optimizations-backlog.md`.
 2. **GTAV Enhanced** — sem suporte operacional; requer adaptador/projeto específico antes de habilitar qualquer ação.
 3. **Authenticode público** — executáveis e instalador ainda não possuem assinatura de publisher confiável; a implementação depende de certificado/conta externa e deve assinar antes dos hashes e manifestos finais.
 4. **Próximas majors do frontend** — TypeScript 7 ainda excede o peer range suportado pelo `typescript-eslint` vigente, e ESLint 10 ainda não é aceito por plugins do stack Next. O estado suportado permanece TypeScript 6 e ESLint 9 até os peers oficiais convergirem.
-5. **Vulnerabilidades reportadas pelo Dependabot no repositório** — os alertas abertos foram zerados após a integração dos PRs atualizáveis; novas atualizações devem continuar sendo avaliadas pelo CI e pelo limite de compatibilidade do frontend.
+5. **Vulnerabilidades do Dependabot** — zeradas; avaliar novas atualizações pelo CI e pelo limite de compatibilidade do item 4.
 6. **Campos de bug-report v5 não enviados** — `reproducibility`, `severity` e `gtaEdition` foram cogitados para o relato de bug (`BugReportWindow`) junto da telemetria v5, mas ficaram fora da integração: o Worker não tem schema/validação para eles em `bug_reports`, e a UI não os preenche hoje. Requer trabalho conjunto de UI + backend antes de existir.
 
 ## 6. Baseline de validação registrada
 
 Estes números são **referência do último estado validado**, não substituem testes da branch atual.
 
-- **28/08/2026 — integração Ralven:** build Release sem warnings, **1.011 testes .NET**, `scripts/Verify-Safety.ps1`, site (lint, typecheck, build e **3 testes**), Worker (**215 testes**) e dashboard (**50 testes**) aprovados; as cinco verificações remotas do PR, incluindo SBOM, também aprovaram. Node 24.19 LTS continua sendo o baseline versionado para as superfícies Node.
+- **30/08/2026 — integração de revisão de plano, cobrança, monitor de sessão e controles de jogos:** build Release sem warnings, **1.067 testes .NET**, `dotnet format --verify-no-changes`, `scripts/Verify-Safety.ps1` e Worker (**234 testes**, `npm audit` sem vulnerabilidades) aprovados; as cinco verificações remotas de cada um dos quatro PRs, incluindo SBOM, também aprovaram. Site e dashboard não foram alterados nesta integração; validados via CI remota. Node 24.19 LTS continua sendo o baseline versionado para as superfícies Node.
 
 - **24/08/2026 — release pública v1.5.0:** build Release sem warnings, **1.000 testes .NET**, `dotnet format --verify-no-changes`, verificação de segurança, contrato do instalador, smoke pós-ofuscação e instalação/upgrade/desinstalação aprovados. Worker (**199 testes**), dashboard (**49 testes**) e site (lint, typecheck, build e **3 testes**) também passaram sem vulnerabilidades. A CI remota e o workflow estável aprovaram SBOM, empacotamento endurecido, assinatura, proveniência, GitHub Release e publicação do feed estável assinado do updater.
 
