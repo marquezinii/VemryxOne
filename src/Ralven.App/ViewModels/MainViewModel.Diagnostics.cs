@@ -13,6 +13,8 @@ namespace Ralven.App.ViewModels;
 
 public sealed partial class MainViewModel
 {
+    private string systemPcStatusKey = "System.Pc.Status.Loading";
+
     public string CpuName { get => cpuName; private set => SetProperty(ref cpuName, value); }
 
     public string RamLabel { get => ramLabel; private set => SetProperty(ref ramLabel, value); }
@@ -70,6 +72,8 @@ public sealed partial class MainViewModel
 
     /// <summary>When the last local scan finished, already localized.</summary>
     public string LastScanLabel { get => lastScanLabel; private set => SetProperty(ref lastScanLabel, value); }
+
+    public string SystemPcStatusMessage => localization.GetString(systemPcStatusKey);
 
     /// <summary>
     /// "Boa tarde, Felipe. O que iremos fazer hoje?" — greets by local time of
@@ -180,6 +184,12 @@ public sealed partial class MainViewModel
         };
         ApplyStreamingReadiness(value);
         RefreshFiveMSessionMonitorAvailability();
+    }
+
+    private void SetSystemPcStatus(string resourceKey)
+    {
+        systemPcStatusKey = resourceKey;
+        OnPropertyChanged(nameof(SystemPcStatusMessage));
     }
 
     /// <summary>

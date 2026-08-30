@@ -26,7 +26,7 @@
   <data name="Dashboard.Title" xml:space="preserve"><value>Resumen</value></data>
   <data name="Dashboard.Subtitle" xml:space="preserve"><value>Rendimiento, claridad y control para tu PC.</value></data>
   <data name="System.Title" xml:space="preserve"><value>Sistema</value></data>
-  <data name="System.Subtitle" xml:space="preserve"><value>Revisa áreas importantes de Windows usando los controles que el propio sistema operativo protege.</value></data>
+  <data name="System.Subtitle" xml:space="preserve"><value>Revisa ajustes de juegos, salud de seguridad e información de la PC sin salir de Ralven.</value></data>
   <data name="System.WindowsUpdate.Title" xml:space="preserve"><value>Windows Update</value></data>
   <data name="System.WindowsUpdate.Description" xml:space="preserve"><value>Comprueba actualizaciones del sistema y de seguridad directamente en la Configuración de Windows.</value></data>
   <data name="System.WindowsUpdate.Action" xml:space="preserve"><value>Abrir Windows Update</value></data>
@@ -37,8 +37,39 @@
   <data name="System.Security.Description" xml:space="preserve"><value>Consulta el estado de protección informado por Windows sin cambiar la configuración de seguridad.</value></data>
   <data name="System.Security.Action" xml:space="preserve"><value>Abrir Seguridad de Windows</value></data>
   <data name="System.About.Title" xml:space="preserve"><value>Información de la PC</value></data>
-  <data name="System.About.Description" xml:space="preserve"><value>Consulta la edición y versión de Windows, el procesador, la memoria instalada y las especificaciones del dispositivo.</value></data>
+  <data name="System.About.Description" xml:space="preserve"><value>Consulta detalles de Windows, procesador, gráficos, memoria y almacenamiento recopilados localmente por Ralven.</value></data>
   <data name="System.About.Action" xml:space="preserve"><value>Ver información de la PC</value></data>
+  <data name="System.Health.Title" xml:space="preserve"><value>Salud de Windows</value></data>
+  <data name="System.Health.Description" xml:space="preserve"><value>Lee la salud agregada informada por el Centro de seguridad de Windows. Ralven no cambia ajustes de seguridad ni de actualización.</value></data>
+  <data name="System.Health.Antivirus" xml:space="preserve"><value>Antivirus</value></data>
+  <data name="System.Health.Firewall" xml:space="preserve"><value>Firewall</value></data>
+  <data name="System.Health.AutomaticUpdates" xml:space="preserve"><value>Configuración de actualizaciones automáticas</value></data>
+  <data name="System.Health.Refresh" xml:space="preserve"><value>Actualizar salud</value></data>
+  <data name="System.Health.Status.Loading" xml:space="preserve"><value>Esperando la primera lectura local.</value></data>
+  <data name="System.Health.Status.Reading" xml:space="preserve"><value>Leyendo la salud informada por el Centro de seguridad de Windows...</value></data>
+  <data name="System.Health.Status.Ready" xml:space="preserve"><value>El Centro de seguridad de Windows proporcionó las tres lecturas de salud.</value></data>
+  <data name="System.Health.Status.Partial" xml:space="preserve"><value>Windows informó solo parte de estos datos. Las áreas no disponibles no se trataron como seguras ni inseguras.</value></data>
+  <data name="System.Health.Status.Unavailable" xml:space="preserve"><value>El Centro de seguridad de Windows no pudo proporcionar esta información.</value></data>
+  <data name="System.Health.Updated.Pending" xml:space="preserve"><value>Aún no hay una lectura de salud</value></data>
+  <data name="System.Health.UpdatedAt" xml:space="preserve"><value>Salud leída a las {0}</value></data>
+  <data name="System.Health.State.Waiting" xml:space="preserve"><value>Esperando</value></data>
+  <data name="System.Health.State.Good" xml:space="preserve"><value>Saludable</value></data>
+  <data name="System.Health.State.Attention" xml:space="preserve"><value>Requiere atención</value></data>
+  <data name="System.Health.State.NotMonitored" xml:space="preserve"><value>No monitorizado</value></data>
+  <data name="System.Health.State.Snoozed" xml:space="preserve"><value>Pospuesto</value></data>
+  <data name="System.Health.State.Unavailable" xml:space="preserve"><value>No disponible</value></data>
+  <data name="System.Pc.Windows" xml:space="preserve"><value>Windows</value></data>
+  <data name="System.Pc.Cpu" xml:space="preserve"><value>Procesador</value></data>
+  <data name="System.Pc.Gpu" xml:space="preserve"><value>Gráficos</value></data>
+  <data name="System.Pc.Memory" xml:space="preserve"><value>Memoria instalada</value></data>
+  <data name="System.Pc.Disk" xml:space="preserve"><value>Almacenamiento disponible</value></data>
+  <data name="System.Pc.LogicalProcessors" xml:space="preserve"><value>Procesadores lógicos</value></data>
+  <data name="System.Pc.Refresh" xml:space="preserve"><value>Actualizar información de la PC</value></data>
+  <data name="System.Pc.Status.Loading" xml:space="preserve"><value>Recopilando información local de la PC...</value></data>
+  <data name="System.Pc.Status.Refreshing" xml:space="preserve"><value>Actualizando información local de la PC...</value></data>
+  <data name="System.Pc.Status.Ready" xml:space="preserve"><value>Ralven recopiló esta información localmente.</value></data>
+  <data name="System.Pc.Status.Stale" xml:space="preserve"><value>La actualización falló. La información recopilada anteriormente sigue visible.</value></data>
+  <data name="System.Pc.Status.Unavailable" xml:space="preserve"><value>Ralven no pudo recopilar la información de la PC.</value></data>
   <data name="System.Gaming.Title" xml:space="preserve"><value>Juegos de Windows</value></data>
   <data name="System.Gaming.Description" xml:space="preserve"><value>Analiza y aplica localmente dos ajustes de juegos compatibles de Windows, sin depender de FiveM ni de acceso administrativo.</value></data>
   <data name="System.Gaming.GameMode" xml:space="preserve"><value>Modo Juego</value></data>

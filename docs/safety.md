@@ -47,6 +47,18 @@ O projeto não aceita implementações que:
 
 ## Controles de jogos do Windows
 
+As informações de PC e saúde exibidas em **Sistema** são estritamente de
+leitura. A saúde vem da API nativa da Central de Segurança do Windows em três
+consultas independentes; falha, serviço parado ou resultado parcial permanece
+explícito como indisponível e não é reinterpretado como seguro ou inseguro. O
+estado de atualização automática não comprova que o Windows está atualizado e
+o painel não busca, baixa, instala ou aprova atualizações. Essas leituras não
+usam broker, elevação, PowerShell, linha de comando ou acesso de rede.
+
+As ações que abrem Segurança do Windows, Windows Update e Sobre continuam
+secundárias e delegam qualquer alteração às superfícies protegidas do próprio
+sistema operacional.
+
 O painel **Sistema > Jogos do Windows** é uma exceção explícita ao antigo
 comportamento somente de atalhos da página Sistema, não uma autorização para
 alterações genéricas no Windows. Seu escopo é fixo:

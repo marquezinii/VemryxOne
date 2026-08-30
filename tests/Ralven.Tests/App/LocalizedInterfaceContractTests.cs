@@ -74,6 +74,7 @@ public sealed partial class LocalizedInterfaceContractTests
         var capture = File.ReadAllText(Path.Combine(appDirectory, "MainWindow.Capture.xaml.cs"));
         var gamesPage = File.ReadAllText(Path.Combine(appDirectory, "Views", "Pages", "GamesPage.xaml"));
         var systemPage = File.ReadAllText(Path.Combine(appDirectory, "Views", "Pages", "SystemPage.xaml.cs"));
+        var systemMarkup = File.ReadAllText(Path.Combine(appDirectory, "Views", "Pages", "SystemPage.xaml"));
         var applicationsView = File.ReadAllText(Path.Combine(appDirectory, "Views", "Pages", "ApplicationsPage.xaml"));
         var applicationsPage = File.ReadAllText(Path.Combine(appDirectory, "Views", "Pages", "ApplicationsPage.xaml.cs"));
         var inspector = File.ReadAllText(Path.Combine(
@@ -98,6 +99,14 @@ public sealed partial class LocalizedInterfaceContractTests
         Assert.Contains("ms-settings:windowsupdate", systemPage, StringComparison.Ordinal);
         Assert.Contains("ApplyWindowsGamingSettingsAsync", systemPage, StringComparison.Ordinal);
         Assert.Contains("RestoreWindowsGamingSettingsAsync", systemPage, StringComparison.Ordinal);
+        Assert.Contains("WindowsAntivirusHealthLabel", systemMarkup, StringComparison.Ordinal);
+        Assert.Contains("WindowsFirewallHealthLabel", systemMarkup, StringComparison.Ordinal);
+        Assert.Contains("WindowsAutomaticUpdatesHealthLabel", systemMarkup, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding CpuName}\"", systemMarkup, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding GpuDetail}\"", systemMarkup, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding RamLabel}\"", systemMarkup, StringComparison.Ordinal);
+        Assert.Contains("RefreshWindowsSystemHealthAsync", systemPage, StringComparison.Ordinal);
+        Assert.Contains("RefreshDiagnosticAsync", systemPage, StringComparison.Ordinal);
         Assert.Contains("ItemsSource=\"{Binding InstalledApplications}\"", applicationsView, StringComparison.Ordinal);
         Assert.Contains("ItemsSource=\"{Binding StartupItems}\"", applicationsView, StringComparison.Ordinal);
         Assert.Contains("Text=\"{Binding SearchText", applicationsView, StringComparison.Ordinal);

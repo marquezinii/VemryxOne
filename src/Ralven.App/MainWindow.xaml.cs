@@ -13,6 +13,7 @@ using Ralven.App.Views;
 using Ralven.App.Views.Pages;
 using Ralven.Contracts;
 using Ralven.UpdateRuntime;
+using Ralven.Windows.Infrastructure;
 
 namespace Ralven.App;
 
@@ -130,7 +131,10 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
             telemetry: telemetry.Service,
             silentUpdateInstaller: silentUpdateInstaller,
             liveAlertService: liveAlertService,
-            windowsGamingControls: new WindowsGamingControlsService(demoMode));
+            windowsGamingControls: new WindowsGamingControlsService(demoMode),
+            windowsSystemHealthInspector: demoMode
+                ? new SyntheticWindowsSystemHealthInspector()
+                : new WindowsSystemHealthInspector());
         if (!string.IsNullOrWhiteSpace(commandLine.JustUpdatedVersion))
         {
             viewModel.ReportCompletedUpdate(commandLine.JustUpdatedVersion);

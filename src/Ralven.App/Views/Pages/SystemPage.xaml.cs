@@ -23,7 +23,9 @@ public partial class SystemPage : UserControl
     {
         if (IsVisible && DataContext is MainViewModel viewModel)
         {
-            await viewModel.RefreshWindowsGamingSettingsAsync();
+            await Task.WhenAll(
+                viewModel.RefreshWindowsGamingSettingsAsync(),
+                viewModel.RefreshWindowsSystemHealthAsync());
         }
     }
 
@@ -32,6 +34,22 @@ public partial class SystemPage : UserControl
         if (DataContext is MainViewModel viewModel)
         {
             await viewModel.RefreshWindowsGamingSettingsAsync();
+        }
+    }
+
+    private async void RefreshWindowsSystemHealth_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel)
+        {
+            await viewModel.RefreshWindowsSystemHealthAsync();
+        }
+    }
+
+    private async void RefreshDiagnostic_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel)
+        {
+            await viewModel.RefreshDiagnosticAsync();
         }
     }
 
