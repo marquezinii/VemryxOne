@@ -28,21 +28,42 @@ public sealed class FiveMSessionStateTrackerTests
         Assert.Equal(TimeSpan.FromSeconds(5), tracker.LastDuration);
     }
 
-    [Theory]
-    [InlineData(FiveMSessionPresence.Present)]
-    [InlineData(FiveMSessionPresence.Indeterminate)]
-    public void Observe_NonAbsentReadingBreaksEndConfirmation(FiveMSessionPresence reading)
+    [Fact]
+    public void Observe_PresentReadingBreaksEndConfirmation()
     {
         var tracker = new FiveMSessionStateTracker();
         tracker.Observe(FiveMSessionPresence.Present, Start);
         tracker.Observe(FiveMSessionPresence.AbsentConfirmed, Start.AddSeconds(5));
 
-        tracker.Observe(reading, Start.AddSeconds(10));
+        tracker.Observe(FiveMSessionPresence.Present, Start.AddSeconds(10));
         tracker.Observe(FiveMSessionPresence.AbsentConfirmed, Start.AddSeconds(15));
 
         Assert.True(tracker.IsActive);
         Assert.True(tracker.IsEndConfirmationPending);
         Assert.False(tracker.HasCompletedSession);
+    }
+
+    [Fact]
+    public void Observe_IndeterminateReadingDoesNotResetOrBlockEndConfirmation()
+    {
+        // A single inconclusive read between two real absences must not force
+        // the confirmation streak to restart from zero, or an intermittent
+        // read failure (e.g. FiveM running elevated) could keep a finished
+        // session marked active indefinitely.
+        var tracker = new FiveMSessionStateTracker();
+        tracker.Observe(FiveMSessionPresence.Present, Start);
+        tracker.Observe(FiveMSessionPresence.AbsentConfirmed, Start.AddSeconds(5));
+
+        tracker.Observe(FiveMSessionPresence.Indeterminate, Start.AddSeconds(10));
+
+        Assert.True(tracker.IsActive);
+        Assert.True(tracker.IsEndConfirmationPending);
+
+        tracker.Observe(FiveMSessionPresence.AbsentConfirmed, Start.AddSeconds(15));
+
+        Assert.False(tracker.IsActive);
+        Assert.True(tracker.HasCompletedSession);
+        Assert.Equal(TimeSpan.FromSeconds(5), tracker.LastDuration);
     }
 
     [Fact]

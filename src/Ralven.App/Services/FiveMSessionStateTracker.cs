@@ -51,8 +51,9 @@ internal sealed class FiveMSessionStateTracker
 
         if (presence == FiveMSessionPresence.Indeterminate)
         {
-            consecutiveAbsences = 0;
-            firstAbsenceAt = null;
+            // Inconclusive reading: it neither confirms presence nor should it
+            // erase an absence streak already in progress, or an intermittent
+            // read failure could keep the session "active" forever.
             return;
         }
 

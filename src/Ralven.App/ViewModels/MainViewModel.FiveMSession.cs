@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Windows.Threading;
 using Ralven.App.Services;
 using Ralven.Contracts;
 using Ralven.Windows.Infrastructure;
@@ -10,8 +11,8 @@ public sealed partial class MainViewModel
     private static readonly TimeSpan FiveMSessionPollInterval = TimeSpan.FromSeconds(5);
     private readonly Func<string, FiveMSessionPresence> fiveMSessionProbe;
     private readonly FiveMSessionStateTracker fiveMSessionTracker = new();
-    private readonly SemaphoreSlim fiveMSessionProbeGate = new(1, 1);
-    private CancellationTokenSource? fiveMSessionCancellation;
+    private DispatcherTimer? fiveMSessionTimer;
+    private bool fiveMSessionProbeInProgress;
     private string? fiveMSessionRoot;
     private FiveMSessionPresence? lastFiveMSessionPresence;
     private bool isFiveMSessionMonitoring;
@@ -79,77 +80,65 @@ public sealed partial class MainViewModel
         IsFiveMSessionMonitoring = true;
         RefreshFiveMSessionMonitorPresentation();
 
-        var cancellation = new CancellationTokenSource();
-        fiveMSessionCancellation = cancellation;
-        var monitorTask = MonitorFiveMSessionAsync(cancellation);
-        _ = monitorTask.ContinueWith(
-            static task => _ = task.Exception,
-            CancellationToken.None,
-            TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
-            TaskScheduler.Default);
+        fiveMSessionTimer ??= new DispatcherTimer(DispatcherPriority.Background)
+        {
+            Interval = FiveMSessionPollInterval
+        };
+        fiveMSessionTimer.Tick -= FiveMSessionTimer_Tick;
+        fiveMSessionTimer.Tick += FiveMSessionTimer_Tick;
+        fiveMSessionTimer.Start();
+        _ = ProbeFiveMSessionAsync();
     }
 
-    private async Task MonitorFiveMSessionAsync(CancellationTokenSource owner)
+    private void FiveMSessionTimer_Tick(object? sender, EventArgs e) => _ = ProbeFiveMSessionAsync();
+
+    // Cada tick é independente e nunca deixa uma falha de leitura interromper
+    // o monitoramento: uma exceção vira apresentação "indisponível" para essa
+    // rodada e o timer segue tentando na próxima, seguindo o mesmo padrão de
+    // CaptureLiveMetricsAsync.
+    private async Task ProbeFiveMSessionAsync()
     {
-        var cancellationToken = owner.Token;
+        if (!isFiveMSessionMonitoring
+            || fiveMSessionProbeInProgress
+            || fiveMSessionRoot is not { } root)
+        {
+            return;
+        }
+
+        fiveMSessionProbeInProgress = true;
         try
         {
-            while (true)
+            var presence = await Task.Run(() => fiveMSessionProbe(root));
+            if (!isFiveMSessionMonitoring)
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                var presence = await ProbeFiveMSessionAsync(fiveMSessionRoot!, cancellationToken);
-                if (cancellationToken.IsCancellationRequested
-                    || !ReferenceEquals(fiveMSessionCancellation, owner))
-                {
-                    return;
-                }
-
-                lastFiveMSessionPresence = presence;
-                fiveMSessionTracker.Observe(presence, DateTimeOffset.UtcNow);
-                RefreshFiveMSessionMonitorPresentation();
-                await Task.Delay(FiveMSessionPollInterval, cancellationToken);
+                return;
             }
-        }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-        {
-        }
-    }
 
-    private async Task<FiveMSessionPresence> ProbeFiveMSessionAsync(
-        string legacyRoot,
-        CancellationToken cancellationToken)
-    {
-        var entered = false;
-        try
-        {
-            await fiveMSessionProbeGate.WaitAsync(cancellationToken);
-            entered = true;
-            return await Task.Run(() => fiveMSessionProbe(legacyRoot), cancellationToken);
-        }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-        {
-            throw;
+            lastFiveMSessionPresence = presence;
+            fiveMSessionTracker.Observe(presence, DateTimeOffset.UtcNow);
         }
         catch (Exception exception) when (exception is not (
             OutOfMemoryException or StackOverflowException or AccessViolationException))
         {
-            return FiveMSessionPresence.Indeterminate;
+            if (!isFiveMSessionMonitoring)
+            {
+                return;
+            }
+
+            lastFiveMSessionPresence = FiveMSessionPresence.Indeterminate;
+            fiveMSessionTracker.Observe(FiveMSessionPresence.Indeterminate, DateTimeOffset.UtcNow);
         }
         finally
         {
-            if (entered)
-            {
-                fiveMSessionProbeGate.Release();
-            }
+            fiveMSessionProbeInProgress = false;
         }
+
+        RefreshFiveMSessionMonitorPresentation();
     }
 
     private void StopFiveMSessionMonitor()
     {
-        var cancellation = fiveMSessionCancellation;
-        fiveMSessionCancellation = null;
-        cancellation?.Cancel();
-        cancellation?.Dispose();
+        fiveMSessionTimer?.Stop();
         fiveMSessionRoot = null;
         lastFiveMSessionPresence = null;
         fiveMSessionTracker.Reset();
