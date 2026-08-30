@@ -83,6 +83,9 @@ public sealed partial class LocalizedInterfaceContractTests
         Assert.Contains("\"Games\" => GamesPage", navigation, StringComparison.Ordinal);
         Assert.Contains("ActivateNavItem(GamesNav)", navigation, StringComparison.Ordinal);
         Assert.Contains("Games.FiveM.Action", gamesPage, StringComparison.Ordinal);
+        Assert.Contains("FiveMGameCardSurface", gamesPage, StringComparison.Ordinal);
+        Assert.Contains("Assets/FiveM.png", gamesPage, StringComparison.Ordinal);
+        Assert.Contains("Height=\"570\"", gamesPage, StringComparison.Ordinal);
         Assert.Contains("\"Games\" => (Element: (UIElement)GamesPage, Nav: GamesNav)", capture, StringComparison.Ordinal);
         Assert.Contains("\"Optimizer\" => (Element: (UIElement)OptimizerPage, Nav: GamesNav)", capture, StringComparison.Ordinal);
         Assert.Contains("ms-settings:windowsupdate", systemPage, StringComparison.Ordinal);

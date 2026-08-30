@@ -18,33 +18,49 @@
             </StackPanel>
         </Border>
 
-        <Border Grid.Row="1" Style="{StaticResource FeatureCardSurface}" Width="520" HorizontalAlignment="Left" Margin="0,0,0,16">
+        <Border Grid.Row="1"
+                Style="{StaticResource FiveMGameCardSurface}"
+                Width="360"
+                Height="570"
+                HorizontalAlignment="Left"
+                Margin="0,0,0,16"
+                AutomationProperties.Name="{Binding [Games.FiveM.Title], Source={StaticResource LocalizedStrings}}">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="290" />
+                    <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Border Style="{StaticResource FeatureIconSurface}">
-                        <Path Style="{StaticResource Icon20}" Data="{StaticResource IconGame}" Stroke="{DynamicResource AccentTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <Border Background="{DynamicResource FiveMGameTileArtworkBrush}"
+                        CornerRadius="18,18,0,0"
+                        ClipToBounds="True">
+                    <Image Source="/Ralven;component/Assets/FiveM.png"
+                           Stretch="Uniform"
+                           Margin="36"
+                           SnapsToDevicePixels="True"
+                           RenderOptions.BitmapScalingMode="HighQuality" />
+                </Border>
+                <StackPanel Grid.Row="1" Margin="24,20,24,0">
+                    <TextBlock Text="{Binding [Games.FiveM.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource DisplayText}" />
+                    <Border Background="{DynamicResource FiveMGameTileLabelBrush}"
+                            BorderBrush="{DynamicResource FiveMGameTileBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource RadiusSm}"
+                            Padding="12,8"
+                            HorizontalAlignment="Left"
+                            Margin="0,14,0,0">
+                        <TextBlock Text="{Binding [Games.FiveM.Edition], Source={StaticResource LocalizedStrings}}" Style="{StaticResource OverlineText}" />
                     </Border>
-                    <StackPanel Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding [Games.FiveM.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SectionText}" />
-                        <TextBlock Text="{Binding [Games.FiveM.Edition], Source={StaticResource LocalizedStrings}}" Style="{StaticResource CaptionText}" Margin="0,4,0,0" />
-                    </StackPanel>
-                </Grid>
-                <TextBlock Grid.Row="1" Text="{Binding [Games.FiveM.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" TextWrapping="Wrap" Margin="0,18,0,0" />
+                    <TextBlock Text="{Binding [Games.FiveM.Description], Source={StaticResource LocalizedStrings}}"
+                               Style="{StaticResource SecondaryText}"
+                               Margin="0,16,0,0" />
+                </StackPanel>
                 <Button Grid.Row="2"
                         Content="{Binding [Games.FiveM.Action], Source={StaticResource LocalizedStrings}}"
                         ToolTip="{Binding [Games.FiveM.ActionTooltip], Source={StaticResource LocalizedStrings}}"
                         Style="{StaticResource PrimaryButtonStyle}"
-                        HorizontalAlignment="Left"
-                        Margin="0,22,0,0"
+                        HorizontalAlignment="Stretch"
+                        Margin="24,22,24,24"
                         Click="OpenFiveM_Click" />
             </Grid>
         </Border>

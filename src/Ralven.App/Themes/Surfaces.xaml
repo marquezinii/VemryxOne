@@ -163,6 +163,15 @@
         <Setter Property="Padding" Value="24" />
     </Style>
 
+    <Style x:Key="FiveMGameCardSurface" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource FiveMGameTileBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource FiveMGameTileBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusXl}" />
+        <Setter Property="Effect" Value="{DynamicResource Elevation2Shadow}" />
+        <Setter Property="ClipToBounds" Value="True" />
+    </Style>
+
     <Style x:Key="FeatureIconSurface" TargetType="Border">
         <Setter Property="Width" Value="42" />
         <Setter Property="Height" Value="42" />
