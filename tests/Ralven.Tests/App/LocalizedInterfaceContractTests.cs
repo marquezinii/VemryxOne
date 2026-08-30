@@ -41,6 +41,7 @@ public sealed partial class LocalizedInterfaceContractTests
             Path.Combine(root, "src", "Ralven.App", "Views", "Pages", "OverviewPage.xaml"),
             Path.Combine(root, "src", "Ralven.App", "Views", "Pages", "SystemPage.xaml"),
             Path.Combine(root, "src", "Ralven.App", "Views", "Pages", "ApplicationsPage.xaml"),
+            Path.Combine(root, "src", "Ralven.App", "Views", "Pages", "GamesPage.xaml"),
             Path.Combine(root, "src", "Ralven.App", "Views", "Pages", "OptimizerPage.xaml")
         };
         var keys = sources
@@ -64,11 +65,14 @@ public sealed partial class LocalizedInterfaceContractTests
     }
 
     [Fact]
-    public void GeneralExpansion_UsesInternalApplicationInventoryAndTrustedWindowsActions()
+    public void GeneralExpansion_UsesInternalCatalogsAndTrustedWindowsActions()
     {
         var root = TestHelpers.FindRepositoryRoot();
         var appDirectory = Path.Combine(root, "src", "Ralven.App");
         var mainWindow = File.ReadAllText(Path.Combine(appDirectory, "MainWindow.xaml"));
+        var navigation = File.ReadAllText(Path.Combine(appDirectory, "MainWindow.Navigation.xaml.cs"));
+        var capture = File.ReadAllText(Path.Combine(appDirectory, "MainWindow.Capture.xaml.cs"));
+        var gamesPage = File.ReadAllText(Path.Combine(appDirectory, "Views", "Pages", "GamesPage.xaml"));
         var systemPage = File.ReadAllText(Path.Combine(appDirectory, "Views", "Pages", "SystemPage.xaml.cs"));
         var applicationsView = File.ReadAllText(Path.Combine(appDirectory, "Views", "Pages", "ApplicationsPage.xaml"));
         var applicationsPage = File.ReadAllText(Path.Combine(appDirectory, "Views", "Pages", "ApplicationsPage.xaml.cs"));
@@ -81,7 +85,16 @@ public sealed partial class LocalizedInterfaceContractTests
 
         Assert.Contains("Tag=\"System\"", mainWindow, StringComparison.Ordinal);
         Assert.Contains("Tag=\"Applications\"", mainWindow, StringComparison.Ordinal);
-        Assert.Contains("[Navigation.FiveM]", mainWindow, StringComparison.Ordinal);
+        Assert.Contains("Tag=\"Games\"", mainWindow, StringComparison.Ordinal);
+        Assert.Contains("[Navigation.Games]", mainWindow, StringComparison.Ordinal);
+        Assert.Contains("\"Games\" => GamesPage", navigation, StringComparison.Ordinal);
+        Assert.Contains("ActivateNavItem(GamesNav)", navigation, StringComparison.Ordinal);
+        Assert.Contains("Games.FiveM.Action", gamesPage, StringComparison.Ordinal);
+        Assert.Contains("FiveMGameCardSurface", gamesPage, StringComparison.Ordinal);
+        Assert.Contains("Assets/FiveM.png", gamesPage, StringComparison.Ordinal);
+        Assert.Contains("Height=\"570\"", gamesPage, StringComparison.Ordinal);
+        Assert.Contains("\"Games\" => (Element: (UIElement)GamesPage, Nav: GamesNav)", capture, StringComparison.Ordinal);
+        Assert.Contains("\"Optimizer\" => (Element: (UIElement)OptimizerPage, Nav: GamesNav)", capture, StringComparison.Ordinal);
         Assert.Contains("ms-settings:windowsupdate", systemPage, StringComparison.Ordinal);
         Assert.Contains("ApplyWindowsGamingSettingsAsync", systemPage, StringComparison.Ordinal);
         Assert.Contains("RestoreWindowsGamingSettingsAsync", systemPage, StringComparison.Ordinal);

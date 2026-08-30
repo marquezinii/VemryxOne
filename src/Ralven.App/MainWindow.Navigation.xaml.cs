@@ -14,6 +14,7 @@ public partial class MainWindow
     // Keep the dashboard as the only page created during InitializeComponent. Every other page is created only when first selected.
     private SystemPage SystemPage => systemPage ??= CreateDeferredPage<SystemPage>();
     private ApplicationsPage ApplicationsPage => applicationsPage ??= CreateApplicationsPage();
+    private GamesPage GamesPage => gamesPage ??= CreateDeferredPage<GamesPage>();
     private OptimizerPage OptimizerPage => optimizerPage ??= CreateDeferredPage<OptimizerPage>();
     private HistoryPage HistoryPage => historyPage ??= CreateDeferredPage<HistoryPage>();
 
@@ -46,7 +47,7 @@ public partial class MainWindow
         {
             "System" => SystemPage,
             "Applications" => ApplicationsPage,
-            "Optimizer" => OptimizerPage,
+            "Games" => GamesPage,
             "History" => HistoryPage,
             "Settings" => SettingsPage,
             _ => DashboardPage
@@ -58,7 +59,7 @@ public partial class MainWindow
         DashboardNav.IsActive = ReferenceEquals(selected, DashboardNav);
         SystemNav.IsActive = ReferenceEquals(selected, SystemNav);
         ApplicationsNav.IsActive = ReferenceEquals(selected, ApplicationsNav);
-        OptimizerNav.IsActive = ReferenceEquals(selected, OptimizerNav);
+        GamesNav.IsActive = ReferenceEquals(selected, GamesNav);
         HistoryNav.IsActive = ReferenceEquals(selected, HistoryNav);
         SettingsNav.IsActive = ReferenceEquals(selected, SettingsNav);
     }
@@ -73,6 +74,10 @@ public partial class MainWindow
         if (applicationsPage is not null)
         {
             applicationsPage.Visibility = Visibility.Collapsed;
+        }
+        if (gamesPage is not null)
+        {
+            gamesPage.Visibility = Visibility.Collapsed;
         }
         if (optimizerPage is not null)
         {
@@ -96,7 +101,7 @@ public partial class MainWindow
 
     internal void RequestNavigateToOptimizer()
     {
-        ActivateNavItem(OptimizerNav);
+        ActivateNavItem(GamesNav);
         Navigate(OptimizerPage);
     }
 
@@ -108,7 +113,7 @@ public partial class MainWindow
 
     internal async Task RequestStartOptimizationAsync()
     {
-        ActivateNavItem(OptimizerNav);
+        ActivateNavItem(GamesNav);
         Navigate(OptimizerPage);
         await viewModel.StartOptimizationAsync();
         if (closeAfterOptimizationStops)

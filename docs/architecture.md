@@ -16,11 +16,13 @@ Este documento descreve a arquitetura-alvo e os limites entre componentes. Uma c
 ## Áreas de produto
 
 O shell separa a experiência em **Visão geral**, **Sistema**, **Aplicativos** e
-**FiveM**. Aplicativos apresenta dentro do Ralven um inventário local somente
+**Jogos**. Aplicativos apresenta dentro do Ralven um inventário local somente
 leitura dos programas desktop registrados e dos itens de inicialização em
 `Run`, `RunOnce` e pastas Startup. Busca, contagens e resultados parciais ficam
 na própria página; as superfícies do Windows e da Microsoft Store permanecem
-como ações secundárias para alterações que o Ralven não executa. Sistema
+como ações secundárias para alterações que o Ralven não executa. Jogos abre um
+catálogo interno que hoje contém somente FiveM sobre GTAV Legacy; o card leva ao
+otimizador especializado existente e mantém Jogos como a categoria ativa. Sistema
 preserva os atalhos para Windows Update, Segurança e informações do PC, mas
 também oferece um painel dedicado de jogos do Windows: ele lê o Modo de Jogo e
 a gravação histórica em segundo plano e, com confirmação explícita, aplica

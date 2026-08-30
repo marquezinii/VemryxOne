@@ -87,6 +87,22 @@
         <GradientStop Color="#2D2E33" Offset="1" />
     </LinearGradientBrush>
 
+    <LinearGradientBrush x:Key="FiveMGameTileBrush" StartPoint="0.92,0" EndPoint="0.08,1">
+        <GradientStop Color="#F2FFFFFF" Offset="0" />
+        <GradientStop Color="#D9E8E8E9" Offset="1" />
+    </LinearGradientBrush>
+    <RadialGradientBrush x:Key="FiveMGameTileArtworkBrush"
+                         GradientOrigin="0.5,0.2"
+                         Center="0.5,0.2"
+                         RadiusX="0.82"
+                         RadiusY="0.78">
+        <GradientStop Color="#1FFF7100" Offset="0" />
+        <GradientStop Color="#0AFF7100" Offset="0.52" />
+        <GradientStop Color="#00FFFFFF" Offset="1" />
+    </RadialGradientBrush>
+    <SolidColorBrush x:Key="FiveMGameTileBorderBrush" Color="#330A0A0B" />
+    <SolidColorBrush x:Key="FiveMGameTileLabelBrush" Color="#0C0A0A0B" />
+
     <SolidColorBrush x:Key="BrandInkBrush" Color="#0A0A0B" />
     <SolidColorBrush x:Key="GamingAccentBrush" Color="#2D2E33" />
 
