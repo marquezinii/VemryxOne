@@ -177,6 +177,22 @@ condições abaixo simultaneamente:
 
 A limpeza de cache não entra implicitamente nos modos Leve, Médio ou Agressivo.
 
+### Monitor de sessão somente leitura
+
+O monitor de sessão da Visão geral é uma capacidade manual e local, limitada ao
+FiveM sobre GTAV Legacy. Uma presença positiva exige nome de processo
+allowlisted e imagem canônica dentro da raiz FiveM diagnosticada, com validação
+contra reparse points. Falha de enumeração ou leitura da imagem é estado
+indeterminado, nunca presença nem ausência confirmada; duas ausências
+confirmadas consecutivas são necessárias para encerrar a sessão.
+
+O monitor mantém apenas estado e duração em memória, continua funcionando com
+o Ralven na bandeja e termina quando o aplicativo fecha. Ele não usa rede,
+telemetria, persistência, broker, leitura de memória, hooks ou injeção e não
+altera FiveM, GTA V ou Windows. Sua existência não autoriza prioridade,
+afinidade, plano de energia, timer resolution ou qualquer outra mutação por
+sessão sem arquitetura própria de rollback e recuperação.
+
 ### Encerramento de processo travado
 
 A ação opt-in `fivem.legacy.stuck-process.terminate`

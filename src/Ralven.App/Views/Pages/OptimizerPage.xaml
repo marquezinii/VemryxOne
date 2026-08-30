@@ -72,22 +72,65 @@
         <DataTemplate x:Key="PlanActionTemplate">
             <Border Style="{StaticResource TableRowStyle}" Padding="12,13">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" MinWidth="170" />
-                        <ColumnDefinition Width="3*" MinWidth="200" />
-                        <ColumnDefinition Width="112" />
-                        <ColumnDefinition Width="164" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="{Binding Name}" Style="{StaticResource BodyStrongText}" TextWrapping="Wrap" Margin="0,0,18,0" />
-                    <TextBlock Grid.Column="1" Text="{Binding Description}" Style="{StaticResource SecondaryText}" TextWrapping="Wrap" Margin="0,1,18,0" />
-                    <TextBlock Grid.Column="2" Text="{Binding RiskLabel}" Style="{StaticResource CaptionText}" VerticalAlignment="Top" Margin="0,2,12,0"
-                               Foreground="{Binding RiskBrushKey, Converter={StaticResource BrushKeyConverter}}" TextWrapping="Wrap" />
-                    <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,2,0,0">
-                        <Path Width="13" Height="13" Stretch="Uniform" StrokeThickness="1.4" Margin="0,1,6,0" VerticalAlignment="Top"
-                              Data="{StaticResource IconShield}" Stroke="{DynamicResource TextTertiaryBrush}"
-                              Visibility="{Binding RequiresElevation, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                        <TextBlock Text="{Binding PrivilegeLabel}" Style="{StaticResource CaptionText}" TextWrapping="Wrap" />
-                    </StackPanel>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" MinWidth="170" />
+                            <ColumnDefinition Width="3*" MinWidth="200" />
+                            <ColumnDefinition Width="112" />
+                            <ColumnDefinition Width="164" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding Name}" Style="{StaticResource BodyStrongText}" TextWrapping="Wrap" Margin="0,0,18,0" />
+                        <TextBlock Grid.Column="1" Text="{Binding Description}" Style="{StaticResource SecondaryText}" TextWrapping="Wrap" Margin="0,1,18,0" />
+                        <TextBlock Grid.Column="2" Text="{Binding RiskLabel}" Style="{StaticResource CaptionText}" VerticalAlignment="Top" Margin="0,2,12,0"
+                                   Foreground="{Binding RiskBrushKey, Converter={StaticResource BrushKeyConverter}}" TextWrapping="Wrap" />
+                        <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,2,0,0">
+                            <Path Width="13" Height="13" Stretch="Uniform" StrokeThickness="1.4" Margin="0,1,6,0" VerticalAlignment="Top"
+                                  Data="{StaticResource IconShield}" Stroke="{DynamicResource TextTertiaryBrush}"
+                                  Visibility="{Binding RequiresElevation, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            <TextBlock Text="{Binding PrivilegeLabel}" Style="{StaticResource CaptionText}" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Expander Grid.Row="1"
+                              Header="{Binding [Optimizer.ShowDetails], Source={StaticResource LocalizedStrings}}"
+                              HorizontalContentAlignment="Stretch"
+                              Background="Transparent"
+                              Foreground="{DynamicResource AccentTextBrush}"
+                              Margin="0,10,0,0"
+                              AutomationProperties.Name="{Binding Name}"
+                              AutomationProperties.HelpText="{Binding [Optimizer.ShowDetails], Source={StaticResource LocalizedStrings}}">
+                        <Grid Margin="24,13,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,24,17">
+                                <TextBlock Text="{Binding [Optimizer.Details.Detection], Source={StaticResource LocalizedStrings}}" Style="{StaticResource OverlineText}" />
+                                <TextBlock Text="{Binding DetectionSummary}" Style="{StaticResource SecondaryText}" TextWrapping="Wrap" Margin="0,6,0,0" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,17">
+                                <TextBlock Text="{Binding [Optimizer.Details.Confirmation], Source={StaticResource LocalizedStrings}}" Style="{StaticResource OverlineText}" />
+                                <TextBlock Text="{Binding ConfirmationSummary}" Style="{StaticResource SecondaryText}" TextWrapping="Wrap" Margin="0,6,0,0" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,24,0">
+                                <TextBlock Text="{Binding [Optimizer.Details.Undo], Source={StaticResource LocalizedStrings}}" Style="{StaticResource OverlineText}" />
+                                <TextBlock Text="{Binding UndoSummary}" Style="{StaticResource SecondaryText}" TextWrapping="Wrap" Margin="0,6,0,0" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Grid.Column="1">
+                                <TextBlock Text="{Binding [Optimizer.Details.Limitations], Source={StaticResource LocalizedStrings}}" Style="{StaticResource OverlineText}" />
+                                <TextBlock Text="{Binding RiskLimitations}" Style="{StaticResource SecondaryText}" TextWrapping="Wrap" Margin="0,6,0,0" />
+                            </StackPanel>
+                        </Grid>
+                    </Expander>
                 </Grid>
             </Border>
         </DataTemplate>

@@ -76,6 +76,19 @@ remove primeiro o perfil pelo UID autenticado e só então a conta Firebase;
 se o Firebase recusar a exclusão, o perfil é restaurado antes de informar a
 falha.
 
+## Cobrança e entitlements
+
+A fundação de cobrança fica no Worker e no D1, separada da autenticação
+Firebase e das políticas de otimização. O aplicativo pode ler apenas o snapshot
+server-side de acesso da própria UID em `GET /account/entitlements`; IDs e
+estados do provedor não são contratos do cliente. Notificações do Mercado Pago
+são autenticadas por HMAC e sempre reconciliadas contra o recurso canônico e um
+checkout intent criado pelo servidor. O corpo da notificação, um redirect de
+checkout ou o estado `authorized` de uma assinatura não concedem Pro. Veja
+[Cobrança e acesso pago](billing.md) para o contrato e os bloqueadores de
+ativação. Enquanto um checkout ou assinatura local existir, a exclusão do perfil
+é bloqueada; o fluxo futuro deve cancelar no provedor antes de remover o vínculo.
+
 | Projeto                  | Responsabilidade                                                    | Não deve conhecer                                        |
 | ------------------------ | ------------------------------------------------------------------- | -------------------------------------------------------- |
 | `Ralven.App`       | WPF, navegação, prévia, progresso e confirmação                     | APIs administrativas ou detalhes de registro             |
@@ -137,7 +150,7 @@ documentação: como detectar, como confirmar, como desfazer, riscos/limitaçõe
 
 IDs são estáveis para que relatórios e snapshots continuem interpretáveis entre versões. Os campos de pré-requisito, criticidade, versões do Windows e documentação vivem em `ActionMetadataDto`/`OptimizationActionDefinition`.
 
-Pré-requisito, criticidade e privilégio alimentam o motor de execução. Os quatro campos de documentação (`DetectionSummary`, `ConfirmationSummary`, `UndoSummary`, `RiskLimitations`) hoje são obrigatórios por teste e participam da verificação de integridade do plano, mas **ainda não são exibidos na interface**; expô-los na revisão do plano continua sendo trabalho em aberto.
+Pré-requisito, criticidade e privilégio alimentam o motor de execução. Os quatro campos de documentação (`DetectionSummary`, `ConfirmationSummary`, `UndoSummary`, `RiskLimitations`) são obrigatórios por teste, participam da verificação de integridade do plano e aparecem de forma localizada nos detalhes expansíveis de cada ação durante a revisão do plano.
 
 `ActionMetadataDto.MatchesExactly` é a única comparação de metadados do projeto. O broker elevado e o catálogo Windows rejeitam um plano cujos metadados divergem do catálogo local, e ambos delegam a esse método — antes cada fronteira repetia a lista de campos e as duas versões haviam divergido.
 
@@ -218,6 +231,22 @@ Responsabilidades:
 - calcular tamanho de caches sem segui-los para fora do root canônico.
 
 O parser XML altera apenas chaves presentes. Um arquivo inválido gera ação de reparo separada; nunca é substituído por um template genérico.
+
+### Monitor local de sessão FiveM
+
+O monitor da Visão geral é iniciado manualmente e permanece ativo enquanto o
+Ralven estiver aberto, inclusive na bandeja. Ele usa exclusivamente a raiz
+Legacy já diagnosticada e só confirma uma sessão quando o nome allowlisted e o
+caminho canônico da imagem do processo pertencem à instalação validada, sem
+atravessar reparse points. Leituras incompletas são tratadas como
+indeterminadas, e duas ausências confirmadas consecutivas são exigidas para
+encerrar uma sessão.
+
+Esse monitor é somente leitura: o estado e a duração ficam apenas em memória,
+não há persistência, telemetria, rede, broker nem alteração no jogo ou no
+Windows. Ele termina quando o aplicativo fecha e, por isso, não autoriza plano
+de energia, prioridade, afinidade, timer resolution ou qualquer outra ação
+mutável condicionada ao ciclo de vida do FiveM.
 
 ## Guard de GTAV Enhanced
 
@@ -377,19 +406,18 @@ importante para o roadmap**: `windows.power.pcie-aspm.adjust`
 (`PciExpressPowerManagementAction`, Médio/Agressivo) e
 `windows.gaming.mouse-polling-rate.guide` (`MousePollingRateGuidanceAction`,
 todos os perfis) foram implementados por caberem no modelo transacional
-atual (ajuste único, reversível, sem depender de vigilância contínua). A
-maior parte do lote pedido nessa rodada — plano de energia próprio
+atual (ajuste único, reversível, sem depender de vigilância contínua). O
+monitor local descrito acima agora observa início e fim de sessões em modo
+somente leitura, mas não persiste estado nem permanece ativo após o Ralven
+fechar. A maior parte do lote pedido nessa rodada — plano de energia próprio
 ativado/restaurado por sessão, prioridade de processo restaurada ao
 fechar, afinidade de CPU, core parking, timer resolution solicitado
-enquanto o jogo está aberto — **não foi implementada porque pressupõe um
-processo de vigilância de ciclo de vida do FiveM/GTA V (detectar
-início/fim em tempo real) que este produto não tem**. O Ralven é
-hoje "aplicar uma vez, verificar, confirmar, reverter se necessário", não
-um serviço residente que reage a um processo abrindo/fechando. Ver
+enquanto o jogo está aberto — **continua não implementada porque exige
+recuperação e rollback garantidos mesmo se o aplicativo encerrar de forma
+inesperada**. O monitor somente leitura não satisfaz esse contrato. Ver
 `docs/graphics-optimizations-backlog.md`, seção 13, para a lista completa
-e a recomendação de que uma sessão futura decida essa arquitetura de
-vigilância explicitamente antes de portar qualquer um desses itens para o
-catálogo.
+e a decisão arquitetural que ainda precisa anteceder qualquer ação mutável
+por sessão.
 
 Cancelamento:
 

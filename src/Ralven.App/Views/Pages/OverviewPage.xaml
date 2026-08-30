@@ -493,6 +493,44 @@
 
                         <Border Style="{StaticResource HairlineDivider}" Margin="0,22" />
 
+                        <!-- Monitor manual, local e somente leitura. Continua
+                             ativo quando a janela está na bandeja, mas não
+                             persiste nem tenta controlar o processo. -->
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Path Style="{StaticResource Icon16}" Data="{StaticResource IconGame}"
+                                      Stroke="{Binding FiveMSessionStatusBrushKey, Converter={StaticResource BrushKeyConverter}}"
+                                      VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding [Dashboard.SessionMonitor.Title], Source={StaticResource LocalizedStrings}}"
+                                           Style="{StaticResource SubsectionText}" Margin="11,0,0,0"
+                                           TextWrapping="Wrap" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <TextBlock Text="{Binding [Dashboard.SessionMonitor.Description], Source={StaticResource LocalizedStrings}}"
+                                       Style="{StaticResource CaptionText}" Margin="0,6,0,0" TextWrapping="Wrap" />
+                            <Border Style="{StaticResource TagChipStyle}" HorizontalAlignment="Left" Margin="0,14,0,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="7" Height="7" VerticalAlignment="Center"
+                                             Fill="{Binding FiveMSessionStatusBrushKey, Converter={StaticResource BrushKeyConverter}}" />
+                                    <TextBlock Text="{Binding FiveMSessionStatusLabel}" Style="{StaticResource OverlineText}"
+                                               Foreground="{Binding FiveMSessionStatusBrushKey, Converter={StaticResource BrushKeyConverter}}"
+                                               Margin="8,0,0,0" />
+                                </StackPanel>
+                            </Border>
+                            <TextBlock Text="{Binding FiveMSessionDetailLabel}" Style="{StaticResource SecondaryText}"
+                                       Margin="0,10,0,0" TextWrapping="Wrap" />
+                            <Button Style="{StaticResource SecondaryButtonStyle}" HorizontalAlignment="Left" Margin="0,14,0,0"
+                                    IsEnabled="{Binding CanToggleFiveMSessionMonitor}"
+                                    Click="ToggleFiveMSessionMonitor_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Style="{StaticResource Icon16}" Data="{StaticResource IconEye}"
+                                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                                    <TextBlock Text="{Binding FiveMSessionActionLabel}" Margin="10,0,0,0" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+
+                        <Border Style="{StaticResource HairlineDivider}" Margin="0,22" />
+
                         <!-- Espaço seguro para criadores. -->
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">

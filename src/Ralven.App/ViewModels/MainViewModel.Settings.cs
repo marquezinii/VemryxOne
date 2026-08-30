@@ -400,6 +400,7 @@ public sealed partial class MainViewModel
         }
 
         NotifyLivePerformanceStateChanged();
+        RefreshFiveMSessionMonitorPresentation();
         ApplyLastOptimization(historyRecords);
         RefreshWindowsGamingPresentation();
     }

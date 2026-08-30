@@ -508,12 +508,24 @@ public sealed partial class MainViewModel
         };
         var nameKey = $"Actions.{action.Id}.Name";
         var descriptionKey = $"Actions.{action.Id}.Description";
+        var detectionSummaryKey = $"Actions.{action.Id}.DetectionSummary";
+        var confirmationSummaryKey = $"Actions.{action.Id}.ConfirmationSummary";
+        var undoSummaryKey = $"Actions.{action.Id}.UndoSummary";
+        var riskLimitationsKey = $"Actions.{action.Id}.RiskLimitations";
         var localizedName = localization.GetString(nameKey);
         var localizedDescription = localization.GetString(descriptionKey);
+        var localizedDetectionSummary = localization.GetString(detectionSummaryKey);
+        var localizedConfirmationSummary = localization.GetString(confirmationSummaryKey);
+        var localizedUndoSummary = localization.GetString(undoSummaryKey);
+        var localizedRiskLimitations = localization.GetString(riskLimitationsKey);
         return new ActionDisplayItem(
             action.Id,
             localizedName == nameKey ? action.Name : localizedName,
             localizedDescription == descriptionKey ? action.Description : localizedDescription,
+            localizedDetectionSummary == detectionSummaryKey ? action.DetectionSummary : localizedDetectionSummary,
+            localizedConfirmationSummary == confirmationSummaryKey ? action.ConfirmationSummary : localizedConfirmationSummary,
+            localizedUndoSummary == undoSummaryKey ? action.UndoSummary : localizedUndoSummary,
+            localizedRiskLimitations == riskLimitationsKey ? action.RiskLimitations : localizedRiskLimitations,
             icon,
             risk,
             riskBrushKey,

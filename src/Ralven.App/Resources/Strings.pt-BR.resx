@@ -133,6 +133,10 @@
   <data name="Optimizer.ChangeMode" xml:space="preserve"><value>Alterar modo</value></data>
   <data name="Optimizer.RunningTitle" xml:space="preserve"><value>Otimizando seu computador</value></data>
   <data name="Optimizer.ShowDetails" xml:space="preserve"><value>Mostrar detalhes</value></data>
+  <data name="Optimizer.Details.Detection" xml:space="preserve"><value>COMO É DETECTADO</value></data>
+  <data name="Optimizer.Details.Confirmation" xml:space="preserve"><value>COMO É CONFIRMADO</value></data>
+  <data name="Optimizer.Details.Undo" xml:space="preserve"><value>COMO DESFAZER</value></data>
+  <data name="Optimizer.Details.Limitations" xml:space="preserve"><value>RISCOS E LIMITAÇÕES</value></data>
   <data name="Optimizer.CompletedTitle" xml:space="preserve"><value>Otimização concluída</value></data>
   <data name="Optimizer.Result.Failed" xml:space="preserve"><value>A otimização não foi concluída</value></data>
   <data name="Optimizer.Result.PartialTitle" xml:space="preserve"><value>Concluído com falhas</value></data>
@@ -456,126 +460,370 @@
   <data name="Streaming.Check.GameSession.Closed.Detail" xml:space="preserve"><value>O PC está em um estado seguro para planejar a otimização antes de jogar ou transmitir.</value></data>
   <data name="Actions.safety.fivem-stopped.verify.Name" xml:space="preserve"><value>Verificar estado do FiveM</value></data>
   <data name="Actions.safety.fivem-stopped.verify.Description" xml:space="preserve"><value>Confirma que os processos do FiveM estão encerrados antes de qualquer alteração em cache ou gráficos.</value></data>
+  <data name="Actions.safety.fivem-stopped.verify.DetectionSummary" xml:space="preserve"><value>Inspeciona os processos ativos cuja imagem pertence à pasta do FiveM.</value></data>
+  <data name="Actions.safety.fivem-stopped.verify.ConfirmationSummary" xml:space="preserve"><value>A verificação passa quando nenhum processo do FiveM está em execução.</value></data>
+  <data name="Actions.safety.fivem-stopped.verify.UndoSummary" xml:space="preserve"><value>Somente leitura: não há nada para desfazer.</value></data>
+  <data name="Actions.safety.fivem-stopped.verify.RiskLimitations" xml:space="preserve"><value>Se o FiveM estiver aberto, as ações dependentes são ignoradas com segurança.</value></data>
   <data name="Actions.safety.gtav-stopped.verify.Name" xml:space="preserve"><value>Verificar estado do GTA V</value></data>
   <data name="Actions.safety.gtav-stopped.verify.Description" xml:space="preserve"><value>Confirma que o GTA V Legacy está fechado antes de qualquer alteração no settings.xml dele.</value></data>
+  <data name="Actions.safety.gtav-stopped.verify.DetectionSummary" xml:space="preserve"><value>Inspeciona os processos ativos cuja imagem pertence à pasta do GTA V.</value></data>
+  <data name="Actions.safety.gtav-stopped.verify.ConfirmationSummary" xml:space="preserve"><value>A verificação passa quando o GTA V não está em execução.</value></data>
+  <data name="Actions.safety.gtav-stopped.verify.UndoSummary" xml:space="preserve"><value>Somente leitura: não há nada para desfazer.</value></data>
+  <data name="Actions.safety.gtav-stopped.verify.RiskLimitations" xml:space="preserve"><value>Se o GTA V estiver aberto, os ajustes gráficos do GTA V são ignorados com segurança.</value></data>
   <data name="Actions.safety.bottleneck.diagnose.Name" xml:space="preserve"><value>Diagnosticar gargalo provável</value></data>
   <data name="Actions.safety.bottleneck.diagnose.Description" xml:space="preserve"><value>Analisa memória disponível, processadores lógicos e espaço livre em disco para apontar o recurso mais limitante, sem alterar nada.</value></data>
+  <data name="Actions.safety.bottleneck.diagnose.DetectionSummary" xml:space="preserve"><value>Lê memória total/disponível, contagem de processadores lógicos e espaço livre no disco do sistema.</value></data>
+  <data name="Actions.safety.bottleneck.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.safety.bottleneck.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não há nada para desfazer.</value></data>
+  <data name="Actions.safety.bottleneck.diagnose.RiskLimitations" xml:space="preserve"><value>É uma heurística local, não um benchmark; resultados variam conforme a carga no momento da leitura.</value></data>
   <data name="Actions.windows.gaming.overlays.detect.Name" xml:space="preserve"><value>Detectar overlays e captura em segundo plano</value></data>
   <data name="Actions.windows.gaming.overlays.detect.Description" xml:space="preserve"><value>Verifica a presença de overlays e softwares de captura de terceiros conhecidos (NVIDIA, RTSS, Discord, Xbox Game Bar) em execução, sem fechá-los.</value></data>
+  <data name="Actions.windows.gaming.overlays.detect.DetectionSummary" xml:space="preserve"><value>Compara os processos em execução com uma lista pequena e conhecida de overlays/capturadores.</value></data>
+  <data name="Actions.windows.gaming.overlays.detect.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.windows.gaming.overlays.detect.UndoSummary" xml:space="preserve"><value>Somente leitura: não fecha nem altera nenhum processo.</value></data>
+  <data name="Actions.windows.gaming.overlays.detect.RiskLimitations" xml:space="preserve"><value>Detecção heurística por nome de processo; presença não significa necessariamente problema.</value></data>
   <data name="Actions.fivem.legacy.logs.read.Name" xml:space="preserve"><value>Ler log recente do FiveM</value></data>
   <data name="Actions.fivem.legacy.logs.read.Description" xml:space="preserve"><value>Localiza o log mais recente do FiveM Legacy e resume sua idade e ocorrências de possíveis erros, sem modificar nada.</value></data>
+  <data name="Actions.fivem.legacy.logs.read.DetectionSummary" xml:space="preserve"><value>Abre o log mais recente da pasta logs do FiveM com acesso compartilhado, mesmo com o FiveM aberto.</value></data>
+  <data name="Actions.fivem.legacy.logs.read.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.fivem.legacy.logs.read.UndoSummary" xml:space="preserve"><value>Somente leitura: não altera nem remove nenhum log.</value></data>
+  <data name="Actions.fivem.legacy.logs.read.RiskLimitations" xml:space="preserve"><value>Contagem de possíveis erros é aproximada (busca textual); não substitui um diagnóstico completo.</value></data>
   <data name="Actions.safety.performance-diagnostics.guide.Name" xml:space="preserve"><value>Orientar diagnóstico de desempenho</value></data>
   <data name="Actions.safety.performance-diagnostics.guide.Description" xml:space="preserve"><value>Aponta os comandos oficiais do FiveM (cl_drawfps, cl_drawperf, netgraph) para medir FPS e rede dentro do próprio jogo.</value></data>
+  <data name="Actions.safety.performance-diagnostics.guide.DetectionSummary" xml:space="preserve"><value>Não lê nada do sistema; apresenta uma orientação fixa baseada na documentação oficial do FiveM.</value></data>
+  <data name="Actions.safety.performance-diagnostics.guide.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com a mensagem de orientação.</value></data>
+  <data name="Actions.safety.performance-diagnostics.guide.UndoSummary" xml:space="preserve"><value>Somente leitura: não há nada para desfazer.</value></data>
+  <data name="Actions.safety.performance-diagnostics.guide.RiskLimitations" xml:space="preserve"><value>Não injeta overlay nem mede FPS pelo aplicativo; a medição é feita pelo próprio FiveM.</value></data>
   <data name="Actions.safety.network-health.diagnose.Name" xml:space="preserve"><value>Diagnosticar saúde da rede local</value></data>
   <data name="Actions.safety.network-health.diagnose.Description" xml:space="preserve"><value>Lê contadores de pacotes descartados e com erro das placas de rede ativas, sem enviar tráfego a nenhum servidor.</value></data>
+  <data name="Actions.safety.network-health.diagnose.DetectionSummary" xml:space="preserve"><value>Lê estatísticas já coletadas pelo Windows para as placas de rede ativas (pacotes descartados/com erro).</value></data>
+  <data name="Actions.safety.network-health.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.safety.network-health.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não envia nem recebe tráfego de rede.</value></data>
+  <data name="Actions.safety.network-health.diagnose.RiskLimitations" xml:space="preserve"><value>Não substitui netgraph/cl_drawperf do próprio FiveM para latência real até o servidor.</value></data>
   <data name="Actions.safety.thermal.diagnose.Name" xml:space="preserve"><value>Diagnosticar temperatura e throttling</value></data>
   <data name="Actions.safety.thermal.diagnose.Description" xml:space="preserve"><value>Tenta ler a zona térmica ACPI exposta pelo Windows; a maioria das placas-mãe não expõe esse dado sem software do fabricante, e isso é informado com honestidade.</value></data>
+  <data name="Actions.safety.thermal.diagnose.DetectionSummary" xml:space="preserve"><value>Consulta MSAcpi_ThermalZoneTemperature (WMI) e valida se o valor está numa faixa plausível.</value></data>
+  <data name="Actions.safety.thermal.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.safety.thermal.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não há nada para desfazer.</value></data>
+  <data name="Actions.safety.thermal.diagnose.RiskLimitations" xml:space="preserve"><value>Sem software do fabricante da placa-mãe/GPU, a maioria dos sistemas não expõe essa leitura; o app nunca inventa um valor.</value></data>
   <data name="Actions.safety.pagefile-commit.diagnose.Name" xml:space="preserve"><value>Diagnosticar pagefile e memória committed</value></data>
   <data name="Actions.safety.pagefile-commit.diagnose.Description" xml:space="preserve"><value>Lê o tamanho total e disponível do arquivo de paginação para avisar quando o sistema está perto do limite de commit, sem redimensionar nada.</value></data>
+  <data name="Actions.safety.pagefile-commit.diagnose.DetectionSummary" xml:space="preserve"><value>Lê o total e o disponível do arquivo de paginação do Windows (GlobalMemoryStatusEx).</value></data>
+  <data name="Actions.safety.pagefile-commit.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.safety.pagefile-commit.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: nunca redimensiona ou desativa o pagefile.</value></data>
+  <data name="Actions.safety.pagefile-commit.diagnose.RiskLimitations" xml:space="preserve"><value>O Windows já gerencia o pagefile automaticamente na maioria dos sistemas; o app não altera esse gerenciamento.</value></data>
   <data name="Actions.fivem.legacy.cache-integrity.diagnose.Name" xml:space="preserve"><value>Diagnosticar integridade do índice de cache</value></data>
   <data name="Actions.fivem.legacy.cache-integrity.diagnose.Description" xml:space="preserve"><value>Verifica se o índice de cache do FiveM (content_index.xml) existe e está bem formado, recomendando o reparo já existente quando necessário.</value></data>
+  <data name="Actions.fivem.legacy.cache-integrity.diagnose.DetectionSummary" xml:space="preserve"><value>Tenta abrir e interpretar como XML o content_index.xml de server-cache e server-cache-priv, se existirem.</value></data>
+  <data name="Actions.fivem.legacy.cache-integrity.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.fivem.legacy.cache-integrity.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não repara nem apaga nada; apenas recomenda a ação de reparo de cache já existente.</value></data>
+  <data name="Actions.fivem.legacy.cache-integrity.diagnose.RiskLimitations" xml:space="preserve"><value>A ausência do arquivo não é tratada como corrupção; apenas um arquivo presente e ilegível gera aviso.</value></data>
   <data name="Actions.windows.gaming.gpu-vendor.detect.Name" xml:space="preserve"><value>Detectar fabricante da GPU</value></data>
   <data name="Actions.windows.gaming.gpu-vendor.detect.Description" xml:space="preserve"><value>Identifica o fabricante (NVIDIA, AMD ou Intel) das GPUs detectadas e aponta para o painel oficial do fabricante, sem escrever nenhum perfil de driver.</value></data>
+  <data name="Actions.windows.gaming.gpu-vendor.detect.DetectionSummary" xml:space="preserve"><value>Lê a descrição do driver de vídeo já usada no diagnóstico de hardware do aplicativo.</value></data>
+  <data name="Actions.windows.gaming.gpu-vendor.detect.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.windows.gaming.gpu-vendor.detect.UndoSummary" xml:space="preserve"><value>Somente leitura: não abre, escreve nem reseta nenhum perfil NVIDIA/AMD/Intel.</value></data>
+  <data name="Actions.windows.gaming.gpu-vendor.detect.RiskLimitations" xml:space="preserve"><value>Não sobrescreve perfil de GPU nem força shader cache; isso é proibido pelo modelo de segurança do produto.</value></data>
   <data name="Actions.safety.cpu-details.diagnose.Name" xml:space="preserve"><value>Diagnosticar núcleos, threads e frequência da CPU</value></data>
   <data name="Actions.safety.cpu-details.diagnose.Description" xml:space="preserve"><value>Lê a quantidade de núcleos físicos, threads lógicas e a frequência atual/máxima da CPU via WMI padrão.</value></data>
+  <data name="Actions.safety.cpu-details.diagnose.DetectionSummary" xml:space="preserve"><value>Consulta Win32_Processor (WMI) por núcleos, threads e clock atual/máximo.</value></data>
+  <data name="Actions.safety.cpu-details.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.safety.cpu-details.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não altera afinidade, prioridade nem frequência.</value></data>
+  <data name="Actions.safety.cpu-details.diagnose.RiskLimitations" xml:space="preserve"><value>Não lê temperatura nem sensores por núcleo; isso exigiria driver de terceiros, fora do escopo do produto.</value></data>
   <data name="Actions.windows.gaming.gpu-details.diagnose.Name" xml:space="preserve"><value>Diagnosticar VRAM e tipo da GPU</value></data>
   <data name="Actions.windows.gaming.gpu-details.diagnose.Description" xml:space="preserve"><value>Lê a VRAM reportada pelo driver e estima se cada GPU detectada é integrada ou dedicada, sem escrever nenhum perfil.</value></data>
+  <data name="Actions.windows.gaming.gpu-details.diagnose.DetectionSummary" xml:space="preserve"><value>Lê HardwareInformation.qwMemorySize e a descrição do driver no registro de vídeo já usado pelo app.</value></data>
+  <data name="Actions.windows.gaming.gpu-details.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.windows.gaming.gpu-details.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não escreve nenhum valor de registro ou perfil de driver.</value></data>
+  <data name="Actions.windows.gaming.gpu-details.diagnose.RiskLimitations" xml:space="preserve"><value>A classificação integrada/dedicada é uma estimativa por nome do driver, não uma leitura de hardware garantida.</value></data>
   <data name="Actions.safety.ram-details.diagnose.Name" xml:space="preserve"><value>Diagnosticar frequência, canais e XMP/EXPO da RAM</value></data>
   <data name="Actions.safety.ram-details.diagnose.Description" xml:space="preserve"><value>Lê a frequência configurada e nominal de cada módulo de RAM, estimando single-channel e se XMP/EXPO parece desativado.</value></data>
+  <data name="Actions.safety.ram-details.diagnose.DetectionSummary" xml:space="preserve"><value>Consulta Win32_PhysicalMemory (WMI) por capacidade, ConfiguredClockSpeed e Speed de cada módulo.</value></data>
+  <data name="Actions.safety.ram-details.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.safety.ram-details.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não altera BIOS, perfil de memória nem frequência.</value></data>
+  <data name="Actions.safety.ram-details.diagnose.RiskLimitations" xml:space="preserve"><value>Canal e XMP/EXPO são estimativas heurísticas; a confirmação exata depende da BIOS/UEFI.</value></data>
   <data name="Actions.fivem.legacy.storage-health.diagnose.Name" xml:space="preserve"><value>Diagnosticar tipo e saúde das unidades</value></data>
   <data name="Actions.fivem.legacy.storage-health.diagnose.Description" xml:space="preserve"><value>Identifica HDD, SSD ou NVMe de cada unidade física e lê o status de saúde preditiva (SMART/NVMe Health), sem reparar nada.</value></data>
+  <data name="Actions.fivem.legacy.storage-health.diagnose.DetectionSummary" xml:space="preserve"><value>Consulta MSFT_PhysicalDisk (Storage Management API), que cobre SATA S.M.A.R.T. e NVMe Health sem driver adicional.</value></data>
+  <data name="Actions.fivem.legacy.storage-health.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.fivem.legacy.storage-health.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não repara, formata nem move dados.</value></data>
+  <data name="Actions.fivem.legacy.storage-health.diagnose.RiskLimitations" xml:space="preserve"><value>Reporta todas as unidades físicas detectadas; não afirma com certeza qual delas hospeda o FiveM.</value></data>
   <data name="Actions.windows.system.driver-versions.diagnose.Name" xml:space="preserve"><value>Diagnosticar build do Windows e versões de driver</value></data>
   <data name="Actions.windows.system.driver-versions.diagnose.Description" xml:space="preserve"><value>Lê o build exato do Windows e as versões dos drivers de vídeo, rede, áudio e chipset (quando identificável).</value></data>
+  <data name="Actions.windows.system.driver-versions.diagnose.DetectionSummary" xml:space="preserve"><value>Consulta Win32_PnPSignedDriver (WMI) agrupado por classe de dispositivo, mais Environment.OSVersion para o build.</value></data>
+  <data name="Actions.windows.system.driver-versions.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.windows.system.driver-versions.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não instala, atualiza nem reverte nenhum driver.</value></data>
+  <data name="Actions.windows.system.driver-versions.diagnose.RiskLimitations" xml:space="preserve"><value>O driver de chipset é identificado por heurística de nome; nem todo fabricante o expõe como classe própria.</value></data>
   <data name="Actions.windows.gaming.display-configuration.diagnose.Name" xml:space="preserve"><value>Diagnosticar resolução, taxa de atualização e HAGS</value></data>
   <data name="Actions.windows.gaming.display-configuration.diagnose.Description" xml:space="preserve"><value>Compara a taxa de atualização configurada com a máxima suportada na resolução atual e lê o estado do HAGS.</value></data>
+  <data name="Actions.windows.gaming.display-configuration.diagnose.DetectionSummary" xml:space="preserve"><value>Usa EnumDisplaySettings (Win32) para o modo atual/máximo e o registro de GraphicsDrivers para HwSchMode.</value></data>
+  <data name="Actions.windows.gaming.display-configuration.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.windows.gaming.display-configuration.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não altera resolução, taxa de atualização nem HAGS.</value></data>
+  <data name="Actions.windows.gaming.display-configuration.diagnose.RiskLimitations" xml:space="preserve"><value>G-SYNC/FreeSync/VRR não têm API pública sem driver do fabricante; o app informa isso em vez de adivinhar.</value></data>
   <data name="Actions.windows.gaming.session-settings.diagnose.Name" xml:space="preserve"><value>Diagnosticar Modo de Jogo, tela cheia e plano de energia</value></data>
   <data name="Actions.windows.gaming.session-settings.diagnose.Description" xml:space="preserve"><value>Lê o estado atual do Modo de Jogo, das otimizações para tela cheia e do plano de energia ativo, sem alterar nada.</value></data>
+  <data name="Actions.windows.gaming.session-settings.diagnose.DetectionSummary" xml:space="preserve"><value>Lê os mesmos valores de registro usados pelas ações de Modo de Jogo/captura, mais o esquema de energia ativo.</value></data>
+  <data name="Actions.windows.gaming.session-settings.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.windows.gaming.session-settings.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não ativa nem desativa nada.</value></data>
+  <data name="Actions.windows.gaming.session-settings.diagnose.RiskLimitations" xml:space="preserve"><value>Apenas relata o estado atual; para aplicar mudanças, use as ações correspondentes do perfil.</value></data>
   <data name="Actions.safety.throttling-signal.diagnose.Name" xml:space="preserve"><value>Diagnosticar sinais combinados de throttling</value></data>
   <data name="Actions.safety.throttling-signal.diagnose.Description" xml:space="preserve"><value>Combina queda de frequência sob carga, eventos de erro de hardware (WHEA) e temperatura disponível para indicar "possível throttling", sem sensor direto por núcleo.</value></data>
+  <data name="Actions.safety.throttling-signal.diagnose.DetectionSummary" xml:space="preserve"><value>Combina Win32_Processor (clock), uma amostra de uso de CPU, eventos Kernel-WHEA recentes e a zona térmica ACPI, quando disponível.</value></data>
+  <data name="Actions.safety.throttling-signal.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.safety.throttling-signal.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não altera plano de energia, afinidade nem prioridade.</value></data>
+  <data name="Actions.safety.throttling-signal.diagnose.RiskLimitations" xml:space="preserve"><value>Sem sensor direto por núcleo, o resultado é sempre apresentado como 'possível', nunca como certeza.</value></data>
   <data name="Actions.safety.resource-usage.diagnose.Name" xml:space="preserve"><value>Diagnosticar uso atual de CPU, disco, GPU e rede</value></data>
   <data name="Actions.safety.resource-usage.diagnose.Description" xml:space="preserve"><value>Faz uma leitura instantânea (não uma média) do uso de CPU, disco, GPU (quando disponível) e throughput de rede.</value></data>
+  <data name="Actions.safety.resource-usage.diagnose.DetectionSummary" xml:space="preserve"><value>Usa PerformanceCounter para CPU/disco/GPU (categoria nativa 'GPU Engine') e contadores de interface de rede para throughput.</value></data>
+  <data name="Actions.safety.resource-usage.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.safety.resource-usage.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não define prioridade nem afinidade de processos.</value></data>
+  <data name="Actions.safety.resource-usage.diagnose.RiskLimitations" xml:space="preserve"><value>É uma amostra curta (~300 ms), não uma média sustentada; a GPU pode não estar disponível em todo hardware.</value></data>
   <data name="Actions.windows.gaming.pcie-link.diagnose.Name" xml:space="preserve"><value>Diagnosticar link PCIe da GPU</value></data>
   <data name="Actions.windows.gaming.pcie-link.diagnose.Description" xml:space="preserve"><value>Tenta ler a largura e velocidade atual/máxima do link PCIe de cada GPU via propriedades de dispositivo do Windows, sem driver de terceiros.</value></data>
+  <data name="Actions.windows.gaming.pcie-link.diagnose.DetectionSummary" xml:space="preserve"><value>Usa CM_Get_DevNode_Property (cfgmgr32) com os DEVPKEYs padrão de link PCIe do Windows.</value></data>
+  <data name="Actions.windows.gaming.pcie-link.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.windows.gaming.pcie-link.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não reconfigura o barramento nem o slot.</value></data>
+  <data name="Actions.windows.gaming.pcie-link.diagnose.RiskLimitations" xml:space="preserve"><value>Nem todo driver/placa-mãe expõe essas propriedades; quando ausente, o app informa isso em vez de adivinhar.</value></data>
   <data name="Actions.safety.hardware-stability.diagnose.Name" xml:space="preserve"><value>Diagnosticar idade da BIOS e estabilidade de hardware</value></data>
   <data name="Actions.safety.hardware-stability.diagnose.Description" xml:space="preserve"><value>Lê a data de lançamento da BIOS e eventos recentes de erro de hardware (WHEA) no Log de Eventos do Windows.</value></data>
+  <data name="Actions.safety.hardware-stability.diagnose.DetectionSummary" xml:space="preserve"><value>Consulta Win32_BIOS (WMI) e eventos da fonte Microsoft-Windows-Kernel-WHEA no log System.</value></data>
+  <data name="Actions.safety.hardware-stability.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.safety.hardware-stability.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não atualiza BIOS nem limpa o log de eventos.</value></data>
+  <data name="Actions.safety.hardware-stability.diagnose.RiskLimitations" xml:space="preserve"><value>Resizable BAR/Above 4G/Smart Access Memory não são detectáveis de forma confiável sem ferramenta do fabricante; o app informa essa limitação em vez de adivinhar.</value></data>
   <data name="Actions.safety.bottleneck-classification.diagnose.Name" xml:space="preserve"><value>Classificar tipo provável de gargalo</value></data>
   <data name="Actions.safety.bottleneck-classification.diagnose.Description" xml:space="preserve"><value>Combina uso de CPU/GPU/disco/rede, memória, temperatura e o processo que mais consome CPU para apontar o recurso mais provavelmente limitante no momento.</value></data>
+  <data name="Actions.safety.bottleneck-classification.diagnose.DetectionSummary" xml:space="preserve"><value>Combina as leituras já feitas por outros diagnósticos (uso de recursos, temperatura, rede, memória) com o processo de maior uso de CPU no momento (Win32_PerfFormattedData_PerfProc_Process).</value></data>
+  <data name="Actions.safety.bottleneck-classification.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.safety.bottleneck-classification.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não encerra nem prioriza nenhum processo.</value></data>
+  <data name="Actions.safety.bottleneck-classification.diagnose.RiskLimitations" xml:space="preserve"><value>É uma classificação por eliminação a partir de sinais locais; 'servidor limitado' é a conclusão quando nenhum sinal local se destaca, não uma medição direta do servidor.</value></data>
   <data name="Actions.gtav.legacy.launch-parameters.diagnose.Name" xml:space="preserve"><value>Diagnosticar parâmetros de inicialização do GTA V</value></data>
   <data name="Actions.gtav.legacy.launch-parameters.diagnose.Description" xml:space="preserve"><value>Lê o commandline.txt do GTA V Legacy standalone (nunca do FiveM, que ignora esse arquivo) e avisa quando parâmetros de reparo ficaram ativos permanentemente.</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.diagnose.DetectionSummary" xml:space="preserve"><value>Lê o commandline.txt na pasta de instalação do GTA V standalone, se existir.</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não altera o arquivo.</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.diagnose.RiskLimitations" xml:space="preserve"><value>O FiveM ignora commandline.txt do GTA (bloqueio documentado do próprio FiveM); este diagnóstico é relevante apenas para quem também joga o GTA V standalone.</value></data>
   <data name="Actions.safety.graphics-preset-recommendation.diagnose.Name" xml:space="preserve"><value>Recomendar preset gráfico</value></data>
   <data name="Actions.safety.graphics-preset-recommendation.diagnose.Description" xml:space="preserve"><value>Analisa GPU, VRAM, CPU, RAM e a taxa de atualização do monitor para sugerir qual preset gráfico (FPS, Equilibrado ou Qualidade) combina melhor com o hardware, sem aplicar nada sozinho.</value></data>
+  <data name="Actions.safety.graphics-preset-recommendation.diagnose.DetectionSummary" xml:space="preserve"><value>Combina os diagnósticos de GPU/VRAM, CPU, RAM e monitor já existentes em uma recomendação simples de preset.</value></data>
+  <data name="Actions.safety.graphics-preset-recommendation.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.safety.graphics-preset-recommendation.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: apenas recomenda; o usuário decide qual preset aplicar manualmente.</value></data>
+  <data name="Actions.safety.graphics-preset-recommendation.diagnose.RiskLimitations" xml:space="preserve"><value>É uma heurística baseada em hardware local; não considera o servidor utilizado nem resultado de benchmark ainda não executado.</value></data>
   <data name="Actions.windows.gaming.texture-vram-fit.diagnose.Name" xml:space="preserve"><value>Diagnosticar textura configurada vs. VRAM disponível</value></data>
   <data name="Actions.windows.gaming.texture-vram-fit.diagnose.Description" xml:space="preserve"><value>Compara a qualidade de textura configurada no FiveM/GTA V com a VRAM detectada da GPU e avisa quando a configuração provavelmente excede a VRAM disponível.</value></data>
+  <data name="Actions.windows.gaming.texture-vram-fit.diagnose.DetectionSummary" xml:space="preserve"><value>Lê TextureQuality do arquivo gráfico existente e a VRAM já lida pelo diagnóstico de GPU, aplicando um limiar conservador documentado.</value></data>
+  <data name="Actions.windows.gaming.texture-vram-fit.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.windows.gaming.texture-vram-fit.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não altera nenhuma configuração gráfica.</value></data>
+  <data name="Actions.windows.gaming.texture-vram-fit.diagnose.RiskLimitations" xml:space="preserve"><value>É uma estimativa por limiar de VRAM, não uma medição real de uso de memória durante o jogo.</value></data>
   <data name="Actions.fivem.legacy.cache-storage.diagnose.Name" xml:space="preserve"><value>Diagnosticar tamanho e integridade do cache do FiveM</value></data>
   <data name="Actions.fivem.legacy.cache-storage.diagnose.Description" xml:space="preserve"><value>Mede o tamanho total e por categoria do cache do FiveM Legacy (server-cache, server-cache-priv, NUI storage, logs, diagnósticos) e sinaliza arquivos bloqueados por outro processo, sem apagar nada.</value></data>
+  <data name="Actions.fivem.legacy.cache-storage.diagnose.DetectionSummary" xml:space="preserve"><value>Percorre as pastas conhecidas de cache/dados do FiveM Legacy somando o tamanho de cada uma e tentando abrir cada arquivo com acesso exclusivo para detectar bloqueio por outro processo.</value></data>
+  <data name="Actions.fivem.legacy.cache-storage.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.fivem.legacy.cache-storage.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não apaga nem move nenhum arquivo.</value></data>
+  <data name="Actions.fivem.legacy.cache-storage.diagnose.RiskLimitations" xml:space="preserve"><value>A detecção de bloqueio é um teste de abertura exclusiva no momento da leitura; um arquivo pode ficar bloqueado ou livre segundos depois.</value></data>
   <data name="Actions.fivem.legacy.installation-health.diagnose.Name" xml:space="preserve"><value>Diagnosticar saúde da instalação do FiveM</value></data>
   <data name="Actions.fivem.legacy.installation-health.diagnose.Description" xml:space="preserve"><value>Verifica instalações duplicadas, permissão de escrita na pasta de dados, sincronização por OneDrive e espaço livre em disco, sem alterar nada.</value></data>
+  <data name="Actions.fivem.legacy.installation-health.diagnose.DetectionSummary" xml:space="preserve"><value>Compara candidatos de instalação conhecidos (registro e CitizenFX.ini), testa escrita na pasta de dados, compara o caminho com a pasta sincronizada do OneDrive e lê o espaço livre da unidade da instalação.</value></data>
+  <data name="Actions.fivem.legacy.installation-health.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.fivem.legacy.installation-health.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não apaga, move nem reinstala nada.</value></data>
+  <data name="Actions.fivem.legacy.installation-health.diagnose.RiskLimitations" xml:space="preserve"><value>A detecção de instalação duplicada é heurística por caminho conhecido; instalações em locais não convencionais podem não ser encontradas.</value></data>
   <data name="Actions.fivem.legacy.crash-patterns.diagnose.Name" xml:space="preserve"><value>Diagnosticar padrões recorrentes de erro e streaming</value></data>
   <data name="Actions.fivem.legacy.crash-patterns.diagnose.Description" xml:space="preserve"><value>Procura códigos de erro reconhecíveis nos nomes dos crash dumps recentes e palavras-chave de erro de streaming (texturas, modelos, mapas) no log mais recente, sem apagar nada.</value></data>
+  <data name="Actions.fivem.legacy.crash-patterns.diagnose.DetectionSummary" xml:space="preserve"><value>Lê os nomes dos arquivos de dump recentes em busca de códigos de erro conhecidos e faz busca textual por palavras-chave de streaming no log mais recente do FiveM.</value></data>
+  <data name="Actions.fivem.legacy.crash-patterns.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.fivem.legacy.crash-patterns.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não abre, remove nem envia nenhum dump.</value></data>
+  <data name="Actions.fivem.legacy.crash-patterns.diagnose.RiskLimitations" xml:space="preserve"><value>É uma busca textual por padrões conhecidos, não uma análise de despejo de memória; um padrão ausente não garante ausência do problema.</value></data>
   <data name="Actions.storage.user-temporary-files.clean.Name" xml:space="preserve"><value>Limpar temporários antigos</value></data>
   <data name="Actions.storage.user-temporary-files.clean.Description" xml:space="preserve"><value>Remove somente arquivos temporários do usuário mais antigos que o período de retenção escolhido pelo perfil.</value></data>
+  <data name="Actions.storage.user-temporary-files.clean.DetectionSummary" xml:space="preserve"><value>Percorre a pasta Temp do usuário buscando arquivos além do período de retenção.</value></data>
+  <data name="Actions.storage.user-temporary-files.clean.ConfirmationSummary" xml:space="preserve"><value>Confirma que os arquivos antigos selecionados não existem mais após a limpeza.</value></data>
+  <data name="Actions.storage.user-temporary-files.clean.UndoSummary" xml:space="preserve"><value>Irreversível: arquivos temporários antigos não são preservados em quarentena.</value></data>
+  <data name="Actions.storage.user-temporary-files.clean.RiskLimitations" xml:space="preserve"><value>Remove apenas arquivos antigos do próprio usuário; nunca toca em pastas do sistema.</value></data>
   <data name="Actions.fivem.legacy.crash-dumps.prune.Name" xml:space="preserve"><value>Remover diagnósticos antigos</value></data>
   <data name="Actions.fivem.legacy.crash-dumps.prune.Description" xml:space="preserve"><value>Remove dumps e logs antigos do FiveM Legacy, preservando diagnósticos recentes.</value></data>
+  <data name="Actions.fivem.legacy.crash-dumps.prune.DetectionSummary" xml:space="preserve"><value>Lista dumps e logs do FiveM mais antigos que o período de retenção.</value></data>
+  <data name="Actions.fivem.legacy.crash-dumps.prune.ConfirmationSummary" xml:space="preserve"><value>Confirma que os diagnósticos antigos foram removidos e os recentes preservados.</value></data>
+  <data name="Actions.fivem.legacy.crash-dumps.prune.UndoSummary" xml:space="preserve"><value>Irreversível: diagnósticos antigos não são copiados para o journal.</value></data>
+  <data name="Actions.fivem.legacy.crash-dumps.prune.RiskLimitations" xml:space="preserve"><value>Dumps podem ser úteis para suporte; apenas os fora do período de retenção são removidos.</value></data>
   <data name="Actions.fivem.legacy.server-cache.repair.Name" xml:space="preserve"><value>Reparar cache de servidores</value></data>
   <data name="Actions.fivem.legacy.server-cache.repair.Description" xml:space="preserve"><value>Remove somente caches regeneráveis de conteúdo de servidores do FiveM Legacy quando um reparo é necessário.</value></data>
+  <data name="Actions.fivem.legacy.server-cache.repair.DetectionSummary" xml:space="preserve"><value>Mede o tamanho de server-cache e server-cache-priv sob a instalação do FiveM.</value></data>
+  <data name="Actions.fivem.legacy.server-cache.repair.ConfirmationSummary" xml:space="preserve"><value>Confirma que apenas os caches regeneráveis foram removidos.</value></data>
+  <data name="Actions.fivem.legacy.server-cache.repair.UndoSummary" xml:space="preserve"><value>Dados regeneráveis: o FiveM baixa o conteúdo novamente no próximo acesso ao servidor.</value></data>
+  <data name="Actions.fivem.legacy.server-cache.repair.RiskLimitations" xml:space="preserve"><value>O primeiro carregamento fica mais lento; clipes antigos do Rockstar Editor podem deixar de funcionar.</value></data>
   <data name="Actions.fivem.legacy.stuck-process.terminate.Name" xml:space="preserve"><value>Encerrar processo travado do FiveM</value></data>
   <data name="Actions.fivem.legacy.stuck-process.terminate.Description" xml:space="preserve"><value>Encerra um processo do FiveM comprovadamente travado (não responde e mantém arquivo de cache bloqueado) para permitir a limpeza. Nunca faz parte de perfis automáticos.</value></data>
+  <data name="Actions.fivem.legacy.stuck-process.terminate.DetectionSummary" xml:space="preserve"><value>Verifica se existe processo cuja imagem pertence à instalação do FiveM com Responding=false (não responde a mensagens da interface).</value></data>
+  <data name="Actions.fivem.legacy.stuck-process.terminate.ConfirmationSummary" xml:space="preserve"><value>Só encerra o processo depois de confirmar que ele não responde; se estiver respondendo normalmente, a ação não faz nada.</value></data>
+  <data name="Actions.fivem.legacy.stuck-process.terminate.UndoSummary" xml:space="preserve"><value>Irreversível: um processo encerrado não pode ser restaurado ao seu estado anterior.</value></data>
+  <data name="Actions.fivem.legacy.stuck-process.terminate.RiskLimitations" xml:space="preserve"><value>Encerra apenas processos cuja imagem executável pertence à pasta de instalação do FiveM; nunca processos de terceiros, do jogo GTA V ou do sistema. Qualquer trabalho não salvo dentro desse processo travado é perdido.</value></data>
   <data name="Actions.fivem.legacy.local-data.recreate.Name" xml:space="preserve"><value>Recriar dados locais do FiveM</value></data>
   <data name="Actions.fivem.legacy.local-data.recreate.Description" xml:space="preserve"><value>Remove e recria as pastas de dados regeneráveis do FiveM Legacy (server-cache, server-cache-priv, logs, crashes) preservando game-storage, NUI storage, ipfs, CitizenFX.ini e plugins, com backup em quarentena.</value></data>
+  <data name="Actions.fivem.legacy.local-data.recreate.DetectionSummary" xml:space="preserve"><value>Confirma que o FiveM está fechado e lista os arquivos dentro das pastas regeneráveis conhecidas (nunca as protegidas por docs/safety.md).</value></data>
+  <data name="Actions.fivem.legacy.local-data.recreate.ConfirmationSummary" xml:space="preserve"><value>Move os arquivos regeneráveis para quarentena antes de confirmar; nada protegido é tocado.</value></data>
+  <data name="Actions.fivem.legacy.local-data.recreate.UndoSummary" xml:space="preserve"><value>Dados regeneráveis: reversível via quarentena até a confirmação final da otimização; depois disso, o FiveM baixa o conteúdo novamente.</value></data>
+  <data name="Actions.fivem.legacy.local-data.recreate.RiskLimitations" xml:space="preserve"><value>Não é uma reinstalação do FiveM nem baixa/executa nenhum instalador; apenas recria as pastas de dados já sancionadas para limpeza condicionada em docs/safety.md.</value></data>
   <data name="Actions.fivem.legacy.auth-data.repair.Name" xml:space="preserve"><value>Reparar dados de entitlement corrompidos</value></data>
   <data name="Actions.fivem.legacy.auth-data.repair.Description" xml:space="preserve"><value>Remove ros_id.dat e a pasta de entitlements digitais apenas quando um padrão de erro de inicialização relacionado a entitlement é detectado no log mais recente, com backup em quarentena e confirmação a cada execução.</value></data>
+  <data name="Actions.fivem.legacy.auth-data.repair.DetectionSummary" xml:space="preserve"><value>Lê o log mais recente do FiveM em busca de um padrão de erro de entitlement/autenticação já conhecido antes de tocar em qualquer arquivo.</value></data>
+  <data name="Actions.fivem.legacy.auth-data.repair.ConfirmationSummary" xml:space="preserve"><value>Só remove ros_id.dat e a pasta de entitlements quando o padrão de erro foi encontrado; caso contrário, não faz nada.</value></data>
+  <data name="Actions.fivem.legacy.auth-data.repair.UndoSummary" xml:space="preserve"><value>Reversível via quarentena até a confirmação final da otimização; depois disso, o FiveM solicita novo login para regenerar os dados.</value></data>
+  <data name="Actions.fivem.legacy.auth-data.repair.RiskLimitations" xml:space="preserve"><value>Ação de exceção documentada em docs/safety.md: ros_id.dat e entitlements normalmente nunca são removidos automaticamente; esta ação só existe para o cenário específico de erro detectado, nunca em perfis automáticos, e sempre em quarentena reversível.</value></data>
   <data name="Actions.windows.gaming.game-mode.enable.Name" xml:space="preserve"><value>Ativar Modo de Jogo</value></data>
   <data name="Actions.windows.gaming.game-mode.enable.Description" xml:space="preserve"><value>Ativa o recurso de jogos do Windows para priorizar recursos enquanto jogos estão em execução.</value></data>
+  <data name="Actions.windows.gaming.game-mode.enable.DetectionSummary" xml:space="preserve"><value>Lê o valor AutoGameModeEnabled do registro do usuário atual.</value></data>
+  <data name="Actions.windows.gaming.game-mode.enable.ConfirmationSummary" xml:space="preserve"><value>Confirma que o Modo de Jogo ficou habilitado após a gravação.</value></data>
+  <data name="Actions.windows.gaming.game-mode.enable.UndoSummary" xml:space="preserve"><value>Totalmente reversível: o valor anterior do registro é restaurado no rollback.</value></data>
+  <data name="Actions.windows.gaming.game-mode.enable.RiskLimitations" xml:space="preserve"><value>O ganho depende do hardware e da versão do Windows; pode não ter efeito perceptível.</value></data>
   <data name="Actions.windows.gaming.high-performance-gpu.prefer.Name" xml:space="preserve"><value>Preferir GPU de alto desempenho</value></data>
   <data name="Actions.windows.gaming.high-performance-gpu.prefer.Description" xml:space="preserve"><value>Define a preferência gráfica do Windows para launchers e renderizadores detectados do FiveM Legacy.</value></data>
+  <data name="Actions.windows.gaming.high-performance-gpu.prefer.DetectionSummary" xml:space="preserve"><value>Lê a preferência gráfica registrada para o executável do FiveM.</value></data>
+  <data name="Actions.windows.gaming.high-performance-gpu.prefer.ConfirmationSummary" xml:space="preserve"><value>Confirma que a preferência de alto desempenho ficou registrada.</value></data>
+  <data name="Actions.windows.gaming.high-performance-gpu.prefer.UndoSummary" xml:space="preserve"><value>Totalmente reversível: a preferência anterior é restaurada no rollback.</value></data>
+  <data name="Actions.windows.gaming.high-performance-gpu.prefer.RiskLimitations" xml:space="preserve"><value>Só faz diferença em computadores com mais de uma GPU.</value></data>
   <data name="Actions.windows.gaming.background-capture.disable.Name" xml:space="preserve"><value>Desativar captura em segundo plano</value></data>
   <data name="Actions.windows.gaming.background-capture.disable.Description" xml:space="preserve"><value>Desativa a gravação contínua em segundo plano do Windows sem remover o Game Bar.</value></data>
+  <data name="Actions.windows.gaming.background-capture.disable.DetectionSummary" xml:space="preserve"><value>Lê o valor de gravação em segundo plano (Game DVR) do registro do usuário.</value></data>
+  <data name="Actions.windows.gaming.background-capture.disable.ConfirmationSummary" xml:space="preserve"><value>Confirma que a captura em segundo plano ficou desabilitada.</value></data>
+  <data name="Actions.windows.gaming.background-capture.disable.UndoSummary" xml:space="preserve"><value>Totalmente reversível: o valor anterior é restaurado no rollback.</value></data>
+  <data name="Actions.windows.gaming.background-capture.disable.RiskLimitations" xml:space="preserve"><value>Não remove o Game Bar nem afeta gravações manuais que você iniciar.</value></data>
   <data name="Actions.windows.power.performance-session.enable.Name" xml:space="preserve"><value>Ativar plano de energia de alto desempenho</value></data>
   <data name="Actions.windows.power.performance-session.enable.Description" xml:space="preserve"><value>Usa um plano de energia de desempenho na tomada e registra o estado anterior para rollback.</value></data>
+  <data name="Actions.windows.power.performance-session.enable.DetectionSummary" xml:space="preserve"><value>Lê o plano de energia ativo e verifica se o computador está na tomada.</value></data>
+  <data name="Actions.windows.power.performance-session.enable.ConfirmationSummary" xml:space="preserve"><value>Confirma que o plano de desempenho ficou ativo.</value></data>
+  <data name="Actions.windows.power.performance-session.enable.UndoSummary" xml:space="preserve"><value>Totalmente reversível: o plano anterior é restaurado no rollback.</value></data>
+  <data name="Actions.windows.power.performance-session.enable.RiskLimitations" xml:space="preserve"><value>Só é aplicado na tomada; aumenta consumo e temperatura enquanto ativo.</value></data>
   <data name="Actions.fivem.legacy.graphics.light.apply.Name" xml:space="preserve"><value>Ajustar gráficos leves do FiveM</value></data>
   <data name="Actions.fivem.legacy.graphics.light.apply.Description" xml:space="preserve"><value>Desliga apenas o antialiasing mais pesado no arquivo existente do FiveM e cria um backup.</value></data>
+  <data name="Actions.fivem.legacy.graphics.light.apply.DetectionSummary" xml:space="preserve"><value>Lê as opções existentes de gta5_settings.xml do FiveM.</value></data>
+  <data name="Actions.fivem.legacy.graphics.light.apply.ConfirmationSummary" xml:space="preserve"><value>Confirma que apenas as opções caras foram ajustadas e o arquivo permanece válido.</value></data>
+  <data name="Actions.fivem.legacy.graphics.light.apply.UndoSummary" xml:space="preserve"><value>Totalmente reversível: o backup do arquivo é restaurado no rollback.</value></data>
+  <data name="Actions.fivem.legacy.graphics.light.apply.RiskLimitations" xml:space="preserve"><value>Só altera opções já presentes; não distribui um XML genérico.</value></data>
   <data name="Actions.fivem.legacy.graphics.balanced.apply.Name" xml:space="preserve"><value>Aplicar gráficos equilibrados do FiveM</value></data>
   <data name="Actions.fivem.legacy.graphics.balanced.apply.Description" xml:space="preserve"><value>Ajusta somente opções gráficas existentes do FiveM Legacy e cria um backup antes da gravação.</value></data>
+  <data name="Actions.fivem.legacy.graphics.balanced.apply.DetectionSummary" xml:space="preserve"><value>Lê as opções existentes de gta5_settings.xml do FiveM.</value></data>
+  <data name="Actions.fivem.legacy.graphics.balanced.apply.ConfirmationSummary" xml:space="preserve"><value>Confirma que os limites equilibrados foram aplicados e o arquivo permanece válido.</value></data>
+  <data name="Actions.fivem.legacy.graphics.balanced.apply.UndoSummary" xml:space="preserve"><value>Totalmente reversível: o backup do arquivo é restaurado no rollback.</value></data>
+  <data name="Actions.fivem.legacy.graphics.balanced.apply.RiskLimitations" xml:space="preserve"><value>Resultados variam conforme o hardware; só altera opções já presentes.</value></data>
   <data name="Actions.fivem.legacy.graphics.aggressive.apply.Name" xml:space="preserve"><value>Aplicar gráficos agressivos do FiveM</value></data>
   <data name="Actions.fivem.legacy.graphics.aggressive.apply.Description" xml:space="preserve"><value>Reduz as opções gráficas mais pesadas do FiveM Legacy e cria um backup antes da gravação.</value></data>
+  <data name="Actions.fivem.legacy.graphics.aggressive.apply.DetectionSummary" xml:space="preserve"><value>Lê as opções existentes de gta5_settings.xml do FiveM.</value></data>
+  <data name="Actions.fivem.legacy.graphics.aggressive.apply.ConfirmationSummary" xml:space="preserve"><value>Confirma que as opções pesadas foram reduzidas e o arquivo permanece válido.</value></data>
+  <data name="Actions.fivem.legacy.graphics.aggressive.apply.UndoSummary" xml:space="preserve"><value>Totalmente reversível: o backup do arquivo é restaurado no rollback.</value></data>
+  <data name="Actions.fivem.legacy.graphics.aggressive.apply.RiskLimitations" xml:space="preserve"><value>Reduz qualidade visual de forma perceptível; não força resolução mínima.</value></data>
   <data name="Actions.gtav.legacy.graphics.light.apply.Name" xml:space="preserve"><value>Ajustar gráficos leves do GTA V</value></data>
   <data name="Actions.gtav.legacy.graphics.light.apply.Description" xml:space="preserve"><value>Localiza o settings.xml do GTA V Legacy, reduz somente opções pesadas existentes e cria um backup.</value></data>
+  <data name="Actions.gtav.legacy.graphics.light.apply.DetectionSummary" xml:space="preserve"><value>Lê as opções existentes do settings.xml do GTA V Legacy.</value></data>
+  <data name="Actions.gtav.legacy.graphics.light.apply.ConfirmationSummary" xml:space="preserve"><value>Confirma que apenas as opções caras foram ajustadas e o arquivo permanece válido.</value></data>
+  <data name="Actions.gtav.legacy.graphics.light.apply.UndoSummary" xml:space="preserve"><value>Totalmente reversível: o backup do arquivo é restaurado no rollback.</value></data>
+  <data name="Actions.gtav.legacy.graphics.light.apply.RiskLimitations" xml:space="preserve"><value>Só altera opções já presentes; não altera resolução, tela ou adaptador.</value></data>
   <data name="Actions.gtav.legacy.graphics.balanced.apply.Name" xml:space="preserve"><value>Equilibrar gráficos do GTA V</value></data>
   <data name="Actions.gtav.legacy.graphics.balanced.apply.Description" xml:space="preserve"><value>Aplica limites equilibrados somente às opções existentes do settings.xml do GTA V Legacy, com backup.</value></data>
+  <data name="Actions.gtav.legacy.graphics.balanced.apply.DetectionSummary" xml:space="preserve"><value>Lê as opções existentes do settings.xml do GTA V Legacy.</value></data>
+  <data name="Actions.gtav.legacy.graphics.balanced.apply.ConfirmationSummary" xml:space="preserve"><value>Confirma que os limites equilibrados foram aplicados e o arquivo permanece válido.</value></data>
+  <data name="Actions.gtav.legacy.graphics.balanced.apply.UndoSummary" xml:space="preserve"><value>Totalmente reversível: o backup do arquivo é restaurado no rollback.</value></data>
+  <data name="Actions.gtav.legacy.graphics.balanced.apply.RiskLimitations" xml:space="preserve"><value>Resultados variam conforme o hardware; só altera opções já presentes.</value></data>
   <data name="Actions.gtav.legacy.graphics.aggressive.apply.Name" xml:space="preserve"><value>Priorizar FPS no GTA V</value></data>
   <data name="Actions.gtav.legacy.graphics.aggressive.apply.Description" xml:space="preserve"><value>Reduz opções gráficas pesadas do GTA V Legacy sem alterar resolução, modo de exibição ou adaptador.</value></data>
+  <data name="Actions.gtav.legacy.graphics.aggressive.apply.DetectionSummary" xml:space="preserve"><value>Lê as opções existentes do settings.xml do GTA V Legacy.</value></data>
+  <data name="Actions.gtav.legacy.graphics.aggressive.apply.ConfirmationSummary" xml:space="preserve"><value>Confirma que as opções pesadas foram reduzidas e o arquivo permanece válido.</value></data>
+  <data name="Actions.gtav.legacy.graphics.aggressive.apply.UndoSummary" xml:space="preserve"><value>Totalmente reversível: o backup do arquivo é restaurado no rollback.</value></data>
+  <data name="Actions.gtav.legacy.graphics.aggressive.apply.RiskLimitations" xml:space="preserve"><value>Reduz qualidade visual; não força resolução, taxa de atualização ou textura mínima.</value></data>
   <data name="Actions.fivem.legacy.graphics.quality.apply.Name" xml:space="preserve"><value>Aplicar preset de qualidade no FiveM</value></data>
   <data name="Actions.fivem.legacy.graphics.quality.apply.Description" xml:space="preserve"><value>Aumenta somente opções gráficas já existentes no FiveM Legacy até um teto seguro, priorizando qualidade visual sem descontrolar o 1% low. Nunca faz parte de perfis automáticos.</value></data>
+  <data name="Actions.fivem.legacy.graphics.quality.apply.DetectionSummary" xml:space="preserve"><value>Lê as opções existentes de gta5_settings.xml do FiveM.</value></data>
+  <data name="Actions.fivem.legacy.graphics.quality.apply.ConfirmationSummary" xml:space="preserve"><value>Confirma que apenas as opções elevadas foram aumentadas, com um teto que preserva o 1% low, e que o arquivo permanece válido.</value></data>
+  <data name="Actions.fivem.legacy.graphics.quality.apply.UndoSummary" xml:space="preserve"><value>Totalmente reversível: o backup do arquivo é restaurado no rollback.</value></data>
+  <data name="Actions.fivem.legacy.graphics.quality.apply.RiskLimitations" xml:space="preserve"><value>Só eleva opções já presentes até um teto conservador; não maximiza tudo às cegas, para não sacrificar consistência de quadros.</value></data>
   <data name="Actions.gtav.legacy.graphics.quality.apply.Name" xml:space="preserve"><value>Aplicar preset de qualidade no GTA V</value></data>
   <data name="Actions.gtav.legacy.graphics.quality.apply.Description" xml:space="preserve"><value>Aumenta somente opções gráficas já existentes no GTA V Legacy até um teto seguro, priorizando qualidade visual sem descontrolar o 1% low. Nunca faz parte de perfis automáticos.</value></data>
+  <data name="Actions.gtav.legacy.graphics.quality.apply.DetectionSummary" xml:space="preserve"><value>Lê as opções existentes do settings.xml do GTA V Legacy.</value></data>
+  <data name="Actions.gtav.legacy.graphics.quality.apply.ConfirmationSummary" xml:space="preserve"><value>Confirma que apenas as opções elevadas foram aumentadas, com um teto que preserva o 1% low, e que o arquivo permanece válido.</value></data>
+  <data name="Actions.gtav.legacy.graphics.quality.apply.UndoSummary" xml:space="preserve"><value>Totalmente reversível: o backup do arquivo é restaurado no rollback.</value></data>
+  <data name="Actions.gtav.legacy.graphics.quality.apply.RiskLimitations" xml:space="preserve"><value>Só eleva opções já presentes até um teto conservador; não maximiza tudo às cegas, para não sacrificar consistência de quadros.</value></data>
   <data name="Actions.fivem.legacy.display-preferences.apply.Name" xml:space="preserve"><value>Ajustar janela e VSync do FiveM</value></data>
   <data name="Actions.fivem.legacy.display-preferences.apply.Description" xml:space="preserve"><value>Define somente o modo de janela/tela cheia e o VSync do FiveM Legacy, sem tocar em resolução, adaptador de vídeo ou proporção de tela. Nunca faz parte de perfis automáticos.</value></data>
+  <data name="Actions.fivem.legacy.display-preferences.apply.DetectionSummary" xml:space="preserve"><value>Lê os valores existentes de janela e VSync no arquivo gráfico do FiveM.</value></data>
+  <data name="Actions.fivem.legacy.display-preferences.apply.ConfirmationSummary" xml:space="preserve"><value>Confirma que apenas janela e VSync foram alterados e o arquivo permanece válido.</value></data>
+  <data name="Actions.fivem.legacy.display-preferences.apply.UndoSummary" xml:space="preserve"><value>Totalmente reversível: o backup do arquivo é restaurado no rollback.</value></data>
+  <data name="Actions.fivem.legacy.display-preferences.apply.RiskLimitations" xml:space="preserve"><value>Não altera resolução, taxa de atualização, adaptador de vídeo nem proporção de tela; esses itens não são ajustados automaticamente pelo produto por exigirem validação individual contra o monitor.</value></data>
   <data name="Actions.gtav.legacy.display-preferences.apply.Name" xml:space="preserve"><value>Ajustar janela e VSync do GTA V</value></data>
   <data name="Actions.gtav.legacy.display-preferences.apply.Description" xml:space="preserve"><value>Define somente o modo de janela/tela cheia e o VSync do GTA V Legacy, sem tocar em resolução, adaptador de vídeo ou proporção de tela. Nunca faz parte de perfis automáticos.</value></data>
+  <data name="Actions.gtav.legacy.display-preferences.apply.DetectionSummary" xml:space="preserve"><value>Lê os valores existentes de janela e VSync no settings.xml do GTA V Legacy.</value></data>
+  <data name="Actions.gtav.legacy.display-preferences.apply.ConfirmationSummary" xml:space="preserve"><value>Confirma que apenas janela e VSync foram alterados e o arquivo permanece válido.</value></data>
+  <data name="Actions.gtav.legacy.display-preferences.apply.UndoSummary" xml:space="preserve"><value>Totalmente reversível: o backup do arquivo é restaurado no rollback.</value></data>
+  <data name="Actions.gtav.legacy.display-preferences.apply.RiskLimitations" xml:space="preserve"><value>Não altera resolução, taxa de atualização, adaptador de vídeo nem proporção de tela; esses itens não são ajustados automaticamente pelo produto por exigirem validação individual contra o monitor.</value></data>
   <data name="Actions.gtav.legacy.launch-parameters.graphics.apply.Name" xml:space="preserve"><value>Aplicar parâmetros gráficos de inicialização do GTA V</value></data>
   <data name="Actions.gtav.legacy.launch-parameters.graphics.apply.Description" xml:space="preserve"><value>Escreve no commandline.txt do GTA V standalone os parâmetros oficiais -cityDensity, -anisotropicQualityLevel, -fxaa, -grassQuality, -lodScale e -frameLimit, preservando qualquer outra linha já existente. Nunca faz parte de perfis automáticos.</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.graphics.apply.DetectionSummary" xml:space="preserve"><value>Lê o commandline.txt existente (ou trata como vazio, se ausente) e identifica quais das linhas gerenciadas já estão presentes.</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.graphics.apply.ConfirmationSummary" xml:space="preserve"><value>Confirma que apenas as linhas gerenciadas foram adicionadas/atualizadas e as demais linhas do arquivo foram preservadas.</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.graphics.apply.UndoSummary" xml:space="preserve"><value>Totalmente reversível: o backup do arquivo é restaurado no rollback.</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.graphics.apply.RiskLimitations" xml:space="preserve"><value>Só é relevante para o GTA V standalone; o FiveM ignora esse arquivo. Valores usam limites conservadores documentados; a unidade exata de -frameLimit não é confirmada oficialmente.</value></data>
   <data name="Actions.gtav.legacy.launch-parameters.display.apply.Name" xml:space="preserve"><value>Aplicar parâmetros de exibição de inicialização do GTA V</value></data>
   <data name="Actions.gtav.legacy.launch-parameters.display.apply.Description" xml:space="preserve"><value>Escreve no commandline.txt do GTA V standalone o modo de tela (-fullscreen/-windowed/-borderless) e, quando escolhida, a versão do DirectX (-DX10/-DX10_1/-DX11). Nunca altera resolução. Nunca faz parte de perfis automáticos.</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.display.apply.DetectionSummary" xml:space="preserve"><value>Lê o commandline.txt existente (ou trata como vazio, se ausente) e identifica o modo de tela/DirectX já configurados.</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.display.apply.ConfirmationSummary" xml:space="preserve"><value>Confirma que apenas as linhas de modo de tela/DirectX foram adicionadas/atualizadas e as demais linhas do arquivo foram preservadas.</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.display.apply.UndoSummary" xml:space="preserve"><value>Totalmente reversível: o backup do arquivo é restaurado no rollback.</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.display.apply.RiskLimitations" xml:space="preserve"><value>Não altera -width/-height nem resolução/taxa de atualização; esses itens exigiriam validar a combinação contra os modos suportados pelo monitor, o que o produto ainda não faz de ponta a ponta.</value></data>
   <data name="Actions.gtav.legacy.launch-parameters.repair.apply.Name" xml:space="preserve"><value>Aplicar parâmetros de reparo de inicialização do GTA V</value></data>
   <data name="Actions.gtav.legacy.launch-parameters.repair.apply.Description" xml:space="preserve"><value>Escreve no commandline.txt do GTA V standalone parâmetros de reparo temporários (-safemode, -useMinimumSettings, -UseAutoSettings) para diagnosticar um problema específico. Nunca faz parte de perfis automáticos e não deve ficar ativo permanentemente.</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.repair.apply.DetectionSummary" xml:space="preserve"><value>Lê o commandline.txt existente (ou trata como vazio, se ausente) e identifica quais parâmetros de reparo já estão presentes.</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.repair.apply.ConfirmationSummary" xml:space="preserve"><value>Confirma que apenas os parâmetros de reparo escolhidos foram adicionados e as demais linhas do arquivo foram preservadas.</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.repair.apply.UndoSummary" xml:space="preserve"><value>Totalmente reversível: use &quot;Reverter esta otimização&quot; assim que terminar de diagnosticar, para não deixar o parâmetro de reparo ativo permanentemente.</value></data>
+  <data name="Actions.gtav.legacy.launch-parameters.repair.apply.RiskLimitations" xml:space="preserve"><value>É um parâmetro de reparo, não uma otimização diária; deixá-lo ativo indefinidamente pode reduzir a qualidade gráfica sem necessidade.</value></data>
   <data name="Actions.windows.gaming.gpu-preference-mismatch.diagnose.Name" xml:space="preserve"><value>Diagnosticar preferência de GPU em notebooks com duas GPUs</value></data>
   <data name="Actions.windows.gaming.gpu-preference-mismatch.diagnose.Description" xml:space="preserve"><value>Compara a detecção de GPU integrada + dedicada com a preferência de GPU já configurada nas preferências gráficas do Windows para o FiveM, sem alterar nada.</value></data>
+  <data name="Actions.windows.gaming.gpu-preference-mismatch.diagnose.DetectionSummary" xml:space="preserve"><value>Lê os adaptadores de vídeo do registro e a preferência de GPU já configurada para o FiveM.</value></data>
+  <data name="Actions.windows.gaming.gpu-preference-mismatch.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.windows.gaming.gpu-preference-mismatch.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não altera a preferência de GPU.</value></data>
+  <data name="Actions.windows.gaming.gpu-preference-mismatch.diagnose.RiskLimitations" xml:space="preserve"><value>Não consegue confirmar qual GPU o jogo está de fato usando numa sessão ao vivo; a verificação é limitada à configuração registrada.</value></data>
   <data name="Actions.windows.gaming.fullscreen-optimizations.toggle.Name" xml:space="preserve"><value>Testar desativar otimizações de tela cheia</value></data>
   <data name="Actions.windows.gaming.fullscreen-optimizations.toggle.Description" xml:space="preserve"><value>Ativa ou desativa (alternando) a sinalização "Desativar otimizações de tela cheia" para FiveM e GTA V, como teste de compatibilidade opt-in. Nunca faz parte de perfis automáticos além do Agressivo.</value></data>
+  <data name="Actions.windows.gaming.fullscreen-optimizations.toggle.DetectionSummary" xml:space="preserve"><value>Lê a sinalização de compatibilidade existente para os executáveis do FiveM/GTA V.</value></data>
+  <data name="Actions.windows.gaming.fullscreen-optimizations.toggle.ConfirmationSummary" xml:space="preserve"><value>Confirma que apenas a sinalização de tela cheia foi alternada, preservando outras sinalizações de compatibilidade já presentes.</value></data>
+  <data name="Actions.windows.gaming.fullscreen-optimizations.toggle.UndoSummary" xml:space="preserve"><value>Totalmente reversível: o valor anterior exato é restaurado no rollback.</value></data>
+  <data name="Actions.windows.gaming.fullscreen-optimizations.toggle.RiskLimitations" xml:space="preserve"><value>Mecanismo baseado em convenção observada da chave AppCompatFlags\Layers, não em documentação oficial da Microsoft; compare o resultado você mesmo e reverta se não notar melhora.</value></data>
   <data name="Actions.windows.gaming.hags.toggle.Name" xml:space="preserve"><value>Testar Hardware-Accelerated GPU Scheduling (HAGS)</value></data>
   <data name="Actions.windows.gaming.hags.toggle.Description" xml:space="preserve"><value>Alterna o HAGS entre ativado e o padrão do Windows, como teste de compatibilidade opt-in. Nunca faz parte de perfis automáticos além do Agressivo.</value></data>
+  <data name="Actions.windows.gaming.hags.toggle.DetectionSummary" xml:space="preserve"><value>Lê o valor atual de HwSchMode no registro dos drivers de vídeo.</value></data>
+  <data name="Actions.windows.gaming.hags.toggle.ConfirmationSummary" xml:space="preserve"><value>Confirma que o valor foi alternado; exige reiniciar o Windows para ter efeito.</value></data>
+  <data name="Actions.windows.gaming.hags.toggle.UndoSummary" xml:space="preserve"><value>Totalmente reversível: o valor anterior é restaurado no rollback (também exige reinício para valer).</value></data>
+  <data name="Actions.windows.gaming.hags.toggle.RiskLimitations" xml:space="preserve"><value>O resultado varia por combinação de GPU/driver; a Microsoft não garante ganho de FPS com HAGS ativado ou desativado.</value></data>
   <data name="Actions.windows.gaming.gsync.guide.Name" xml:space="preserve"><value>Orientar configuração de G-SYNC/FreeSync/VRR</value></data>
   <data name="Actions.windows.gaming.gsync.guide.Description" xml:space="preserve"><value>Orienta como conferir e ativar o G-SYNC (NVIDIA) ou FreeSync (AMD) pelo painel oficial do fabricante ou pelo monitor, e sugere um limite de FPS compatível com a faixa variável, sem alterar nada.</value></data>
+  <data name="Actions.windows.gaming.gsync.guide.DetectionSummary" xml:space="preserve"><value>Lê a taxa de atualização máxima detectada na resolução atual e o fabricante da GPU.</value></data>
+  <data name="Actions.windows.gaming.gsync.guide.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.windows.gaming.gsync.guide.UndoSummary" xml:space="preserve"><value>Somente leitura: não ativa nem desativa G-SYNC/FreeSync/VRR.</value></data>
+  <data name="Actions.windows.gaming.gsync.guide.RiskLimitations" xml:space="preserve"><value>Não existe API pública para confirmar ou ativar G-SYNC/FreeSync/VRR; a orientação é best-effort, nunca um fato garantido.</value></data>
   <data name="Actions.windows.system.driver-reinstall.guide.Name" xml:space="preserve"><value>Orientar reinstalação limpa do driver de vídeo</value></data>
   <data name="Actions.windows.system.driver-reinstall.guide.Description" xml:space="preserve"><value>Mostra o passo a passo oficial de reinstalação limpa do driver de vídeo (DDU + instalador oficial) quando há suspeita de corrupção. Nunca baixa, instala ou remove nada sozinho. Nunca faz parte de perfis automáticos.</value></data>
+  <data name="Actions.windows.system.driver-reinstall.guide.DetectionSummary" xml:space="preserve"><value>Nenhuma detecção automática de corrupção; é acionado manualmente pelo usuário.</value></data>
+  <data name="Actions.windows.system.driver-reinstall.guide.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.windows.system.driver-reinstall.guide.UndoSummary" xml:space="preserve"><value>Somente leitura: não baixa, instala nem remove nenhum driver.</value></data>
+  <data name="Actions.windows.system.driver-reinstall.guide.RiskLimitations" xml:space="preserve"><value>É orientação, não reparo automático; reinstalar o driver errado ou interromper a instalação pode deixar o computador sem saída de vídeo -- siga os passos com cuidado.</value></data>
   <data name="Actions.windows.gaming.hybrid-laptop.diagnose.Name" xml:space="preserve"><value>Diagnosticar notebook híbrido/gaming</value></data>
   <data name="Actions.windows.gaming.hybrid-laptop.diagnose.Description" xml:space="preserve"><value>Verifica se o notebook está na bateria ou com Economia de Energia ativa e detecta utilitários conhecidos de troca de GPU/desempenho do fabricante (Armoury Crate, MSI Center, Lenovo Vantage, etc.), sem alterar nada.</value></data>
+  <data name="Actions.windows.gaming.hybrid-laptop.diagnose.DetectionSummary" xml:space="preserve"><value>Lê o estado de energia (CA/bateria, Economia de Energia) e a lista de utilitários de fabricante instalados.</value></data>
+  <data name="Actions.windows.gaming.hybrid-laptop.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.windows.gaming.hybrid-laptop.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não altera energia, GPU nem instala/remove nada.</value></data>
+  <data name="Actions.windows.gaming.hybrid-laptop.diagnose.RiskLimitations" xml:space="preserve"><value>Não controla MUX switch nem BIOS por métodos genéricos não documentados; detectar o utilitário do fabricante instalado não confirma que o notebook tem MUX switch ou GPU dedicada.</value></data>
   <data name="Actions.windows.power.pcie-aspm.adjust.Name" xml:space="preserve"><value>Ajustar PCI Express Link State Power Management</value></data>
   <data name="Actions.windows.power.pcie-aspm.adjust.Description" xml:space="preserve"><value>Desativa o gerenciamento de energia de link do PCI Express (ASPM) no plano de energia ativo, reduzindo picos de latência em troca de um consumo levemente maior.</value></data>
+  <data name="Actions.windows.power.pcie-aspm.adjust.DetectionSummary" xml:space="preserve"><value>Lê o índice atual da configuração ASPM (`powercfg /Q`) do plano de energia ativo.</value></data>
+  <data name="Actions.windows.power.pcie-aspm.adjust.ConfirmationSummary" xml:space="preserve"><value>Confirma que o valor foi definido como Off (0) no plano ativo.</value></data>
+  <data name="Actions.windows.power.pcie-aspm.adjust.UndoSummary" xml:space="preserve"><value>Totalmente reversível: o valor anterior é restaurado no rollback via powercfg.</value></data>
+  <data name="Actions.windows.power.pcie-aspm.adjust.RiskLimitations" xml:space="preserve"><value>Nem todo chipset/placa-mãe expõe essa configuração; quando ausente, a ação não altera nada. A leitura do valor atual depende do texto de saída do `powercfg /Q`, que varia por idioma do Windows -- em builds não testadas nesse idioma, a ação pode não conseguir ler o valor e simplesmente não fará nada.</value></data>
   <data name="Actions.windows.gaming.mouse-polling-rate.guide.Name" xml:space="preserve"><value>Orientar sobre polling rate do mouse</value></data>
   <data name="Actions.windows.gaming.mouse-polling-rate.guide.Description" xml:space="preserve"><value>Quando a CPU está sob carga alta, orienta testar reduzir mouses configurados para 4000/8000 Hz de polling para 1000 Hz, sem alterar nada.</value></data>
+  <data name="Actions.windows.gaming.mouse-polling-rate.guide.DetectionSummary" xml:space="preserve"><value>Lê o uso atual de CPU (mesma medição já usada nos diagnósticos de recursos existentes).</value></data>
+  <data name="Actions.windows.gaming.mouse-polling-rate.guide.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.windows.gaming.mouse-polling-rate.guide.UndoSummary" xml:space="preserve"><value>Somente leitura: não altera nenhuma configuração de mouse ou de sistema.</value></data>
+  <data name="Actions.windows.gaming.mouse-polling-rate.guide.RiskLimitations" xml:space="preserve"><value>Não lê a taxa de polling real do mouse (não há API pública documentada para isso) nem correlaciona stutter com movimento do mouse em tempo real; a orientação é sempre condicionada à carga de CPU observada no momento do diagnóstico.</value></data>
   <data name="Actions.windows.appearance.visual-effects.reduce.Name" xml:space="preserve"><value>Reduzir efeitos visuais do Windows</value></data>
   <data name="Actions.windows.appearance.visual-effects.reduce.Description" xml:space="preserve"><value>Reduz animações e transparências, preservando legibilidade e suavização de fontes.</value></data>
+  <data name="Actions.windows.appearance.visual-effects.reduce.DetectionSummary" xml:space="preserve"><value>Lê o estado atual de animações e transparências do Windows.</value></data>
+  <data name="Actions.windows.appearance.visual-effects.reduce.ConfirmationSummary" xml:space="preserve"><value>Confirma que os efeitos foram reduzidos preservando a suavização de fontes.</value></data>
+  <data name="Actions.windows.appearance.visual-effects.reduce.UndoSummary" xml:space="preserve"><value>Totalmente reversível: o estado anterior dos efeitos é restaurado no rollback.</value></data>
+  <data name="Actions.windows.appearance.visual-effects.reduce.RiskLimitations" xml:space="preserve"><value>Muda a aparência do desktop; preserva legibilidade e suavização de fontes.</value></data>
   <data name="Runtime.ApplyingAction" xml:space="preserve"><value>Aplicando {0}</value></data>
   <data name="Runtime.ActionCompleted" xml:space="preserve"><value>Concluído: {0}</value></data>
   <data name="Runtime.ValidatingTransaction" xml:space="preserve"><value>Validando transação {0}.</value></data>
@@ -760,6 +1008,24 @@
   <data name="Dashboard.LivePerformance.Network" xml:space="preserve"><value>REDE</value></data>
   <data name="Dashboard.LivePerformance.ChartDescription" xml:space="preserve"><value>Histórico de uso da CPU e GPU no último minuto.</value></data>
   <data name="Dashboard.LivePerformance.LocalOnly" xml:space="preserve"><value>Leitura local. Nada é enviado pela internet.</value></data>
+  <data name="Dashboard.SessionMonitor.Title" xml:space="preserve"><value>Sessão do FiveM</value></data>
+  <data name="Dashboard.SessionMonitor.Description" xml:space="preserve"><value>Detecção local e somente leitura do processo. Nenhum dado do jogo é acessado ou enviado.</value></data>
+  <data name="Dashboard.SessionMonitor.Start" xml:space="preserve"><value>Iniciar monitor</value></data>
+  <data name="Dashboard.SessionMonitor.Stop" xml:space="preserve"><value>Parar monitor</value></data>
+  <data name="Dashboard.SessionMonitor.Unavailable" xml:space="preserve"><value>MONITOR INDISPONÍVEL</value></data>
+  <data name="Dashboard.SessionMonitor.UnavailableDetail" xml:space="preserve"><value>Execute a varredura local para validar uma instalação FiveM para GTAV Legacy.</value></data>
+  <data name="Dashboard.SessionMonitor.Off" xml:space="preserve"><value>MONITOR DESLIGADO</value></data>
+  <data name="Dashboard.SessionMonitor.OffDetail" xml:space="preserve"><value>Inicie manualmente quando quiser que o Ralven acompanhe a sessão enquanto o app estiver aberto ou na bandeja.</value></data>
+  <data name="Dashboard.SessionMonitor.Waiting" xml:space="preserve"><value>AGUARDANDO O FIVEM</value></data>
+  <data name="Dashboard.SessionMonitor.WaitingDetail" xml:space="preserve"><value>Abra o FiveM. O Ralven valida a imagem do processo a cada cinco segundos.</value></data>
+  <data name="Dashboard.SessionMonitor.Active" xml:space="preserve"><value>SESSÃO DETECTADA</value></data>
+  <data name="Dashboard.SessionMonitor.ActiveDetail" xml:space="preserve"><value>Validada localmente há {0}. O monitoramento continua somente leitura.</value></data>
+  <data name="Dashboard.SessionMonitor.ConfirmingEnd" xml:space="preserve"><value>CONFIRMANDO O FIM DA SESSÃO</value></data>
+  <data name="Dashboard.SessionMonitor.ConfirmingEndDetail" xml:space="preserve"><value>O processo desapareceu uma vez. Uma segunda leitura confirmada é necessária.</value></data>
+  <data name="Dashboard.SessionMonitor.Completed" xml:space="preserve"><value>SESSÃO ENCERRADA</value></data>
+  <data name="Dashboard.SessionMonitor.CompletedDetail" xml:space="preserve"><value>A sessão foi observada por cerca de {0}. O monitor continua pronto para a próxima.</value></data>
+  <data name="Dashboard.SessionMonitor.ReadUnavailable" xml:space="preserve"><value>LEITURA INDISPONÍVEL</value></data>
+  <data name="Dashboard.SessionMonitor.ReadUnavailableDetail" xml:space="preserve"><value>Não foi possível concluir a validação local do processo. O estado anterior foi preservado.</value></data>
   <data name="Dashboard.SystemOverview.Description" xml:space="preserve"><value>Hardware detectado e disponível para FiveM e GTA V.</value></data>
   <data name="Dashboard.Eyebrow" xml:space="preserve"><value>DIAGNÓSTICO LOCAL</value></data>
   <data name="Dashboard.LastScan" xml:space="preserve"><value>Última varredura às {0}</value></data>
@@ -881,6 +1147,14 @@
   <data name="Settings.Account.SignOut" xml:space="preserve"><value>Sair</value></data>
   <data name="Settings.Account.NewPasswordLabel" xml:space="preserve"><value>Nova senha</value></data>
   <data name="Settings.Account.Title" xml:space="preserve"><value>Conta</value></data>
+  <data name="Settings.Account.Plan.Title" xml:space="preserve"><value>Plano</value></data>
+  <data name="Settings.Account.Plan.Free" xml:space="preserve"><value>Gratuito</value></data>
+  <data name="Settings.Account.Plan.FreeDetail" xml:space="preserve"><value>Nenhum acesso Pro ativo está vinculado a esta conta.</value></data>
+  <data name="Settings.Account.Plan.ProUntil" xml:space="preserve"><value>Pro até {0}</value></data>
+  <data name="Settings.Account.Plan.ProDetail" xml:space="preserve"><value>Acesso Pro confirmado pelos servidores do Ralven.</value></data>
+  <data name="Settings.Account.Plan.Unavailable" xml:space="preserve"><value>Não foi possível confirmar seu plano</value></data>
+  <data name="Settings.Account.Plan.UnavailableDetail" xml:space="preserve"><value>Não foi possível verificar seu acesso atual. Nenhum recurso Pro é liberado enquanto esse estado estiver indisponível.</value></data>
+  <data name="Settings.Account.Plan.Refresh" xml:space="preserve"><value>Atualizar</value></data>
   <data name="Settings.Account.ChangePhoto" xml:space="preserve"><value>Trocar foto</value></data>
   <data name="Settings.Account.Unavailable" xml:space="preserve"><value>O acesso à conta não está disponível nesta instalação.</value></data>
   <data name="Report.ViewHistoryButton" xml:space="preserve"><value>Ver histórico</value></data>
