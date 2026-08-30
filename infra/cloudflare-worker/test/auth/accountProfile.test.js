@@ -89,7 +89,7 @@ test('validateAccountProfile accepts accented, hyphenated and apostrophe names',
   assert.equal(result.lastName, "O'Neil-Santos");
 });
 
-function fakeDb({ throwsWithMessage } = {}) {
+function fakeDb({ throwsWithMessage, billingCheckout = false } = {}) {
   const inserted = [];
   return {
     inserted,
@@ -97,7 +97,13 @@ function fakeDb({ throwsWithMessage } = {}) {
       return {
         bind(...params) {
           if (sql.startsWith('SELECT')) {
-            return { async first() { return null; } };
+            return {
+              async first() {
+                return billingCheckout && sql.includes('billing_checkout_intents')
+                  ? { blocked: 1 }
+                  : null;
+              },
+            };
           }
           return {
             async run() {
@@ -168,8 +174,14 @@ test('fetchAccountProfile maps the stored row to camelCase and reads by the give
 
 test('deleteAccountProfile scopes the deletion to the verified uid', async () => {
   const db = fakeDb();
-  await deleteAccountProfile(db, 'firebase-uid-123');
-  assert.deepEqual(db.inserted[0].params, ['firebase-uid-123']);
+  assert.equal(await deleteAccountProfile(db, 'firebase-uid-123'), true);
+  assert.deepEqual(db.inserted[0].params, ['firebase-uid-123', 'firebase-uid-123']);
+});
+
+test('deleteAccountProfile blocks deletion while a checkout or subscription flow is linked', async () => {
+  const db = fakeDb({ billingCheckout: true });
+  assert.equal(await deleteAccountProfile(db, 'firebase-uid-123'), false);
+  assert.deepEqual(db.inserted[0].params, ['firebase-uid-123', 'firebase-uid-123']);
 });
 
 test('fetchAccountProfile returns null when the account has no profile row', async () => {

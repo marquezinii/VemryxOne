@@ -63,6 +63,19 @@ remove primeiro o perfil pelo UID autenticado e só então a conta Firebase;
 se o Firebase recusar a exclusão, o perfil é restaurado antes de informar a
 falha.
 
+## Cobrança e entitlements
+
+A fundação de cobrança fica no Worker e no D1, separada da autenticação
+Firebase e das políticas de otimização. O aplicativo pode ler apenas o snapshot
+server-side de acesso da própria UID em `GET /account/entitlements`; IDs e
+estados do provedor não são contratos do cliente. Notificações do Mercado Pago
+são autenticadas por HMAC e sempre reconciliadas contra o recurso canônico e um
+checkout intent criado pelo servidor. O corpo da notificação, um redirect de
+checkout ou o estado `authorized` de uma assinatura não concedem Pro. Veja
+[Cobrança e acesso pago](billing.md) para o contrato e os bloqueadores de
+ativação. Enquanto um checkout ou assinatura local existir, a exclusão do perfil
+é bloqueada; o fluxo futuro deve cancelar no provedor antes de remover o vínculo.
+
 | Projeto                  | Responsabilidade                                                    | Não deve conhecer                                        |
 | ------------------------ | ------------------------------------------------------------------- | -------------------------------------------------------- |
 | `Ralven.App`       | WPF, navegação, prévia, progresso e confirmação                     | APIs administrativas ou detalhes de registro             |
@@ -124,7 +137,7 @@ documentação: como detectar, como confirmar, como desfazer, riscos/limitaçõe
 
 IDs são estáveis para que relatórios e snapshots continuem interpretáveis entre versões. Os campos de pré-requisito, criticidade, versões do Windows e documentação vivem em `ActionMetadataDto`/`OptimizationActionDefinition`.
 
-Pré-requisito, criticidade e privilégio alimentam o motor de execução. Os quatro campos de documentação (`DetectionSummary`, `ConfirmationSummary`, `UndoSummary`, `RiskLimitations`) hoje são obrigatórios por teste e participam da verificação de integridade do plano, mas **ainda não são exibidos na interface**; expô-los na revisão do plano continua sendo trabalho em aberto.
+Pré-requisito, criticidade e privilégio alimentam o motor de execução. Os quatro campos de documentação (`DetectionSummary`, `ConfirmationSummary`, `UndoSummary`, `RiskLimitations`) são obrigatórios por teste, participam da verificação de integridade do plano e aparecem de forma localizada nos detalhes expansíveis de cada ação durante a revisão do plano.
 
 `ActionMetadataDto.MatchesExactly` é a única comparação de metadados do projeto. O broker elevado e o catálogo Windows rejeitam um plano cujos metadados divergem do catálogo local, e ambos delegam a esse método — antes cada fronteira repetia a lista de campos e as duas versões haviam divergido.
 

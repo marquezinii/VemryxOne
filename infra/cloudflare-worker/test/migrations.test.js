@@ -65,12 +65,13 @@ function apply(config, stateDirectory, expectSuccess = true) {
   ], { expectSuccess });
 }
 
-function execute(config, stateDirectory, command) {
-  return JSON.parse(run([
+function execute(config, stateDirectory, command, expectSuccess = true) {
+  const output = run([
     'd1', 'execute', 'TELEMETRY_DB', '--local',
     '--persist-to', stateDirectory, '--config', config,
     '--command', command, '--json',
-  ]));
+  ], { expectSuccess });
+  return expectSuccess ? JSON.parse(output) : output;
 }
 
 function adoptHistoricalBootstrap(config, stateDirectory) {
@@ -112,8 +113,38 @@ const workerSchemaSmoke = `
   INSERT INTO account_profiles
     (uid, username, username_normalized, first_name, last_name, terms_version, terms_accepted_at, created_at)
   VALUES ('test-user', 'TestUser', 'testuser', 'Test', 'User', 'v1', '2026-01-01T00:00:00.000Z', '2026-01-01T00:00:00.000Z');
+  INSERT INTO billing_checkout_intents
+    (id, account_uid, provider, external_reference, offer_key, amount_cents, currency,
+     provider_checkout_id, state, created_at, updated_at)
+  VALUES
+    ('checkout-1', 'test-user', 'mercado_pago', 'opaque-checkout-1', 'ralven_pro_monthly',
+     1490, 'BRL', 'provider-checkout-1', 'completed', '2026-01-01T00:00:00.000Z',
+     '2026-01-01T00:01:00.000Z');
+  INSERT INTO billing_webhook_events
+    (provider, provider_request_id, resource_id, received_at,
+     processing_outcome, processed_at)
+  VALUES
+    ('mercado_pago', 'request-1', 'provider-subscription-1',
+     '2026-01-01T00:01:01.000Z', 'processed', '2026-01-01T00:01:02.000Z');
+  INSERT INTO billing_subscriptions
+    (id, account_uid, checkout_intent_id, provider, provider_subscription_id,
+     offer_key, state, provider_updated_at, last_event_id, created_at, updated_at)
+  VALUES
+    ('subscription-1', 'test-user', 'checkout-1', 'mercado_pago', 'provider-subscription-1',
+     'ralven_pro_monthly', 'authorized', '2026-01-01T00:01:00.000Z',
+     (SELECT id FROM billing_webhook_events WHERE provider = 'mercado_pago' AND provider_request_id = 'request-1'),
+     '2026-01-01T00:00:00.000Z', '2026-01-01T00:01:02.000Z');
+  INSERT INTO account_entitlements
+    (account_uid, entitlement_key, state, subscription_id, valid_from, valid_until,
+     provider_updated_at, last_event_id, updated_at)
+  VALUES
+    ('test-user', 'ralven_pro', 'active', 'subscription-1', '2026-01-01T00:00:00.000Z',
+     '2026-02-01T00:00:00.000Z', '2026-01-01T00:01:00.000Z',
+     (SELECT id FROM billing_webhook_events WHERE provider = 'mercado_pago' AND provider_request_id = 'request-1'),
+     '2026-01-01T00:01:02.000Z');
   SELECT message, active, updated_at FROM live_alert WHERE id = 1;
   SELECT username, first_name, last_name, terms_version FROM account_profiles WHERE uid = 'test-user';
+  SELECT entitlement_key, state, valid_until FROM account_entitlements WHERE account_uid = 'test-user';
 `;
 
 async function verifyUpgradeFrom(priorCount, t) {
@@ -149,6 +180,133 @@ test('D1 migrations adopt the historical schema.sql bootstrap before applying ne
   const currentConfig = await createFixture(root, 'current', migrationNames);
   apply(currentConfig, stateDirectory);
   execute(currentConfig, stateDirectory, workerSchemaSmoke);
+});
+
+test('billing migration enforces ownership, deduplicates events, and cascades account deletion', async (t) => {
+  const root = await mkdtemp(join(tmpdir(), 'Ralven-d1-billing-'));
+  t.after(() => rm(root, { recursive: true, force: true }));
+
+  const stateDirectory = join(root, 'state');
+  const config = await createFixture(root, 'current', migrationNames);
+  apply(config, stateDirectory);
+
+  const result = execute(config, stateDirectory, `
+    INSERT INTO account_profiles
+      (uid, username, username_normalized, first_name, last_name, terms_version, terms_accepted_at, created_at)
+    VALUES
+      ('billing-user', 'BillingUser', 'billinguser', 'Billing', 'User', 'v1',
+       '2026-01-01T00:00:00.000Z', '2026-01-01T00:00:00.000Z'),
+      ('billing-other', 'BillingOther', 'billingother', 'Billing', 'Other', 'v1',
+       '2026-01-01T00:00:00.000Z', '2026-01-01T00:00:00.000Z');
+    INSERT INTO billing_checkout_intents
+      (id, account_uid, provider, external_reference, offer_key, amount_cents, currency,
+       state, created_at, updated_at)
+    VALUES
+      ('checkout-valid', 'billing-user', 'mercado_pago', 'opaque-valid',
+       'ralven_pro_monthly', 1490, 'BRL', 'pending',
+       '2026-01-01T00:00:00.000Z', '2026-01-01T00:00:00.000Z');
+    INSERT OR IGNORE INTO billing_checkout_intents
+      (id, account_uid, provider, external_reference, offer_key, amount_cents, currency,
+       state, created_at, updated_at)
+    VALUES
+      ('checkout-replay', 'billing-user', 'mercado_pago', 'opaque-valid',
+       'ralven_pro_monthly', 1490, 'BRL', 'pending',
+       '2026-01-01T00:00:01.000Z', '2026-01-01T00:00:01.000Z'),
+      ('checkout-invalid-state', 'billing-user', 'mercado_pago', 'opaque-invalid',
+       'ralven_pro_monthly', 1490, 'BRL', 'unknown',
+       '2026-01-01T00:00:01.000Z', '2026-01-01T00:00:01.000Z');
+    INSERT INTO billing_webhook_events
+      (provider, provider_request_id, resource_id, received_at)
+    VALUES
+      ('mercado_pago', 'request-late', 'provider-subscription-1',
+       '2026-01-01T00:02:02.000Z'),
+      ('mercado_pago', 'request-early', 'provider-subscription-1',
+       '2026-01-01T00:02:01.000Z');
+    INSERT OR IGNORE INTO billing_webhook_events
+      (provider, provider_request_id, resource_id, received_at)
+    VALUES
+      ('mercado_pago', 'request-late', 'different-resource',
+       '2026-01-01T00:03:00.000Z');
+    INSERT INTO billing_subscriptions
+      (id, account_uid, checkout_intent_id, provider, provider_subscription_id,
+       offer_key, state, provider_updated_at, last_event_id, created_at, updated_at)
+    VALUES
+      ('subscription-valid', 'billing-user', 'checkout-valid', 'mercado_pago',
+       'provider-subscription-1', 'ralven_pro_monthly', 'authorized',
+       '2026-01-01T00:02:00.000Z',
+       (SELECT id FROM billing_webhook_events WHERE provider = 'mercado_pago' AND provider_request_id = 'request-late'),
+       '2026-01-01T00:00:00.000Z', '2026-01-01T00:02:02.000Z');
+    INSERT INTO account_entitlements
+      (account_uid, entitlement_key, state, subscription_id, valid_from, valid_until,
+       provider_updated_at, last_event_id, updated_at)
+    VALUES
+      ('billing-user', 'ralven_pro', 'active', 'subscription-valid',
+       '2026-01-01T00:00:00.000Z', '2026-02-01T00:00:00.000Z',
+       '2026-01-01T00:02:00.000Z',
+       (SELECT id FROM billing_webhook_events WHERE provider = 'mercado_pago' AND provider_request_id = 'request-late'),
+       '2026-01-01T00:02:02.000Z');
+    SELECT id FROM billing_checkout_intents ORDER BY id;
+    SELECT provider_request_id FROM billing_webhook_events
+      WHERE provider = 'mercado_pago' AND resource_id = 'provider-subscription-1'
+      ORDER BY received_at, id;
+    SELECT name FROM sqlite_master
+      WHERE type = 'index' AND name IN (
+        'idx_billing_checkout_intents_account_contract',
+        'idx_billing_subscriptions_account_contract'
+      )
+      ORDER BY name;
+  `);
+
+  assert.deepEqual(result.at(-3).results, [{ id: 'checkout-valid' }]);
+  assert.deepEqual(result.at(-2).results, [
+    { provider_request_id: 'request-early' },
+    { provider_request_id: 'request-late' },
+  ]);
+  assert.deepEqual(result.at(-1).results.map(({ name }) => name), [
+    'idx_billing_checkout_intents_account_contract',
+    'idx_billing_subscriptions_account_contract',
+  ]);
+
+  execute(config, stateDirectory, `
+    INSERT INTO billing_subscriptions
+      (id, account_uid, checkout_intent_id, provider, provider_subscription_id,
+       offer_key, state, provider_updated_at, created_at, updated_at)
+    VALUES
+      ('subscription-cross-account', 'billing-other', 'checkout-valid', 'mercado_pago',
+       'provider-subscription-cross', 'ralven_pro_monthly', 'authorized',
+       '2026-01-01T00:03:00.000Z', '2026-01-01T00:03:00.000Z',
+       '2026-01-01T00:03:00.000Z');
+  `, false);
+  execute(config, stateDirectory, `
+    INSERT INTO account_entitlements
+      (account_uid, entitlement_key, state, subscription_id, valid_from, valid_until,
+       provider_updated_at, updated_at)
+    VALUES
+      ('billing-other', 'ralven_pro', 'active', 'subscription-valid',
+       '2026-01-01T00:00:00.000Z', '2026-02-01T00:00:00.000Z',
+       '2026-01-01T00:03:00.000Z', '2026-01-01T00:03:00.000Z');
+  `, false);
+  const invalidOwnership = execute(config, stateDirectory, `
+    SELECT
+      (SELECT COUNT(*) FROM billing_subscriptions WHERE id = 'subscription-cross-account') AS subscription_count,
+      (SELECT COUNT(*) FROM account_entitlements WHERE account_uid = 'billing-other') AS entitlement_count;
+  `);
+  assert.deepEqual(invalidOwnership.at(-1).results, [{ subscription_count: 0, entitlement_count: 0 }]);
+
+  const deletion = execute(config, stateDirectory, `
+    DELETE FROM account_profiles WHERE uid = 'billing-user';
+    SELECT
+      (SELECT COUNT(*) FROM billing_checkout_intents WHERE account_uid = 'billing-user') AS checkout_count,
+      (SELECT COUNT(*) FROM billing_subscriptions WHERE account_uid = 'billing-user') AS subscription_count,
+      (SELECT COUNT(*) FROM account_entitlements WHERE account_uid = 'billing-user') AS entitlement_count,
+      (SELECT COUNT(*) FROM billing_webhook_events WHERE provider = 'mercado_pago') AS webhook_count;
+  `);
+  assert.deepEqual(deletion.at(-1).results, [{
+    checkout_count: 0,
+    subscription_count: 0,
+    entitlement_count: 0,
+    webhook_count: 2,
+  }]);
 });
 
 test('a failed D1 migration is atomic and is not recorded as applied', async (t) => {

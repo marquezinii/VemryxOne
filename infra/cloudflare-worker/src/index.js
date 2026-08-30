@@ -22,6 +22,8 @@ import { createCsrfToken, isValidCsrfToken } from './auth/crypto.js';
 import { parseReleaseManifest } from './releaseManifest.js';
 import { validateLiveAlertUpdate } from './liveAlert/validateSubmission.js';
 import { buildLiveAlertUpsert, toLiveAlertResponse } from './liveAlert/store.js';
+import { fetchAccountEntitlements } from './billing/entitlements.js';
+import { handleMercadoPagoWebhook } from './billing/mercadoPagoWebhook.js';
 
 const MAX_TELEMETRY_BODY_BYTES = 512 * 1024;
 const MAX_BUG_REPORT_BODY_BYTES = 128 * 1024;
@@ -40,7 +42,9 @@ const MAX_LIVE_ALERT_BODY_BYTES = 4 * 1024;
 //   POST    /account/profile       -- create the username/first/last-name profile for a Firebase account (requires a valid Firebase ID token)
 //   GET     /account/profile       -- read the caller's own username/first/last-name profile (requires a valid Firebase ID token)
 //   DELETE  /account/profile       -- delete the caller's own profile before its Firebase account is deleted
+//   GET     /account/entitlements  -- read the caller's server-authoritative access tier (requires a valid Firebase ID token)
 //   GET     /account/username-available -- advisory "is this username free?" probe for the registration form (no auth; rate limited per IP)
+//   POST    /billing/mercado-pago/webhook -- verify and reconcile one Mercado Pago subscription notification
 //   POST    /admin/login           -- { password } -> session cookie
 //   POST    /admin/logout          -- clears the session cookie
 //   GET     /admin/csrf            -- session-bound CSRF token (requires a valid session)
@@ -143,6 +147,9 @@ async function route(request, env, url) {
   if (request.method === 'DELETE' && url.pathname === '/account/profile') {
     return handleAccountProfileDelete(request, env);
   }
+  if (request.method === 'GET' && url.pathname === '/account/entitlements') {
+    return handleAccountEntitlementsGet(request, env);
+  }
   if (request.method === 'GET' && url.pathname === '/account/username-available') {
     return handleUsernameAvailability(request, env, url);
   }
@@ -151,6 +158,9 @@ async function route(request, env, url) {
   }
   if (request.method === 'POST' && url.pathname === '/admin/live-alert') {
     return handleLiveAlertUpdate(request, env);
+  }
+  if (request.method === 'POST' && url.pathname === '/billing/mercado-pago/webhook') {
+    return handleMercadoPagoWebhook(request, env);
   }
 
   if (request.method === 'GET' && url.pathname === '/admin/csrf') {
@@ -333,8 +343,22 @@ async function handleAccountProfileDelete(request, env) {
   const auth = await requireFirebaseUser(request);
   if (!auth.authorized) return auth.response;
 
-  await deleteAccountProfile(env.TELEMETRY_DB, auth.uid);
+  const deleted = await deleteAccountProfile(env.TELEMETRY_DB, auth.uid);
+  if (!deleted) {
+    return jsonResponse({ error: 'billing-cancellation-required' }, 409);
+  }
   return new Response(null, { status: 204 });
+}
+
+async function handleAccountEntitlementsGet(request, env) {
+  const auth = await requireFirebaseUser(request);
+  if (!auth.authorized) return auth.response;
+
+  try {
+    return jsonResponse(await fetchAccountEntitlements(env.TELEMETRY_DB, auth.uid));
+  } catch {
+    return jsonResponse({ error: 'entitlements-unavailable' }, 500);
+  }
 }
 
 async function handleUpdaterEventsList(request, env, url) {
