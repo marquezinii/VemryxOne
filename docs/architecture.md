@@ -137,7 +137,7 @@ documentação: como detectar, como confirmar, como desfazer, riscos/limitaçõe
 
 IDs são estáveis para que relatórios e snapshots continuem interpretáveis entre versões. Os campos de pré-requisito, criticidade, versões do Windows e documentação vivem em `ActionMetadataDto`/`OptimizationActionDefinition`.
 
-Pré-requisito, criticidade e privilégio alimentam o motor de execução. Os quatro campos de documentação (`DetectionSummary`, `ConfirmationSummary`, `UndoSummary`, `RiskLimitations`) hoje são obrigatórios por teste e participam da verificação de integridade do plano, mas **ainda não são exibidos na interface**; expô-los na revisão do plano continua sendo trabalho em aberto.
+Pré-requisito, criticidade e privilégio alimentam o motor de execução. Os quatro campos de documentação (`DetectionSummary`, `ConfirmationSummary`, `UndoSummary`, `RiskLimitations`) são obrigatórios por teste, participam da verificação de integridade do plano e aparecem de forma localizada nos detalhes expansíveis de cada ação durante a revisão do plano.
 
 `ActionMetadataDto.MatchesExactly` é a única comparação de metadados do projeto. O broker elevado e o catálogo Windows rejeitam um plano cujos metadados divergem do catálogo local, e ambos delegam a esse método — antes cada fronteira repetia a lista de campos e as duas versões haviam divergido.
 

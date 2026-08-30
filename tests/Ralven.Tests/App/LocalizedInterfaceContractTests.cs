@@ -168,8 +168,24 @@ public sealed partial class LocalizedInterfaceContractTests
     }
 
     [Fact]
-    public void EveryOptimizationAction_HasLocalizedNameAndDescription()
+    public void EveryOptimizationAction_HasLocalizedReviewContent()
     {
+        var root = TestHelpers.FindRepositoryRoot();
+        var resourceDirectory = Path.Combine(root, "src", "Ralven.App", "Resources");
+        var localizedResources = new[]
+        {
+            "Strings.resx",
+            "Strings.pt-BR.resx",
+            "Strings.es.resx"
+        }.Select(fileName => XDocument
+            .Load(Path.Combine(resourceDirectory, fileName))
+            .Descendants("data")
+            .ToDictionary(
+                element => (string)element.Attribute("name")!,
+                element => (string?)element.Element("value") ?? string.Empty,
+                StringComparer.Ordinal))
+            .ToArray();
+        var portugueseReviewContent = localizedResources[1];
         var english = new LocalizationService(
             System.Globalization.CultureInfo.GetCultureInfo("en-US"));
         var portuguese = new LocalizationService(
@@ -179,13 +195,31 @@ public sealed partial class LocalizedInterfaceContractTests
 
         foreach (var action in ActionCatalog.Current.Actions)
         {
-            foreach (var suffix in new[] { "Name", "Description" })
+            foreach (var suffix in new[]
+                     {
+                         "Name",
+                         "Description",
+                         "DetectionSummary",
+                         "ConfirmationSummary",
+                         "UndoSummary",
+                         "RiskLimitations"
+                     })
             {
                 var key = $"Actions.{action.Id}.{suffix}";
+                Assert.All(localizedResources, resources =>
+                {
+                    Assert.True(resources.TryGetValue(key, out var value));
+                    Assert.False(string.IsNullOrWhiteSpace(value));
+                });
                 Assert.NotEqual(key, english.GetString(key));
                 Assert.NotEqual(key, portuguese.GetString(key));
                 Assert.NotEqual(key, spanish.GetString(key));
             }
+
+            Assert.Equal(action.DetectionSummary, portugueseReviewContent[$"Actions.{action.Id}.DetectionSummary"]);
+            Assert.Equal(action.ConfirmationSummary, portugueseReviewContent[$"Actions.{action.Id}.ConfirmationSummary"]);
+            Assert.Equal(action.UndoSummary, portugueseReviewContent[$"Actions.{action.Id}.UndoSummary"]);
+            Assert.Equal(action.RiskLimitations, portugueseReviewContent[$"Actions.{action.Id}.RiskLimitations"]);
         }
     }
 
@@ -335,6 +369,11 @@ public sealed partial class LocalizedInterfaceContractTests
         Assert.Contains("IsBusy", optimizer, StringComparison.Ordinal);
         Assert.Contains("IsReportAvailable", optimizer, StringComparison.Ordinal);
         Assert.Contains("PlannedActions", optimizer, StringComparison.Ordinal);
+        Assert.Contains("<Expander", optimizer, StringComparison.Ordinal);
+        Assert.Contains("DetectionSummary", optimizer, StringComparison.Ordinal);
+        Assert.Contains("ConfirmationSummary", optimizer, StringComparison.Ordinal);
+        Assert.Contains("UndoSummary", optimizer, StringComparison.Ordinal);
+        Assert.Contains("RiskLimitations", optimizer, StringComparison.Ordinal);
         // O trilho único (SpectrumSelector) substituiu o hero recomendado +
         // três cards de perfil por um único sistema visual; o sinal de
         // "recomendado" chega via RecommendedIndex, calculado a partir das
