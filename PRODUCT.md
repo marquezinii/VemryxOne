@@ -15,7 +15,7 @@ Ralven não é um pacote genérico de tweaks. Cada mutação tem escopo tipado, 
 ## Capacidades atuais
 
 - visão geral com diagnóstico local e métricas reais;
-- acessos seguros a superfícies nativas de Sistema e Aplicativos;
+- inventário interno somente leitura de aplicativos e inicialização, além de acessos seguros a superfícies nativas do Windows;
 - diagnóstico e otimização especializada de FiveM/GTAV Legacy;
 - planos Leve, Médio e Agressivo com prévia e confirmação;
 - execução transacional, journal, histórico e rollback;

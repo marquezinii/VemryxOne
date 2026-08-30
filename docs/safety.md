@@ -89,6 +89,26 @@ O painel nunca aceita caminho, hive, nome de valor, ação ou comando fornecido
 pela UI. Qualquer novo ajuste geral do Windows exige ação própria, evidência,
 detecção, confirmação, validação, reversibilidade e testes independentes.
 
+## Inventário de aplicativos e inicialização
+
+A página **Aplicativos** faz somente descoberta local como usuário padrão:
+
+- lê os registros de desinstalação em HKCU/HKLM nas visões de 32 e 64 bits para
+  nome, versão, fabricante e tamanho estimado;
+- lê apenas os nomes registrados em `Run`/`RunOnce` e os nomes de arquivos nas
+  pastas Startup; conteúdo de comandos não é carregado nem exibido;
+- nunca lê ou executa `UninstallString` e nunca lê ou escreve
+  `StartupApproved`;
+- trata acesso negado e fontes indisponíveis como resultado parcial explícito,
+  sem transformar ausência de dados em sucesso completo;
+- não instala, atualiza, desinstala, habilita ou desabilita software e não usa o
+  broker.
+
+As ações secundárias continuam abrindo superfícies confiáveis do Windows para
+qualquer alteração. Uma futura operação de pacote ou inicialização exige
+contrato tipado, confirmação, verificação e rollback próprios; texto descoberto
+no registro nunca pode ser promovido a comando executável.
+
 ## Escopo de edição gráfica
 
 `LegacyGraphicsPresetAction` e `DisplayPreferencesAction` só escrevem opções
