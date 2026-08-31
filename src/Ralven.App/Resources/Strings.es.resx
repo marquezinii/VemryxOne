@@ -246,7 +246,7 @@
   <data name="Settings.General.Updates" xml:space="preserve"><value>Actualizaciones</value></data>
   <data name="Settings.Language.Title" xml:space="preserve"><value>Idioma</value></data>
   <data name="Settings.Language.Description" xml:space="preserve"><value>Sigue a Windows automáticamente o elige un idioma.</value></data>
-  <data name="Settings.Language.Automatic" xml:space="preserve"><value>Windows (automático)</value></data>
+  <data name="Settings.Language.Automatic" xml:space="preserve"><value>Idioma del sistema</value></data>
   <data name="Settings.Language.English" xml:space="preserve"><value>English</value></data>
   <data name="Settings.Language.PortugueseBrazil" xml:space="preserve"><value>Português (Brasil)</value></data>
   <data name="Settings.Language.Spanish" xml:space="preserve"><value>Español</value></data>
