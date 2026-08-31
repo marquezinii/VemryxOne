@@ -212,6 +212,8 @@
   <data name="Optimizer.Result.PartialTitle" xml:space="preserve"><value>Completed with failures</value></data>
   <data name="Optimizer.NextStep" xml:space="preserve"><value>NEXT RECOMMENDED STEP</value></data>
   <data name="Optimizer.PlanTitle" xml:space="preserve"><value>Optimization plan</value></data>
+  <data name="Optimizer.AutomaticAnalysis.Header" xml:space="preserve"><value>{0} automatic checks</value></data>
+  <data name="Optimizer.AutomaticAnalysis.Description" xml:space="preserve"><value>Ralven checks these items automatically during optimization to understand the PC's current state. No action is required from you.</value></data>
   <data name="Optimizer.Table.Action" xml:space="preserve"><value>ACTION</value></data>
   <data name="Optimizer.Table.Description" xml:space="preserve"><value>WHAT IT DOES</value></data>
   <data name="Optimizer.Table.Risk" xml:space="preserve"><value>RISK</value></data>
@@ -340,7 +342,7 @@
   <data name="Plan.Empty.GeneralNoSafeActions" xml:space="preserve"><value>This PC already matches the safe Windows targets available for the selected profile.</value></data>
   <data name="Plan.Empty.DiagnosticInProgress" xml:space="preserve"><value>Wait for the diagnostic to finish before preparing actions.</value></data>
   <data name="Plan.Empty.DiagnosticUnavailable" xml:space="preserve"><value>The diagnostic could not be completed. Try scanning your PC again before preparing actions.</value></data>
-  <data name="Plan.ActionsCatalog" xml:space="preserve"><value>{0} actions • catalog v{1}</value></data>
+  <data name="Plan.ActionsCatalog" xml:space="preserve"><value>{0} adjustments • catalog v{1}</value></data>
   <data name="Plan.ActionsCompletedSummary" xml:space="preserve"><value>{0} actions completed. {1}</value></data>
   <data name="Diagnosis.Partial" xml:space="preserve"><value>Partial diagnostics</value></data>
   <data name="Diagnosis.CouldNotScanAgain" xml:space="preserve"><value>Could not scan again right now</value></data>
@@ -477,6 +479,7 @@
 {0}</value></data>
   <data name="Brand.FooterCopyright" xml:space="preserve"><value>© 2026 Ralven</value></data>
   <data name="Plan.VerifiedActions.Label" xml:space="preserve"><value>VERIFIED ACTIONS</value></data>
+  <data name="Plan.AppliedAdjustments.Label" xml:space="preserve"><value>ADJUSTMENTS TO APPLY</value></data>
   <data name="Progress.ElapsedFormat" xml:space="preserve"><value>Elapsed {0}</value></data>
   <data name="Progress.RemainingFormat" xml:space="preserve"><value>About {0} remaining</value></data>
   <data name="Progress.Finishing" xml:space="preserve"><value>Finishing...</value></data>
@@ -723,7 +726,7 @@
   <data name="Actions.fivem.legacy.server-cache.repair.UndoSummary" xml:space="preserve"><value>Regenerable data: FiveM downloads the content again the next time a server is accessed.</value></data>
   <data name="Actions.fivem.legacy.server-cache.repair.RiskLimitations" xml:space="preserve"><value>The first load will be slower; old Rockstar Editor clips may stop working.</value></data>
   <data name="Actions.fivem.legacy.stuck-process.terminate.Name" xml:space="preserve"><value>Terminate a stuck FiveM process</value></data>
-  <data name="Actions.fivem.legacy.stuck-process.terminate.Description" xml:space="preserve"><value>Terminates a demonstrably stuck FiveM process (not responding, holding a cache file locked) to allow cleanup. Never part of automatic profiles.</value></data>
+  <data name="Actions.fivem.legacy.stuck-process.terminate.Description" xml:space="preserve"><value>Terminates a demonstrably stuck and unresponsive FiveM process. This may release files still held by that instance, but it is never part of automatic profiles.</value></data>
   <data name="Actions.fivem.legacy.stuck-process.terminate.DetectionSummary" xml:space="preserve"><value>Checks for a process whose executable belongs to the FiveM installation and has Responding=false (it does not respond to interface messages).</value></data>
   <data name="Actions.fivem.legacy.stuck-process.terminate.ConfirmationSummary" xml:space="preserve"><value>Terminates the process only after confirming that it is not responding; if it responds normally, the action does nothing.</value></data>
   <data name="Actions.fivem.legacy.stuck-process.terminate.UndoSummary" xml:space="preserve"><value>Irreversible: a terminated process cannot be restored to its previous state.</value></data>
@@ -879,11 +882,11 @@
   <data name="Actions.windows.gaming.hybrid-laptop.diagnose.UndoSummary" xml:space="preserve"><value>Read-only: does not change power or GPU settings and does not install or remove anything.</value></data>
   <data name="Actions.windows.gaming.hybrid-laptop.diagnose.RiskLimitations" xml:space="preserve"><value>Does not control a MUX switch or BIOS through undocumented generic methods; detecting an installed manufacturer utility does not confirm that the laptop has a MUX switch or dedicated GPU.</value></data>
   <data name="Actions.windows.power.pcie-aspm.adjust.Name" xml:space="preserve"><value>Adjust PCI Express Link State Power Management</value></data>
-  <data name="Actions.windows.power.pcie-aspm.adjust.Description" xml:space="preserve"><value>Disables PCI Express Link State Power Management (ASPM) on the active power scheme, reducing latency spikes in exchange for a slightly higher power draw.</value></data>
-  <data name="Actions.windows.power.pcie-aspm.adjust.DetectionSummary" xml:space="preserve"><value>Reads the current ASPM setting index (`powercfg /Q`) from the active power plan.</value></data>
-  <data name="Actions.windows.power.pcie-aspm.adjust.ConfirmationSummary" xml:space="preserve"><value>Confirms that the value is set to Off (0) in the active power plan.</value></data>
-  <data name="Actions.windows.power.pcie-aspm.adjust.UndoSummary" xml:space="preserve"><value>Fully reversible: the previous value is restored through powercfg during rollback.</value></data>
-  <data name="Actions.windows.power.pcie-aspm.adjust.RiskLimitations" xml:space="preserve"><value>Not every chipset or motherboard exposes this setting; when absent, the action changes nothing. Reading the current value depends on localized `powercfg /Q` output, so on builds not tested in that language the action may be unable to read it and will simply do nothing.</value></data>
+  <data name="Actions.windows.power.pcie-aspm.adjust.Description" xml:space="preserve"><value>Disables PCI Express link power savings (ASPM) on the active scheme. This avoids link power-state transitions, but perceptible impact depends on the hardware and power use may increase.</value></data>
+  <data name="Actions.windows.power.pcie-aspm.adjust.DetectionSummary" xml:space="preserve"><value>Reads the active scheme's AC and DC ASPM indexes through the native PowerReadACValueIndex and PowerReadDCValueIndex APIs.</value></data>
+  <data name="Actions.windows.power.pcie-aspm.adjust.ConfirmationSummary" xml:space="preserve"><value>Reads AC and DC again and confirms Off (0) after reactivating the scheme.</value></data>
+  <data name="Actions.windows.power.pcie-aspm.adjust.UndoSummary" xml:space="preserve"><value>Fully reversible: restores and confirms the previous AC and DC values separately.</value></data>
+  <data name="Actions.windows.power.pcie-aspm.adjust.RiskLimitations" xml:space="preserve"><value>Not every computer exposes this setting; the action is skipped when absent. It can increase power use and temperature, and no perceptible gain is guaranteed on every computer.</value></data>
   <data name="Actions.windows.gaming.mouse-polling-rate.guide.Name" xml:space="preserve"><value>Guide mouse polling rate</value></data>
   <data name="Actions.windows.gaming.mouse-polling-rate.guide.Description" xml:space="preserve"><value>When the CPU is under heavy load, suggests testing 4000/8000 Hz mice at 1000 Hz instead, without changing anything.</value></data>
   <data name="Actions.windows.gaming.mouse-polling-rate.guide.DetectionSummary" xml:space="preserve"><value>Reads current CPU usage (the same measurement already used by the existing resource diagnostics).</value></data>
@@ -893,9 +896,15 @@
   <data name="Actions.windows.appearance.visual-effects.reduce.Name" xml:space="preserve"><value>Reduce Windows visual effects</value></data>
   <data name="Actions.windows.appearance.visual-effects.reduce.Description" xml:space="preserve"><value>Reduces animations and transparency while preserving readability and font smoothing.</value></data>
   <data name="Actions.windows.appearance.visual-effects.reduce.DetectionSummary" xml:space="preserve"><value>Reads the current state of Windows animations and transparency effects.</value></data>
-  <data name="Actions.windows.appearance.visual-effects.reduce.ConfirmationSummary" xml:space="preserve"><value>Confirms that the effects were reduced while preserving font smoothing.</value></data>
+  <data name="Actions.windows.appearance.visual-effects.reduce.ConfirmationSummary" xml:space="preserve"><value>Reads the state again and confirms that the effects were reduced while preserving font smoothing.</value></data>
   <data name="Actions.windows.appearance.visual-effects.reduce.UndoSummary" xml:space="preserve"><value>Fully reversible: the previous visual-effects state is restored during rollback.</value></data>
   <data name="Actions.windows.appearance.visual-effects.reduce.RiskLimitations" xml:space="preserve"><value>Changes the desktop's appearance while preserving readability and font smoothing.</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.Name" xml:space="preserve"><value>Make Windows menus more responsive</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.Description" xml:space="preserve"><value>Limits the menu opening delay to 100 ms without increasing a value that is already lower.</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.DetectionSummary" xml:space="preserve"><value>Reads the current menu opening delay through the official Windows API.</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.ConfirmationSummary" xml:space="preserve"><value>Reads the setting again and confirms that the delay matches the applied target.</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.UndoSummary" xml:space="preserve"><value>Fully reversible: rollback restores the previous menu opening delay.</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.RiskLimitations" xml:space="preserve"><value>Changes how quickly Windows menus open; the perceived effect can vary by PC and usage.</value></data>
   <data name="Runtime.ApplyingAction" xml:space="preserve"><value>Applying {0}</value></data>
   <data name="Runtime.ActionCompleted" xml:space="preserve"><value>Completed: {0}</value></data>
   <data name="Runtime.ValidatingTransaction" xml:space="preserve"><value>Validating transaction {0}.</value></data>
@@ -963,18 +972,20 @@
   <data name="Runtime.BrokerResultUnconfirmed" xml:space="preserve"><value>The administrative component did not confirm its result: {0}</value></data>
   <data name="Runtime.UacCancelledRestored" xml:space="preserve"><value>UAC was cancelled. Reversible settings were restored; completed cleanups remain recorded.</value></data>
   <data name="Runtime.AdminPhaseFailed" xml:space="preserve"><value>The administrative phase failed safely: {0}</value></data>
-  <data name="Runtime.UacCancelledPreserved" xml:space="preserve"><value>The optimization was completed, but Windows' confirmation for the high-performance power plan was cancelled. Every other change was kept.</value></data>
-  <data name="Runtime.AdminPhaseFailedPreserved" xml:space="preserve"><value>The optimization was completed, but Windows did not allow enabling the high-performance power plan: {0} Every other change was kept.</value></data>
+  <data name="Runtime.UacCancelledPreserved" xml:space="preserve"><value>The optimization was completed, but confirmation for Windows adjustments requiring administrator access was cancelled. Every other change was kept.</value></data>
+  <data name="Runtime.AdminPhaseFailedPreserved" xml:space="preserve"><value>The optimization was completed, but Windows could not confirm adjustments requiring administrator access: {0} Every other change was kept.</value></data>
   <data name="Runtime.RollbackJournalError" xml:space="preserve"><value>The journal preserved a rollback error for diagnostics.</value></data>
   <data name="Runtime.RollbackConflict" xml:space="preserve"><value>Local rollback found a conflict and preserved the user's newer state.</value></data>
   <data name="Runtime.RestoreBlockedFiveM" xml:space="preserve"><value>FiveM is open right now. Close it and try the restoration again.</value></data>
   <data name="Runtime.RestoreProcessCheckFailed" xml:space="preserve"><value>Ralven cannot confirm right now that FiveM is closed. Confirm it is closed and try the restoration again.</value></data>
+  <data name="Runtime.RestoreIncomplete" xml:space="preserve"><value>Some changes could not be restored safely. Their current state was preserved and recorded in History.</value></data>
   <data name="Runtime.Interrupted.RolledBack" xml:space="preserve"><value>{0} Reversible local settings were restored; confirmed cleanups remain in History.</value></data>
   <data name="Runtime.Interrupted.AdminPending" xml:space="preserve"><value>{0} History shows an administrative restoration pending; use Undo to complete it with UAC.</value></data>
   <data name="Runtime.Interrupted.RollbackFailed" xml:space="preserve"><value>{0} Local rollback found a conflict and preserved the journal for diagnostics.</value></data>
   <data name="Runtime.Interrupted.Unconfirmed" xml:space="preserve"><value>{0} The final state could not be confirmed; inspect History before trying again.</value></data>
   <data name="Runtime.Interrupted.CheckHistory" xml:space="preserve"><value>{0} Check local History to confirm the transaction's final state.</value></data>
   <data name="History.State.Committed" xml:space="preserve"><value>Completed</value></data>
+  <data name="History.State.CommittedWithErrors" xml:space="preserve"><value>Completed with errors</value></data>
   <data name="History.State.AwaitingUac" xml:space="preserve"><value>Waiting for UAC confirmation</value></data>
   <data name="History.State.AdminRollbackPending" xml:space="preserve"><value>Administrative rollback pending</value></data>
   <data name="History.State.LocalRollbackPending" xml:space="preserve"><value>Local rollback pending</value></data>
@@ -1366,4 +1377,6 @@
   <data name="ActionResults.MouseAcceleration.Unavailable" xml:space="preserve"><value>Windows pointer acceleration could not be queried.</value></data>
   <data name="ActionResults.MouseAcceleration.Active" xml:space="preserve"><value>Windows pointer acceleration is active (level {0}; thresholds {1}/{2}). Games using Raw Input may ignore it.</value></data>
   <data name="ActionResults.MouseAcceleration.Inactive" xml:space="preserve"><value>Windows pointer acceleration is disabled (thresholds {0}/{1}).</value></data>
+  <data name="ActionResults.MenuShowDelay.AlreadyOptimized" xml:space="preserve"><value>Windows menu opening delay was already optimized.</value></data>
+  <data name="ActionResults.MenuShowDelay.Applied" xml:space="preserve"><value>Windows menu opening responsiveness was adjusted.</value></data>
 </root>

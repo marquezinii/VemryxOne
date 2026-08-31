@@ -107,9 +107,61 @@ internal sealed class FakeVisualEffectsController : IVisualEffectsController
 {
     public VisualEffectsState State { get; set; } = new(true, true, true);
 
+    public int MenuShowDelay { get; set; } = 400;
+
+    public bool IgnoreNextStateSet { get; set; }
+
+    public bool IgnoreNextMenuShowDelaySet { get; set; }
+
+    public Queue<VisualEffectsState?> StateSetResults { get; } = new();
+
+    public Queue<int?> MenuShowDelaySetResults { get; } = new();
+
     public VisualEffectsState Get() => State;
 
-    public void Set(VisualEffectsState state) => State = state;
+    public void Set(VisualEffectsState state)
+    {
+        if (StateSetResults.TryDequeue(out var result))
+        {
+            if (result is not null)
+            {
+                State = result;
+            }
+
+            return;
+        }
+
+        if (IgnoreNextStateSet)
+        {
+            IgnoreNextStateSet = false;
+            return;
+        }
+
+        State = state;
+    }
+
+    public int GetMenuShowDelay() => MenuShowDelay;
+
+    public void SetMenuShowDelay(int milliseconds)
+    {
+        if (MenuShowDelaySetResults.TryDequeue(out var result))
+        {
+            if (result.HasValue)
+            {
+                MenuShowDelay = result.Value;
+            }
+
+            return;
+        }
+
+        if (IgnoreNextMenuShowDelaySet)
+        {
+            IgnoreNextMenuShowDelaySet = false;
+            return;
+        }
+
+        MenuShowDelay = milliseconds;
+    }
 }
 
 internal sealed class FakePowerStatusProvider(bool isOnAcPower = true) : IPowerStatusProvider
@@ -125,6 +177,8 @@ internal sealed class FakePowerStatusProvider(bool isOnAcPower = true) : IPowerS
 
 internal sealed class FakePowerPlanController : IPowerPlanController
 {
+    private bool aspmSetCompleted;
+
     public Guid ActiveScheme { get; set; } = Guid.NewGuid();
 
     public Guid PerformanceScheme { get; set; } = Guid.NewGuid();
@@ -133,6 +187,12 @@ internal sealed class FakePowerPlanController : IPowerPlanController
 
     /// <summary>When true, activation fails as if Windows denied permission (instead of the scheme not existing).</summary>
     public bool DenyAccess { get; set; }
+
+    public bool IgnoreNextActivation { get; set; }
+
+    public bool ThrowAfterPerformanceActivation { get; set; }
+
+    public bool CancelAfterPerformanceActivation { get; set; }
 
     public Task<Guid> GetActiveSchemeAsync(CancellationToken cancellationToken)
     {
@@ -154,37 +214,81 @@ internal sealed class FakePowerPlanController : IPowerPlanController
         }
 
         ActiveScheme = PerformanceScheme;
+        if (CancelAfterPerformanceActivation)
+        {
+            throw new OperationCanceledException();
+        }
+
+        if (ThrowAfterPerformanceActivation)
+        {
+            throw new InvalidOperationException("Simulated failure after activation.");
+        }
+
         return Task.FromResult(PowerPlanActivationOutcome.Activated);
     }
 
     public Task ActivateSchemeAsync(Guid schemeId, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        ActiveScheme = schemeId;
+        if (IgnoreNextActivation)
+        {
+            IgnoreNextActivation = false;
+        }
+        else
+        {
+            ActiveScheme = schemeId;
+        }
+
         return Task.CompletedTask;
     }
 
     /// <summary>Null means "not exposed on this machine", matching the real controller's contract.</summary>
-    public int? AspmPolicy { get; set; } = 1;
+    public PciExpressAspmPolicy? AspmPolicyState { get; set; } = new(1, 1);
+
+    public int? AspmPolicy
+    {
+        get => AspmPolicyState?.AcPolicy;
+        set => AspmPolicyState = value is null ? null : new(value.Value, value.Value);
+    }
 
     public bool AspmSetShouldFail { get; set; }
 
-    public Task<int?> GetPciExpressAspmPolicyAsync(CancellationToken cancellationToken)
+    public bool ThrowOnAspmReadAfterSet { get; set; }
+
+    public Task<PciExpressAspmState?> GetPciExpressAspmPolicyAsync(
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        return Task.FromResult(AspmPolicy);
+        if (ThrowOnAspmReadAfterSet && aspmSetCompleted)
+        {
+            throw new InvalidOperationException("Simulated redundant ASPM read failure.");
+        }
+
+        return Task.FromResult(AspmPolicyState is null
+            ? null
+            : new PciExpressAspmState(ActiveScheme, AspmPolicyState));
     }
 
-    public Task<bool> TrySetPciExpressAspmPolicyAsync(int policyValue, CancellationToken cancellationToken)
+    public Task SetPciExpressAspmPolicyAsync(
+        Guid schemeId,
+        PciExpressAspmPolicy expectedCurrent,
+        PciExpressAspmPolicy desired,
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (AspmSetShouldFail)
         {
-            return Task.FromResult(false);
+            throw new InvalidOperationException("Simulated ASPM update failure.");
         }
 
-        AspmPolicy = policyValue;
-        return Task.FromResult(true);
+        if (schemeId != ActiveScheme || AspmPolicyState != expectedCurrent)
+        {
+            throw new IOException("Simulated concurrent ASPM change.");
+        }
+
+        AspmPolicyState = desired;
+        aspmSetCompleted = true;
+        return Task.CompletedTask;
     }
 }
 

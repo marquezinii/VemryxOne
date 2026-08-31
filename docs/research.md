@@ -32,6 +32,27 @@ GUID atual, verificar alimentação por tomada e guardar o estado anterior para
 rollback. Acesso negado pode acionar o broker tipado; esquema inexistente vira
 `Skipped`, não uma criação improvisada.
 
+**Fato sobre ASPM.** O Windows documenta a configuração PCI Express Link State
+Power Management pelo GUID `ee12f906-d277-404b-b6da-e5fa1a576df5`, com índices
+0 (Off), 1 (economia moderada) e 2 (economia máxima). As APIs
+`PowerReadACValueIndex` e `PowerReadDCValueIndex` leem separadamente os valores
+na tomada e na bateria; `powercfg /setacvalueindex`, `/setdcvalueindex` e
+`/setactive` são os mecanismos oficiais de gravação e ativação. A documentação
+prova o mecanismo de energia, não um ganho universal de FPS ou latência.
+
+Fontes:
+
+- [Link State Power Management](https://learn.microsoft.com/en-us/windows-hardware/customize/power-settings/pci-express-settings-link-state-power-management)
+- [PowerReadACValueIndex](https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreadacvalueindex)
+- [PowerReadDCValueIndex](https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreaddcvalueindex)
+- [Opções do powercfg](https://learn.microsoft.com/en-us/windows-hardware/design/device-experiences/powercfg-command-line-options)
+
+**Decisão sobre ASPM.** O Ralven só aplica Off quando ambos os índices podem ser
+lidos. Ele captura AC e DC separadamente, compensa qualquer falha parcial,
+reativa o plano, relê a pós-condição e recusa rollback sobre uma escolha mais
+nova. Hardware sem a configuração vira `Skipped`. O texto público descreve o
+efeito como condicional e explicita consumo/temperatura maiores.
+
 ### Tela e taxa de atualização
 
 **Fato.** `EnumDisplaySettings` expõe o modo atual e os modos disponíveis por
@@ -91,6 +112,23 @@ e não interpreta falha da Central de Segurança como estado saudável. A leitur
 do mouse é apenas diagnóstico da configuração do usuário: o Ralven não altera
 proteções, Windows Update, velocidade, limiares ou aceleração automaticamente e
 não deduz o caminho de entrada usado por um jogo a partir desse valor.
+
+### Responsividade da interface
+
+**Fato.** `SystemParametersInfo` expõe contratos públicos para consultar e
+alterar animações da interface e `SPI_GETMENUSHOWDELAY`/
+`SPI_SETMENUSHOWDELAY` representam, em milissegundos, o tempo que o Windows
+aguarda antes de abrir um menu em cascata.
+
+Fonte:
+
+- [SystemParametersInfo](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfow)
+
+**Decisão.** Os perfis Médio e Agressivo podem limitar o atraso dos menus a
+100 ms, sem aumentar um valor menor já escolhido pelo usuário. O perfil
+Agressivo também pode reduzir animações allowlisted. As duas ações releem suas
+pós-condições e guardam os valores anteriores para rollback; suavização de
+fontes e parâmetros de acessibilidade não relacionados permanecem intactos.
 
 ### HAGS, VRR e perfis de fabricante
 

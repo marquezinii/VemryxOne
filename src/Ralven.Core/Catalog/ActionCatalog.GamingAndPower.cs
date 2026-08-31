@@ -17,7 +17,7 @@ public sealed partial class ActionCatalog
                 ActionReversibility.FullyReversible,
                 RequiredPrivilege.StandardUser,
                 AllProfiles,
-                requiresFiveMStopped: false,
+                requiresFiveMStopped: true,
                 progressWeight: 5,
                 expectedImpact: "Pode melhorar a consistência da sessão em sistemas compatíveis.",
                 ActionOptionGate.EnableGameMode,
@@ -52,7 +52,7 @@ public sealed partial class ActionCatalog
                 ActionReversibility.FullyReversible,
                 RequiredPrivilege.StandardUser,
                 BalancedAndAggressive,
-                requiresFiveMStopped: false,
+                requiresFiveMStopped: true,
                 progressWeight: 4,
                 expectedImpact: "Reduz atividade de captura quando ela estava habilitada.",
                 ActionOptionGate.DisableBackgroundCapture,
@@ -82,7 +82,7 @@ public sealed partial class ActionCatalog
             Define(
                 OptimizationActionIds.AdjustPciExpressPowerManagement,
                 "Ajustar PCI Express Link State Power Management",
-                "Desativa o gerenciamento de energia de link do PCI Express (ASPM) no plano de energia ativo, reduzindo picos de latência em troca de um consumo levemente maior.",
+                "Desativa a economia de energia dos links PCI Express (ASPM) no plano ativo. Isso evita transições de economia do link, mas o efeito perceptível depende do hardware e o consumo pode aumentar.",
                 ActionCategory.Power,
                 ActionRisk.Low,
                 ActionReversibility.FullyReversible,
@@ -90,12 +90,13 @@ public sealed partial class ActionCatalog
                 BalancedAndAggressive,
                 requiresFiveMStopped: false,
                 progressWeight: 3,
-                expectedImpact: "Reduz picos de latência de link do PCI Express (armazenamento/rede/GPU); aumenta levemente o consumo de energia.",
+                expectedImpact: "Evita transições de economia de energia dos links PCI Express; o ganho perceptível depende do hardware e o consumo pode aumentar.",
                 ActionOptionGate.AdjustPciExpressPowerManagement,
-                detectionSummary: "Lê o índice atual da configuração ASPM (`powercfg /Q`) do plano de energia ativo.",
-                confirmationSummary: "Confirma que o valor foi definido como Off (0) no plano ativo.",
-                undoSummary: "Totalmente reversível: o valor anterior é restaurado no rollback via powercfg.",
-                riskLimitations: "Nem todo chipset/placa-mãe expõe essa configuração; quando ausente, a ação não altera nada. A leitura do valor atual depende do texto de saída do `powercfg /Q`, que varia por idioma do Windows -- em builds não testadas nesse idioma, a ação pode não conseguir ler o valor e simplesmente não fará nada.")
+                detectionSummary: "Lê os índices AC e DC da configuração ASPM do plano ativo pelas APIs nativas PowerReadACValueIndex e PowerReadDCValueIndex.",
+                confirmationSummary: "Relê AC e DC e confirma Off (0) depois de reativar o plano.",
+                undoSummary: "Totalmente reversível: restaura e confirma separadamente os valores AC e DC anteriores.",
+                riskLimitations: "Nem todo hardware expõe essa configuração; nesse caso a ação é ignorada. Pode aumentar consumo e temperatura, e não há garantia de ganho perceptível em todo computador.",
+                version: 2)
         ];
     }
 
@@ -103,6 +104,23 @@ public sealed partial class ActionCatalog
     {
         return
         [
+            Define(
+                OptimizationActionIds.ReduceMenuShowDelay,
+                "Tornar menus do Windows mais responsivos",
+                "Limita a 100 ms o atraso de abertura dos menus sem aumentar um valor menor já escolhido pelo usuário.",
+                ActionCategory.Appearance,
+                ActionRisk.Low,
+                ActionReversibility.FullyReversible,
+                RequiredPrivilege.StandardUser,
+                BalancedAndAggressive,
+                requiresFiveMStopped: false,
+                progressWeight: 2,
+                expectedImpact: "Torna a abertura de menus em cascata mais imediata.",
+                ActionOptionGate.ReduceMenuShowDelay,
+                detectionSummary: "Lê o atraso atual de abertura dos menus pela API oficial SystemParametersInfo do Windows.",
+                confirmationSummary: "Relê e confirma que o atraso não ultrapassa 100 ms.",
+                undoSummary: "Totalmente reversível: o atraso anterior é restaurado no rollback.",
+                riskLimitations: "Muda somente a velocidade de abertura de menus em cascata; o efeito percebido varia conforme o uso."),
             Define(
                 OptimizationActionIds.ReduceWindowsVisualEffects,
                 "Reduzir efeitos visuais do Windows",
@@ -117,7 +135,7 @@ public sealed partial class ActionCatalog
                 expectedImpact: "Reduz trabalho visual do desktop em computadores limitados.",
                 ActionOptionGate.ReduceWindowsVisualEffects,
                 detectionSummary: "Lê o estado atual de animações e transparências do Windows.",
-                confirmationSummary: "Confirma que os efeitos foram reduzidos preservando a suavização de fontes.",
+                confirmationSummary: "Relê e confirma que os efeitos foram reduzidos preservando a suavização de fontes.",
                 undoSummary: "Totalmente reversível: o estado anterior dos efeitos é restaurado no rollback.",
                 riskLimitations: "Muda a aparência do desktop; preserva legibilidade e suavização de fontes.")
         ];

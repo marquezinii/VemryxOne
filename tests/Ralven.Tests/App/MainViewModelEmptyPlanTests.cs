@@ -8,6 +8,39 @@ namespace Ralven.Tests.App;
 public sealed class MainViewModelEmptyPlanTests
 {
     [Fact]
+    public void BeforeDiagnostic_NoProfileIsPresentedAsRecommended()
+    {
+        var viewModel = new MainViewModel(new FakeAppOptimizationService(
+            new AppSettings(),
+            settingsFileExists: false));
+
+        Assert.False(viewModel.IsLightRecommended);
+        Assert.False(viewModel.IsBalancedRecommended);
+        Assert.False(viewModel.IsAggressiveRecommended);
+        Assert.False(viewModel.IsSelectedProfileRecommended);
+    }
+
+    [Theory]
+    [InlineData(OptimizationProfile.Light)]
+    [InlineData(OptimizationProfile.Balanced)]
+    [InlineData(OptimizationProfile.Aggressive)]
+    public async Task InitializeAsync_SelectsTheProfileRecommendedByHardware(
+        OptimizationProfile recommendedProfile)
+    {
+        var viewModel = new MainViewModel(new FakeAppOptimizationService(
+            new AppSettings(),
+            settingsFileExists: false,
+            recommendedProfile: recommendedProfile));
+
+        await viewModel.InitializeAsync();
+
+        Assert.Equal(recommendedProfile == OptimizationProfile.Light, viewModel.IsLightSelected);
+        Assert.Equal(recommendedProfile == OptimizationProfile.Balanced, viewModel.IsBalancedSelected);
+        Assert.Equal(recommendedProfile == OptimizationProfile.Aggressive, viewModel.IsAggressiveSelected);
+        Assert.True(viewModel.IsSelectedProfileRecommended);
+    }
+
+    [Fact]
     public async Task InitializeAsync_WhenDiagnosticFails_DoesNotClaimFiveMIsMissing()
     {
         var service = new FakeAppOptimizationService(
@@ -65,6 +98,32 @@ public sealed class MainViewModelEmptyPlanTests
         await viewModel.InitializeAsync();
 
         Assert.Equal(OptimizationScope.GeneralWindows, viewModel.OptimizationScope);
+        Assert.False(viewModel.CanStart);
+    }
+
+    [Fact]
+    public async Task EnhancedEdition_ExplainsTheSafeBlockInsteadOfClaimingLegacyIsMissing()
+    {
+        var service = new FakeAppOptimizationService(
+            new AppSettings(),
+            settingsFileExists: false,
+            edition: FiveMEdition.Enhanced);
+        var localization = new LocalizationService(
+            System.Globalization.CultureInfo.GetCultureInfo("pt-BR"));
+        var viewModel = new MainViewModel(service, localization);
+
+        await viewModel.InitializeAsync();
+        viewModel.SetOptimizationScope(OptimizationScope.FiveMLegacy);
+
+        Assert.Equal(
+            localization.GetString("Diagnosis.FiveMEnhancedBlocked"),
+            viewModel.EditionLabel);
+        Assert.Equal(
+            localization.GetString("Diagnosis.EnhancedUnsupported"),
+            viewModel.RecommendationText);
+        Assert.Equal(
+            localization.GetString("Diagnosis.EnhancedUnsupported"),
+            viewModel.EmptyPlanMessage);
         Assert.False(viewModel.CanStart);
     }
 }

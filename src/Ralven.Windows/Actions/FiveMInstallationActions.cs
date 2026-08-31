@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using Ralven.Contracts;
 using Ralven.Core.Catalog;
@@ -297,6 +298,9 @@ internal static class FiveMLogTailReader
     private const long MaxTailBytes = 512 * 1024;
 
     public static string? ReadLatest(string fiveMAppRoot)
+        => ReadLatestWithMetadata(fiveMAppRoot)?.Content;
+
+    public static FiveMLogTail? ReadLatestWithMetadata(string fiveMAppRoot)
     {
         var logsDirectory = Path.Combine(fiveMAppRoot, "logs");
         if (!Directory.Exists(logsDirectory))
@@ -335,9 +339,11 @@ internal static class FiveMLogTailReader
             }
 
             using var reader = new StreamReader(stream);
-            return reader.ReadToEnd();
+            return new FiveMLogTail(reader.ReadToEnd(), latest.LastWriteTimeUtc);
         }
-        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        catch (Exception exception) when (exception is IOException
+            or UnauthorizedAccessException
+            or System.Security.SecurityException)
         {
             return null;
         }
@@ -477,8 +483,8 @@ public sealed class StuckProcessTerminationAction : WindowsOptimizationAction
 
         if (!terminator.TryTerminate(snapshot, fiveMInstallationRoot))
         {
-            return Task.FromResult(WindowsActionApplyResult.NoChange(
-                $"Processo travado '{snapshot.ProcessName}' (PID {snapshot.ProcessId}) foi encontrado, mas não foi possível encerrá-lo agora."));
+            throw new InvalidOperationException(
+                $"Processo travado '{snapshot.ProcessName}' (PID {snapshot.ProcessId}) foi encontrado, mas não foi possível encerrá-lo agora.");
         }
 
         return Task.FromResult(WindowsActionApplyResult.ChangedWith(
@@ -548,30 +554,70 @@ public sealed class RecreateFiveMLocalDataAction : QuarantineCleanupAction
                 matchAll)
         ];
     }
+
+    protected override IReadOnlyDictionary<string, string> GetAllowedScopeRoots()
+    {
+        var dataRoot = SafePath.EnsureDescendant(fiveMAppRoot, Path.Combine(fiveMAppRoot, "data"));
+        return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["server-cache"] = SafePath.EnsureDescendant(dataRoot, Path.Combine(dataRoot, "server-cache")),
+            ["server-cache-priv"] = SafePath.EnsureDescendant(dataRoot, Path.Combine(dataRoot, "server-cache-priv")),
+            ["logs"] = SafePath.EnsureDescendant(fiveMAppRoot, Path.Combine(fiveMAppRoot, "logs")),
+            ["crashes"] = SafePath.EnsureDescendant(fiveMAppRoot, Path.Combine(fiveMAppRoot, "crashes"))
+        };
+    }
 }
 
-internal sealed record QuarantinedAuthItem(string OriginalPath, string QuarantinePath, bool IsDirectory);
+internal sealed record FiveMLogTail(string Content, DateTimeOffset LastWriteTimeUtc);
+
+internal sealed record QuarantinedAuthEntry(
+    string RelativePath,
+    bool IsDirectory,
+    long Length,
+    string? Sha256);
+
+internal sealed record QuarantinedAuthItem(
+    string OriginalPath,
+    string QuarantinePath,
+    bool IsDirectory,
+    string? Sha256,
+    IReadOnlyList<QuarantinedAuthEntry> Entries);
 
 internal sealed record AuthDataRepairSnapshot(IReadOnlyList<QuarantinedAuthItem> Items);
 
 public sealed class StaleAuthDataRepairAction : WindowsOptimizationAction
 {
+    private const int MaximumCapturedEntries = 4096;
+    private static readonly TimeSpan MaximumDiagnosticLogAge = TimeSpan.FromHours(24);
+    private static readonly TimeSpan MaximumFutureLogSkew = TimeSpan.FromMinutes(5);
     private readonly string fiveMAppRoot;
     private readonly string rosIdPath;
     private readonly string digitalEntitlementsRoot;
     private readonly string quarantineRoot;
     private readonly string installationRoot;
     private readonly IFiveMProcessInspector processInspector;
-    private static readonly string[] EntitlementFailureKeywords =
+    private static readonly string[] EntitlementFailurePhrases =
     [
-        "entitlement", "ros_id", "social club", "authentication failed", "digitalentitlements"
+        "entitlement error",
+        "entitlement failed",
+        "failed entitlement",
+        "ros_id error",
+        "ros_id failed",
+        "social club authentication failed",
+        "digitalentitlements error",
+        "digitalentitlements failed"
     ];
+    private static readonly Regex BracketedLogPrefix = new(
+        @"^(?:\s*\[[^\]\r\n]{1,80}\])+\s*",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     public StaleAuthDataRepairAction(
         string fiveMAppRoot,
         string installationRoot,
         string rosIdPath,
+        string expectedRosIdParent,
         string digitalEntitlementsRoot,
+        string expectedDigitalEntitlementsParent,
         string quarantineRoot,
         IFiveMProcessInspector processInspector)
     {
@@ -580,6 +626,26 @@ public sealed class StaleAuthDataRepairAction : WindowsOptimizationAction
         this.rosIdPath = SafePath.Normalize(rosIdPath);
         this.digitalEntitlementsRoot = SafePath.Normalize(digitalEntitlementsRoot);
         this.quarantineRoot = SafePath.Normalize(quarantineRoot);
+        var rosIdParent = Path.GetDirectoryName(this.rosIdPath);
+        var digitalEntitlementsParent = Path.GetDirectoryName(this.digitalEntitlementsRoot);
+        if (!Path.GetFileName(this.rosIdPath).Equals("ros_id.dat", StringComparison.OrdinalIgnoreCase)
+            || string.IsNullOrWhiteSpace(rosIdParent)
+            || !SafePath.Normalize(rosIdParent).Equals(
+                SafePath.Normalize(expectedRosIdParent),
+                StringComparison.OrdinalIgnoreCase)
+            || !Path.GetFileName(this.digitalEntitlementsRoot).Equals(
+                "DigitalEntitlements",
+                StringComparison.OrdinalIgnoreCase)
+            || string.IsNullOrWhiteSpace(digitalEntitlementsParent)
+            || !SafePath.Normalize(digitalEntitlementsParent).Equals(
+                SafePath.Normalize(expectedDigitalEntitlementsParent),
+                StringComparison.OrdinalIgnoreCase))
+        {
+            throw new ArgumentException("Os caminhos de entitlement não correspondem aos alvos allowlisted.");
+        }
+
+        SafePath.EnsureDescendant(this.installationRoot, this.fiveMAppRoot);
+
         this.processInspector = processInspector
             ?? throw new ArgumentNullException(nameof(processInspector));
     }
@@ -597,8 +663,16 @@ public sealed class StaleAuthDataRepairAction : WindowsOptimizationAction
             throw new InvalidOperationException("FiveM precisa estar fechado para reparar os dados de entitlement.");
         }
 
-        var logTail = FiveMLogTailReader.ReadLatest(fiveMAppRoot);
-        if (logTail is null || !ContainsEntitlementFailurePattern(logTail))
+        var logTail = FiveMLogTailReader.ReadLatestWithMetadata(fiveMAppRoot);
+        if (logTail is null
+            || logTail.LastWriteTimeUtc < context.StartedAtUtc - MaximumDiagnosticLogAge
+            || logTail.LastWriteTimeUtc > context.StartedAtUtc + MaximumFutureLogSkew)
+        {
+            return Task.FromResult(WindowsActionApplyResult.Skipped(
+                "Nenhum log recente do FiveM está disponível para confirmar a falha de entitlement."));
+        }
+
+        if (!ContainsEntitlementFailurePattern(logTail.Content))
         {
             return Task.FromResult(WindowsActionApplyResult.NoChange(
                 "Nenhum padrão conhecido de erro de entitlement foi encontrado no log recente; nada foi removido."));
@@ -616,8 +690,15 @@ public sealed class StaleAuthDataRepairAction : WindowsOptimizationAction
                 SafePath.EnsureNoReparsePoints(rosIdPath);
                 var destination = Path.Combine(transactionQuarantine, Path.GetFileName(rosIdPath));
                 Directory.CreateDirectory(transactionQuarantine);
+                SafePath.EnsureNoReparsePoints(transactionQuarantine);
                 File.Move(rosIdPath, destination, overwrite: false);
-                moved.Add(new QuarantinedAuthItem(rosIdPath, destination, IsDirectory: false));
+                moved.Add(new QuarantinedAuthItem(rosIdPath, destination, false, null, []));
+                moved[^1] = new QuarantinedAuthItem(
+                    rosIdPath,
+                    destination,
+                    IsDirectory: false,
+                    ComputeFileSha256(destination),
+                    []);
             }
 
             if (Directory.Exists(digitalEntitlementsRoot))
@@ -625,19 +706,28 @@ public sealed class StaleAuthDataRepairAction : WindowsOptimizationAction
                 SafePath.EnsureNoReparsePoints(digitalEntitlementsRoot);
                 var destination = Path.Combine(transactionQuarantine, Path.GetFileName(digitalEntitlementsRoot));
                 Directory.CreateDirectory(transactionQuarantine);
+                SafePath.EnsureNoReparsePoints(transactionQuarantine);
                 Directory.Move(digitalEntitlementsRoot, destination);
-                moved.Add(new QuarantinedAuthItem(digitalEntitlementsRoot, destination, IsDirectory: true));
+                moved.Add(new QuarantinedAuthItem(digitalEntitlementsRoot, destination, true, null, []));
+                moved[^1] = new QuarantinedAuthItem(
+                    digitalEntitlementsRoot,
+                    destination,
+                    IsDirectory: true,
+                    Sha256: null,
+                    CaptureDirectoryEntries(destination));
             }
         }
-        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        catch (Exception exception) when (exception is IOException
+            or UnauthorizedAccessException
+            or System.Security.SecurityException)
         {
-            RestoreItems(moved);
+            RestoreItems(moved, throwOnConflict: false);
             throw;
         }
 
         if (moved.Count == 0)
         {
-            return Task.FromResult(WindowsActionApplyResult.NoChange(
+            return Task.FromResult(WindowsActionApplyResult.Skipped(
                 "Padrão de erro de entitlement encontrado, mas nenhum dos arquivos esperados existe no momento."));
         }
 
@@ -657,11 +747,18 @@ public sealed class StaleAuthDataRepairAction : WindowsOptimizationAction
         }
 
         var snapshot = WindowsActionSnapshot.Deserialize<AuthDataRepairSnapshot>(snapshotJson);
+        ValidateSnapshot(context, snapshot);
+        cancellationToken.ThrowIfCancellationRequested();
+        foreach (var item in snapshot.Items)
+        {
+            ValidateQuarantinedContent(item);
+        }
+
         foreach (var item in snapshot.Items)
         {
             if (item.IsDirectory && Directory.Exists(item.QuarantinePath))
             {
-                Directory.Delete(item.QuarantinePath, recursive: true);
+                DeleteCapturedDirectory(item);
             }
             else if (!item.IsDirectory && File.Exists(item.QuarantinePath))
             {
@@ -683,33 +780,222 @@ public sealed class StaleAuthDataRepairAction : WindowsOptimizationAction
         }
 
         var snapshot = WindowsActionSnapshot.Deserialize<AuthDataRepairSnapshot>(snapshotJson);
-        RestoreItems(snapshot.Items);
+        ValidateSnapshot(context, snapshot);
+        cancellationToken.ThrowIfCancellationRequested();
+        foreach (var item in snapshot.Items)
+        {
+            ValidateQuarantinedContent(item);
+        }
+
+        RestoreItems(snapshot.Items, throwOnConflict: true);
         return Task.CompletedTask;
     }
 
-    private static void RestoreItems(IReadOnlyList<QuarantinedAuthItem> items)
+    private void ValidateSnapshot(WindowsActionContext context, AuthDataRepairSnapshot snapshot)
     {
+        if (snapshot.Items is null || snapshot.Items.Count is 0 or > 2)
+        {
+            throw new InvalidDataException("O snapshot de entitlement não contém itens válidos.");
+        }
+
+        var transactionQuarantine = SafePath.EnsureDescendant(
+            quarantineRoot,
+            Path.Combine(quarantineRoot, context.TransactionId.ToString("N")));
+        var allowed = new Dictionary<string, (string QuarantinePath, bool IsDirectory)>(
+            StringComparer.OrdinalIgnoreCase)
+        {
+            [rosIdPath] = (Path.Combine(transactionQuarantine, Path.GetFileName(rosIdPath)), false),
+            [digitalEntitlementsRoot] = (
+                Path.Combine(transactionQuarantine, Path.GetFileName(digitalEntitlementsRoot)),
+                true)
+        };
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var item in snapshot.Items)
+        {
+            var original = SafePath.Normalize(item.OriginalPath);
+            if (!seen.Add(original)
+                || !allowed.TryGetValue(original, out var expected)
+                || expected.IsDirectory != item.IsDirectory
+                || !SafePath.Normalize(item.QuarantinePath).Equals(
+                    SafePath.Normalize(expected.QuarantinePath),
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidDataException("O snapshot de entitlement contém um caminho fora da allowlist.");
+            }
+
+            ValidateCapturedEntries(item);
+        }
+    }
+
+    private static void RestoreItems(
+        IReadOnlyList<QuarantinedAuthItem> items,
+        bool throwOnConflict)
+    {
+        var conflicts = new List<string>();
         foreach (var item in items.Reverse())
         {
+            SafePath.EnsureNoReparsePoints(item.QuarantinePath);
+            SafePath.EnsureNoReparsePoints(item.OriginalPath);
             if (item.IsDirectory)
             {
-                if (Directory.Exists(item.QuarantinePath) && !Directory.Exists(item.OriginalPath))
+                if (Directory.Exists(item.QuarantinePath) && Directory.Exists(item.OriginalPath))
+                {
+                    conflicts.Add(item.OriginalPath);
+                }
+                else if (Directory.Exists(item.QuarantinePath))
                 {
                     Directory.Move(item.QuarantinePath, item.OriginalPath);
                 }
             }
-            else if (File.Exists(item.QuarantinePath) && !File.Exists(item.OriginalPath))
+            else if (File.Exists(item.QuarantinePath) && File.Exists(item.OriginalPath))
+            {
+                conflicts.Add(item.OriginalPath);
+            }
+            else if (File.Exists(item.QuarantinePath))
             {
                 File.Move(item.QuarantinePath, item.OriginalPath);
             }
+        }
+
+        if (throwOnConflict && conflicts.Count > 0)
+        {
+            throw new IOException(
+                $"Rollback preservou {conflicts.Count} item(ns) de entitlement em quarentena porque o destino foi recriado.");
         }
     }
 
     private static bool ContainsEntitlementFailurePattern(string logTail)
     {
-        return EntitlementFailureKeywords.Any(
-            keyword => logTail.Contains(keyword, StringComparison.OrdinalIgnoreCase)
-                && (logTail.Contains("error", StringComparison.OrdinalIgnoreCase)
-                    || logTail.Contains("fail", StringComparison.OrdinalIgnoreCase)));
+        return logTail
+            .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
+            .Select(line => BracketedLogPrefix.Replace(line, string.Empty).Trim().TrimEnd('.', '!', ':'))
+            .Any(line => EntitlementFailurePhrases.Contains(line, StringComparer.OrdinalIgnoreCase));
+    }
+
+    private static void ValidateCapturedEntries(QuarantinedAuthItem item)
+    {
+        if (item.Entries is null
+            || (!item.IsDirectory && (item.Entries.Count != 0 || string.IsNullOrWhiteSpace(item.Sha256)))
+            || (item.IsDirectory && item.Sha256 is not null)
+            || item.Entries.Count > MaximumCapturedEntries)
+        {
+            throw new InvalidDataException("O snapshot de entitlement contém um manifesto inválido.");
+        }
+
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var entry in item.Entries)
+        {
+            if (string.IsNullOrWhiteSpace(entry.RelativePath)
+                || Path.IsPathRooted(entry.RelativePath)
+                || !seen.Add(entry.RelativePath)
+                || entry.Length < 0
+                || (entry.IsDirectory ? entry.Sha256 is not null : string.IsNullOrWhiteSpace(entry.Sha256)))
+            {
+                throw new InvalidDataException("O snapshot de entitlement contém uma entrada inválida.");
+            }
+
+            SafePath.EnsureDescendant(item.QuarantinePath, Path.Combine(item.QuarantinePath, entry.RelativePath));
+        }
+    }
+
+    private static void ValidateQuarantinedContent(QuarantinedAuthItem item)
+    {
+        SafePath.EnsureNoReparsePoints(item.QuarantinePath);
+        if (item.IsDirectory)
+        {
+            var current = CaptureDirectoryEntries(item.QuarantinePath);
+            if (!current.SequenceEqual(item.Entries))
+            {
+                throw new IOException("A quarentena de entitlement foi alterada depois da aplicação; o conteúdo foi preservado.");
+            }
+        }
+        else if (!File.Exists(item.QuarantinePath)
+            || !ComputeFileSha256(item.QuarantinePath).Equals(item.Sha256, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new IOException("O item em quarentena foi alterado depois da aplicação; o conteúdo foi preservado.");
+        }
+    }
+
+    private static IReadOnlyList<QuarantinedAuthEntry> CaptureDirectoryEntries(string root)
+    {
+        var entries = new List<QuarantinedAuthEntry>();
+        CaptureDirectoryEntries(root, root, entries);
+        return entries
+            .OrderBy(entry => entry.RelativePath, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+    }
+
+    private static void CaptureDirectoryEntries(
+        string root,
+        string directory,
+        List<QuarantinedAuthEntry> entries)
+    {
+        SafePath.EnsureNoReparsePoints(directory);
+        foreach (var path in Directory.EnumerateFileSystemEntries(directory))
+        {
+            if (entries.Count >= MaximumCapturedEntries)
+            {
+                throw new InvalidDataException("A quarentena de entitlement excede o limite seguro de itens.");
+            }
+
+            SafePath.EnsureDescendant(root, path);
+            SafePath.EnsureNoReparsePoints(path);
+            var relativePath = Path.GetRelativePath(root, path);
+            if (Directory.Exists(path))
+            {
+                entries.Add(new QuarantinedAuthEntry(relativePath, true, 0, null));
+                CaptureDirectoryEntries(root, path, entries);
+            }
+            else
+            {
+                var info = new FileInfo(path);
+                entries.Add(new QuarantinedAuthEntry(
+                    relativePath,
+                    false,
+                    info.Length,
+                    ComputeFileSha256(path)));
+            }
+        }
+    }
+
+    private static void DeleteCapturedDirectory(QuarantinedAuthItem item)
+    {
+        foreach (var entry in item.Entries.Where(entry => !entry.IsDirectory))
+        {
+            var path = SafePath.EnsureDescendant(
+                item.QuarantinePath,
+                Path.Combine(item.QuarantinePath, entry.RelativePath));
+            SafePath.EnsureNoReparsePoints(path);
+            if (!ComputeFileSha256(path).Equals(entry.Sha256, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new IOException("Um item em quarentena mudou durante a confirmação; o conteúdo restante foi preservado.");
+            }
+
+            File.Delete(path);
+        }
+
+        foreach (var entry in item.Entries
+            .Where(entry => entry.IsDirectory)
+            .OrderByDescending(entry => entry.RelativePath.Count(character => character == Path.DirectorySeparatorChar)))
+        {
+            var path = SafePath.EnsureDescendant(
+                item.QuarantinePath,
+                Path.Combine(item.QuarantinePath, entry.RelativePath));
+            SafePath.EnsureNoReparsePoints(path);
+            Directory.Delete(path, recursive: false);
+        }
+
+        Directory.Delete(item.QuarantinePath, recursive: false);
+    }
+
+    private static string ComputeFileSha256(string path)
+    {
+        SafePath.EnsureNoReparsePoints(path);
+        using var stream = new FileStream(
+            path,
+            FileMode.Open,
+            FileAccess.Read,
+            FileShare.Read);
+        return Convert.ToHexString(SHA256.HashData(stream));
     }
 }

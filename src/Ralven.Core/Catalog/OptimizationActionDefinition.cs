@@ -163,6 +163,7 @@ internal enum ActionOptionGate
     ApplyLegacyGraphicsPreset,
     ApplyGtaVGraphicsPreset,
     ReduceWindowsVisualEffects,
+    ReduceMenuShowDelay,
     TerminateStuckFiveMProcess,
     RecreateFiveMLocalData,
     RepairStaleAuthData,

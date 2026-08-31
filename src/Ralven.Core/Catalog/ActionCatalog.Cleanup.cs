@@ -64,7 +64,7 @@ public sealed partial class ActionCatalog
             Define(
                 OptimizationActionIds.TerminateStuckFiveMProcess,
                 "Encerrar processo travado do FiveM",
-                "Encerra um processo do FiveM comprovadamente travado (não responde e mantém arquivo de cache bloqueado) para permitir a limpeza. Nunca faz parte de perfis automáticos.",
+                "Encerra um processo do FiveM comprovadamente travado e sem resposta. Isso pode liberar arquivos ainda mantidos por essa instância, mas nunca faz parte de perfis automáticos.",
                 ActionCategory.Storage,
                 ActionRisk.Moderate,
                 ActionReversibility.Irreversible,
@@ -72,7 +72,7 @@ public sealed partial class ActionCatalog
                 AllProfiles,
                 requiresFiveMStopped: false,
                 progressWeight: 5,
-                expectedImpact: "Desbloqueia arquivos de cache presos por uma instância travada do FiveM sem exigir reinício manual do Windows.",
+                expectedImpact: "Pode liberar arquivos mantidos por uma instância travada do FiveM sem exigir reinício manual do Windows.",
                 ActionOptionGate.TerminateStuckFiveMProcess,
                 detectionSummary: "Verifica se existe processo cuja imagem pertence à instalação do FiveM com Responding=false (não responde a mensagens da interface).",
                 confirmationSummary: "Só encerra o processo depois de confirmar que ele não responde; se estiver respondendo normalmente, a ação não faz nada.",
@@ -113,7 +113,8 @@ public sealed partial class ActionCatalog
                 detectionSummary: "Lê o log mais recente do FiveM em busca de um padrão de erro de entitlement/autenticação já conhecido antes de tocar em qualquer arquivo.",
                 confirmationSummary: "Só remove ros_id.dat e a pasta de entitlements quando o padrão de erro foi encontrado; caso contrário, não faz nada.",
                 undoSummary: "Reversível via quarentena até a confirmação final da otimização; depois disso, o FiveM solicita novo login para regenerar os dados.",
-                riskLimitations: "Ação de exceção documentada em docs/safety.md: ros_id.dat e entitlements normalmente nunca são removidos automaticamente; esta ação só existe para o cenário específico de erro detectado, nunca em perfis automáticos, e sempre em quarentena reversível.")
+                riskLimitations: "Ação de exceção documentada em docs/safety.md: ros_id.dat e entitlements normalmente nunca são removidos automaticamente; esta ação só existe para o cenário específico de erro detectado, nunca em perfis automáticos, e sempre em quarentena reversível.",
+                version: 2)
         ];
     }
 }

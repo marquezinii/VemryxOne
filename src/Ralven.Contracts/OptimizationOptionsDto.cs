@@ -28,6 +28,8 @@ public sealed record OptimizationOptionsDto
 
     public bool ReduceWindowsVisualEffects { get; init; } = true;
 
+    public bool ReduceMenuShowDelay { get; init; } = true;
+
     /// <summary>
     /// Opt-in repair action, never part of automatic profile composition
     /// (see docs/safety.md). Off by default; only meant to be turned on for

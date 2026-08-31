@@ -149,6 +149,12 @@ public sealed class UserTemporaryFilesCleanupAction : QuarantineCleanupAction
                 context.StartedAtUtc - minimumAge)
         ];
     }
+
+    protected override IReadOnlyDictionary<string, string> GetAllowedScopeRoots() =>
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["user-temp"] = temporaryDirectory
+        };
 }
 
 public sealed class LegacyCrashDumpsPruneAction : QuarantineCleanupAction
@@ -195,6 +201,13 @@ public sealed class LegacyCrashDumpsPruneAction : QuarantineCleanupAction
                 cutoff)
         ];
     }
+
+    protected override IReadOnlyDictionary<string, string> GetAllowedScopeRoots() =>
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["logs"] = SafePath.EnsureDescendant(fiveMAppRoot, Path.Combine(fiveMAppRoot, "logs")),
+            ["crashes"] = SafePath.EnsureDescendant(fiveMAppRoot, Path.Combine(fiveMAppRoot, "crashes"))
+        };
 
     private void EnsureFiveMStopped()
     {
@@ -281,6 +294,18 @@ public sealed class LegacyServerCacheRepairAction : QuarantineCleanupAction
             new CleanupScope("server-cache-priv", roots[1], allExistingFiles)
         ];
     }
+
+    protected override IReadOnlyDictionary<string, string> GetAllowedScopeRoots()
+    {
+        var dataRoot = SafePath.EnsureDescendant(
+            fiveMAppRoot,
+            Path.Combine(fiveMAppRoot, "data"));
+        return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["server-cache"] = SafePath.EnsureDescendant(dataRoot, Path.Combine(dataRoot, "server-cache")),
+            ["server-cache-priv"] = SafePath.EnsureDescendant(dataRoot, Path.Combine(dataRoot, "server-cache-priv"))
+        };
+    }
 }
 
 public abstract class QuarantineCleanupAction : WindowsOptimizationAction
@@ -295,6 +320,8 @@ public abstract class QuarantineCleanupAction : WindowsOptimizationAction
     }
 
     protected abstract IReadOnlyList<CleanupScope> GetScopes(WindowsActionContext context);
+
+    protected abstract IReadOnlyDictionary<string, string> GetAllowedScopeRoots();
 
     public override Task<WindowsActionApplyResult> ApplyAsync(
         WindowsActionContext context,
@@ -326,6 +353,13 @@ public abstract class QuarantineCleanupAction : WindowsOptimizationAction
                         context.TransactionId.ToString("N"),
                         scope.Name));
                 var moved = new List<QuarantinedFileSnapshot>();
+                snapshots.Add(new CleanupScopeSnapshot(
+                    scope.Name,
+                    scope.Root,
+                    quarantineRoot,
+                    moved,
+                    enumeration.SkippedReparsePoints,
+                    enumeration.SkippedInaccessiblePaths));
 
                 foreach (var file in enumeration.Files)
                 {
@@ -353,13 +387,6 @@ public abstract class QuarantineCleanupAction : WindowsOptimizationAction
                     }
                 }
 
-                snapshots.Add(new CleanupScopeSnapshot(
-                    scope.Name,
-                    scope.Root,
-                    quarantineRoot,
-                    moved,
-                    enumeration.SkippedReparsePoints,
-                    enumeration.SkippedInaccessiblePaths));
             }
         }
         catch
@@ -392,19 +419,40 @@ public abstract class QuarantineCleanupAction : WindowsOptimizationAction
         }
 
         var snapshot = WindowsActionSnapshot.Deserialize<CleanupActionSnapshot>(snapshotJson);
+        ValidateSnapshot(context, snapshot);
         foreach (var scope in snapshot.Scopes)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            if (Directory.Exists(scope.QuarantineRoot))
+            ValidateQuarantineContents(scope);
+        }
+
+        // Commit is destructive and cannot be rolled back. Honor cancellation only
+        // before deleting the first quarantined file so it can never stop halfway.
+        cancellationToken.ThrowIfCancellationRequested();
+        foreach (var scope in snapshot.Scopes)
+        {
+            foreach (var file in scope.Files)
             {
-                fileTree.PurgeCreatedTree(scope.QuarantineRoot);
-                var transactionDirectory = Path.GetDirectoryName(scope.QuarantineRoot);
-                if (transactionDirectory is not null && Directory.Exists(transactionDirectory))
+                if (!File.Exists(file.QuarantinePath))
                 {
-                    fileTree.DeleteEmptyDirectoriesBottomUp(transactionDirectory);
+                    continue;
                 }
+
+                SafePath.EnsureNoReparsePoints(file.QuarantinePath);
+                if (new FileInfo(file.QuarantinePath).Length != file.Length)
+                {
+                    throw new IOException(
+                        $"A quarentena mudou após a preparação; '{file.QuarantinePath}' foi preservado.");
+                }
+
+                File.Delete(file.QuarantinePath);
             }
 
+            if (Directory.Exists(scope.QuarantineRoot))
+            {
+                fileTree.DeleteEmptyDirectoriesBottomUp(scope.QuarantineRoot);
+            }
+
+            DeleteEmptyQuarantineAncestors(scope.QuarantineRoot);
         }
 
         return Task.CompletedTask;
@@ -421,9 +469,125 @@ public abstract class QuarantineCleanupAction : WindowsOptimizationAction
         }
 
         var snapshot = WindowsActionSnapshot.Deserialize<CleanupActionSnapshot>(snapshotJson);
+        ValidateSnapshot(context, snapshot);
         cancellationToken.ThrowIfCancellationRequested();
         RestoreMovedFiles(snapshot.Scopes, throwOnConflict: true);
         return Task.CompletedTask;
+    }
+
+    private void ValidateSnapshot(WindowsActionContext context, CleanupActionSnapshot snapshot)
+    {
+        if (snapshot.Scopes is null)
+        {
+            throw new InvalidDataException("O snapshot de limpeza não contém scopes válidos.");
+        }
+
+        var allowedRoots = GetAllowedScopeRoots();
+        var seenScopes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var scope in snapshot.Scopes)
+        {
+            if (scope.Files is null
+                || string.IsNullOrWhiteSpace(scope.Name)
+                || !seenScopes.Add(scope.Name)
+                || !allowedRoots.TryGetValue(scope.Name, out var allowedRoot))
+            {
+                throw new InvalidDataException("O snapshot de limpeza contém um scope inválido.");
+            }
+
+            var root = SafePath.Normalize(scope.Root);
+            if (!root.Equals(SafePath.Normalize(allowedRoot), StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidDataException("O snapshot de limpeza aponta para uma raiz fora da allowlist.");
+            }
+
+            var expectedQuarantineRoot = SafePath.EnsureDescendant(
+                root,
+                Path.Combine(
+                    root,
+                    QuarantineDirectoryName,
+                    context.TransactionId.ToString("N"),
+                    scope.Name));
+            if (!SafePath.Normalize(scope.QuarantineRoot).Equals(
+                    expectedQuarantineRoot,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidDataException("O snapshot de limpeza aponta para uma quarentena inesperada.");
+            }
+
+            var seenFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var file in scope.Files)
+            {
+                var original = SafePath.EnsureDescendant(root, file.OriginalPath);
+                var relativePath = Path.GetRelativePath(root, original);
+                var expectedQuarantinePath = SafePath.EnsureDescendant(
+                    expectedQuarantineRoot,
+                    Path.Combine(expectedQuarantineRoot, relativePath));
+                if (file.Length < 0
+                    || !seenFiles.Add(original)
+                    || !SafePath.Normalize(file.QuarantinePath).Equals(
+                        expectedQuarantinePath,
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new InvalidDataException("O snapshot de limpeza contém um arquivo fora da allowlist.");
+                }
+            }
+        }
+    }
+
+    private void ValidateQuarantineContents(CleanupScopeSnapshot scope)
+    {
+        if (!Directory.Exists(scope.QuarantineRoot))
+        {
+            return;
+        }
+
+        SafePath.EnsureNoReparsePoints(scope.QuarantineRoot);
+        var enumeration = fileTree.EnumerateFiles(scope.QuarantineRoot, _ => true);
+        if (enumeration.SkippedReparsePoints.Count > 0
+            || enumeration.SkippedInaccessiblePaths.Count > 0)
+        {
+            throw new IOException(
+                $"A quarentena '{scope.QuarantineRoot}' contém caminhos que não podem ser validados.");
+        }
+
+        var declaredPaths = scope.Files
+            .Select(file => SafePath.Normalize(file.QuarantinePath))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var unexpected = enumeration.Files.FirstOrDefault(file => !declaredPaths.Contains(file.FullPath));
+        if (unexpected is not null)
+        {
+            throw new IOException(
+                $"A quarentena contém conteúdo não declarado; '{unexpected.FullPath}' foi preservado.");
+        }
+
+        var declaredLengths = scope.Files.ToDictionary(
+            file => SafePath.Normalize(file.QuarantinePath),
+            file => file.Length,
+            StringComparer.OrdinalIgnoreCase);
+        var changed = enumeration.Files.FirstOrDefault(file =>
+            declaredLengths.TryGetValue(file.FullPath, out var expectedLength)
+            && file.Length != expectedLength);
+        if (changed is not null)
+        {
+            throw new IOException(
+                $"A quarentena mudou após a preparação; '{changed.FullPath}' foi preservado.");
+        }
+    }
+
+    private static void DeleteEmptyQuarantineAncestors(string quarantineRoot)
+    {
+        var transactionDirectory = Path.GetDirectoryName(quarantineRoot);
+        var quarantineDirectory = transactionDirectory is null
+            ? null
+            : Path.GetDirectoryName(transactionDirectory);
+        foreach (var directory in new[] { transactionDirectory, quarantineDirectory }.OfType<string>())
+        {
+            SafePath.EnsureNoReparsePoints(directory);
+            if (Directory.Exists(directory) && !Directory.EnumerateFileSystemEntries(directory).Any())
+            {
+                Directory.Delete(directory, recursive: false);
+            }
+        }
     }
 
     private static void RestoreMovedFiles(

@@ -308,13 +308,17 @@ public sealed class LegacyGraphicsPresetAction : WindowsOptimizationAction
         cancellationToken.ThrowIfCancellationRequested();
         if (target == GraphicsSettingsTarget.GtaV && gameRoot is null)
         {
-            return Task.FromResult(WindowsActionApplyResult.NoChange(
+            return Task.FromResult(WindowsActionApplyResult.Skipped(
                 "A instalação do GTA V Legacy não foi confirmada; o settings.xml não será alterado."));
         }
 
-        if (!File.Exists(settingsPath))
+        try
         {
-            return Task.FromResult(WindowsActionApplyResult.NoChange(
+            _ = File.GetAttributes(settingsPath);
+        }
+        catch (Exception exception) when (exception is FileNotFoundException or DirectoryNotFoundException)
+        {
+            return Task.FromResult(WindowsActionApplyResult.Skipped(
                 target == GraphicsSettingsTarget.FiveM
                     ? "gta5_settings.xml ainda não existe; abra o FiveM uma vez antes de aplicar o preset."
                     : "settings.xml ainda não existe; abra o GTA V Legacy uma vez antes de aplicar o preset."));
@@ -345,6 +349,7 @@ public sealed class LegacyGraphicsPresetAction : WindowsOptimizationAction
         var graphics = graphicsSections[0];
         var changed = new List<string>();
         var incompatible = new List<string>();
+        var verified = 0;
         foreach (var setting in preset)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -371,6 +376,7 @@ public sealed class LegacyGraphicsPresetAction : WindowsOptimizationAction
                 continue;
             }
 
+            verified++;
             var shouldChange = direction == GraphicsPresetDirection.LowerOnly
                 ? ShouldLowerValue(setting.Key, attribute.Value, setting.Value)
                 : ShouldRaiseValue(setting.Key, attribute.Value, setting.Value);
@@ -392,8 +398,14 @@ public sealed class LegacyGraphicsPresetAction : WindowsOptimizationAction
 
         if (changed.Count == 0)
         {
+            if (verified == 0)
+            {
+                return Task.FromResult(WindowsActionApplyResult.Skipped(
+                    "Nenhuma configuração gráfica allowlisted compatível foi encontrada no arquivo."));
+            }
+
             return Task.FromResult(WindowsActionApplyResult.NoChange(
-                "As configurações gráficas allowlisted já estavam no preset solicitado."));
+                "As configurações gráficas allowlisted encontradas foram verificadas e já estavam no preset solicitado."));
         }
 
         var snapshot = transaction.Apply(document, context.TransactionId, originalHash, changed);

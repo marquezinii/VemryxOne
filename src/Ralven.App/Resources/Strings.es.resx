@@ -208,6 +208,8 @@
   <data name="Optimizer.Result.PartialTitle" xml:space="preserve"><value>Completado con errores</value></data>
   <data name="Optimizer.NextStep" xml:space="preserve"><value>SIGUIENTE PASO RECOMENDADO</value></data>
   <data name="Optimizer.PlanTitle" xml:space="preserve"><value>Plan de optimización</value></data>
+  <data name="Optimizer.AutomaticAnalysis.Header" xml:space="preserve"><value>{0} comprobaciones automáticas</value></data>
+  <data name="Optimizer.AutomaticAnalysis.Description" xml:space="preserve"><value>Ralven comprueba estos elementos automáticamente durante la optimización para conocer el estado actual del equipo. No necesitas hacer nada.</value></data>
   <data name="Optimizer.Details.Detection" xml:space="preserve"><value>CÓMO SE DETECTA</value></data>
   <data name="Optimizer.Details.Confirmation" xml:space="preserve"><value>CÓMO SE CONFIRMA</value></data>
   <data name="Optimizer.Details.Undo" xml:space="preserve"><value>CÓMO DESHACER</value></data>
@@ -340,7 +342,7 @@
   <data name="Plan.Empty.GeneralNoSafeActions" xml:space="preserve"><value>Esta PC ya cumple los objetivos seguros de Windows disponibles para el perfil seleccionado.</value></data>
   <data name="Plan.Empty.DiagnosticInProgress" xml:space="preserve"><value>Espera a que termine el diagnóstico antes de preparar acciones.</value></data>
   <data name="Plan.Empty.DiagnosticUnavailable" xml:space="preserve"><value>No se pudo completar el diagnóstico. Vuelve a analizar tu computadora antes de preparar acciones.</value></data>
-  <data name="Plan.ActionsCatalog" xml:space="preserve"><value>{0} acciones • catálogo v{1}</value></data>
+  <data name="Plan.ActionsCatalog" xml:space="preserve"><value>{0} ajustes • catálogo v{1}</value></data>
   <data name="Plan.ActionsCompletedSummary" xml:space="preserve"><value>{0} acciones completadas. {1}</value></data>
   <data name="Diagnosis.Partial" xml:space="preserve"><value>Diagnóstico parcial</value></data>
   <data name="Diagnosis.CouldNotScanAgain" xml:space="preserve"><value>No se pudo escanear de nuevo en este momento</value></data>
@@ -477,6 +479,7 @@
 {0}</value></data>
   <data name="Brand.FooterCopyright" xml:space="preserve"><value>© 2026 Ralven</value></data>
   <data name="Plan.VerifiedActions.Label" xml:space="preserve"><value>ACCIONES VERIFICADAS</value></data>
+  <data name="Plan.AppliedAdjustments.Label" xml:space="preserve"><value>AJUSTES QUE SE APLICARÁN</value></data>
   <data name="Progress.ElapsedFormat" xml:space="preserve"><value>Transcurrido {0}</value></data>
   <data name="Progress.RemainingFormat" xml:space="preserve"><value>Quedan aproximadamente {0}</value></data>
   <data name="Progress.Finishing" xml:space="preserve"><value>Finalizando...</value></data>
@@ -723,7 +726,7 @@
   <data name="Actions.fivem.legacy.server-cache.repair.UndoSummary" xml:space="preserve"><value>Datos regenerables: FiveM vuelve a descargar el contenido la próxima vez que se accede al servidor.</value></data>
   <data name="Actions.fivem.legacy.server-cache.repair.RiskLimitations" xml:space="preserve"><value>La primera carga será más lenta; es posible que los clips antiguos del Editor de Rockstar dejen de funcionar.</value></data>
   <data name="Actions.fivem.legacy.stuck-process.terminate.Name" xml:space="preserve"><value>Terminar un proceso de FiveM bloqueado</value></data>
-  <data name="Actions.fivem.legacy.stuck-process.terminate.Description" xml:space="preserve"><value>Termina un proceso de FiveM demostrablemente bloqueado (sin responder, reteniendo un archivo de caché bloqueado) para permitir la limpieza. Nunca forma parte de perfiles automáticos.</value></data>
+  <data name="Actions.fivem.legacy.stuck-process.terminate.Description" xml:space="preserve"><value>Termina un proceso de FiveM comprobadamente bloqueado y sin respuesta. Esto puede liberar archivos aún retenidos por esa instancia, pero nunca forma parte de perfiles automáticos.</value></data>
   <data name="Actions.fivem.legacy.stuck-process.terminate.DetectionSummary" xml:space="preserve"><value>Comprueba si existe un proceso cuya imagen pertenece a la instalación de FiveM y tiene Responding=false (no responde a los mensajes de la interfaz).</value></data>
   <data name="Actions.fivem.legacy.stuck-process.terminate.ConfirmationSummary" xml:space="preserve"><value>Solo termina el proceso después de confirmar que no responde; si responde con normalidad, la acción no hace nada.</value></data>
   <data name="Actions.fivem.legacy.stuck-process.terminate.UndoSummary" xml:space="preserve"><value>Irreversible: un proceso terminado no puede restaurarse a su estado anterior.</value></data>
@@ -879,11 +882,11 @@
   <data name="Actions.windows.gaming.hybrid-laptop.diagnose.UndoSummary" xml:space="preserve"><value>Solo lectura: no modifica la energía ni la GPU, y tampoco instala ni elimina nada.</value></data>
   <data name="Actions.windows.gaming.hybrid-laptop.diagnose.RiskLimitations" xml:space="preserve"><value>No controla el conmutador MUX ni el BIOS mediante métodos genéricos no documentados; detectar la utilidad instalada del fabricante no confirma que la laptop tenga un conmutador MUX o una GPU dedicada.</value></data>
   <data name="Actions.windows.power.pcie-aspm.adjust.Name" xml:space="preserve"><value>Ajustar la administración de energía del estado de enlace PCI Express</value></data>
-  <data name="Actions.windows.power.pcie-aspm.adjust.Description" xml:space="preserve"><value>Deshabilita la administración de energía del estado de enlace PCI Express (ASPM) en el esquema de energía activo, reduciendo picos de latencia a cambio de un consumo ligeramente mayor.</value></data>
-  <data name="Actions.windows.power.pcie-aspm.adjust.DetectionSummary" xml:space="preserve"><value>Lee el índice actual de la configuración ASPM (`powercfg /Q`) del plan de energía activo.</value></data>
-  <data name="Actions.windows.power.pcie-aspm.adjust.ConfirmationSummary" xml:space="preserve"><value>Confirma que el valor se haya establecido en Off (0) en el plan activo.</value></data>
-  <data name="Actions.windows.power.pcie-aspm.adjust.UndoSummary" xml:space="preserve"><value>Totalmente reversible: el valor anterior se restaura durante la reversión mediante powercfg.</value></data>
-  <data name="Actions.windows.power.pcie-aspm.adjust.RiskLimitations" xml:space="preserve"><value>No todos los chipsets o placas base exponen esta configuración; cuando falta, la acción no modifica nada. La lectura del valor actual depende del texto de salida de `powercfg /Q`, que varía según el idioma de Windows; en compilaciones no probadas en ese idioma, es posible que la acción no pueda leer el valor y simplemente no haga nada.</value></data>
+  <data name="Actions.windows.power.pcie-aspm.adjust.Description" xml:space="preserve"><value>Deshabilita el ahorro de energía de los enlaces PCI Express (ASPM) en el esquema activo. Esto evita transiciones de ahorro del enlace, pero el efecto perceptible depende del hardware y el consumo puede aumentar.</value></data>
+  <data name="Actions.windows.power.pcie-aspm.adjust.DetectionSummary" xml:space="preserve"><value>Lee los índices AC y DC de ASPM del esquema activo mediante las API nativas PowerReadACValueIndex y PowerReadDCValueIndex.</value></data>
+  <data name="Actions.windows.power.pcie-aspm.adjust.ConfirmationSummary" xml:space="preserve"><value>Vuelve a leer AC y DC y confirma Off (0) después de reactivar el esquema.</value></data>
+  <data name="Actions.windows.power.pcie-aspm.adjust.UndoSummary" xml:space="preserve"><value>Totalmente reversible: restaura y confirma por separado los valores AC y DC anteriores.</value></data>
+  <data name="Actions.windows.power.pcie-aspm.adjust.RiskLimitations" xml:space="preserve"><value>No todos los equipos exponen esta configuración; la acción se omite cuando falta. Puede aumentar el consumo y la temperatura, y no se garantiza una mejora perceptible en todos los equipos.</value></data>
   <data name="Actions.windows.gaming.mouse-polling-rate.guide.Name" xml:space="preserve"><value>Guiar tasa de sondeo del mouse</value></data>
   <data name="Actions.windows.gaming.mouse-polling-rate.guide.Description" xml:space="preserve"><value>Cuando la CPU está bajo mucha carga, sugiere probar mouses de 4000/8000 Hz a 1000 Hz en su lugar, sin cambiar nada.</value></data>
   <data name="Actions.windows.gaming.mouse-polling-rate.guide.DetectionSummary" xml:space="preserve"><value>Lee el uso actual de CPU mediante la misma medición que ya utilizan los diagnósticos de recursos existentes.</value></data>
@@ -893,9 +896,15 @@
   <data name="Actions.windows.appearance.visual-effects.reduce.Name" xml:space="preserve"><value>Reducir efectos visuales de Windows</value></data>
   <data name="Actions.windows.appearance.visual-effects.reduce.Description" xml:space="preserve"><value>Reduce animaciones y transparencia mientras conserva la legibilidad y el suavizado de fuentes.</value></data>
   <data name="Actions.windows.appearance.visual-effects.reduce.DetectionSummary" xml:space="preserve"><value>Lee el estado actual de las animaciones y transparencias de Windows.</value></data>
-  <data name="Actions.windows.appearance.visual-effects.reduce.ConfirmationSummary" xml:space="preserve"><value>Confirma que se hayan reducido los efectos sin desactivar el suavizado de fuentes.</value></data>
+  <data name="Actions.windows.appearance.visual-effects.reduce.ConfirmationSummary" xml:space="preserve"><value>Vuelve a leer el estado y confirma que se hayan reducido los efectos sin desactivar el suavizado de fuentes.</value></data>
   <data name="Actions.windows.appearance.visual-effects.reduce.UndoSummary" xml:space="preserve"><value>Totalmente reversible: el estado anterior de los efectos se restaura durante la reversión.</value></data>
   <data name="Actions.windows.appearance.visual-effects.reduce.RiskLimitations" xml:space="preserve"><value>Cambia la apariencia del escritorio; conserva la legibilidad y el suavizado de fuentes.</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.Name" xml:space="preserve"><value>Hacer más receptivos los menús de Windows</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.Description" xml:space="preserve"><value>Limita el retraso de apertura de los menús a 100 ms sin aumentar un valor que ya sea menor.</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.DetectionSummary" xml:space="preserve"><value>Lee el retraso actual de apertura de los menús mediante la API oficial de Windows.</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.ConfirmationSummary" xml:space="preserve"><value>Vuelve a leer la configuración y confirma que el retraso coincide con el objetivo aplicado.</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.UndoSummary" xml:space="preserve"><value>Totalmente reversible: la reversión restaura el retraso anterior de apertura de los menús.</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.RiskLimitations" xml:space="preserve"><value>Cambia la velocidad de apertura de los menús; el efecto percibido puede variar según el equipo y el uso.</value></data>
   <data name="Runtime.ApplyingAction" xml:space="preserve"><value>Aplicando {0}</value></data>
   <data name="Runtime.ActionCompleted" xml:space="preserve"><value>Completado: {0}</value></data>
   <data name="Runtime.ValidatingTransaction" xml:space="preserve"><value>Validando transacción {0}.</value></data>
@@ -963,18 +972,20 @@
   <data name="Runtime.BrokerResultUnconfirmed" xml:space="preserve"><value>El componente administrativo no confirmó su resultado: {0}</value></data>
   <data name="Runtime.UacCancelledRestored" xml:space="preserve"><value>UAC se canceló. Las configuraciones reversibles se restauraron; las limpiezas completadas permanecen registradas.</value></data>
   <data name="Runtime.AdminPhaseFailed" xml:space="preserve"><value>La fase administrativa falló de forma segura: {0}</value></data>
-  <data name="Runtime.UacCancelledPreserved" xml:space="preserve"><value>La optimización se completó, pero se canceló la confirmación de Windows para el plan de energía de alto rendimiento. Todos los demás cambios se conservaron.</value></data>
-  <data name="Runtime.AdminPhaseFailedPreserved" xml:space="preserve"><value>La optimización se completó, pero Windows no permitió habilitar el plan de energía de alto rendimiento: {0} Todos los demás cambios se conservaron.</value></data>
+  <data name="Runtime.UacCancelledPreserved" xml:space="preserve"><value>La optimización se completó, pero se canceló la confirmación de los ajustes de Windows que requerían acceso de administrador. Todos los demás cambios se conservaron.</value></data>
+  <data name="Runtime.AdminPhaseFailedPreserved" xml:space="preserve"><value>La optimización se completó, pero Windows no pudo confirmar ajustes que requerían acceso de administrador: {0} Todos los demás cambios se conservaron.</value></data>
   <data name="Runtime.RollbackJournalError" xml:space="preserve"><value>El diario conservó un error de reversión para diagnósticos.</value></data>
   <data name="Runtime.RollbackConflict" xml:space="preserve"><value>La reversión local encontró un conflicto y conservó el estado más reciente del usuario.</value></data>
   <data name="Runtime.RestoreBlockedFiveM" xml:space="preserve"><value>FiveM está abierto ahora. Ciérralo y vuelve a intentar la restauración.</value></data>
   <data name="Runtime.RestoreProcessCheckFailed" xml:space="preserve"><value>Ralven no puede confirmar ahora que FiveM está cerrado. Confirma que está cerrado y vuelve a intentar la restauración.</value></data>
+  <data name="Runtime.RestoreIncomplete" xml:space="preserve"><value>Algunos cambios no se pudieron restaurar de forma segura. Su estado actual se conservó y se registró en el Historial.</value></data>
   <data name="Runtime.Interrupted.RolledBack" xml:space="preserve"><value>{0} Las configuraciones locales reversibles se restauraron; las limpiezas confirmadas permanecen en Historial.</value></data>
   <data name="Runtime.Interrupted.AdminPending" xml:space="preserve"><value>{0} El Historial muestra una restauración administrativa pendiente; usa Deshacer para completarla con UAC.</value></data>
   <data name="Runtime.Interrupted.RollbackFailed" xml:space="preserve"><value>{0} La reversión local encontró un conflicto y conservó el diario para diagnósticos.</value></data>
   <data name="Runtime.Interrupted.Unconfirmed" xml:space="preserve"><value>{0} No se pudo confirmar el estado final; revisa el Historial antes de volver a intentarlo.</value></data>
   <data name="Runtime.Interrupted.CheckHistory" xml:space="preserve"><value>{0} Revisa el Historial local para confirmar el estado final de la transacción.</value></data>
   <data name="History.State.Committed" xml:space="preserve"><value>Completado</value></data>
+  <data name="History.State.CommittedWithErrors" xml:space="preserve"><value>Completado con errores</value></data>
   <data name="History.State.AwaitingUac" xml:space="preserve"><value>Esperando confirmación de UAC</value></data>
   <data name="History.State.AdminRollbackPending" xml:space="preserve"><value>Reversión administrativa pendiente</value></data>
   <data name="History.State.LocalRollbackPending" xml:space="preserve"><value>Reversión local pendiente</value></data>
@@ -1366,4 +1377,6 @@
   <data name="ActionResults.MouseAcceleration.Unavailable" xml:space="preserve"><value>No se pudo consultar la aceleración del puntero de Windows.</value></data>
   <data name="ActionResults.MouseAcceleration.Active" xml:space="preserve"><value>La aceleración del puntero de Windows está activa (nivel {0}; umbrales {1}/{2}). Los juegos que usan Raw Input pueden ignorarla.</value></data>
   <data name="ActionResults.MouseAcceleration.Inactive" xml:space="preserve"><value>La aceleración del puntero de Windows está desactivada (umbrales {0}/{1}).</value></data>
+  <data name="ActionResults.MenuShowDelay.AlreadyOptimized" xml:space="preserve"><value>El retraso de apertura de los menús de Windows ya estaba optimizado.</value></data>
+  <data name="ActionResults.MenuShowDelay.Applied" xml:space="preserve"><value>Se ajustó la respuesta de apertura de los menús de Windows.</value></data>
 </root>

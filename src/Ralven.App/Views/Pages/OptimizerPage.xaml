@@ -29,7 +29,12 @@
         concreta desta tela: snapshot e reversão.
     -->
     <UserControl.Resources>
-        <CollectionViewSource x:Key="GroupedPlanActions" Source="{Binding DataContext.PlannedActions, ElementName=Root}">
+        <CollectionViewSource x:Key="GroupedPlannedAdjustments" Source="{Binding DataContext.PlannedAdjustments, ElementName=Root}">
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="CategoryLabel" />
+            </CollectionViewSource.GroupDescriptions>
+        </CollectionViewSource>
+        <CollectionViewSource x:Key="GroupedInformationalPlanActions" Source="{Binding DataContext.InformationalPlannedActions, ElementName=Root}">
             <CollectionViewSource.GroupDescriptions>
                 <PropertyGroupDescription PropertyName="CategoryLabel" />
             </CollectionViewSource.GroupDescriptions>
@@ -329,7 +334,7 @@
                             <Border Style="{StaticResource HairlineDivider}" Margin="0,24" />
 
                             <StackPanel>
-                                <TextBlock Text="{Binding [Plan.VerifiedActions.Label], Source={StaticResource LocalizedStrings}}" Style="{StaticResource OverlineText}" />
+                                <TextBlock Text="{Binding [Plan.AppliedAdjustments.Label], Source={StaticResource LocalizedStrings}}" Style="{StaticResource OverlineText}" />
                                 <TextBlock Text="{Binding SelectedActionCount}" Style="{StaticResource ReadoutSmallText}" Margin="0,5,0,0" />
 
                                 <TextBlock Text="{Binding [Optimizer.Impact], Source={StaticResource LocalizedStrings}}" Style="{StaticResource OverlineText}" Margin="0,22,0,0" />
@@ -512,7 +517,7 @@
                         <Border.Style>
                             <Style TargetType="Border" BasedOn="{StaticResource TableHeaderRowStyle}">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding HasPlannedActions}" Value="False">
+                                    <DataTrigger Binding="{Binding HasPlannedAdjustments}" Value="False">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -558,24 +563,58 @@
                                 </Style.Triggers>
                             </Style>
                         </ScrollViewer.Style>
-                        <ItemsControl ItemsSource="{Binding Source={StaticResource GroupedPlanActions}}" ItemTemplate="{StaticResource PlanActionTemplate}">
-                            <ItemsControl.ItemContainerStyle>
-                                <Style TargetType="ContentPresenter">
-                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                </Style>
-                            </ItemsControl.ItemContainerStyle>
-                            <ItemsControl.GroupStyle>
-                                <GroupStyle>
-                                    <GroupStyle.HeaderTemplate>
-                                        <DataTemplate>
-                                            <Border BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,0,0,1" Padding="12,9" Margin="0,14,0,0">
-                                                <TextBlock Text="{Binding Name}" Style="{StaticResource OverlineText}" Foreground="{DynamicResource AccentTextBrush}" />
-                                            </Border>
-                                        </DataTemplate>
-                                    </GroupStyle.HeaderTemplate>
-                                </GroupStyle>
-                            </ItemsControl.GroupStyle>
-                        </ItemsControl>
+                        <StackPanel>
+                            <ItemsControl ItemsSource="{Binding Source={StaticResource GroupedPlannedAdjustments}}" ItemTemplate="{StaticResource PlanActionTemplate}"
+                                          Visibility="{Binding HasPlannedAdjustments, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <ItemsControl.ItemContainerStyle>
+                                    <Style TargetType="ContentPresenter">
+                                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                    </Style>
+                                </ItemsControl.ItemContainerStyle>
+                                <ItemsControl.GroupStyle>
+                                    <GroupStyle>
+                                        <GroupStyle.HeaderTemplate>
+                                            <DataTemplate>
+                                                <Border BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,0,0,1" Padding="12,9" Margin="0,14,0,0">
+                                                    <TextBlock Text="{Binding Name}" Style="{StaticResource OverlineText}" Foreground="{DynamicResource AccentTextBrush}" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </GroupStyle.HeaderTemplate>
+                                    </GroupStyle>
+                                </ItemsControl.GroupStyle>
+                            </ItemsControl>
+
+                            <Expander Header="{Binding AutomaticAnalysisHeader}"
+                                      IsExpanded="False"
+                                      HorizontalContentAlignment="Stretch"
+                                      Margin="0,18,0,0"
+                                      Visibility="{Binding HasAutomaticAnalysis, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                      AutomationProperties.Name="{Binding AutomaticAnalysisHeader}"
+                                      AutomationProperties.HelpText="{Binding [Optimizer.AutomaticAnalysis.Description], Source={StaticResource LocalizedStrings}}">
+                                <StackPanel Margin="0,8,0,0">
+                                    <TextBlock Text="{Binding [Optimizer.AutomaticAnalysis.Description], Source={StaticResource LocalizedStrings}}"
+                                               Style="{StaticResource SecondaryText}" TextWrapping="Wrap" Margin="12,0,12,8" />
+                                    <ItemsControl ItemsSource="{Binding Source={StaticResource GroupedInformationalPlanActions}}" ItemTemplate="{StaticResource PlanActionTemplate}">
+                                        <ItemsControl.ItemContainerStyle>
+                                            <Style TargetType="ContentPresenter">
+                                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                            </Style>
+                                        </ItemsControl.ItemContainerStyle>
+                                        <ItemsControl.GroupStyle>
+                                            <GroupStyle>
+                                                <GroupStyle.HeaderTemplate>
+                                                    <DataTemplate>
+                                                        <Border BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,0,0,1" Padding="12,9" Margin="0,14,0,0">
+                                                            <TextBlock Text="{Binding Name}" Style="{StaticResource OverlineText}" Foreground="{DynamicResource AccentTextBrush}" />
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </GroupStyle.HeaderTemplate>
+                                            </GroupStyle>
+                                        </ItemsControl.GroupStyle>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Expander>
+                        </StackPanel>
                     </ScrollViewer>
                 </Grid>
             </Border>

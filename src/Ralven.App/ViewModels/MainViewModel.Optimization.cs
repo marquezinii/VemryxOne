@@ -63,8 +63,7 @@ public sealed partial class MainViewModel
         set { if (value) SelectProfile(OptimizationProfile.Aggressive); }
     }
 
-    private OptimizationProfile RecommendedProfile =>
-        diagnostic?.RecommendedProfile ?? OptimizationProfile.Balanced;
+    private OptimizationProfile? RecommendedProfile => diagnostic?.RecommendedProfile;
 
     public bool IsLightRecommended => RecommendedProfile == OptimizationProfile.Light;
 
@@ -72,9 +71,15 @@ public sealed partial class MainViewModel
 
     public bool IsAggressiveRecommended => RecommendedProfile == OptimizationProfile.Aggressive;
 
-    public int SelectedActionCount => currentPlan?.Actions.Count ?? 0;
+    public int SelectedActionCount => PlannedAdjustments.Count;
 
-    public bool HasPlannedActions => SelectedActionCount > 0;
+    public int AutomaticAnalysisCount => InformationalPlannedActions.Count;
+
+    public bool HasPlannedAdjustments => SelectedActionCount > 0;
+
+    public bool HasAutomaticAnalysis => AutomaticAnalysisCount > 0;
+
+    public bool HasPlannedActions => currentPlan?.Actions.Count > 0;
 
     public string ElevationLabel => localization.GetString(
         currentPlan?.RequiresElevation == true
@@ -92,6 +97,10 @@ public sealed partial class MainViewModel
         SelectedActionCount,
         currentPlan?.CatalogVersion ?? 1);
 
+    public string AutomaticAnalysisHeader => localization.Format(
+        "Optimizer.AutomaticAnalysis.Header",
+        AutomaticAnalysisCount);
+
     public string PlanNoticesText => !HasPlannedActions
         ? string.Empty
         : currentPlan?.Notices.Count > 0
@@ -102,6 +111,8 @@ public sealed partial class MainViewModel
         ? localization.GetString(diagnosticFailed
             ? "Plan.Empty.DiagnosticUnavailable"
             : "Plan.Empty.DiagnosticInProgress")
+        : currentPlan?.Blocks.Any(block => block.Code == PlanBlockCode.EnhancedNotSupported) == true
+            ? localization.GetString("Diagnosis.EnhancedUnsupported")
         : IsGeneralWindowsOptimization
             ? localization.GetString("Plan.Empty.GeneralNoSafeActions")
             : diagnostic.Edition == FiveMEdition.Legacy
@@ -459,7 +470,8 @@ public sealed partial class MainViewModel
             ApplyLegacyGraphicsPreset = optimizationScope == OptimizationScope.FiveMLegacy,
             ApplyGtaVGraphicsPreset = optimizationScope == OptimizationScope.FiveMLegacy
                 && diagnostic?.GtaVDetected == true,
-            ReduceWindowsVisualEffects = selectedProfile == OptimizationProfile.Aggressive
+            ReduceWindowsVisualEffects = selectedProfile == OptimizationProfile.Aggressive,
+            ReduceMenuShowDelay = selectedProfile != OptimizationProfile.Light
         };
 
         currentPlan = PlanBuilder.Build(
@@ -473,16 +485,26 @@ public sealed partial class MainViewModel
             PlanBuildContext.New(TimeProvider.System));
 
         PlannedActions.Clear();
+        PlannedAdjustments.Clear();
+        InformationalPlannedActions.Clear();
         foreach (var action in currentPlan.Actions)
         {
-            PlannedActions.Add(ToDisplayItem(action.Metadata));
+            var displayItem = ToDisplayItem(action.Metadata);
+            PlannedActions.Add(displayItem);
+            (action.Metadata.Risk == ActionRisk.Informational
+                ? InformationalPlannedActions
+                : PlannedAdjustments).Add(displayItem);
         }
 
         OnPropertyChanged(nameof(SelectedActionCount));
+        OnPropertyChanged(nameof(AutomaticAnalysisCount));
+        OnPropertyChanged(nameof(HasPlannedAdjustments));
+        OnPropertyChanged(nameof(HasAutomaticAnalysis));
         OnPropertyChanged(nameof(HasPlannedActions));
         OnPropertyChanged(nameof(ElevationLabel));
         OnPropertyChanged(nameof(PlanSummary));
         OnPropertyChanged(nameof(PlanHeader));
+        OnPropertyChanged(nameof(AutomaticAnalysisHeader));
         OnPropertyChanged(nameof(PlanNoticesText));
         OnPropertyChanged(nameof(EmptyPlanMessage));
         OnPropertyChanged(nameof(SafetySummary));

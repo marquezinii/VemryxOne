@@ -453,6 +453,10 @@ public sealed partial class LocalizedInterfaceContractTests
         Assert.Contains("IsBusy", optimizer, StringComparison.Ordinal);
         Assert.Contains("IsReportAvailable", optimizer, StringComparison.Ordinal);
         Assert.Contains("PlannedActions", optimizer, StringComparison.Ordinal);
+        Assert.Contains("GroupedPlannedAdjustments", optimizer, StringComparison.Ordinal);
+        Assert.Contains("GroupedInformationalPlanActions", optimizer, StringComparison.Ordinal);
+        Assert.Contains("AutomaticAnalysisHeader", optimizer, StringComparison.Ordinal);
+        Assert.Contains("IsExpanded=\"False\"", optimizer, StringComparison.Ordinal);
         Assert.Contains("<Expander", optimizer, StringComparison.Ordinal);
         Assert.Contains("DetectionSummary", optimizer, StringComparison.Ordinal);
         Assert.Contains("ConfirmationSummary", optimizer, StringComparison.Ordinal);
@@ -467,6 +471,7 @@ public sealed partial class LocalizedInterfaceContractTests
         Assert.Contains("IsLightRecommended", optimizer, StringComparison.Ordinal);
         Assert.Contains("IsBalancedRecommended", optimizer, StringComparison.Ordinal);
         Assert.Contains("IsAggressiveRecommended", optimizer, StringComparison.Ordinal);
+        Assert.Contains(": -1;", optimizer, StringComparison.Ordinal);
         // O ledger de execução (StepLedger) agora é exibido de verdade, com
         // marca de resultado por ação, em vez de ficar populado sem uso.
         Assert.Contains("StepLedger", optimizer, StringComparison.Ordinal);

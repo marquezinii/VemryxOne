@@ -42,7 +42,7 @@ public partial class SpectrumSelector : UserControl
         nameof(RecommendedIndex),
         typeof(int),
         typeof(SpectrumSelector),
-        new PropertyMetadata(1, (sender, _) => ((SpectrumSelector)sender).UpdateRecommendedMark()));
+        new PropertyMetadata(-1, (sender, _) => ((SpectrumSelector)sender).UpdateRecommendedMark()));
 
     public static readonly DependencyProperty Option0LabelProperty = DependencyProperty.Register(
         nameof(Option0Label), typeof(string), typeof(SpectrumSelector), new PropertyMetadata(string.Empty, OnLabelChanged));

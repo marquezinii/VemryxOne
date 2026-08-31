@@ -205,7 +205,8 @@ public sealed partial class ActionCatalog
                 detectionSummary: "Lê o commandline.txt existente (ou trata como vazio, se ausente) e identifica quais das linhas gerenciadas já estão presentes.",
                 confirmationSummary: "Confirma que apenas as linhas gerenciadas foram adicionadas/atualizadas e as demais linhas do arquivo foram preservadas.",
                 undoSummary: "Totalmente reversível: o backup do arquivo é restaurado no rollback.",
-                riskLimitations: "Só é relevante para o GTA V standalone; o FiveM ignora esse arquivo. Valores usam limites conservadores documentados; a unidade exata de -frameLimit não é confirmada oficialmente."),
+                riskLimitations: "Só é relevante para o GTA V standalone; o FiveM ignora esse arquivo. Valores usam limites conservadores documentados; a unidade exata de -frameLimit não é confirmada oficialmente.",
+                version: 2),
             Define(
                 OptimizationActionIds.ApplyGtaVDisplayLaunchParameters,
                 "Aplicar parâmetros de exibição de inicialização do GTA V",
@@ -223,7 +224,8 @@ public sealed partial class ActionCatalog
                 detectionSummary: "Lê o commandline.txt existente (ou trata como vazio, se ausente) e identifica o modo de tela/DirectX já configurados.",
                 confirmationSummary: "Confirma que apenas as linhas de modo de tela/DirectX foram adicionadas/atualizadas e as demais linhas do arquivo foram preservadas.",
                 undoSummary: "Totalmente reversível: o backup do arquivo é restaurado no rollback.",
-                riskLimitations: "Não altera -width/-height nem resolução/taxa de atualização; esses itens exigiriam validar a combinação contra os modos suportados pelo monitor, o que o produto ainda não faz de ponta a ponta."),
+                riskLimitations: "Não altera -width/-height nem resolução/taxa de atualização; esses itens exigiriam validar a combinação contra os modos suportados pelo monitor, o que o produto ainda não faz de ponta a ponta.",
+                version: 2),
             Define(
                 OptimizationActionIds.ApplyGtaVRepairLaunchParameters,
                 "Aplicar parâmetros de reparo de inicialização do GTA V",
@@ -241,7 +243,8 @@ public sealed partial class ActionCatalog
                 detectionSummary: "Lê o commandline.txt existente (ou trata como vazio, se ausente) e identifica quais parâmetros de reparo já estão presentes.",
                 confirmationSummary: "Confirma que apenas os parâmetros de reparo escolhidos foram adicionados e as demais linhas do arquivo foram preservadas.",
                 undoSummary: "Totalmente reversível: use \"Reverter esta otimização\" assim que terminar de diagnosticar, para não deixar o parâmetro de reparo ativo permanentemente.",
-                riskLimitations: "É um parâmetro de reparo, não uma otimização diária; deixá-lo ativo indefinidamente pode reduzir a qualidade gráfica sem necessidade.")
+                riskLimitations: "É um parâmetro de reparo, não uma otimização diária; deixá-lo ativo indefinidamente pode reduzir a qualidade gráfica sem necessidade.",
+                version: 2)
         ];
     }
 }

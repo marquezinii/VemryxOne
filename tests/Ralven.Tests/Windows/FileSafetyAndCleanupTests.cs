@@ -163,6 +163,156 @@ public sealed class FileSafetyAndCleanupTests
     }
 
     [Fact]
+    public async Task UserTemporaryCleanup_RejectsSnapshotOutsideCanonicalScopeBeforeCommit()
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+        var tempRoot = temporaryDirectory.Combine("temp");
+        var outsideRoot = temporaryDirectory.Combine("outside");
+        Directory.CreateDirectory(tempRoot);
+        Directory.CreateDirectory(outsideRoot);
+        var outsideFile = Path.Combine(outsideRoot, "keep.txt");
+        File.WriteAllText(outsideFile, "keep");
+        var context = Context();
+        var action = new UserTemporaryFilesCleanupAction(tempRoot, TimeSpan.FromDays(7));
+        var maliciousSnapshot = WindowsActionSnapshot.Serialize(new CleanupActionSnapshot(
+        [
+            new CleanupScopeSnapshot(
+                "user-temp",
+                outsideRoot,
+                outsideRoot,
+                [],
+                [],
+                [])
+        ]));
+
+        await Assert.ThrowsAsync<InvalidDataException>(
+            () => action.CommitAsync(context, maliciousSnapshot, CancellationToken.None));
+
+        Assert.Equal("keep", File.ReadAllText(outsideFile));
+    }
+
+    [Fact]
+    public async Task UserTemporaryCleanup_CommitRefusesUnexpectedQuarantineContent()
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+        var tempRoot = temporaryDirectory.Combine("temp");
+        Directory.CreateDirectory(tempRoot);
+        var oldFile = Path.Combine(tempRoot, "old.tmp");
+        File.WriteAllText(oldFile, "old");
+        File.SetLastWriteTimeUtc(oldFile, DateTime.UtcNow.AddDays(-10));
+        var action = new UserTemporaryFilesCleanupAction(tempRoot, TimeSpan.FromDays(7));
+        var context = Context();
+        var result = await action.ApplyAsync(context, CancellationToken.None);
+        var snapshot = WindowsActionSnapshot.Deserialize<CleanupActionSnapshot>(result.SnapshotJson);
+        var declaredPath = snapshot.Scopes.Single().Files.Single().QuarantinePath;
+        var unexpectedPath = Path.Combine(snapshot.Scopes.Single().QuarantineRoot, "unexpected.tmp");
+        File.WriteAllText(unexpectedPath, "unexpected");
+
+        await Assert.ThrowsAsync<IOException>(() =>
+            action.CommitAsync(context, result.SnapshotJson, CancellationToken.None));
+
+        Assert.True(File.Exists(declaredPath));
+        Assert.Equal("unexpected", File.ReadAllText(unexpectedPath));
+    }
+
+    [Fact]
+    public async Task UserTemporaryCleanup_CancelledCommitPreservesEntireQuarantine()
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+        var tempRoot = temporaryDirectory.Combine("temp");
+        Directory.CreateDirectory(tempRoot);
+        foreach (var name in new[] { "first.tmp", "second.tmp" })
+        {
+            var path = Path.Combine(tempRoot, name);
+            File.WriteAllText(path, name);
+            File.SetLastWriteTimeUtc(path, DateTime.UtcNow.AddDays(-10));
+        }
+
+        var action = new UserTemporaryFilesCleanupAction(tempRoot, TimeSpan.FromDays(7));
+        var context = Context();
+        var result = await action.ApplyAsync(context, CancellationToken.None);
+        var snapshot = WindowsActionSnapshot.Deserialize<CleanupActionSnapshot>(result.SnapshotJson);
+        using var cancellation = new CancellationTokenSource();
+        cancellation.Cancel();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+            action.CommitAsync(context, result.SnapshotJson, cancellation.Token));
+
+        Assert.All(snapshot.Scopes.SelectMany(scope => scope.Files),
+            file => Assert.True(File.Exists(file.QuarantinePath)));
+    }
+
+    [Fact]
+    public async Task UserTemporaryCleanup_CancellationAfterFirstMoveRestoresCurrentScope()
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+        var tempRoot = temporaryDirectory.Combine("temp");
+        Directory.CreateDirectory(tempRoot);
+        var files = Enumerable.Range(0, 1024)
+            .Select(index => Path.Combine(tempRoot, $"{index:D4}.tmp"))
+            .ToArray();
+        foreach (var file in files)
+        {
+            File.WriteAllText(file, "old");
+            File.SetLastWriteTimeUtc(file, DateTime.UtcNow.AddDays(-10));
+        }
+
+        var action = new UserTemporaryFilesCleanupAction(tempRoot, TimeSpan.FromDays(7));
+        using var cancellation = new CancellationTokenSource();
+        var observeFirstMove = Task.Run(() =>
+        {
+            Assert.True(SpinWait.SpinUntil(
+                () => files.Any(file => !File.Exists(file)),
+                TimeSpan.FromSeconds(10)));
+            cancellation.Cancel();
+        }, TestContext.Current.CancellationToken);
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+            Task.Run(
+                () => action.ApplyAsync(Context(), cancellation.Token),
+                TestContext.Current.CancellationToken));
+        await observeFirstMove;
+
+        Assert.All(files, file => Assert.True(File.Exists(file)));
+    }
+
+    [Fact]
+    public async Task UserTemporaryCleanup_CommitRefusesUnexpectedQuarantineReparsePoint()
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+        var tempRoot = temporaryDirectory.Combine("temp");
+        var outsideRoot = temporaryDirectory.Combine("outside");
+        Directory.CreateDirectory(tempRoot);
+        Directory.CreateDirectory(outsideRoot);
+        var outsideFile = Path.Combine(outsideRoot, "keep.txt");
+        File.WriteAllText(outsideFile, "keep");
+        var oldFile = Path.Combine(tempRoot, "old.tmp");
+        File.WriteAllText(oldFile, "old");
+        File.SetLastWriteTimeUtc(oldFile, DateTime.UtcNow.AddDays(-10));
+        var action = new UserTemporaryFilesCleanupAction(tempRoot, TimeSpan.FromDays(7));
+        var context = Context();
+        var result = await action.ApplyAsync(context, CancellationToken.None);
+        var snapshot = WindowsActionSnapshot.Deserialize<CleanupActionSnapshot>(result.SnapshotJson);
+        var linkPath = Path.Combine(snapshot.Scopes.Single().QuarantineRoot, "outside-link");
+        try
+        {
+            Directory.CreateSymbolicLink(linkPath, outsideRoot);
+        }
+        catch (Exception exception) when (exception is UnauthorizedAccessException
+            or IOException
+            or PlatformNotSupportedException)
+        {
+            return;
+        }
+
+        await Assert.ThrowsAsync<IOException>(() =>
+            action.CommitAsync(context, result.SnapshotJson, CancellationToken.None));
+
+        Assert.Equal("keep", File.ReadAllText(outsideFile));
+        Assert.True(File.Exists(snapshot.Scopes.Single().Files.Single().QuarantinePath));
+    }
+
+    [Fact]
     public async Task ServerCacheRepair_PreservesProtectedFiveMData()
     {
         using var temporaryDirectory = new TemporaryDirectory();

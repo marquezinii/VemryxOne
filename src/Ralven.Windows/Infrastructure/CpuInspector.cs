@@ -1,4 +1,5 @@
 using System.Management;
+using System.Runtime.InteropServices;
 
 namespace Ralven.Windows.Infrastructure;
 
@@ -24,40 +25,84 @@ public sealed class WindowsCpuInspector : ICpuInspector
 {
     private static readonly TimedSnapshotCache<CpuSnapshot> Cache = new();
 
-    public CpuSnapshot? GetSnapshot() => Cache.GetOrReadOptional(Read);
+    public CpuSnapshot? GetSnapshot() => Cache.GetOrReadOptional(
+        () => ReadSafely(ReadProcessors));
 
-    private static CpuSnapshot? Read()
+    internal static CpuSnapshot? ReadSafely(Func<IReadOnlyList<CpuSnapshot>> read)
     {
         try
         {
-            using var searcher = new ManagementObjectSearcher(
-                "SELECT NumberOfCores, NumberOfLogicalProcessors, CurrentClockSpeed, MaxClockSpeed "
-                    + "FROM Win32_Processor");
-            using var results = searcher.Get();
-            foreach (ManagementObject processor in results.Cast<ManagementObject>())
-            {
-                using (processor)
-                {
-                    var cores = processor["NumberOfCores"] as uint?;
-                    var threads = processor["NumberOfLogicalProcessors"] as uint?;
-                    var current = processor["CurrentClockSpeed"] as uint?;
-                    var max = processor["MaxClockSpeed"] as uint?;
-                    if (cores is > 0 && threads is > 0 && current is > 0 && max is > 0)
-                    {
-                        return new CpuSnapshot(
-                            checked((int)cores.Value),
-                            checked((int)threads.Value),
-                            current.Value,
-                            max.Value);
-                    }
-                }
-            }
-
-            return null;
+            return Aggregate(read());
         }
-        catch (Exception exception) when (exception is ManagementException or UnauthorizedAccessException)
+        catch (Exception exception) when (exception is ManagementException
+            or COMException
+            or UnauthorizedAccessException)
         {
             return null;
         }
+    }
+
+    internal static CpuSnapshot? Aggregate(IEnumerable<CpuSnapshot> processors)
+    {
+        var valid = processors.Where(processor => processor is
+        {
+            PhysicalCores: > 0,
+            LogicalThreads: > 0,
+            CurrentClockMhz: > 0,
+            MaxClockMhz: > 0
+        }).ToArray();
+        if (valid.Length == 0)
+        {
+            return null;
+        }
+
+        var physicalCores = valid.Sum(processor => (long)processor.PhysicalCores);
+        var logicalThreads = valid.Sum(processor => (long)processor.LogicalThreads);
+        if (physicalCores > int.MaxValue || logicalThreads > int.MaxValue)
+        {
+            return null;
+        }
+
+        var currentClock = valid.Sum(processor =>
+            (double)processor.CurrentClockMhz * processor.PhysicalCores) / physicalCores;
+        var maxClock = valid.Sum(processor =>
+            (double)processor.MaxClockMhz * processor.PhysicalCores) / physicalCores;
+        return new CpuSnapshot(
+            (int)physicalCores,
+            (int)logicalThreads,
+            checked((uint)Math.Round(currentClock)),
+            checked((uint)Math.Round(maxClock)));
+    }
+
+    private static IReadOnlyList<CpuSnapshot> ReadProcessors()
+    {
+        using var searcher = new ManagementObjectSearcher(
+            "SELECT NumberOfCores, NumberOfLogicalProcessors, CurrentClockSpeed, MaxClockSpeed "
+                + "FROM Win32_Processor");
+        using var results = searcher.Get();
+        var processors = new List<CpuSnapshot>();
+        foreach (ManagementObject processor in results.Cast<ManagementObject>())
+        {
+            using (processor)
+            {
+                var cores = processor["NumberOfCores"] as uint?;
+                var threads = processor["NumberOfLogicalProcessors"] as uint?;
+                var current = processor["CurrentClockSpeed"] as uint?;
+                var max = processor["MaxClockSpeed"] as uint?;
+                if (cores is > 0 and <= int.MaxValue
+                    && threads is > 0 and <= int.MaxValue
+                    && current is > 0
+                    && max is > 0)
+                {
+                    processors.Add(new CpuSnapshot(
+                        (int)cores.Value,
+                        (int)threads.Value,
+                        current.Value,
+                        max.Value));
+                }
+            }
+        }
+
+        return processors;
     }
 }

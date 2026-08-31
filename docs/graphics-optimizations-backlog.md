@@ -330,7 +330,7 @@ como uma decisão de arquitetura pendente, não como algo "esquecido".
 
 | Item | Classificação | Perfis | Observação |
 | --- | --- | --- | --- |
-| Ajustar PCI Express Link State Power Management | ✅ | Médio e Agressivo | **Implementado** — `windows.power.pcie-aspm.adjust`/`PciExpressPowerManagementAction`, via `powercfg /Q` + `/set{a,d}cvalueindex` no plano ativo (mesmo mecanismo documentado já usado por `SessionPerformancePowerPlanAction`). Totalmente reversível; se o computador não expõe essa configuração, ou a leitura do texto do `powercfg` não bate (varia por idioma do Windows), a ação simplesmente não faz nada, nunca falha. |
+| Ajustar PCI Express Link State Power Management | ✅ | Médio e Agressivo | **Implementado** — `windows.power.pcie-aspm.adjust`/`PciExpressPowerManagementAction`. Lê AC/DC pelas APIs nativas `PowerReadACValueIndex`/`PowerReadDCValueIndex`, aplica `/set{a,d}cvalueindex` de forma transacional, reativa o plano, relê a pós-condição e restaura AC/DC separadamente. Hardware sem o setting vira `Skipped`; falha parcial é compensada e falha real não é reportada como sucesso. O mecanismo é oficial, mas o benefício perceptível depende do hardware. |
 
 ### Já coberto por infraestrutura existente, sem mudança de código
 

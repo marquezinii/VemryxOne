@@ -383,6 +383,7 @@ public sealed class WindowsActionHandlerTests
 
         var batteryResult = await action.ApplyAsync(context, CancellationToken.None);
         Assert.False(batteryResult.Changed);
+        Assert.Equal(ActionExecutionOutcome.Skipped, batteryResult.Outcome);
         Assert.Equal(previous, controller.ActiveScheme);
 
         powerStatus.OnAcPower = true;
@@ -436,23 +437,89 @@ public sealed class WindowsActionHandlerTests
         var result = await action.ApplyAsync(context, CancellationToken.None);
 
         Assert.False(result.Changed);
+        Assert.Equal(ActionExecutionOutcome.Skipped, result.Outcome);
+        Assert.Equal(previous, controller.ActiveScheme);
+    }
+
+    [Fact]
+    public async Task SessionPowerPlan_RollbackVerifiesTheRestoredScheme()
+    {
+        var controller = new FakePowerPlanController();
+        var action = new SessionPerformancePowerPlanAction(controller, new FakePowerStatusProvider());
+        var context = Context(elevated: true);
+        var result = await action.ApplyAsync(context, CancellationToken.None);
+        controller.IgnoreNextActivation = true;
+
+        await Assert.ThrowsAsync<IOException>(() =>
+            action.RollbackAsync(context, result.SnapshotJson, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task SessionPowerPlan_RollbackRefusesConcurrentSchemeChange()
+    {
+        var controller = new FakePowerPlanController();
+        var action = new SessionPerformancePowerPlanAction(controller, new FakePowerStatusProvider());
+        var context = Context(elevated: true);
+        var result = await action.ApplyAsync(context, CancellationToken.None);
+        var newerScheme = Guid.NewGuid();
+        controller.ActiveScheme = newerScheme;
+
+        await Assert.ThrowsAsync<IOException>(() =>
+            action.RollbackAsync(context, result.SnapshotJson, CancellationToken.None));
+
+        Assert.Equal(newerScheme, controller.ActiveScheme);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task SessionPowerPlan_MutateThenFailureRestoresPreviousScheme(bool cancel)
+    {
+        var controller = new FakePowerPlanController
+        {
+            CancelAfterPerformanceActivation = cancel,
+            ThrowAfterPerformanceActivation = !cancel
+        };
+        var previous = controller.ActiveScheme;
+        var action = new SessionPerformancePowerPlanAction(controller, new FakePowerStatusProvider());
+
+        await Assert.ThrowsAnyAsync<Exception>(() => action.ApplyAsync(Context(), CancellationToken.None));
+
         Assert.Equal(previous, controller.ActiveScheme);
     }
 
     [Fact]
     public async Task PciExpressPowerManagement_SetsOffAndRollbackRestoresPreviousPolicy()
     {
-        var controller = new FakePowerPlanController { AspmPolicy = 1 };
+        var previous = new PciExpressAspmPolicy(1, 2);
+        var controller = new FakePowerPlanController { AspmPolicyState = previous };
         var action = new PciExpressPowerManagementAction(controller);
         var context = Context();
 
         var result = await action.ApplyAsync(context, CancellationToken.None);
 
         Assert.True(result.Changed);
-        Assert.Equal(0, controller.AspmPolicy);
+        Assert.Equal(new PciExpressAspmPolicy(0, 0), controller.AspmPolicyState);
 
         await action.RollbackAsync(context, result.SnapshotJson, CancellationToken.None);
-        Assert.Equal(1, controller.AspmPolicy);
+        Assert.Equal(previous, controller.AspmPolicyState);
+    }
+
+    [Fact]
+    public async Task PciExpressPowerManagement_SuccessReturnsSnapshotWithoutRedundantPostWriteRead()
+    {
+        var controller = new FakePowerPlanController
+        {
+            AspmPolicyState = new PciExpressAspmPolicy(1, 2),
+            ThrowOnAspmReadAfterSet = true
+        };
+        var action = new PciExpressPowerManagementAction(controller);
+
+        var result = await action.ApplyAsync(Context(), CancellationToken.None);
+
+        Assert.True(result.Changed);
+        Assert.NotNull(result.SnapshotJson);
+        Assert.Equal(new PciExpressAspmPolicy(0, 0), controller.AspmPolicyState);
     }
 
     [Fact]
@@ -464,6 +531,7 @@ public sealed class WindowsActionHandlerTests
         var result = await action.ApplyAsync(Context(), CancellationToken.None);
 
         Assert.False(result.Changed);
+        Assert.Equal(ActionExecutionOutcome.Verified, result.Outcome);
     }
 
     [Fact]
@@ -475,19 +543,69 @@ public sealed class WindowsActionHandlerTests
         var result = await action.ApplyAsync(Context(), CancellationToken.None);
 
         Assert.False(result.Changed);
+        Assert.Equal(ActionExecutionOutcome.Skipped, result.Outcome);
         Assert.Contains(result.Messages, message => message.Contains("não expõe", StringComparison.Ordinal));
     }
 
     [Fact]
-    public async Task PciExpressPowerManagement_NoChangeWhenSetFails()
+    public async Task PciExpressPowerManagement_SetFailureIsVisible()
     {
         var controller = new FakePowerPlanController { AspmPolicy = 1, AspmSetShouldFail = true };
         var action = new PciExpressPowerManagementAction(controller);
 
-        var result = await action.ApplyAsync(Context(), CancellationToken.None);
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            action.ApplyAsync(Context(), CancellationToken.None));
 
-        Assert.False(result.Changed);
         Assert.Equal(1, controller.AspmPolicy);
+    }
+
+    [Fact]
+    public async Task PciExpressPowerManagement_RollbackRefusesConcurrentChange()
+    {
+        var controller = new FakePowerPlanController
+        {
+            AspmPolicyState = new PciExpressAspmPolicy(1, 2)
+        };
+        var action = new PciExpressPowerManagementAction(controller);
+        var context = Context();
+        var result = await action.ApplyAsync(context, CancellationToken.None);
+        controller.AspmPolicyState = new PciExpressAspmPolicy(0, 1);
+
+        await Assert.ThrowsAsync<IOException>(() =>
+            action.RollbackAsync(context, result.SnapshotJson, CancellationToken.None));
+
+        Assert.Equal(new PciExpressAspmPolicy(0, 1), controller.AspmPolicyState);
+    }
+
+    [Fact]
+    public async Task PciExpressPowerManagement_RollbackRefusesDifferentActiveScheme()
+    {
+        var controller = new FakePowerPlanController
+        {
+            AspmPolicyState = new PciExpressAspmPolicy(1, 2)
+        };
+        var action = new PciExpressPowerManagementAction(controller);
+        var result = await action.ApplyAsync(Context(), CancellationToken.None);
+        controller.ActiveScheme = Guid.NewGuid();
+
+        await Assert.ThrowsAsync<IOException>(
+            () => action.RollbackAsync(Context(), result.SnapshotJson, CancellationToken.None));
+
+        Assert.Equal(new PciExpressAspmPolicy(0, 0), controller.AspmPolicyState);
+    }
+
+    [Fact]
+    public async Task PciExpressPowerManagement_LegacySnapshotWithoutSchemeAndBothPoliciesFailsClosed()
+    {
+        var controller = new FakePowerPlanController { AspmPolicyState = new PciExpressAspmPolicy(0, 0) };
+        var action = new PciExpressPowerManagementAction(controller);
+
+        await Assert.ThrowsAsync<InvalidDataException>(() => action.RollbackAsync(
+            Context(),
+            "{\"previousPolicy\":1}",
+            CancellationToken.None));
+
+        Assert.Equal(new PciExpressAspmPolicy(0, 0), controller.AspmPolicyState);
     }
 
     [Fact]
@@ -530,6 +648,130 @@ public sealed class WindowsActionHandlerTests
         Assert.Equal(new VisualEffectsState(true, false, true), controller.State);
     }
 
+    [Fact]
+    public async Task VisualEffectsApply_PostconditionFailureRestoresPreviousSettings()
+    {
+        var controller = new FakeVisualEffectsController { IgnoreNextStateSet = true };
+        var action = new VisualEffectsAction(controller);
+
+        await Assert.ThrowsAsync<IOException>(() =>
+            action.ApplyAsync(Context(), CancellationToken.None));
+
+        Assert.Equal(new VisualEffectsState(true, true, true), controller.State);
+    }
+
+    [Fact]
+    public async Task VisualEffectsApply_ReportsWhenFailedApplyCannotBeRestored()
+    {
+        var controller = new FakeVisualEffectsController();
+        var partialState = new VisualEffectsState(true, false, false);
+        controller.StateSetResults.Enqueue(partialState);
+        controller.StateSetResults.Enqueue(null);
+        var action = new VisualEffectsAction(controller);
+
+        var exception = await Assert.ThrowsAsync<AggregateException>(() =>
+            action.ApplyAsync(Context(), CancellationToken.None));
+
+        Assert.Equal(2, exception.InnerExceptions.Count);
+        Assert.Equal(partialState, controller.State);
+    }
+
+    [Fact]
+    public async Task MenuShowDelayApply_VerifiesAndRollsBack()
+    {
+        var controller = new FakeVisualEffectsController();
+        var action = new MenuShowDelayAction(controller, Text);
+        var context = Context();
+
+        var result = await action.ApplyAsync(context, CancellationToken.None);
+
+        Assert.True(result.Changed);
+        Assert.Equal(100, controller.MenuShowDelay);
+        Assert.Equal("ActionResults.MenuShowDelay.Applied", Assert.Single(result.Messages));
+
+        await action.RollbackAsync(context, result.SnapshotJson, CancellationToken.None);
+
+        Assert.Equal(400, controller.MenuShowDelay);
+    }
+
+    [Fact]
+    public async Task MenuShowDelayApply_DoesNotIncreaseFasterExistingValue()
+    {
+        var controller = new FakeVisualEffectsController { MenuShowDelay = 75 };
+        var action = new MenuShowDelayAction(controller, Text);
+
+        var result = await action.ApplyAsync(Context(), CancellationToken.None);
+
+        Assert.False(result.Changed);
+        Assert.Equal(75, controller.MenuShowDelay);
+        Assert.Equal("ActionResults.MenuShowDelay.AlreadyOptimized", Assert.Single(result.Messages));
+    }
+
+    [Fact]
+    public async Task MenuShowDelayRollback_PreservesNewerUserChoice()
+    {
+        var controller = new FakeVisualEffectsController();
+        var action = new MenuShowDelayAction(controller, Text);
+        var context = Context();
+        var result = await action.ApplyAsync(context, CancellationToken.None);
+        controller.MenuShowDelay = 75;
+
+        await Assert.ThrowsAsync<IOException>(() =>
+            action.RollbackAsync(context, result.SnapshotJson, CancellationToken.None));
+        Assert.Equal(75, controller.MenuShowDelay);
+    }
+
+    [Fact]
+    public async Task MenuShowDelayApply_PostconditionFailureRestoresPreviousValue()
+    {
+        var controller = new FakeVisualEffectsController { IgnoreNextMenuShowDelaySet = true };
+        var action = new MenuShowDelayAction(controller, Text);
+
+        await Assert.ThrowsAsync<IOException>(() =>
+            action.ApplyAsync(Context(), CancellationToken.None));
+
+        Assert.Equal(400, controller.MenuShowDelay);
+    }
+
+    [Fact]
+    public async Task MenuShowDelayApply_ReportsWhenFailedApplyCannotBeRestored()
+    {
+        var controller = new FakeVisualEffectsController();
+        controller.MenuShowDelaySetResults.Enqueue(101);
+        controller.MenuShowDelaySetResults.Enqueue(null);
+        var action = new MenuShowDelayAction(controller, Text);
+
+        var exception = await Assert.ThrowsAsync<AggregateException>(() =>
+            action.ApplyAsync(Context(), CancellationToken.None));
+
+        Assert.Equal(2, exception.InnerExceptions.Count);
+        Assert.Equal(101, controller.MenuShowDelay);
+    }
+
+    [Fact]
+    public async Task MenuShowDelayRollback_RejectsSnapshotOutsideAllowlist()
+    {
+        var action = new MenuShowDelayAction(new FakeVisualEffectsController(), Text);
+        var snapshot = WindowsActionSnapshot.Serialize(new MenuShowDelaySnapshot(400, 99));
+
+        await Assert.ThrowsAsync<InvalidDataException>(() =>
+            action.RollbackAsync(Context(), snapshot, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task MenuShowDelayRollback_VerifiesRestoredValue()
+    {
+        var controller = new FakeVisualEffectsController();
+        var action = new MenuShowDelayAction(controller, Text);
+        var context = Context();
+        var result = await action.ApplyAsync(context, CancellationToken.None);
+        controller.IgnoreNextMenuShowDelaySet = true;
+
+        await Assert.ThrowsAsync<IOException>(() =>
+            action.RollbackAsync(context, result.SnapshotJson, CancellationToken.None));
+        Assert.Equal(100, controller.MenuShowDelay);
+    }
+
     private static WindowsActionContext Context(bool elevated = false)
     {
         return new WindowsActionContext
@@ -539,4 +781,6 @@ public sealed class WindowsActionHandlerTests
             IsElevated = elevated
         };
     }
+
+    private static string Text(string key, params object?[] _) => key;
 }

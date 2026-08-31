@@ -534,6 +534,32 @@ public sealed class TimedSnapshotCacheTests
 public sealed class HardwareInspectorSmokeTests
 {
     [Fact]
+    public void CpuInspector_AggregatesAllValidProcessors()
+    {
+        var snapshot = WindowsCpuInspector.Aggregate(
+        [
+            new CpuSnapshot(8, 16, 3000, 4800),
+            new CpuSnapshot(4, 8, 2400, 4200),
+            new CpuSnapshot(0, 0, 0, 0)
+        ]);
+
+        Assert.NotNull(snapshot);
+        Assert.Equal(12, snapshot.PhysicalCores);
+        Assert.Equal(24, snapshot.LogicalThreads);
+        Assert.Equal(2800u, snapshot.CurrentClockMhz);
+        Assert.Equal(4600u, snapshot.MaxClockMhz);
+    }
+
+    [Fact]
+    public void HardwareInspectors_DegradeExpectedReadFailures()
+    {
+        Assert.Null(WindowsCpuInspector.ReadSafely(
+            () => throw new System.Runtime.InteropServices.COMException()));
+        Assert.Empty(GpuAdapterRegistryReader.ReadSafely(
+            () => throw new IOException()));
+    }
+
+    [Fact]
     public void WindowsCpuInspector_NeverThrows()
     {
         var snapshot = new WindowsCpuInspector().GetSnapshot();

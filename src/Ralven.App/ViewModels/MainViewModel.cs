@@ -182,6 +182,10 @@ public sealed partial class MainViewModel : BindableBase, IDisposable
 
     public ObservableCollection<ActionDisplayItem> PlannedActions { get; } = [];
 
+    public ObservableCollection<ActionDisplayItem> PlannedAdjustments { get; } = [];
+
+    public ObservableCollection<ActionDisplayItem> InformationalPlannedActions { get; } = [];
+
     public ObservableCollection<HistoryDisplayItem> HistoryItems { get; } = [];
 
     public ObservableCollection<StreamingReadinessDisplayItem> StreamingReadinessItems { get; } = [];

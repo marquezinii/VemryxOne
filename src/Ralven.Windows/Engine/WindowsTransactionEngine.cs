@@ -75,6 +75,24 @@ public sealed class WindowsTransactionEngine
         {
             var journal = await LoadOrCreateJournalAsync(actions, context, cancellationToken)
                 .ConfigureAwait(false);
+            if (await FinalizeInterruptedJournalAsync(journal).ConfigureAwait(false))
+            {
+                return CreateResult(
+                    journal,
+                    journal.Actions
+                        .Where(entry => entry.State == ActionJournalState.Committed)
+                        .Where(entry => entry.Outcome == ActionExecutionOutcome.Applied)
+                        .Select(entry => entry.ActionId)
+                        .ToArray(),
+                    GetDeferredAdministratorIds(journal),
+                    journal.Error);
+            }
+
+            if (journal.State == TransactionState.CommittedWithErrors)
+            {
+                return CreateResult(journal, [], GetDeferredAdministratorIds(journal), journal.Error);
+            }
+
             var selected = BuildSelectedActions(actions, journal, context, options);
 
             if (selected.Count == 0)
@@ -172,7 +190,31 @@ public sealed class WindowsTransactionEngine
         else
         {
             ValidateExistingJournal(journal, actions);
-            journal.WasElevated |= context.IsElevated;
+            if (journal.Profile is not null
+                && context.Profile is not null
+                && journal.Profile != context.Profile)
+            {
+                throw new InvalidOperationException(
+                    $"Transaction '{journal.TransactionId}' was created for profile '{journal.Profile}', not '{context.Profile}'.");
+            }
+
+            var journalChanged = false;
+            if (journal.Profile is null && context.Profile is not null)
+            {
+                journal.Profile = context.Profile;
+                journalChanged = true;
+            }
+
+            if (context.IsElevated && !journal.WasElevated)
+            {
+                journal.WasElevated = true;
+                journalChanged = true;
+            }
+
+            if (journalChanged)
+            {
+                await journalStore.SaveAsync(journal, cancellationToken).ConfigureAwait(false);
+            }
         }
 
         return journal;
@@ -240,6 +282,44 @@ public sealed class WindowsTransactionEngine
         return selected;
     }
 
+    private async Task<bool> FinalizeInterruptedJournalAsync(WindowsTransactionJournal journal)
+    {
+        if (journal.State is not (TransactionState.Applying or TransactionState.Committing))
+        {
+            return false;
+        }
+
+        const string reason =
+            "A execução anterior foi interrompida antes de confirmar o estado final desta ação.";
+        foreach (var entry in journal.Actions)
+        {
+            if (entry.State is ActionJournalState.Applying
+                or ActionJournalState.Applied
+                or ActionJournalState.Committing)
+            {
+                entry.RollbackSafeAfterInterruption =
+                    entry.State == ActionJournalState.Applied
+                    && entry.Reversibility == ActionReversibility.RebuildableData;
+                MarkTerminal(entry, ActionJournalState.Failed, ActionExecutionOutcome.Failed, reason);
+                entry.Error ??= reason;
+            }
+            else if (entry.State is ActionJournalState.Pending
+                or ActionJournalState.DeferredPrivilege)
+            {
+                MarkTerminal(
+                    entry,
+                    ActionJournalState.Skipped,
+                    ActionExecutionOutcome.NotRun,
+                    "Não executada porque a execução anterior foi interrompida.");
+            }
+        }
+
+        journal.State = TransactionState.CommittedWithErrors;
+        journal.Error = reason;
+        await journalStore.SaveAsync(journal, CancellationToken.None).ConfigureAwait(false);
+        return true;
+    }
+
     private async Task<WindowsTransactionResult> CompleteWithNoSelectedActionsAsync(
         WindowsTransactionJournal journal,
         CancellationToken cancellationToken)
@@ -297,9 +377,29 @@ public sealed class WindowsTransactionEngine
             item.Entry.Changed = result.Changed;
             item.Entry.SnapshotJson = result.SnapshotJson;
             item.Entry.Messages.AddRange(result.Messages);
+            if (result.Changed
+                && !string.IsNullOrWhiteSpace(result.SnapshotJson)
+                && !applied.Any(appliedItem => ReferenceEquals(appliedItem.Entry, item.Entry)))
+            {
+                // Apply already returned a durable compensation snapshot. It
+                // must remain recoverable even if its semantic outcome is
+                // rejected below.
+                applied.Add(item);
+            }
+
+            item.Entry.Outcome = ValidateApplyOutcome(result);
+            if (item.Entry.Outcome == ActionExecutionOutcome.Skipped)
+            {
+                item.Entry.State = ActionJournalState.Skipped;
+                item.Entry.OutcomeReason = result.Messages.LastOrDefault();
+                item.Entry.CompletedAtUtc = DateTimeOffset.UtcNow;
+                completedWeight += Math.Max(1, item.Action.Metadata.ProgressWeight);
+                await journalStore.SaveAsync(journal, cancellationToken).ConfigureAwait(false);
+                continue;
+            }
+
             item.Entry.State = ActionJournalState.Applied;
             item.Entry.CompletedAtUtc = DateTimeOffset.UtcNow;
-            applied.Add(item);
             completedWeight += Math.Max(1, item.Action.Metadata.ProgressWeight);
             await journalStore.SaveAsync(journal, cancellationToken).ConfigureAwait(false);
 
@@ -326,7 +426,7 @@ public sealed class WindowsTransactionEngine
             item.Entry.State = ActionJournalState.Committed;
             item.Entry.Outcome = item.Entry.Changed
                 ? ActionExecutionOutcome.Applied
-                : ActionExecutionOutcome.Verified;
+                : item.Entry.Outcome;
             item.Entry.CompletedAtUtc = DateTimeOffset.UtcNow;
             await journalStore.SaveAsync(journal, cancellationToken).ConfigureAwait(false);
         }
@@ -349,6 +449,7 @@ public sealed class WindowsTransactionEngine
         var current = journal.Actions.LastOrDefault(entry =>
             entry.State is ActionJournalState.Applying
                 or ActionJournalState.Committing);
+        var currentWasCommitting = current?.State == ActionJournalState.Committing;
         if (current is not null)
         {
             current.State = ActionJournalState.Failed;
@@ -362,15 +463,18 @@ public sealed class WindowsTransactionEngine
         {
             var recoveryContext = context with { IsImmediateFailureRecovery = true };
             var rollbackCandidates = applied
-                .Where(item => CanRecoverAppliedAction(item.Entry))
+                .Where(item => CanRecoverAppliedAction(
+                    item.Entry,
+                    currentWasCommitting && ReferenceEquals(item.Entry, current)))
                 .ToArray();
+            var recoverySuccessState = DetermineFailureRecoveryState(journal, rollbackCandidates);
             try
             {
                 await RollbackAppliedAsync(
                     journal,
                     rollbackCandidates,
                     recoveryContext,
-                    TransactionState.RolledBack,
+                    recoverySuccessState,
                     CancellationToken.None).ConfigureAwait(false);
             }
             catch (Exception rollbackException) when (rollbackException is not StackOverflowException)
@@ -382,7 +486,7 @@ public sealed class WindowsTransactionEngine
 
                 journal.State = rollbackCandidates.All(item =>
                     item.Entry.State == ActionJournalState.RolledBack)
-                    ? TransactionState.RolledBack
+                    ? DetermineFailureRecoveryState(journal, rollbackCandidates)
                     : TransactionState.RollbackFailed;
             }
         }
@@ -512,14 +616,18 @@ public sealed class WindowsTransactionEngine
                 .Select(item => item.Entry.ActionId)
                 .ToHashSet(StringComparer.Ordinal);
             var hasRemainingStandardActions = journal.Actions.Any(entry =>
-                CanRollback(entry)
-                && entry.RequiredPrivilege == RequiredPrivilege.StandardUser
-                && !selectedIds.Contains(entry.ActionId));
+                    CanRollback(entry)
+                    && entry.RequiredPrivilege == RequiredPrivilege.StandardUser
+                    && !selectedIds.Contains(entry.ActionId));
             var successState = deferredAdministratorIds.Count > 0
                 ? TransactionState.AwaitingElevationRollback
                 : hasRemainingStandardActions
                     ? TransactionState.AwaitingStandardRollback
-                    : TransactionState.RolledBack;
+                    : journal.Actions.Any(entry =>
+                        entry.Outcome == ActionExecutionOutcome.Failed
+                        && !selectedIds.Contains(entry.ActionId))
+                        ? TransactionState.CommittedWithErrors
+                        : TransactionState.RolledBack;
             await RollbackAppliedAsync(
                 journal,
                 rollback,
@@ -564,14 +672,17 @@ public sealed class WindowsTransactionEngine
 
             foreach (var entry in journal.Actions.Where(entry =>
                          entry.RequiredPrivilege == RequiredPrivilege.Administrator
-                         && entry.State is ActionJournalState.Pending
-                             or ActionJournalState.DeferredPrivilege))
+                         && entry.State is (ActionJournalState.Pending
+                             or ActionJournalState.DeferredPrivilege
+                             or ActionJournalState.Applying
+                             or ActionJournalState.Applied
+                             or ActionJournalState.Committing)))
             {
-                entry.State = ActionJournalState.Failed;
-                entry.Outcome = ActionExecutionOutcome.Failed;
-                entry.OutcomeReason = reason;
+                entry.RollbackSafeAfterInterruption =
+                    entry.State == ActionJournalState.Applied
+                    && entry.Reversibility == ActionReversibility.RebuildableData;
+                MarkTerminal(entry, ActionJournalState.Failed, ActionExecutionOutcome.Failed, reason);
                 entry.Error = reason;
-                entry.CompletedAtUtc = DateTimeOffset.UtcNow;
             }
 
             journal.State = TransactionState.CommittedWithErrors;
@@ -607,23 +718,42 @@ public sealed class WindowsTransactionEngine
                 or ActionJournalState.Pending
                 or ActionJournalState.DeferredPrivilege
                 or ActionJournalState.SkippedPrivilege
-                or ActionJournalState.Skipped
-                or ActionJournalState.Failed)
+                or ActionJournalState.Skipped)
         {
             return false;
         }
 
-        if (entry.State == ActionJournalState.Committed
-            && entry.Reversibility is ActionReversibility.Irreversible
-                or ActionReversibility.RebuildableData)
+        if (entry.Reversibility == ActionReversibility.Irreversible)
         {
             return false;
+        }
+
+        if (entry.Reversibility == ActionReversibility.RebuildableData
+            && entry.State is ActionJournalState.Committed or ActionJournalState.Failed)
+        {
+            return entry.State == ActionJournalState.Failed
+                && entry.RollbackSafeAfterInterruption;
         }
 
         return true;
     }
 
-    private static bool CanRecoverAppliedAction(WindowsActionJournalEntry entry)
+    private static TransactionState DetermineFailureRecoveryState(
+        WindowsTransactionJournal journal,
+        IReadOnlyList<(IWindowsOptimizationAction Action, WindowsActionJournalEntry Entry)> rollbackCandidates)
+    {
+        var hasUnrecoverableChangedFailure = journal.Actions.Any(entry =>
+            entry.State == ActionJournalState.Failed
+            && entry.Changed
+            && !rollbackCandidates.Any(candidate => ReferenceEquals(candidate.Entry, entry)));
+        return hasUnrecoverableChangedFailure
+            ? TransactionState.CommittedWithErrors
+            : TransactionState.RolledBack;
+    }
+
+    private static bool CanRecoverAppliedAction(
+        WindowsActionJournalEntry entry,
+        bool commitStarted = false)
     {
         if (!entry.Changed
             || string.IsNullOrWhiteSpace(entry.SnapshotJson)
@@ -632,9 +762,26 @@ public sealed class WindowsTransactionEngine
             return false;
         }
 
-        return entry.State != ActionJournalState.Committed
-            || entry.Reversibility is not (
-                ActionReversibility.Irreversible or ActionReversibility.RebuildableData);
+        if (entry.Reversibility == ActionReversibility.Irreversible)
+        {
+            return false;
+        }
+
+        return entry.Reversibility != ActionReversibility.RebuildableData
+            || (!commitStarted && entry.State != ActionJournalState.Committed);
+    }
+
+    private static ActionExecutionOutcome ValidateApplyOutcome(WindowsActionApplyResult result)
+    {
+        if ((result.Changed && result.Outcome != ActionExecutionOutcome.Applied)
+            || (!result.Changed && result.Outcome is not (
+                ActionExecutionOutcome.Verified or ActionExecutionOutcome.Skipped)))
+        {
+            throw new InvalidOperationException(
+                $"Action returned invalid outcome '{result.Outcome}' for Changed={result.Changed}.");
+        }
+
+        return result.Outcome;
     }
 
     private void ValidateJournalForRollback(
@@ -682,6 +829,7 @@ public sealed class WindowsTransactionEngine
             CreatedAtUtc = context.StartedAtUtc,
             UpdatedAtUtc = context.StartedAtUtc,
             WasElevated = context.IsElevated,
+            Profile = context.Profile,
             State = TransactionState.Created,
             Actions = actions.Select((action, index) => new WindowsActionJournalEntry
             {
@@ -892,6 +1040,7 @@ public sealed class WindowsTransactionEngine
         List<string> applied,
         CancellationToken cancellationToken)
     {
+        var commitStarted = false;
         try
         {
             var result = await item.Action.ApplyAsync(context, cancellationToken)
@@ -899,16 +1048,23 @@ public sealed class WindowsTransactionEngine
             item.Entry.Changed = result.Changed;
             item.Entry.SnapshotJson = result.SnapshotJson;
             item.Entry.Messages.AddRange(result.Messages);
+            item.Entry.Outcome = ValidateApplyOutcome(result);
 
             if (result.Changed)
             {
                 item.Entry.State = ActionJournalState.Committing;
                 await journalStore.SaveAsync(journal, cancellationToken).ConfigureAwait(false);
+                commitStarted = true;
                 await item.Action.CommitAsync(context, item.Entry.SnapshotJson, cancellationToken)
                     .ConfigureAwait(false);
                 item.Entry.State = ActionJournalState.Committed;
                 item.Entry.Outcome = ActionExecutionOutcome.Applied;
                 applied.Add(item.Action.Metadata.Id);
+            }
+            else if (item.Entry.Outcome == ActionExecutionOutcome.Skipped)
+            {
+                item.Entry.State = ActionJournalState.Skipped;
+                item.Entry.OutcomeReason = result.Messages.LastOrDefault();
             }
             else
             {
@@ -918,7 +1074,11 @@ public sealed class WindowsTransactionEngine
 
             item.Entry.CompletedAtUtc = DateTimeOffset.UtcNow;
             await journalStore.SaveAsync(journal, cancellationToken).ConfigureAwait(false);
-            return item.Entry.Changed ? IsolatedItemResult.Applied : IsolatedItemResult.Verified;
+            return item.Entry.Changed
+                ? IsolatedItemResult.Applied
+                : item.Entry.Outcome == ActionExecutionOutcome.Skipped
+                    ? IsolatedItemResult.Skipped
+                    : IsolatedItemResult.Verified;
         }
         catch (OperationCanceledException cancellationException) when (
             cancellationToken.IsCancellationRequested)
@@ -926,7 +1086,8 @@ public sealed class WindowsTransactionEngine
             var recoveryErrors = new List<Exception>();
             try
             {
-                await IsolatedRollbackSelfAsync(journal, item, context).ConfigureAwait(false);
+                await IsolatedRollbackSelfAsync(journal, item, context, commitStarted)
+                    .ConfigureAwait(false);
             }
             catch (Exception rollbackPipelineException) when (
                 rollbackPipelineException is not StackOverflowException)
@@ -978,7 +1139,8 @@ public sealed class WindowsTransactionEngine
             try
             {
                 await journalStore.SaveAsync(journal, CancellationToken.None).ConfigureAwait(false);
-                await IsolatedRollbackSelfAsync(journal, item, context).ConfigureAwait(false);
+                await IsolatedRollbackSelfAsync(journal, item, context, commitStarted)
+                    .ConfigureAwait(false);
             }
             catch (Exception rollbackPipelineException) when (
                 rollbackPipelineException is not StackOverflowException)
@@ -1019,6 +1181,7 @@ public sealed class WindowsTransactionEngine
         {
             IsolatedItemResult.Applied => ActionExecutionOutcome.Applied,
             IsolatedItemResult.Verified => ActionExecutionOutcome.Verified,
+            IsolatedItemResult.Skipped => ActionExecutionOutcome.Skipped,
             IsolatedItemResult.Deferred => ActionExecutionOutcome.Skipped,
             _ => ActionExecutionOutcome.Failed
         };
@@ -1028,6 +1191,7 @@ public sealed class WindowsTransactionEngine
     {
         Applied,
         Verified,
+        Skipped,
         Deferred,
         Failed,
         FailedCritical
@@ -1036,10 +1200,22 @@ public sealed class WindowsTransactionEngine
     private async Task IsolatedRollbackSelfAsync(
         WindowsTransactionJournal journal,
         (IWindowsOptimizationAction Action, WindowsActionJournalEntry Entry) item,
-        WindowsActionContext context)
+        WindowsActionContext context,
+        bool commitStarted)
     {
         if (!item.Entry.Changed || string.IsNullOrWhiteSpace(item.Entry.SnapshotJson))
         {
+            return;
+        }
+
+        if (!CanRecoverAppliedAction(item.Entry, commitStarted))
+        {
+            item.Entry.State = ActionJournalState.Failed;
+            item.Entry.Outcome = ActionExecutionOutcome.Failed;
+            item.Entry.OutcomeReason =
+                "A alteração não pode ser revertida com segurança após a interrupção.";
+            item.Entry.CompletedAtUtc = DateTimeOffset.UtcNow;
+            await journalStore.SaveAsync(journal, CancellationToken.None).ConfigureAwait(false);
             return;
         }
 

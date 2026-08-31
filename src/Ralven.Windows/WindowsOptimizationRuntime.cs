@@ -316,7 +316,11 @@ public sealed class WindowsOptimizationActionFactory
 
     private IReadOnlyList<IWindowsOptimizationAction> CreateVisualEffectsActions(OptimizationOptionsDto options)
     {
-        return [CreateAction(OptimizationActionIds.ReduceWindowsVisualEffects, options)];
+        return
+        [
+            CreateAction(OptimizationActionIds.ReduceMenuShowDelay, options),
+            CreateAction(OptimizationActionIds.ReduceWindowsVisualEffects, options)
+        ];
     }
 
     private IWindowsOptimizationAction CreateAction(
@@ -430,7 +434,9 @@ public sealed class WindowsOptimizationActionFactory
                 environment.FiveMAppRoot,
                 environment.FiveMInstallationRoot,
                 RosIdPath,
+                Path.GetDirectoryName(environment.LegacyGraphicsSettingsPath)!,
                 DigitalEntitlementsRoot,
+                Path.GetDirectoryName(environment.UserTemporaryDirectory)!,
                 AuthQuarantineRoot,
                 dependencies.ProcessInspector),
             OptimizationActionIds.CleanUserTemporaryFiles => new UserTemporaryFilesCleanupAction(
@@ -573,6 +579,9 @@ public sealed class WindowsOptimizationActionFactory
                 dependencies.GtaVProcessInspector),
             OptimizationActionIds.ReduceWindowsVisualEffects => new VisualEffectsAction(
                 dependencies.VisualEffects),
+            OptimizationActionIds.ReduceMenuShowDelay => new MenuShowDelayAction(
+                dependencies.VisualEffects,
+                dependencies.ActionText),
             _ => throw new InvalidOperationException(
                 $"Core action '{actionId}' has no registered Windows handler.")
         };
@@ -790,7 +799,7 @@ public sealed class WindowsOptimizationRuntime
     {
         return Engine.ExecuteAsync(
             ResolveActions(plan),
-            context,
+            context with { Profile = plan.Profile },
             options,
             cancellationToken);
     }
