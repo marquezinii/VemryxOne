@@ -7,7 +7,7 @@
 
 - **Produto:** Ralven, aplicativo desktop Windows para otimização transparente, reversível e orientada por diagnóstico do FiveM para **GTAV Legacy**.
 - **Integração:** `dev/proxima-versao` é a branch de integração da próxima versão; `main` representa a linha pública/estável. O fluxo de branches, worktrees, Pull Requests, integração e release é definido em `AI_RULES.md`.
-- **Último estado consolidado neste documento-fonte:** 31/08/2026, após integrar o fortalecimento transacional e adaptativo do otimizador. Antes de qualquer trabalho, confirme o estado real com Git e os testes atuais.
+- **Último estado consolidado neste documento-fonte:** 31/08/2026, após integrar o fortalecimento transacional e adaptativo do otimizador e a revisão de Configurações. Antes de qualquer trabalho, confirme o estado real com Git e os testes atuais.
 - **Release pública atual:** `v1.5.0`, publicada em 24/08/2026 a partir do commit integrado em `main`. O runtime assinado, instalador, hashes, manifesto e feed estável do updater foram publicados e validados.
 - **Próxima release pública:** a última release continua `v1.5.0`; Ralven ainda não foi publicado. A versão da nova geração só é definida no fluxo oficial de release, a partir das mudanças desde `v1.5.0`, sem aliases de execução, instalação ou atualização para gerações sem suporte.
 - **Atalho de desenvolvimento:** `Ralven - Desenvolvimento` usa `scripts\Start-DevelopmentApp.ps1`. Conforme `AI_RULES.md`, deve ser reconstruído com `scripts\Install-DevelopmentShortcut.ps1 -Build` quando aplicável. O script espelha a árvore para a pasta irmã fixa `Ralven-dev-shortcut`, sem ficar órfão após a remoção de um worktree.
@@ -68,6 +68,7 @@ Preferências, journals, solicitações efêmeras, filas e logs locais ficam sob
 
 - Aplicação WPF com WPF-UI/Fluent, Mica, tema claro/escuro/sistema e localização.
 - Janela principal inicia/restaura maximizada e preserva comportamento de bandeja.
+- Configurações ocupa uma superfície fixa na área principal, com navegação lateral e conteúdo rolável; reúne preferências funcionais de inicialização/bandeja, aparência e idioma, privacidade, atualizações e conta. O idioma automático é apresentado como **Idioma do sistema**.
 - Visão geral apresenta diagnóstico/prontidão e monitoramento local de recursos; coleta pausa quando a superfície não está ativa.
 - Visão geral também monitora localmente início/fim de sessão do FiveM (`FiveMSessionStateTracker`/`FiveMSessionProbe`), por leitura passiva de processo/janela, sem hook, leitura de memória ou ação mutável automática; continua ativo com o app minimizado/na bandeja (decisão de produto), pois esse é o cenário normal de uso.
 - Aba **Sistema** reúne o diagnóstico local existente e a saúde agregada somente leitura de antivírus, firewall e atualizações automáticas da Central de Segurança do Windows; indisponibilidade da API é explícita e nunca vira afirmação de proteção. Também tem controles reais de jogos do Windows (Modo de Jogos, captura em segundo plano) sobre chaves HKCU allowlisted, com snapshot/journal/rollback via `WindowsTransactionEngine` e refresh ao voltar para a página.
