@@ -313,9 +313,13 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         syncingLanguageSelector = true;
         try
         {
-            LanguageSelector.SelectedIndex = viewModel.IsPortugueseSelected
-                ? 0
-                : viewModel.IsSpanishSelected ? 2 : 1;
+            LanguageSelector.SelectedIndex = viewModel.LanguagePreference switch
+            {
+                AppLanguagePreference.PortugueseBrazil => 1,
+                AppLanguagePreference.English => 2,
+                AppLanguagePreference.Spanish => 3,
+                _ => 0
+            };
         }
         finally
         {
@@ -340,7 +344,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
             InitializeCrashReportingIfAuthorized();
             await FlushPendingTelemetryIfAnyAsync();
         }
-        if (startupLaunch && viewModel.MinimizeToTrayOnClose)
+        if (startupLaunch && viewModel.StartMinimized)
         {
             HideToTray();
         }

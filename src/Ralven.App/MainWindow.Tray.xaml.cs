@@ -44,10 +44,12 @@ public partial class MainWindow
 
     private void ViewModel_UpdateAvailableDetected(object? sender, string version)
     {
-        // Shows regardless of whether the window is currently visible,
-        // minimized or minimized to the tray — the user asked for the
-        // native Windows notification to fire in every case.
-        trayIcon.ShowUpdateAvailable(version);
+        // The in-app update banner remains available independently; this
+        // preference controls only the native Windows notification.
+        if (viewModel.NotifyWhenUpdateAvailable)
+        {
+            trayIcon.ShowUpdateAvailable(version);
+        }
     }
 
     private void TrayIcon_ShowRequested(object? sender, EventArgs e) => RequestActivation();

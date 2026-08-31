@@ -18,7 +18,7 @@ public sealed class MainWindowLanguageSelectorSyncTests
         var source = ReadMainWindowSource();
 
         Assert.Contains("syncingLanguageSelector = true;", source, StringComparison.Ordinal);
-        Assert.Contains("LanguageSelector.SelectedIndex = viewModel.IsPortugueseSelected", source, StringComparison.Ordinal);
+        Assert.Contains("LanguageSelector.SelectedIndex = viewModel.LanguagePreference switch", source, StringComparison.Ordinal);
         Assert.Contains("syncingLanguageSelector = false;", source, StringComparison.Ordinal);
         // O try/finally garante que o flag nunca fica preso em true, mesmo se
         // a atribuição do SelectedIndex lançar uma exceção.
@@ -37,20 +37,14 @@ public sealed class MainWindowLanguageSelectorSyncTests
     }
 
     [Fact]
-    public void ProgrammaticSyncUsesCurrentLanguageNotAPinnedPreference()
+    public void ProgrammaticSyncPreservesTheAutomaticPreference()
     {
         var source = ReadMainWindowSource();
 
-        // O índice sincronizado reflete o idioma já resolvido pela
-        // preferência (inclusive o detectado em modo Automatic), e não chama
-        // SelectLanguage de volta para a ViewModel.
-        Assert.Contains("viewModel.IsPortugueseSelected", source, StringComparison.Ordinal);
-        Assert.Contains("viewModel.IsSpanishSelected", source, StringComparison.Ordinal);
-        Assert.Contains("viewModel.SelectLanguage", source, StringComparison.Ordinal);
-        Assert.DoesNotContain(
-            "LanguageSelector.SelectedIndex = viewModel.LanguagePreference switch",
-            source,
-            StringComparison.Ordinal);
+        Assert.Contains("AppLanguagePreference.PortugueseBrazil => 1", source, StringComparison.Ordinal);
+        Assert.Contains("AppLanguagePreference.English => 2", source, StringComparison.Ordinal);
+        Assert.Contains("AppLanguagePreference.Spanish => 3", source, StringComparison.Ordinal);
+        Assert.Contains("_ => 0", source, StringComparison.Ordinal);
     }
 
     private static string ReadMainWindowSource() => TestHelpers.ReadMainWindowSource();

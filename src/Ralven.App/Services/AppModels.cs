@@ -227,15 +227,27 @@ public sealed record AppSettings
 
     public bool LaunchAtStartup { get; init; }
 
+    /// <summary>
+    /// Whether a launch requested by the Windows startup entry should remain
+    /// in the notification area. <see langword="null"/> identifies settings
+    /// written before this preference existed; those installations inherit
+    /// the previous <see cref="MinimizeToTrayOnClose"/> behavior once and are
+    /// normalized on the next save.
+    /// </summary>
+    public bool? StartMinimized { get; init; }
+
     public bool CheckForUpdates { get; init; } = true;
+
+    public bool NotifyWhenUpdateAvailable { get; init; } = true;
 
     /// <summary>
     /// Consentimento para telemetria técnica anonimizada. Vem habilitada por
     /// padrão em instalações novas; o usuário pode desativá-la a qualquer
     /// momento nas configurações. Continua transmitindo apenas categorias
     /// allowlisted de erro, duração de uma otimização e versão do
-    /// aplicativo — nunca logs, arquivos, documentos, histórico, caminhos,
-    /// hardware ou dados pessoais.
+    /// aplicativo e sinais técnicos allowlisted descritos na política de
+    /// privacidade — nunca logs, arquivos, documentos, histórico, caminhos,
+    /// seriais de hardware ou dados pessoais.
     /// </summary>
     public bool ShareAnonymousTelemetry { get; init; } = true;
 

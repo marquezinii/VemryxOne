@@ -108,7 +108,9 @@ public sealed partial class MainViewModel : BindableBase, IDisposable
     private AppThemePreference themePreference = AppThemePreference.System;
     private bool minimizeToTrayOnClose;
     private bool launchAtStartup;
+    private bool startMinimized;
     private bool checkForUpdates = true;
+    private bool notifyWhenUpdateAvailable = true;
     private bool shareAnonymousTelemetry;
     private bool shareCrashReports;
     private int? privacyConsentVersion;

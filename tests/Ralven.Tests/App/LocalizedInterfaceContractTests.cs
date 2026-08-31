@@ -688,8 +688,11 @@ public sealed partial class LocalizedInterfaceContractTests
         Assert.Equal(
             new[]
             {
-                "{Binding MinimizeToTrayOnClose}",
                 "{Binding LaunchAtStartup}",
+                "{Binding StartMinimized}",
+                "{Binding MinimizeToTrayOnClose}",
+                "{Binding CheckForUpdates}",
+                "{Binding NotifyWhenUpdateAvailable}",
                 "{Binding ShareAnonymousTelemetry}",
                 "{Binding ShareCrashReports}"
             },

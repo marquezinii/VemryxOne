@@ -1,4 +1,5 @@
 using System.IO;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -11,7 +12,8 @@ public partial class MainWindow
 {
     private async Task CaptureIfRequestedAsync()
     {
-        var argument = Environment.GetCommandLineArgs()
+        var arguments = Environment.GetCommandLineArgs();
+        var argument = arguments
             .FirstOrDefault(value => value.StartsWith("--capture=", StringComparison.OrdinalIgnoreCase));
         if (argument is null)
         {
@@ -29,7 +31,7 @@ public partial class MainWindow
             // pessoa. --capture-theme= resolve isso pelo mesmo caminho que
             // --capture-page= já usa para as páginas: só vale sob --capture=,
             // não persiste nada, e não existe fora do smoke-test.
-            var theme = Environment.GetCommandLineArgs()
+            var theme = arguments
                 .FirstOrDefault(value => value.StartsWith("--capture-theme=", StringComparison.OrdinalIgnoreCase));
             if (theme is not null)
             {
@@ -39,10 +41,22 @@ public partial class MainWindow
                     : AppThemePreference.Dark);
             }
 
+            var size = arguments
+                .FirstOrDefault(value => value.StartsWith("--capture-size=", StringComparison.OrdinalIgnoreCase));
+            if (size is not null
+                && TryParseCaptureSize(size["--capture-size=".Length..].Trim('"'), out var width, out var height))
+            {
+                WindowState = WindowState.Normal;
+                Width = Math.Max(MinWidth, width);
+                Height = Math.Max(MinHeight, height);
+                Left = 0;
+                Top = 0;
+            }
+
             // O smoke-test de captura sempre abriu na Visão geral. Com
             // --capture-page= ele consegue fotografar qualquer página, o que
             // é o único jeito de conferir o Otimizador sem interação manual.
-            var page = Environment.GetCommandLineArgs()
+            var page = arguments
                 .FirstOrDefault(value => value.StartsWith("--capture-page=", StringComparison.OrdinalIgnoreCase));
             if (page is not null)
             {
@@ -55,7 +69,7 @@ public partial class MainWindow
                     "Optimizer" => ConfigureOptimizerCapture(OptimizationScope.GeneralWindows, OptimizerNav),
                     "FiveMOptimizer" => ConfigureOptimizerCapture(OptimizationScope.FiveMLegacy, GamesNav),
                     "History" => (HistoryPage, HistoryNav),
-                    "Settings" => (SettingsPage, SettingsNav),
+                    "Settings" => ConfigureSettingsCapture(arguments),
                     _ => (DashboardPage, DashboardNav)
                 };
                 ActivateNavItem(target.Nav);
@@ -94,6 +108,36 @@ public partial class MainWindow
             // alive after the window closes, making the release gate hang.
             System.Windows.Application.Current.Shutdown(0);
         }
+    }
+
+    internal static bool TryParseCaptureSize(string value, out int width, out int height)
+    {
+        width = 0;
+        height = 0;
+        var parts = value.Replace('X', 'x').Split('x', 2, StringSplitOptions.TrimEntries);
+        return parts.Length == 2
+            && int.TryParse(parts[0], NumberStyles.None, CultureInfo.InvariantCulture, out width)
+            && int.TryParse(parts[1], NumberStyles.None, CultureInfo.InvariantCulture, out height)
+            && width is > 0 and <= 7680
+            && height is > 0 and <= 4320;
+    }
+
+    private (UIElement Element, Wpf.Ui.Controls.NavigationViewItem Nav) ConfigureSettingsCapture(
+        IReadOnlyList<string> arguments)
+    {
+        var categoryArgument = arguments.FirstOrDefault(value =>
+            value.StartsWith("--capture-settings-category=", StringComparison.OrdinalIgnoreCase));
+        var category = categoryArgument?["--capture-settings-category=".Length..].Trim('"');
+        System.Windows.Controls.RadioButton selected = category switch
+        {
+            "Account" => CategoryAccount,
+            "Privacy" => CategoryPrivacy,
+            "Tools" => CategoryTools,
+            "About" => CategoryAbout,
+            _ => CategoryGeneral
+        };
+        selected.IsChecked = true;
+        return (SettingsPage, SettingsNav);
     }
 
     private (UIElement Element, Wpf.Ui.Controls.NavigationViewItem Nav) ConfigureOptimizerCapture(

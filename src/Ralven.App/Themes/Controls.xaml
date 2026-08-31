@@ -840,6 +840,16 @@
         <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}" />
     </Style>
 
+    <Style x:Key="SettingsCardStyle" TargetType="Border">
+        <Setter Property="MinHeight" Value="76" />
+        <Setter Property="Padding" Value="18,16" />
+        <Setter Property="Margin" Value="0,0,0,10" />
+        <Setter Property="Background" Value="{DynamicResource Surface2Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}" />
+    </Style>
+
     <Style x:Key="AlertRowStyle" TargetType="Border">
         <Setter Property="MinHeight" Value="48" />
         <Setter Property="Padding" Value="16,12" />
