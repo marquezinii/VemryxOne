@@ -7,7 +7,7 @@
 
 - **Produto:** Ralven, aplicativo desktop Windows para otimização transparente, reversível e orientada por diagnóstico do FiveM para **GTAV Legacy**.
 - **Integração:** `dev/proxima-versao` é a branch de integração da próxima versão; `main` representa a linha pública/estável. O fluxo de branches, worktrees, Pull Requests, integração e release é definido em `AI_RULES.md`.
-- **Último estado consolidado neste documento-fonte:** 30/08/2026, após integrar os inventários internos de Sistema, Aplicativos e Jogos. Antes de qualquer trabalho, confirme o estado real com Git e os testes atuais.
+- **Último estado consolidado neste documento-fonte:** 31/08/2026, após integrar o otimizador geral do Windows. Antes de qualquer trabalho, confirme o estado real com Git e os testes atuais.
 - **Release pública atual:** `v1.5.0`, publicada em 24/08/2026 a partir do commit integrado em `main`. O runtime assinado, instalador, hashes, manifesto e feed estável do updater foram publicados e validados.
 - **Próxima release pública:** a última release continua `v1.5.0`; Ralven ainda não foi publicado. A versão da nova geração só é definida no fluxo oficial de release, a partir das mudanças desde `v1.5.0`, sem aliases de execução, instalação ou atualização para gerações sem suporte.
 - **Atalho de desenvolvimento:** `Ralven - Desenvolvimento` usa `scripts\Start-DevelopmentApp.ps1`. Conforme `AI_RULES.md`, deve ser reconstruído com `scripts\Install-DevelopmentShortcut.ps1 -Build` quando aplicável. O script espelha a árvore para a pasta irmã fixa `Ralven-dev-shortcut`, sem ficar órfão após a remoção de um worktree.
@@ -75,7 +75,7 @@ Preferências, journals, solicitações efêmeras, filas e logs locais ficam sob
 - Aba **Jogos** é o catálogo de títulos compatíveis; hoje mostra FiveM sobre GTAV Legacy e encaminha para o fluxo especializado existente, sem habilitar outros jogos ou GTAV Enhanced.
 - Revisão do plano do Otimizador detalha por ação: como é detectada, o que a confirmação verifica, como é desfeita e riscos/limitações; texto cai no conteúdo do catálogo quando a chave de localização não existe.
 - Redesenho visual completo (20/08, direção "Câmara Âmbar"): tokens de tema (`Themes/Tokens/*.xaml`), `Controls.xaml`, `Surfaces.xaml`, `Typography.xaml` e as páginas Visão geral/Otimizador/Histórico foram redesenhadas; `ArcProgress`/`CoreVisual`/`CoreVisualPalette` (cena 3D antiga do Otimizador) foram removidos nesse redesenho.
-- Aba **Otimizador**: trilha Preparar → Executar → Resultado, seleção Leve/Médio/Agressivo, resumo do computador, execução/progresso e resultado.
+- Aba **Otimizador**: plano geral `GeneralWindows`, independente de FiveM/GTA, na trilha Preparar → Executar → Resultado; usa somente ações explicitamente permitidas para esse escopo e preserva a experiência especializada `FiveMLegacy` em Jogos.
 - Animações do Otimizador evitam `ScaleTransform` em elementos interativos, seguindo a regra já adotada para impedir deslocamento de listas no hover.
 - Smoke de captura aceita seleção de página via `--capture-page=Optimizer|History|Settings|Dashboard` e tema via `--capture-theme=light|dark` (só sob `--capture=`, não persiste).
 - Painel de **Notas da Versão** (`ReleaseNotesWindow`) é exibido automaticamente após um update bem-sucedido, controlado por `ReleaseNotesEvaluator`/`ReleaseNotesCatalog` e pelo campo `LastSeenReleaseNotesVersion` das configurações (mostra de novo só quando existem notas mais recentes que a última vista).
@@ -84,8 +84,8 @@ Preferências, journals, solicitações efêmeras, filas e logs locais ficam sob
 
 ### Motor de otimização e diagnóstico
 
-- `ActionCatalog.CurrentVersion` mais recente registrado: **14**.
-- Diagnósticos cobrem FiveM/GTA, CPU, GPU, RAM, armazenamento, cache, processos, rede, pagefile/commit, drivers, monitor, HAGS, energia, WHEA, sinais de throttling e outros dados obtidos por APIs nativas/best-effort.
+- `ActionCatalog.CurrentVersion` mais recente registrado: **16**.
+- Diagnósticos cobrem FiveM/GTA, CPU, GPU, RAM, armazenamento/TRIM, cache, processos, rede, pagefile/commit, drivers, taxa de atualização, aceleração do mouse, energia, WHEA, sinais de throttling e outros dados obtidos por APIs nativas/best-effort.
 - Existem diagnósticos somente leitura para gargalo provável, overlays/captura, logs do FiveM e orientação de medição pelas ferramentas oficiais do FiveM.
 - Relatório estruturado e relatório técnico sanitizado podem ser copiados/salvos explicitamente pelo usuário.
 - Relatos de bug são classificados automaticamente por `BugCodeClassifier`/`BugCode` (enum de códigos estáveis) antes do envio, para agrupar causas semelhantes no dashboard sem exigir triagem manual de texto livre.
@@ -142,7 +142,7 @@ Somente itens ainda relevantes devem permanecer aqui. Quando resolvidos e integr
 
 Estes números são **referência do último estado validado**, não substituem testes da branch atual.
 
-- **30/08/2026 — integração dos inventários de Sistema, Aplicativos e Jogos:** build Release sem warnings, **1.091 testes .NET**, `dotnet format --verify-no-changes`, `scripts/Verify-Safety.ps1` e `git diff --check` aprovados; as cinco verificações remotas dos três PRs, incluindo SBOM, também aprovaram. Site, dashboard e Worker não receberam mudança de produto; foram validados pela CI remota. Node 24.19 LTS continua sendo o baseline versionado para as superfícies Node.
+- **31/08/2026 — integração do otimizador geral e atualização compatível do Worker:** build Release sem warnings, **1.144 testes .NET**, `dotnet format --verify-no-changes`, `scripts/Verify-Safety.ps1` e `git diff --check` aprovados. Com Node 24.19 LTS, o Worker passou `npm test`, `npm run test:migrations` e `npm audit` sem vulnerabilidades; `wrangler` está em 4.127.0 com o postinstall de `workerd` allowlisted na versão transitiva exata.
 
 - **24/08/2026 — release pública v1.5.0:** build Release sem warnings, **1.000 testes .NET**, `dotnet format --verify-no-changes`, verificação de segurança, contrato do instalador, smoke pós-ofuscação e instalação/upgrade/desinstalação aprovados. Worker (**199 testes**), dashboard (**49 testes**) e site (lint, typecheck, build e **3 testes**) também passaram sem vulnerabilidades. A CI remota e o workflow estável aprovaram SBOM, empacotamento endurecido, assinatura, proveniência, GitHub Release e publicação do feed estável assinado do updater.
 
