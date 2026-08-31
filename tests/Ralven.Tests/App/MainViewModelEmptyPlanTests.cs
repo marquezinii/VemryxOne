@@ -100,4 +100,30 @@ public sealed class MainViewModelEmptyPlanTests
         Assert.Equal(OptimizationScope.GeneralWindows, viewModel.OptimizationScope);
         Assert.False(viewModel.CanStart);
     }
+
+    [Fact]
+    public async Task EnhancedEdition_ExplainsTheSafeBlockInsteadOfClaimingLegacyIsMissing()
+    {
+        var service = new FakeAppOptimizationService(
+            new AppSettings(),
+            settingsFileExists: false,
+            edition: FiveMEdition.Enhanced);
+        var localization = new LocalizationService(
+            System.Globalization.CultureInfo.GetCultureInfo("pt-BR"));
+        var viewModel = new MainViewModel(service, localization);
+
+        await viewModel.InitializeAsync();
+        viewModel.SetOptimizationScope(OptimizationScope.FiveMLegacy);
+
+        Assert.Equal(
+            localization.GetString("Diagnosis.FiveMEnhancedBlocked"),
+            viewModel.EditionLabel);
+        Assert.Equal(
+            localization.GetString("Diagnosis.EnhancedUnsupported"),
+            viewModel.RecommendationText);
+        Assert.Equal(
+            localization.GetString("Diagnosis.EnhancedUnsupported"),
+            viewModel.EmptyPlanMessage);
+        Assert.False(viewModel.CanStart);
+    }
 }

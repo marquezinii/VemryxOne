@@ -68,7 +68,8 @@ O primeiro escopo geral reutiliza somente capacidades já estreitas e testadas:
 - seleção do plano de energia de desempenho com captura/restauração do GUID
   anterior e somente quando ligado à tomada;
 - ASPM PCI Express apenas quando a configuração existe no plano ativo, com
-  captura e restauração do valor anterior;
+  captura separada de AC/DC, compensação de falha parcial, pós-verificação e
+  restauração dos dois valores sem sobrescrever uma escolha posterior;
 - efeitos visuais e atraso de menus allowlisted via `SystemParametersInfo`, com
   verificação e rollback, preservando legibilidade e suavização de fontes.
 
@@ -233,12 +234,14 @@ condições abaixo simultaneamente:
 - nunca faz parte de nenhum perfil automático (`ActionOptionGate` próprio,
   desligado por padrão; precisa ser habilitado explicitamente fora dos
   perfis padrão);
-- só toca em algum arquivo depois de detectar, no log mais recente do
-  FiveM, um padrão textual já conhecido de erro de entitlement/autenticação
-  — caso contrário, a ação não faz nada e informa isso;
+- só toca em algum arquivo depois de detectar, em log recente dentro da janela
+  da sessão, uma frase completa allowlisted de erro de entitlement/autenticação
+  — log antigo, timestamp futuro ou substring ambígua falham fechados;
 - move os itens para quarentena em vez de apagar diretamente, preservando a
   reversibilidade até a confirmação final da transação, igual ao padrão já
   usado para `server-cache`/`server-cache-priv`;
+- vincula o snapshot aos pais canônicos e ao manifesto SHA-256 exato da
+  quarentena; conteúdo novo, alterado ou reparse point impede commit/rollback;
 - exige que o FiveM esteja fechado, como qualquer outra limpeza condicionada.
 
 ### Limpeza condicionada

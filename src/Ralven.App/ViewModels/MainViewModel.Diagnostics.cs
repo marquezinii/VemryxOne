@@ -159,9 +159,12 @@ public sealed partial class MainViewModel
         };
         IsFiveMLegacyDetected = value.Edition == FiveMEdition.Legacy;
         IsGtaVLegacyDetected = value.GtaVDetected || File.Exists(value.GtaVGraphicsSettingsPath);
-        EditionLabel = IsFiveMLegacyDetected
-            ? localization.GetString("Diagnosis.FiveMLegacyDetected")
-            : localization.GetString("Diagnosis.FiveMNotFound");
+        EditionLabel = value.Edition switch
+        {
+            FiveMEdition.Legacy => localization.GetString("Diagnosis.FiveMLegacyDetected"),
+            FiveMEdition.Enhanced => localization.GetString("Diagnosis.FiveMEnhancedBlocked"),
+            _ => localization.GetString("Diagnosis.FiveMNotFound")
+        };
         EditionBadgeLabel = value.Edition switch
         {
             FiveMEdition.Legacy => "LEGACY",
@@ -178,7 +181,9 @@ public sealed partial class MainViewModel
                 : localization.Format(
                     "Diagnosis.RecommendedProfile",
                     ProfileName(value.RecommendedProfile));
-        RecommendationText = localization.GetString("Diagnosis.GeneralReady");
+        RecommendationText = localization.GetString(value.Edition == FiveMEdition.Enhanced
+            ? "Diagnosis.EnhancedUnsupported"
+            : "Diagnosis.GeneralReady");
         ApplyStreamingReadiness(value);
         RefreshFiveMSessionMonitorAvailability();
     }

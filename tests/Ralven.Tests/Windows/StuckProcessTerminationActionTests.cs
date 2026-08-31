@@ -40,7 +40,7 @@ public sealed class StuckProcessTerminationActionTests
     }
 
     [Fact]
-    public async Task Apply_WhenRevalidationFails_ReportsNoChange()
+    public async Task Apply_WhenConfirmedProcessCannotBeTerminated_ThrowsOperationalFailure()
     {
         var inspector = new FakeStuckFiveMProcessInspector
         {
@@ -49,9 +49,9 @@ public sealed class StuckProcessTerminationActionTests
         var terminator = new FakeFiveMProcessTerminator { TerminateSucceeds = false };
         var action = new StuckProcessTerminationAction(InstallationRoot, inspector, terminator);
 
-        var result = await action.ApplyAsync(CreateContext(), CancellationToken.None);
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => action.ApplyAsync(CreateContext(), CancellationToken.None));
 
-        Assert.False(result.Changed);
         Assert.Equal(1, terminator.CallCount);
     }
 

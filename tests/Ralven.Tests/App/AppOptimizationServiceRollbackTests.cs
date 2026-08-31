@@ -1,6 +1,10 @@
 using System.Globalization;
+using System.Text.Json;
 using Ralven.App.Services;
 using Ralven.App.ViewModels;
+using Ralven.Contracts;
+using Ralven.Core.Catalog;
+using Ralven.Windows.Engine;
 using Ralven.Windows.Infrastructure;
 using Xunit;
 
@@ -8,6 +12,59 @@ namespace Ralven.Tests.App;
 
 public sealed class AppOptimizationServiceRollbackTests
 {
+    [Fact]
+    public async Task RollbackAsync_WhenUnrecoverableFailureRemains_DoesNotReportCompleted()
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+        var localization = CreatePortugueseLocalization();
+        var definition = ActionCatalog.Current.GetRequired(
+            OptimizationActionIds.CleanUserTemporaryFiles);
+        var transactionId = Guid.NewGuid();
+        var journal = new WindowsTransactionJournal
+        {
+            TransactionId = transactionId,
+            SchemaVersion = 1,
+            CreatedAtUtc = DateTimeOffset.UtcNow,
+            UpdatedAtUtc = DateTimeOffset.UtcNow,
+            WasElevated = false,
+            State = TransactionState.CommittedWithErrors,
+            Actions =
+            [
+                new WindowsActionJournalEntry
+                {
+                    Sequence = 1,
+                    ActionId = definition.Id,
+                    Version = definition.Version,
+                    RequiredPrivilege = definition.RequiredPrivilege,
+                    Reversibility = definition.Reversibility,
+                    State = ActionJournalState.Failed,
+                    Outcome = ActionExecutionOutcome.Failed,
+                    Changed = true,
+                    SnapshotJson = "{}"
+                }
+            ]
+        };
+        var journalDirectory = Path.Combine(temporaryDirectory.Path, "Transactions");
+        Directory.CreateDirectory(journalDirectory);
+        await File.WriteAllTextAsync(
+            Path.Combine(journalDirectory, $"{transactionId:N}.json"),
+            JsonSerializer.Serialize(journal, RalvenJson.Options),
+            TestContext.Current.CancellationToken);
+        var updates = new List<AppProgressUpdate>();
+
+        var restored = await new AppOptimizationService(temporaryDirectory.Path, localization)
+            .RollbackAsync(
+                transactionId,
+                new InlineProgress<AppProgressUpdate>(updates.Add),
+                TestContext.Current.CancellationToken);
+
+        Assert.False(restored);
+        Assert.DoesNotContain(updates, update =>
+            update.Headline == localization.GetString("Runtime.RestoreCompleted"));
+        var warning = Assert.Single(updates, update => update.Kind == AppProgressKind.Warning);
+        Assert.Equal(localization.GetString("Runtime.RestoreIncomplete"), warning.Detail);
+    }
+
     [Fact]
     public void HandleRollbackFailure_WhenFiveMIsRunning_ReportsSpecificLocalizedGuidance()
     {

@@ -119,6 +119,64 @@ public sealed class IsolatedExecutionTests
         Assert.Equal(0, verified.CommitCount);
     }
 
+    [Fact]
+    public async Task MissingPrecondition_IsRecordedAsSkippedInsteadOfVerified()
+    {
+        var skipped = ConfigurableTestAction.Skipped(OptimizationActionIds.EnableGameMode);
+        var (engine, journals, id) = Build(skipped);
+
+        var result = await engine.ExecuteAsync(
+            [skipped],
+            Context(id),
+            Isolated,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(TransactionState.Committed, result.State);
+        var entry = Assert.Single(journals.Get(id).Actions);
+        Assert.Equal(ActionJournalState.Skipped, entry.State);
+        Assert.Equal(ActionExecutionOutcome.Skipped, entry.Outcome);
+        Assert.Equal("pré-condição ausente", entry.OutcomeReason);
+        Assert.Equal(0, skipped.CommitCount);
+    }
+
+    [Fact]
+    public async Task StrictExecution_AlsoRecordsMissingPreconditionAsSkipped()
+    {
+        var skipped = ConfigurableTestAction.Skipped(OptimizationActionIds.EnableGameMode);
+        var (engine, journals, id) = Build(skipped);
+
+        var result = await engine.ExecuteAsync(
+            [skipped],
+            Context(id),
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(TransactionState.Committed, result.State);
+        var entry = Assert.Single(journals.Get(id).Actions);
+        Assert.Equal(ActionJournalState.Skipped, entry.State);
+        Assert.Equal(ActionExecutionOutcome.Skipped, entry.Outcome);
+        Assert.Equal(0, skipped.CommitCount);
+    }
+
+    [Fact]
+    public async Task IrreversibleCommitFailure_IsNeverReportedAsRolledBack()
+    {
+        var irreversible = ConfigurableTestAction.CommitFailing(
+            OptimizationActionIds.TerminateStuckFiveMProcess);
+        var (engine, journals, id) = Build(irreversible);
+
+        var result = await engine.ExecuteAsync(
+            [irreversible],
+            Context(id),
+            Isolated,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(TransactionState.CommittedWithErrors, result.State);
+        var entry = Assert.Single(journals.Get(id).Actions);
+        Assert.Equal(ActionJournalState.Failed, entry.State);
+        Assert.Equal(ActionExecutionOutcome.Failed, entry.Outcome);
+        Assert.Equal(0, irreversible.RollbackCount);
+    }
+
     private static (WindowsTransactionEngine Engine, InMemoryJournalStore Journals, Guid Id) Build(
         params ConfigurableTestAction[] actions)
     {
@@ -163,6 +221,7 @@ public sealed class IsolatedExecutionTests
         {
             Changing,
             NoChange,
+            Skip,
             FailApply,
             FailCommit,
             Cancel
@@ -179,6 +238,8 @@ public sealed class IsolatedExecutionTests
         public static ConfigurableTestAction Changing(string id) => new(id, Behavior.Changing);
 
         public static ConfigurableTestAction NoChange(string id) => new(id, Behavior.NoChange);
+
+        public static ConfigurableTestAction Skipped(string id) => new(id, Behavior.Skip);
 
         public static ConfigurableTestAction Failing(string id) => new(id, Behavior.FailApply);
 
@@ -206,6 +267,11 @@ public sealed class IsolatedExecutionTests
             if (behavior == Behavior.NoChange)
             {
                 return Task.FromResult(WindowsActionApplyResult.NoChange("já estava correto"));
+            }
+
+            if (behavior == Behavior.Skip)
+            {
+                return Task.FromResult(WindowsActionApplyResult.Skipped("pré-condição ausente"));
             }
 
             return Task.FromResult(WindowsActionApplyResult.ChangedWith(

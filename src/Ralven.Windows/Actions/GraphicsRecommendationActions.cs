@@ -43,14 +43,28 @@ public sealed class GraphicsPresetRecommendationAction : WindowsOptimizationActi
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var gpus = gpuDetails.GetSnapshot();
-        var cpuSnapshot = cpu.GetSnapshot();
-        var ram = ramDetails.GetSnapshot();
-        var display = displayConfiguration.GetSnapshot();
+        IReadOnlyList<GpuAdapterDetails> gpus;
+        CpuSnapshot? cpuSnapshot;
+        RamDetailsSnapshot ram;
+        DisplayConfigurationSnapshot? display;
+        try
+        {
+            gpus = gpuDetails.GetSnapshot();
+            cpuSnapshot = cpu.GetSnapshot();
+            ram = ramDetails.GetSnapshot();
+            display = displayConfiguration.GetSnapshot();
+        }
+        catch (Exception exception) when (exception is IOException
+            or UnauthorizedAccessException
+            or InvalidOperationException)
+        {
+            return Task.FromResult(WindowsActionApplyResult.Skipped(
+                "Não foi possível ler o hardware necessário para recomendar um preset agora."));
+        }
 
         if (gpus.Count == 0 || cpuSnapshot is null || ram.Modules.Count == 0)
         {
-            return Task.FromResult(WindowsActionApplyResult.NoChange(
+            return Task.FromResult(WindowsActionApplyResult.Skipped(
                 "Não foi possível ler hardware suficiente para recomendar um preset agora; use os diagnósticos de GPU/CPU/RAM individualmente."));
         }
 
@@ -132,7 +146,7 @@ public sealed class TextureVramFitDiagnosisAction : WindowsOptimizationAction
         cancellationToken.ThrowIfCancellationRequested();
         if (!File.Exists(settingsPath))
         {
-            return Task.FromResult(WindowsActionApplyResult.NoChange(
+            return Task.FromResult(WindowsActionApplyResult.Skipped(
                 "O arquivo gráfico ainda não existe; nada para comparar com a VRAM."));
         }
 
@@ -142,23 +156,35 @@ public sealed class TextureVramFitDiagnosisAction : WindowsOptimizationAction
             textureQuality = ReadTextureQuality(settingsPath);
         }
         catch (Exception exception) when (exception is IOException
-            or UnauthorizedAccessException or XmlException)
+            or UnauthorizedAccessException or XmlException or InvalidDataException)
         {
-            return Task.FromResult(WindowsActionApplyResult.NoChange(
+            return Task.FromResult(WindowsActionApplyResult.Skipped(
                 $"Não foi possível ler a qualidade de textura configurada ({exception.Message})."));
         }
 
         if (textureQuality is null)
         {
-            return Task.FromResult(WindowsActionApplyResult.NoChange(
+            return Task.FromResult(WindowsActionApplyResult.Skipped(
                 "A opção de qualidade de textura não foi encontrada no arquivo gráfico."));
         }
 
-        var gpus = gpuDetails.GetSnapshot();
+        IReadOnlyList<GpuAdapterDetails> gpus;
+        try
+        {
+            gpus = gpuDetails.GetSnapshot();
+        }
+        catch (Exception exception) when (exception is IOException
+            or UnauthorizedAccessException
+            or InvalidOperationException)
+        {
+            return Task.FromResult(WindowsActionApplyResult.Skipped(
+                "Não foi possível ler a VRAM da GPU para comparar com a qualidade de textura configurada."));
+        }
+
         var bestVramBytes = gpus.Count == 0 ? (long?)null : gpus.Max(gpu => gpu.VramBytes ?? 0);
         if (bestVramBytes is null or 0)
         {
-            return Task.FromResult(WindowsActionApplyResult.NoChange(
+            return Task.FromResult(WindowsActionApplyResult.Skipped(
                 "Não foi possível ler a VRAM da GPU para comparar com a qualidade de textura configurada."));
         }
 

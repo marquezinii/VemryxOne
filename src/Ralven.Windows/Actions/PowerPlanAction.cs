@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using Ralven.Contracts;
 using Ralven.Core.Catalog;
@@ -64,8 +65,13 @@ public enum PowerPlanActivationOutcome
 {
     Activated,
     AccessDenied,
-    SchemeUnavailable
+    SchemeUnavailable,
+    Failed
 }
+
+public sealed record PciExpressAspmPolicy(int AcPolicy, int DcPolicy);
+
+public sealed record PciExpressAspmState(Guid SchemeId, PciExpressAspmPolicy Policy);
 
 public interface IPowerPlanController
 {
@@ -81,19 +87,32 @@ public interface IPowerPlanController
     /// Null when the setting is not exposed on this machine (some
     /// motherboards/chipsets do not surface it).
     /// </summary>
-    Task<int?> GetPciExpressAspmPolicyAsync(CancellationToken cancellationToken);
+    Task<PciExpressAspmState?> GetPciExpressAspmPolicyAsync(CancellationToken cancellationToken);
 
-    Task<bool> TrySetPciExpressAspmPolicyAsync(int policyValue, CancellationToken cancellationToken);
+    Task SetPciExpressAspmPolicyAsync(
+        Guid schemeId,
+        PciExpressAspmPolicy expectedCurrent,
+        PciExpressAspmPolicy desired,
+        CancellationToken cancellationToken);
 }
 
 public sealed partial class PowerCfgController : IPowerPlanController
 {
     private readonly ICommandRunner commandRunner;
     private readonly string powerCfgPath;
+    private readonly Func<Guid, PciExpressAspmPolicy?> readAspmPolicy;
 
     public PowerCfgController(ICommandRunner commandRunner)
+        : this(commandRunner, ReadAspmPolicy)
+    {
+    }
+
+    internal PowerCfgController(
+        ICommandRunner commandRunner,
+        Func<Guid, PciExpressAspmPolicy?> readAspmPolicy)
     {
         this.commandRunner = commandRunner ?? throw new ArgumentNullException(nameof(commandRunner));
+        this.readAspmPolicy = readAspmPolicy ?? throw new ArgumentNullException(nameof(readAspmPolicy));
         powerCfgPath = Path.GetFullPath(Path.Combine(Environment.SystemDirectory, "powercfg.exe"));
         if (!File.Exists(powerCfgPath))
         {
@@ -139,9 +158,14 @@ public sealed partial class PowerCfgController : IPowerPlanController
             return PowerPlanActivationOutcome.Activated;
         }
 
-        return LooksLikeAccessDenied(result)
-            ? PowerPlanActivationOutcome.AccessDenied
-            : PowerPlanActivationOutcome.SchemeUnavailable;
+        if (LooksLikeAccessDenied(result))
+        {
+            return PowerPlanActivationOutcome.AccessDenied;
+        }
+
+        return result.ExitCode == 2
+            ? PowerPlanActivationOutcome.SchemeUnavailable
+            : PowerPlanActivationOutcome.Failed;
     }
 
     private static bool LooksLikeAccessDenied(CommandResult result)
@@ -176,81 +200,243 @@ public sealed partial class PowerCfgController : IPowerPlanController
     private const string PciExpressSubgroupGuid = "501a4d13-42af-4429-9fd1-a8218c268e20";
     private const string AspmPolicySettingGuid = "ee12f906-d277-404b-b6da-e5fa1a576df5";
 
-    public async Task<int?> GetPciExpressAspmPolicyAsync(CancellationToken cancellationToken)
+    public async Task<PciExpressAspmState?> GetPciExpressAspmPolicyAsync(
+        CancellationToken cancellationToken)
     {
-        try
-        {
-            var activeScheme = await GetActiveSchemeGuidAsync(cancellationToken).ConfigureAwait(false);
-            if (activeScheme is null)
-            {
-                return null;
-            }
-
-            var status = PowerReadACValueIndex(
-                IntPtr.Zero,
-                activeScheme.Value,
-                new Guid(PciExpressSubgroupGuid),
-                new Guid(AspmPolicySettingGuid),
-                out var value);
-
-            return status == 0 ? value : null;
-        }
-        catch (Exception exception) when (exception is DllNotFoundException or EntryPointNotFoundException)
-        {
-            return null;
-        }
+        var activeScheme = await GetActiveSchemeAsync(cancellationToken).ConfigureAwait(false);
+        var policy = readAspmPolicy(activeScheme);
+        return policy is null ? null : new PciExpressAspmState(activeScheme, policy);
     }
 
-    private async Task<Guid?> GetActiveSchemeGuidAsync(CancellationToken cancellationToken)
+    private static PciExpressAspmPolicy? ReadAspmPolicy(Guid activeScheme)
     {
-        try
+        var subgroup = new Guid(PciExpressSubgroupGuid);
+        var setting = new Guid(AspmPolicySettingGuid);
+        var acStatus = PowerReadACValueIndex(
+            IntPtr.Zero,
+            in activeScheme,
+            in subgroup,
+            in setting,
+            out var acValue);
+        var dcStatus = PowerReadDCValueIndex(
+            IntPtr.Zero,
+            in activeScheme,
+            in subgroup,
+            in setting,
+            out var dcValue);
+
+        const int SettingNotFound = 2;
+        if (acStatus != 0 && acStatus != SettingNotFound)
         {
-            return await GetActiveSchemeAsync(cancellationToken).ConfigureAwait(false);
+            throw new Win32Exception(acStatus, "Windows failed while reading the AC PCI Express policy.");
         }
-        catch
+
+        if (dcStatus != 0 && dcStatus != SettingNotFound)
+        {
+            throw new Win32Exception(dcStatus, "Windows failed while reading the DC PCI Express policy.");
+        }
+
+        if (acStatus == SettingNotFound || dcStatus == SettingNotFound)
         {
             return null;
         }
+
+        if (!IsValidAspmPolicy(acValue) || !IsValidAspmPolicy(dcValue))
+        {
+            throw new InvalidDataException("Windows returned an unsupported PCI Express policy value.");
+        }
+
+        return new PciExpressAspmPolicy(acValue, dcValue);
     }
 
     [DllImport("powrprof.dll", ExactSpelling = true)]
     private static extern int PowerReadACValueIndex(
         IntPtr rootPowerKey,
-        Guid schemeGuid,
-        Guid subGroupOfPowerSettings,
-        Guid powerSetting,
+        in Guid schemeGuid,
+        in Guid subGroupOfPowerSettings,
+        in Guid powerSetting,
         out int acValueIndex);
 
-    public async Task<bool> TrySetPciExpressAspmPolicyAsync(int policyValue, CancellationToken cancellationToken)
+    [DllImport("powrprof.dll", ExactSpelling = true)]
+    private static extern int PowerReadDCValueIndex(
+        IntPtr rootPowerKey,
+        in Guid schemeGuid,
+        in Guid subGroupOfPowerSettings,
+        in Guid powerSetting,
+        out int dcValueIndex);
+
+    public async Task SetPciExpressAspmPolicyAsync(
+        Guid schemeId,
+        PciExpressAspmPolicy expectedCurrent,
+        PciExpressAspmPolicy desired,
+        CancellationToken cancellationToken)
     {
-        if (policyValue is < 0 or > 2)
+        ArgumentNullException.ThrowIfNull(expectedCurrent);
+        ArgumentNullException.ThrowIfNull(desired);
+        if (schemeId == Guid.Empty)
         {
-            throw new ArgumentOutOfRangeException(nameof(policyValue));
+            throw new ArgumentException("The power scheme GUID cannot be empty.", nameof(schemeId));
         }
 
-        var indexText = policyValue.ToString(CultureInfo.InvariantCulture);
-        var ac = await commandRunner.RunAsync(
-            powerCfgPath,
-            ["/setacvalueindex", "SCHEME_CURRENT", PciExpressSubgroupGuid, AspmPolicySettingGuid, indexText],
-            TimeSpan.FromSeconds(10),
-            cancellationToken).ConfigureAwait(false);
-        var dc = await commandRunner.RunAsync(
-            powerCfgPath,
-            ["/setdcvalueindex", "SCHEME_CURRENT", PciExpressSubgroupGuid, AspmPolicySettingGuid, indexText],
-            TimeSpan.FromSeconds(10),
-            cancellationToken).ConfigureAwait(false);
-        if (!ac.Succeeded || !dc.Succeeded)
+        ValidateAspmPolicy(expectedCurrent);
+        ValidateAspmPolicy(desired);
+
+        var activeScheme = await GetActiveSchemeAsync(cancellationToken).ConfigureAwait(false);
+        var current = readAspmPolicy(schemeId);
+        if (activeScheme != schemeId || current != expectedCurrent)
         {
-            return false;
+            throw new IOException("The active power scheme or PCI Express policy changed before it could be updated.");
         }
 
+        cancellationToken.ThrowIfCancellationRequested();
+        try
+        {
+            await SetAspmPolicyRawAsync(schemeId, desired, CancellationToken.None).ConfigureAwait(false);
+            var appliedScheme = await GetActiveSchemeAsync(CancellationToken.None).ConfigureAwait(false);
+            var applied = readAspmPolicy(schemeId);
+            if (appliedScheme != schemeId || applied != desired)
+            {
+                throw new IOException("Windows did not apply the requested PCI Express power management values.");
+            }
+        }
+        catch (Exception applyException)
+        {
+            try
+            {
+                await CompensateAspmPolicyAsync(schemeId, expectedCurrent, desired).ConfigureAwait(false);
+            }
+            catch (Exception restoreException)
+            {
+                throw new AggregateException(
+                    "Applying and restoring PCI Express power management both failed.",
+                    applyException,
+                    restoreException);
+            }
+
+            throw;
+        }
+    }
+
+    private async Task SetAspmPolicyRawAsync(
+        Guid schemeId,
+        PciExpressAspmPolicy policy,
+        CancellationToken cancellationToken)
+    {
+        await EnsureActiveSchemeAsync(schemeId, cancellationToken).ConfigureAwait(false);
         var apply = await commandRunner.RunAsync(
             powerCfgPath,
-            ["/S", "SCHEME_CURRENT"],
+            ["/setacvalueindex", schemeId.ToString("D"), PciExpressSubgroupGuid, AspmPolicySettingGuid,
+                policy.AcPolicy.ToString(CultureInfo.InvariantCulture)],
             TimeSpan.FromSeconds(10),
             cancellationToken).ConfigureAwait(false);
-        return apply.Succeeded;
+        if (!apply.Succeeded)
+        {
+            throw new InvalidOperationException("powercfg failed while updating the AC PCI Express policy.");
+        }
+
+        await EnsureActiveSchemeAsync(schemeId, cancellationToken).ConfigureAwait(false);
+        apply = await commandRunner.RunAsync(
+            powerCfgPath,
+            ["/setdcvalueindex", schemeId.ToString("D"), PciExpressSubgroupGuid, AspmPolicySettingGuid,
+                policy.DcPolicy.ToString(CultureInfo.InvariantCulture)],
+            TimeSpan.FromSeconds(10),
+            cancellationToken).ConfigureAwait(false);
+        if (!apply.Succeeded)
+        {
+            throw new InvalidOperationException("powercfg failed while updating the DC PCI Express policy.");
+        }
+
+        await EnsureActiveSchemeAsync(schemeId, cancellationToken).ConfigureAwait(false);
+        apply = await commandRunner.RunAsync(
+            powerCfgPath,
+            ["/S", schemeId.ToString("D")],
+            TimeSpan.FromSeconds(10),
+            cancellationToken).ConfigureAwait(false);
+        if (!apply.Succeeded)
+        {
+            throw new InvalidOperationException("powercfg failed while applying the PCI Express policy.");
+        }
     }
+
+    private async Task CompensateAspmPolicyAsync(
+        Guid schemeId,
+        PciExpressAspmPolicy previous,
+        PciExpressAspmPolicy attempted)
+    {
+        var activeScheme = await GetActiveSchemeAsync(CancellationToken.None).ConfigureAwait(false);
+        var current = readAspmPolicy(schemeId)
+            ?? throw new IOException("The PCI Express policy could not be read before compensation.");
+        var restoreAc = current.AcPolicy == attempted.AcPolicy && current.AcPolicy != previous.AcPolicy;
+        var restoreDc = current.DcPolicy == attempted.DcPolicy && current.DcPolicy != previous.DcPolicy;
+        var acConflict = current.AcPolicy != previous.AcPolicy && !restoreAc;
+        var dcConflict = current.DcPolicy != previous.DcPolicy && !restoreDc;
+
+        if (restoreAc)
+        {
+            await SetAspmValueAsync("/setacvalueindex", schemeId, previous.AcPolicy).ConfigureAwait(false);
+        }
+
+        if (restoreDc)
+        {
+            await SetAspmValueAsync("/setdcvalueindex", schemeId, previous.DcPolicy).ConfigureAwait(false);
+        }
+
+        if ((restoreAc || restoreDc) && activeScheme == schemeId)
+        {
+            await ApplySchemeAsync(schemeId).ConfigureAwait(false);
+        }
+
+        var restored = readAspmPolicy(schemeId);
+        if (acConflict || dcConflict || restored != previous)
+        {
+            throw new IOException("PCI Express power management changed concurrently; compensation preserved newer values.");
+        }
+    }
+
+    private async Task EnsureActiveSchemeAsync(Guid expected, CancellationToken cancellationToken)
+    {
+        if (await GetActiveSchemeAsync(cancellationToken).ConfigureAwait(false) != expected)
+        {
+            throw new IOException("The active power scheme changed during the PCI Express update.");
+        }
+    }
+
+    private async Task SetAspmValueAsync(string operation, Guid schemeId, int value)
+    {
+        var result = await commandRunner.RunAsync(
+            powerCfgPath,
+            [operation, schemeId.ToString("D"), PciExpressSubgroupGuid, AspmPolicySettingGuid,
+                value.ToString(CultureInfo.InvariantCulture)],
+            TimeSpan.FromSeconds(10),
+            CancellationToken.None).ConfigureAwait(false);
+        if (!result.Succeeded)
+        {
+            throw new InvalidOperationException("powercfg failed while compensating the PCI Express policy.");
+        }
+    }
+
+    private async Task ApplySchemeAsync(Guid schemeId)
+    {
+        var result = await commandRunner.RunAsync(
+            powerCfgPath,
+            ["/S", schemeId.ToString("D")],
+            TimeSpan.FromSeconds(10),
+            CancellationToken.None).ConfigureAwait(false);
+        if (!result.Succeeded)
+        {
+            throw new InvalidOperationException("powercfg failed while applying the compensated PCI Express policy.");
+        }
+    }
+
+    private static void ValidateAspmPolicy(PciExpressAspmPolicy policy)
+    {
+        if (!IsValidAspmPolicy(policy.AcPolicy) || !IsValidAspmPolicy(policy.DcPolicy))
+        {
+            throw new ArgumentOutOfRangeException(nameof(policy));
+        }
+    }
+
+    private static bool IsValidAspmPolicy(int value) => value is >= 0 and <= 2;
 
     [GeneratedRegex(
         @"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}",
@@ -280,12 +466,28 @@ public sealed class SessionPerformancePowerPlanAction : WindowsOptimizationActio
     {
         if (!powerStatus.IsOnAcPower())
         {
-            return WindowsActionApplyResult.NoChange(
+            return WindowsActionApplyResult.Skipped(
                 "O modo de alto desempenho não foi ativado porque o computador está na bateria.");
         }
 
         var previous = await controller.GetActiveSchemeAsync(cancellationToken).ConfigureAwait(false);
-        var outcome = await controller.TryActivatePerformanceSchemeAsync(cancellationToken).ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
+        PowerPlanActivationOutcome outcome;
+        try
+        {
+            outcome = await controller.TryActivatePerformanceSchemeAsync(CancellationToken.None).ConfigureAwait(false);
+        }
+        catch (Exception applyException)
+        {
+            await CompensateFailedActivationAsync(previous, applyException).ConfigureAwait(false);
+            throw;
+        }
+
+        if (outcome != PowerPlanActivationOutcome.Activated)
+        {
+            await CompensateFailedActivationAsync(previous, applyException: null).ConfigureAwait(false);
+        }
+
         if (outcome == PowerPlanActivationOutcome.AccessDenied)
         {
             // Muitas configurações do Windows permitem que um usuário comum
@@ -301,19 +503,34 @@ public sealed class SessionPerformancePowerPlanAction : WindowsOptimizationActio
 
         if (outcome == PowerPlanActivationOutcome.SchemeUnavailable)
         {
-            return WindowsActionApplyResult.NoChange(
+            return WindowsActionApplyResult.Skipped(
                 "Este computador não expõe um plano de alto desempenho compatível.");
+        }
+
+        if (outcome == PowerPlanActivationOutcome.Failed)
+        {
+            throw new InvalidOperationException("Windows failed while activating the performance power plan.");
         }
 
         Guid applied;
         try
         {
-            applied = await controller.GetActiveSchemeAsync(cancellationToken).ConfigureAwait(false);
+            applied = await controller.GetActiveSchemeAsync(CancellationToken.None).ConfigureAwait(false);
         }
-        catch
+        catch (Exception applyException)
         {
-            await controller.ActivateSchemeAsync(previous, CancellationToken.None)
-                .ConfigureAwait(false);
+            try
+            {
+                await RestoreSchemeAndVerifyAsync(previous).ConfigureAwait(false);
+            }
+            catch (Exception restoreException)
+            {
+                throw new AggregateException(
+                    "Applying and restoring the performance power plan both failed.",
+                    applyException,
+                    restoreException);
+            }
+
             throw;
         }
 
@@ -339,6 +556,13 @@ public sealed class SessionPerformancePowerPlanAction : WindowsOptimizationActio
         }
 
         var snapshot = WindowsActionSnapshot.Deserialize<PowerPlanSnapshot>(snapshotJson);
+        if (snapshot.PreviousScheme == Guid.Empty
+            || snapshot.AppliedScheme == Guid.Empty
+            || snapshot.PreviousScheme == snapshot.AppliedScheme)
+        {
+            throw new InvalidDataException("The power plan snapshot contains unsupported values.");
+        }
+
         var current = await controller.GetActiveSchemeAsync(cancellationToken).ConfigureAwait(false);
         if (current != snapshot.AppliedScheme)
         {
@@ -346,12 +570,52 @@ public sealed class SessionPerformancePowerPlanAction : WindowsOptimizationActio
                 "O plano de energia mudou depois da otimização; o rollback preservou a escolha mais recente.");
         }
 
-        await controller.ActivateSchemeAsync(snapshot.PreviousScheme, cancellationToken)
+        cancellationToken.ThrowIfCancellationRequested();
+        await controller.ActivateSchemeAsync(snapshot.PreviousScheme, CancellationToken.None)
             .ConfigureAwait(false);
+        var restored = await controller.GetActiveSchemeAsync(CancellationToken.None).ConfigureAwait(false);
+        if (restored != snapshot.PreviousScheme)
+        {
+            throw new IOException("Windows did not restore the previous power plan.");
+        }
+    }
+
+    private async Task RestoreSchemeAndVerifyAsync(Guid scheme)
+    {
+        await controller.ActivateSchemeAsync(scheme, CancellationToken.None).ConfigureAwait(false);
+        var restored = await controller.GetActiveSchemeAsync(CancellationToken.None).ConfigureAwait(false);
+        if (restored != scheme)
+        {
+            throw new IOException("Windows did not restore the previous power plan after apply failed.");
+        }
+    }
+
+    private async Task CompensateFailedActivationAsync(Guid previous, Exception? applyException)
+    {
+        try
+        {
+            var current = await controller.GetActiveSchemeAsync(CancellationToken.None).ConfigureAwait(false);
+            if (current != previous)
+            {
+                await RestoreSchemeAndVerifyAsync(previous).ConfigureAwait(false);
+            }
+        }
+        catch (Exception restoreException)
+        {
+            throw applyException is null
+                ? new AggregateException("The failed power-plan activation could not be compensated.", restoreException)
+                : new AggregateException(
+                    "Applying and restoring the performance power plan both failed.",
+                    applyException,
+                    restoreException);
+        }
     }
 }
 
-internal sealed record PciExpressAspmSnapshot(int PreviousPolicy);
+internal sealed record PciExpressAspmSnapshot(
+    Guid SchemeId,
+    PciExpressAspmPolicy Previous,
+    PciExpressAspmPolicy Applied);
 
 /// <summary>
 /// Sets PCI Express Link State Power Management (ASPM) on the active power
@@ -364,7 +628,7 @@ internal sealed record PciExpressAspmSnapshot(int PreviousPolicy);
 /// </summary>
 public sealed class PciExpressPowerManagementAction : WindowsOptimizationAction
 {
-    private const int OffPolicy = 0;
+    private static readonly PciExpressAspmPolicy OffPolicy = new(0, 0);
 
     private readonly IPowerPlanController controller;
 
@@ -383,24 +647,25 @@ public sealed class PciExpressPowerManagementAction : WindowsOptimizationAction
         var previous = await controller.GetPciExpressAspmPolicyAsync(cancellationToken).ConfigureAwait(false);
         if (previous is null)
         {
-            return WindowsActionApplyResult.NoChange(
+            return WindowsActionApplyResult.Skipped(
                 "Este computador não expõe a configuração de PCI Express Link State Power Management.");
         }
 
-        if (previous == OffPolicy)
+        if (previous.Policy == OffPolicy)
         {
             return WindowsActionApplyResult.NoChange(
                 "PCI Express Link State Power Management já estava desativado (Off).");
         }
 
-        if (!await controller.TrySetPciExpressAspmPolicyAsync(OffPolicy, cancellationToken).ConfigureAwait(false))
-        {
-            return WindowsActionApplyResult.NoChange(
-                "Não foi possível alterar o PCI Express Link State Power Management neste computador.");
-        }
+        await controller.SetPciExpressAspmPolicyAsync(
+                previous.SchemeId,
+                previous.Policy,
+                OffPolicy,
+                cancellationToken)
+            .ConfigureAwait(false);
 
         return WindowsActionApplyResult.ChangedWith(
-            new PciExpressAspmSnapshot(previous.Value),
+            new PciExpressAspmSnapshot(previous.SchemeId, previous.Policy, OffPolicy),
             "PCI Express Link State Power Management definido como Off; o valor anterior foi salvo para rollback.");
     }
 
@@ -409,15 +674,42 @@ public sealed class PciExpressPowerManagementAction : WindowsOptimizationAction
         string? snapshotJson,
         CancellationToken cancellationToken)
     {
-        var snapshot = WindowsActionSnapshot.Deserialize<PciExpressAspmSnapshot>(snapshotJson);
-        // Uma falha de restauração precisa ser visível ao engine (que registra
-        // o RollbackFailed no journal), não engolida: sem isso o histórico
-        // reporta um rollback concluído que na verdade não restaurou nada.
-        if (!await controller.TrySetPciExpressAspmPolicyAsync(snapshot.PreviousPolicy, cancellationToken)
-                .ConfigureAwait(false))
+        PciExpressAspmSnapshot snapshot;
+        try
         {
-            throw new InvalidOperationException(
-                "Não foi possível restaurar o PCI Express Link State Power Management para o valor anterior.");
+            snapshot = WindowsActionSnapshot.Deserialize<PciExpressAspmSnapshot>(snapshotJson);
         }
+        catch (JsonException exception)
+        {
+            throw new InvalidDataException(
+                "The PCI Express snapshot does not prove the exact scheme and both AC/DC policies; rollback was refused.",
+                exception);
+        }
+        if (snapshot.SchemeId == Guid.Empty
+            || snapshot.Previous is null
+            || snapshot.Applied != OffPolicy
+            || snapshot.Previous == snapshot.Applied
+            || !IsValidPolicy(snapshot.Previous))
+        {
+            throw new InvalidDataException("The PCI Express power management snapshot is outside the action allowlist.");
+        }
+
+        var current = await controller.GetPciExpressAspmPolicyAsync(cancellationToken).ConfigureAwait(false);
+        if (current is null || current.SchemeId != snapshot.SchemeId || current.Policy != snapshot.Applied)
+        {
+            throw new IOException(
+                "PCI Express power management changed after optimization; rollback refused to overwrite newer settings.");
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+        await controller.SetPciExpressAspmPolicyAsync(
+                snapshot.SchemeId,
+                snapshot.Applied,
+                snapshot.Previous,
+                CancellationToken.None)
+            .ConfigureAwait(false);
     }
+
+    private static bool IsValidPolicy(PciExpressAspmPolicy policy) =>
+        policy.AcPolicy is >= 0 and <= 2 && policy.DcPolicy is >= 0 and <= 2;
 }

@@ -17,7 +17,7 @@ public sealed partial class ActionCatalog
                 ActionReversibility.FullyReversible,
                 RequiredPrivilege.StandardUser,
                 AllProfiles,
-                requiresFiveMStopped: false,
+                requiresFiveMStopped: true,
                 progressWeight: 5,
                 expectedImpact: "Pode melhorar a consistência da sessão em sistemas compatíveis.",
                 ActionOptionGate.EnableGameMode,
@@ -52,7 +52,7 @@ public sealed partial class ActionCatalog
                 ActionReversibility.FullyReversible,
                 RequiredPrivilege.StandardUser,
                 BalancedAndAggressive,
-                requiresFiveMStopped: false,
+                requiresFiveMStopped: true,
                 progressWeight: 4,
                 expectedImpact: "Reduz atividade de captura quando ela estava habilitada.",
                 ActionOptionGate.DisableBackgroundCapture,
@@ -82,7 +82,7 @@ public sealed partial class ActionCatalog
             Define(
                 OptimizationActionIds.AdjustPciExpressPowerManagement,
                 "Ajustar PCI Express Link State Power Management",
-                "Desativa o gerenciamento de energia de link do PCI Express (ASPM) no plano de energia ativo, reduzindo picos de latência em troca de um consumo levemente maior.",
+                "Desativa a economia de energia dos links PCI Express (ASPM) no plano ativo. Isso evita transições de economia do link, mas o efeito perceptível depende do hardware e o consumo pode aumentar.",
                 ActionCategory.Power,
                 ActionRisk.Low,
                 ActionReversibility.FullyReversible,
@@ -90,12 +90,13 @@ public sealed partial class ActionCatalog
                 BalancedAndAggressive,
                 requiresFiveMStopped: false,
                 progressWeight: 3,
-                expectedImpact: "Reduz picos de latência de link do PCI Express (armazenamento/rede/GPU); aumenta levemente o consumo de energia.",
+                expectedImpact: "Evita transições de economia de energia dos links PCI Express; o ganho perceptível depende do hardware e o consumo pode aumentar.",
                 ActionOptionGate.AdjustPciExpressPowerManagement,
-                detectionSummary: "Lê o índice atual da configuração ASPM (`powercfg /Q`) do plano de energia ativo.",
-                confirmationSummary: "Confirma que o valor foi definido como Off (0) no plano ativo.",
-                undoSummary: "Totalmente reversível: o valor anterior é restaurado no rollback via powercfg.",
-                riskLimitations: "Nem todo chipset/placa-mãe expõe essa configuração; quando ausente, a ação não altera nada. A leitura do valor atual depende do texto de saída do `powercfg /Q`, que varia por idioma do Windows -- em builds não testadas nesse idioma, a ação pode não conseguir ler o valor e simplesmente não fará nada.")
+                detectionSummary: "Lê os índices AC e DC da configuração ASPM do plano ativo pelas APIs nativas PowerReadACValueIndex e PowerReadDCValueIndex.",
+                confirmationSummary: "Relê AC e DC e confirma Off (0) depois de reativar o plano.",
+                undoSummary: "Totalmente reversível: restaura e confirma separadamente os valores AC e DC anteriores.",
+                riskLimitations: "Nem todo hardware expõe essa configuração; nesse caso a ação é ignorada. Pode aumentar consumo e temperatura, e não há garantia de ganho perceptível em todo computador.",
+                version: 2)
         ];
     }
 

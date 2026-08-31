@@ -35,6 +35,7 @@ internal sealed class WindowsAdministratorRuntimeAdapter
             TransactionId = validatedPlan.Plan.PlanId,
             StartedAtUtc = DateTimeOffset.UtcNow,
             IsElevated = true,
+            Profile = validatedPlan.Plan.Profile,
             Progress = new InlineProgress<WindowsActionProgress>(progress =>
                 events.Publish(
                     BrokerEventKind.Progress,

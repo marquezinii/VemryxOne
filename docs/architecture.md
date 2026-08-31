@@ -450,7 +450,9 @@ importante para o roadmap**: `windows.power.pcie-aspm.adjust`
 (`PciExpressPowerManagementAction`, Médio/Agressivo) e
 `windows.gaming.mouse-polling-rate.guide` (`MousePollingRateGuidanceAction`,
 todos os perfis) foram implementados por caberem no modelo transacional
-atual (ajuste único, reversível, sem depender de vigilância contínua). O
+atual (ajuste único, reversível, sem depender de vigilância contínua). O ASPM
+lê AC/DC pelas APIs nativas, aplica ambos com compensação e só confirma depois
+de reler a pós-condição; sua documentação não promete ganho universal. O
 monitor local descrito acima agora observa início e fim de sessões em modo
 somente leitura, mas não persiste estado nem permanece ativo após o Ralven
 fechar. A maior parte do lote pedido nessa rodada — plano de energia próprio

@@ -434,7 +434,9 @@ public sealed class WindowsOptimizationActionFactory
                 environment.FiveMAppRoot,
                 environment.FiveMInstallationRoot,
                 RosIdPath,
+                Path.GetDirectoryName(environment.LegacyGraphicsSettingsPath)!,
                 DigitalEntitlementsRoot,
+                Path.GetDirectoryName(environment.UserTemporaryDirectory)!,
                 AuthQuarantineRoot,
                 dependencies.ProcessInspector),
             OptimizationActionIds.CleanUserTemporaryFiles => new UserTemporaryFilesCleanupAction(
@@ -797,7 +799,7 @@ public sealed class WindowsOptimizationRuntime
     {
         return Engine.ExecuteAsync(
             ResolveActions(plan),
-            context,
+            context with { Profile = plan.Profile },
             options,
             cancellationToken);
     }

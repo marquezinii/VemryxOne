@@ -111,6 +111,8 @@ public sealed partial class MainViewModel
         ? localization.GetString(diagnosticFailed
             ? "Plan.Empty.DiagnosticUnavailable"
             : "Plan.Empty.DiagnosticInProgress")
+        : currentPlan?.Blocks.Any(block => block.Code == PlanBlockCode.EnhancedNotSupported) == true
+            ? localization.GetString("Diagnosis.EnhancedUnsupported")
         : IsGeneralWindowsOptimization
             ? localization.GetString("Plan.Empty.GeneralNoSafeActions")
             : diagnostic.Edition == FiveMEdition.Legacy

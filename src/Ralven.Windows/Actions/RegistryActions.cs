@@ -92,19 +92,38 @@ public abstract class AllowlistedRegistryAction : WindowsOptimizationAction
                 }
 
                 ValidateMutationSafety(context);
-                Registry.Write(mutation.Address, desired);
-                applied.Add(new RegistryMutationSnapshotEntry(
+                var snapshotEntry = new RegistryMutationSnapshotEntry(
                     mutation.Address,
                     previous,
-                    desired));
+                    desired);
+                // Record before writing: a registry provider may mutate the value and
+                // still throw, in which case immediate recovery must know what to restore.
+                applied.Add(snapshotEntry);
+                Registry.Write(mutation.Address, desired);
+                if (!Equivalent(Registry.Read(mutation.Address), desired))
+                {
+                    throw new IOException(
+                        "O Windows não confirmou a configuração de registro solicitada.");
+                }
             }
         }
-        catch
+        catch (Exception applyException)
         {
-            RestoreEntries(
-                applied,
-                requireAppliedValue: false,
-                context with { IsImmediateFailureRecovery = true });
+            try
+            {
+                RestoreEntries(
+                    applied,
+                    requireAppliedValue: false,
+                    context with { IsImmediateFailureRecovery = true });
+            }
+            catch (Exception recoveryException)
+            {
+                throw new AggregateException(
+                    "A alteração de registro falhou e o estado anterior não pôde ser confirmado.",
+                    applyException,
+                    recoveryException);
+            }
+
             throw;
         }
 
@@ -167,36 +186,119 @@ public abstract class AllowlistedRegistryAction : WindowsOptimizationAction
         bool requireAppliedValue,
         WindowsActionContext context)
     {
-        var conflicts = new List<RegistryAddress>();
-        foreach (var entry in entries.Reverse())
+        var orderedEntries = entries.Reverse().ToArray();
+        if (requireAppliedValue)
         {
-            if (requireAppliedValue)
+            var conflicts = orderedEntries
+                .Where(entry => !Equivalent(Registry.Read(entry.Address), entry.AppliedValue))
+                .Select(entry => entry.Address)
+                .ToArray();
+            if (conflicts.Length > 0)
             {
+                throw new IOException(
+                    $"Rollback recusou sobrescrever {conflicts.Length} valor(es) de registro alterado(s) depois da otimização.");
+            }
+        }
+
+        var failures = new List<Exception>();
+        var restorationAttempts = new List<RegistryMutationSnapshotEntry>();
+        foreach (var entry in orderedEntries)
+        {
+            try
+            {
+                ValidateMutationSafety(context);
                 var current = Registry.Read(entry.Address);
-                if (!Equivalent(current, entry.AppliedValue))
+                if (!requireAppliedValue && Equivalent(current, entry.PreviousValue))
                 {
-                    conflicts.Add(entry.Address);
                     continue;
                 }
-            }
 
-            if (entry.PreviousValue.Exists)
-            {
-                ValidateMutationSafety(context);
-                Registry.Write(entry.Address, entry.PreviousValue);
+                if (!Equivalent(current, entry.AppliedValue))
+                {
+                    throw new IOException(
+                        $"A restauração recusou sobrescrever '{entry.Address.ValueName}' porque o valor mudou depois da tentativa de aplicação.");
+                }
+
+                if (requireAppliedValue)
+                {
+                    restorationAttempts.Add(entry);
+                }
+
+                if (entry.PreviousValue.Exists)
+                {
+                    Registry.Write(entry.Address, entry.PreviousValue);
+                }
+                else
+                {
+                    Registry.Delete(entry.Address);
+                }
+
+                if (!Equivalent(Registry.Read(entry.Address), entry.PreviousValue))
+                {
+                    throw new IOException(
+                        $"O Windows não confirmou a restauração de '{entry.Address.ValueName}'.");
+                }
             }
-            else
+            catch (Exception exception)
             {
-                ValidateMutationSafety(context);
-                Registry.Delete(entry.Address);
+                failures.Add(exception);
+                if (requireAppliedValue)
+                {
+                    failures.AddRange(CompensateRestoredEntries(restorationAttempts, context));
+                    break;
+                }
             }
         }
 
-        if (conflicts.Count > 0)
+        if (failures.Count == 1)
         {
-            throw new IOException(
-                $"Rollback recusou sobrescrever {conflicts.Count} valor(es) de registro alterado(s) depois da otimização.");
+            throw failures[0];
         }
+
+        if (failures.Count > 1)
+        {
+            throw new AggregateException(
+                "Uma ou mais configurações de registro não puderam ser restauradas.",
+                failures);
+        }
+    }
+
+    private IReadOnlyList<Exception> CompensateRestoredEntries(
+        IEnumerable<RegistryMutationSnapshotEntry> restoredEntries,
+        WindowsActionContext context)
+    {
+        var failures = new List<Exception>();
+        foreach (var entry in restoredEntries.Reverse())
+        {
+            try
+            {
+                ValidateMutationSafety(context with { IsImmediateFailureRecovery = true });
+                var current = Registry.Read(entry.Address);
+                if (Equivalent(current, entry.AppliedValue))
+                {
+                    continue;
+                }
+
+                if (!Equivalent(current, entry.PreviousValue))
+                {
+                    throw new IOException(
+                        $"A compensação recusou sobrescrever '{entry.Address.ValueName}' porque o valor mudou durante o rollback.");
+                }
+
+                Registry.Write(entry.Address, entry.AppliedValue);
+                if (!Equivalent(Registry.Read(entry.Address), entry.AppliedValue))
+                {
+                    throw new IOException(
+                        $"O Windows não confirmou a compensação de '{entry.Address.ValueName}'.");
+                }
+            }
+            catch (Exception exception)
+            {
+                failures.Add(exception);
+            }
+        }
+
+        return failures;
     }
 
     protected static bool Equivalent(RegistryValueState left, RegistryValueState right)
@@ -207,6 +309,13 @@ public abstract class AllowlistedRegistryAction : WindowsOptimizationAction
             && left.NumericValue == right.NumericValue
             && string.Equals(left.BinaryBase64Value, right.BinaryBase64Value, StringComparison.Ordinal)
             && SequenceEqual(left.MultiStringValue, right.MultiStringValue);
+    }
+
+    protected static bool IsMissingOrDwordBoolean(RegistryValueState value)
+    {
+        return !value.Exists
+            || (value.Kind == RegistryValueKind.DWord
+                && value.NumericValue is 0 or 1);
     }
 
     private static bool SequenceEqual(
@@ -273,6 +382,20 @@ public sealed class GameModeRegistryAction : AllowlistedRegistryAction
             EnsureFiveMStopped(processInspector, installationRoot);
         }
     }
+
+    protected override bool IsAllowedRollbackEntry(
+        RegistryAddress address,
+        RegistryValueState previousValue,
+        RegistryValueState appliedValue,
+        IReadOnlyList<RegistryMutation> currentMutations)
+    {
+        return IsMissingOrDwordBoolean(previousValue)
+            && base.IsAllowedRollbackEntry(
+                address,
+                previousValue,
+                appliedValue,
+                currentMutations);
+    }
 }
 
 public sealed class GameDvrRegistryAction : AllowlistedRegistryAction
@@ -327,6 +450,20 @@ public sealed class GameDvrRegistryAction : AllowlistedRegistryAction
         {
             EnsureFiveMStopped(processInspector, installationRoot);
         }
+    }
+
+    protected override bool IsAllowedRollbackEntry(
+        RegistryAddress address,
+        RegistryValueState previousValue,
+        RegistryValueState appliedValue,
+        IReadOnlyList<RegistryMutation> currentMutations)
+    {
+        return IsMissingOrDwordBoolean(previousValue)
+            && base.IsAllowedRollbackEntry(
+                address,
+                previousValue,
+                appliedValue,
+                currentMutations);
     }
 }
 
@@ -627,6 +764,38 @@ public sealed class HagsToggleAction : AllowlistedRegistryAction
         var flipped = current == EnabledValue ? DisabledValue : EnabledValue;
         return RegistryValueState.FromDword((int)flipped);
     }
+
+    protected override void ValidateCurrentValueForApply(
+        RegistryMutation mutation,
+        RegistryValueState currentValue)
+    {
+        if (!IsSupportedState(currentValue))
+        {
+            throw new InvalidDataException(
+                "HAGS has an unsupported registry value and will not be overwritten.");
+        }
+    }
+
+    protected override bool IsAllowedRollbackEntry(
+        RegistryAddress address,
+        RegistryValueState previousValue,
+        RegistryValueState appliedValue,
+        IReadOnlyList<RegistryMutation> currentMutations)
+    {
+        return IsSupportedState(previousValue)
+            && base.IsAllowedRollbackEntry(
+                address,
+                previousValue,
+                appliedValue,
+                currentMutations);
+    }
+
+    private static bool IsSupportedState(RegistryValueState value)
+    {
+        return !value.Exists
+            || (value.Kind == RegistryValueKind.DWord
+                && value.NumericValue is DisabledValue or EnabledValue);
+    }
 }
 
 /// <summary>
@@ -702,7 +871,9 @@ public sealed class FullscreenOptimizationsRegistryAction : AllowlistedRegistryA
         }
 
         if (current.Kind != RegistryValueKind.String
-            || string.IsNullOrWhiteSpace(current.StringValue)
+            || current.StringValue is null
+            || (current.StringValue.Length > 0
+                && string.IsNullOrWhiteSpace(current.StringValue))
             || current.StringValue.IndexOfAny(['\r', '\n']) >= 0)
         {
             return null;

@@ -426,7 +426,7 @@ public sealed class PlanBuilderTests
         Assert.All(plan.Actions, action =>
             Assert.True(ActionCatalog.Current.GetRequired(action.Metadata.Id)
                 .Supports(OptimizationScope.GeneralWindows)));
-        Assert.DoesNotContain(OptimizationActionIds.VerifyFiveMIsStopped, Ids(plan));
+        Assert.Contains(OptimizationActionIds.VerifyFiveMIsStopped, Ids(plan));
         Assert.DoesNotContain(OptimizationActionIds.RepairLegacyServerCache, Ids(plan));
         Assert.DoesNotContain(OptimizationActionIds.ApplyAggressiveLegacyGraphics, Ids(plan));
         Assert.DoesNotContain(OptimizationActionIds.ApplyAggressiveGtaVGraphics, Ids(plan));

@@ -11,7 +11,7 @@ public sealed class ActionCatalogTests
     {
         var catalog = ActionCatalog.Current;
 
-        Assert.Equal(17, ActionCatalog.CurrentVersion);
+        Assert.Equal(18, ActionCatalog.CurrentVersion);
         Assert.NotEmpty(catalog.Actions);
 
         Assert.All(catalog.Actions, action =>
@@ -51,6 +51,7 @@ public sealed class ActionCatalogTests
 
         var expected = new[]
         {
+            OptimizationActionIds.VerifyFiveMIsStopped,
             OptimizationActionIds.DiagnoseBottleneck,
             OptimizationActionIds.DetectOverlaysAndCaptureSoftware,
             OptimizationActionIds.DiagnoseNetworkHealth,

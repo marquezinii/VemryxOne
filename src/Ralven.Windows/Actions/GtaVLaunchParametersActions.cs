@@ -1,5 +1,7 @@
 using System.Globalization;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using Ralven.Contracts;
 using Ralven.Core.Catalog;
 using Ralven.Windows.Infrastructure;
@@ -24,6 +26,26 @@ internal static class GtaVCommandLineFile
     public static IReadOnlyList<string> ReadLines(string path)
     {
         return File.Exists(path) ? File.ReadAllLines(path) : [];
+    }
+
+    public static (IReadOnlyList<string> Lines, string Sha256) ReadLinesWithHash(string path)
+    {
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        using var buffer = new MemoryStream();
+        stream.CopyTo(buffer);
+        var bytes = buffer.ToArray();
+        buffer.Position = 0;
+        using var reader = new StreamReader(
+            buffer,
+            new UTF8Encoding(encoderShouldEmitUTF8Identifier: false),
+            detectEncodingFromByteOrderMarks: true);
+        var lines = new List<string>();
+        while (reader.ReadLine() is { } line)
+        {
+            lines.Add(line);
+        }
+
+        return (lines, Convert.ToHexString(SHA256.HashData(bytes)));
     }
 
     public static string? FlagToken(string line)
@@ -70,15 +92,83 @@ internal static class GtaVCommandLineFile
         return (kept.Concat(desiredManagedLines).ToArray(), changedFlags);
     }
 
-    public static void WriteAtomically(string path, IReadOnlyList<string> lines)
+    public static string WriteAtomically(
+        string path,
+        IReadOnlyList<string> lines,
+        bool originalExisted,
+        string? expectedOriginalSha256)
     {
         var directory = Path.GetDirectoryName(path)!;
+        SafePath.EnsureNoReparsePoints(directory);
         Directory.CreateDirectory(directory);
-        var temporaryPath = Path.Combine(directory, $".{Path.GetFileName(path)}.{Guid.NewGuid():N}.tmp");
+        var token = Guid.NewGuid().ToString("N");
+        var temporaryPath = Path.Combine(directory, $".{Path.GetFileName(path)}.{token}.tmp");
+        var displacedPath = Path.Combine(directory, $".{Path.GetFileName(path)}.{token}.apply-displaced");
         File.WriteAllLines(temporaryPath, lines, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+        var appliedSha256 = SafeXmlDocumentStore.ComputeSha256(temporaryPath);
+        var preserveDisplaced = false;
         try
         {
-            File.Move(temporaryPath, path, overwrite: true);
+            // Revalidate immediately around the atomic exchange. Verifying the
+            // displaced file closes the remaining TOCTOU window.
+            SafePath.EnsureNoReparsePoints(path);
+            if (originalExisted)
+            {
+                if (string.IsNullOrWhiteSpace(expectedOriginalSha256)
+                    || !File.Exists(path)
+                    || !SafeXmlDocumentStore.ComputeSha256(path).Equals(
+                        expectedOriginalSha256,
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new IOException(
+                        "GTA V commandline.txt changed before optimization; the newer state was preserved.");
+                }
+
+                SafeXmlDocumentStore.ReplaceAndVerifyDisplacedOriginal(
+                    temporaryPath,
+                    path,
+                    displacedPath,
+                    expectedOriginalSha256,
+                    "GTA V commandline.txt changed before optimization; the newer state was preserved.");
+            }
+            else
+            {
+                File.Move(temporaryPath, path, overwrite: false);
+            }
+
+            try
+            {
+                EnsureExpectedContents(path, lines);
+            }
+            catch (Exception validationError) when (validationError is IOException
+                or UnauthorizedAccessException)
+            {
+                try
+                {
+                    CompensateFailedApply(
+                        path,
+                        originalExisted,
+                        displacedPath,
+                        appliedSha256);
+                }
+                catch (Exception compensationError) when (compensationError is IOException
+                    or UnauthorizedAccessException)
+                {
+                    preserveDisplaced = File.Exists(displacedPath);
+                    throw new IOException(
+                        "GTA V commandline.txt failed postcondition and could not be restored safely.",
+                        new AggregateException(validationError, compensationError));
+                }
+
+                throw;
+            }
+
+            if (File.Exists(displacedPath))
+            {
+                File.Delete(displacedPath);
+            }
+
+            return appliedSha256;
         }
         finally
         {
@@ -86,13 +176,119 @@ internal static class GtaVCommandLineFile
             {
                 File.Delete(temporaryPath);
             }
+
+            if (!preserveDisplaced && File.Exists(displacedPath))
+            {
+                File.Delete(displacedPath);
+            }
+        }
+    }
+
+    internal static void CompensateFailedApply(
+        string path,
+        bool originalExisted,
+        string displacedPath,
+        string appliedSha256)
+    {
+        if (!File.Exists(path)
+            || !SafeXmlDocumentStore.ComputeSha256(path).Equals(
+                appliedSha256,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            throw new IOException(
+                "GTA V commandline.txt changed after optimization; the newer state was preserved.");
+        }
+
+        if (originalExisted)
+        {
+            if (!File.Exists(displacedPath))
+            {
+                throw new IOException("The original GTA V commandline.txt is unavailable for compensation.");
+            }
+
+            File.Replace(displacedPath, path, null, ignoreMetadataErrors: true);
+        }
+        else
+        {
+            File.Delete(path);
+        }
+    }
+
+    public static void EnsureExpectedContents(string path, IReadOnlyList<string> expectedLines)
+    {
+        if (!File.Exists(path)
+            || !File.ReadAllLines(path).SequenceEqual(expectedLines, StringComparer.Ordinal))
+        {
+            throw new IOException("Windows did not persist the requested GTA V commandline parameters.");
+        }
+    }
+
+    public static void RestoreAtomically(
+        string path,
+        bool originalExisted,
+        IReadOnlyList<string> originalLines,
+        string expectedCurrentSha256)
+    {
+        SafePath.EnsureNoReparsePoints(path);
+        if (!File.Exists(path))
+        {
+            throw new IOException(
+                "GTA V commandline.txt changed after optimization; rollback preserved the newer state.");
+        }
+
+        var directory = Path.GetDirectoryName(path)!;
+        var token = Guid.NewGuid().ToString("N");
+        var displacedPath = Path.Combine(directory, $".{Path.GetFileName(path)}.{token}.rollback-displaced");
+        if (!originalExisted)
+        {
+            File.Move(path, displacedPath, overwrite: false);
+            if (SafeXmlDocumentStore.ComputeSha256(displacedPath).Equals(
+                    expectedCurrentSha256,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                File.Delete(displacedPath);
+                return;
+            }
+
+            if (!File.Exists(path))
+            {
+                File.Move(displacedPath, path, overwrite: false);
+            }
+
+            throw new IOException(
+                "GTA V commandline.txt changed after optimization; rollback preserved the newer state.");
+        }
+
+        var replacementPath = Path.Combine(directory, $".{Path.GetFileName(path)}.{token}.rollback.tmp");
+        File.WriteAllLines(
+            replacementPath,
+            originalLines,
+            new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+        try
+        {
+            SafeXmlDocumentStore.ReplaceAndVerifyDisplacedOriginal(
+                replacementPath,
+                path,
+                displacedPath,
+                expectedCurrentSha256,
+                "GTA V commandline.txt changed after optimization; rollback preserved the newer state.");
+            File.Delete(displacedPath);
+            EnsureExpectedContents(path, originalLines);
+        }
+        finally
+        {
+            if (File.Exists(replacementPath))
+            {
+                File.Delete(replacementPath);
+            }
         }
     }
 }
 
 internal sealed record CommandLineSnapshot(
-    string SettingsPath,
+    bool OriginalExisted,
     IReadOnlyList<string> OriginalLines,
+    string AppliedSha256,
     IReadOnlyList<string> ChangedFlags);
 
 public sealed class GtaVLaunchParametersDiagnosisAction : WindowsOptimizationAction
@@ -117,13 +313,13 @@ public sealed class GtaVLaunchParametersDiagnosisAction : WindowsOptimizationAct
         cancellationToken.ThrowIfCancellationRequested();
         if (commandLinePath is null)
         {
-            return Task.FromResult(WindowsActionApplyResult.NoChange(
+            return Task.FromResult(WindowsActionApplyResult.Skipped(
                 "A instalação do GTA V Legacy standalone não foi confirmada; nada para diagnosticar."));
         }
 
         if (!File.Exists(commandLinePath))
         {
-            return Task.FromResult(WindowsActionApplyResult.NoChange(
+            return Task.FromResult(WindowsActionApplyResult.Skipped(
                 "Nenhum commandline.txt foi encontrado na pasta do GTA V; o jogo está usando os parâmetros padrão."));
         }
 
@@ -134,7 +330,7 @@ public sealed class GtaVLaunchParametersDiagnosisAction : WindowsOptimizationAct
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
-            return Task.FromResult(WindowsActionApplyResult.NoChange(
+            return Task.FromResult(WindowsActionApplyResult.Skipped(
                 $"Não foi possível ler o commandline.txt ({exception.Message})."));
         }
 
@@ -196,7 +392,7 @@ public abstract class GtaVLaunchParametersActionBase : WindowsOptimizationAction
         cancellationToken.ThrowIfCancellationRequested();
         if (commandLinePath is null)
         {
-            return Task.FromResult(WindowsActionApplyResult.NoChange(
+            return Task.FromResult(WindowsActionApplyResult.Skipped(
                 "A instalação do GTA V Legacy standalone não foi confirmada; commandline.txt não será alterado."));
         }
 
@@ -205,15 +401,18 @@ public abstract class GtaVLaunchParametersActionBase : WindowsOptimizationAction
             throw new InvalidOperationException("GTA V precisa estar fechado para editar commandline.txt.");
         }
 
+        SafePath.EnsureNoReparsePoints(commandLinePath);
+        var originalExisted = File.Exists(commandLinePath);
         IReadOnlyList<string> existingLines;
-        try
+        string? originalSha256;
+        if (originalExisted)
         {
-            existingLines = GtaVCommandLineFile.ReadLines(commandLinePath);
+            (existingLines, originalSha256) = GtaVCommandLineFile.ReadLinesWithHash(commandLinePath);
         }
-        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        else
         {
-            return Task.FromResult(WindowsActionApplyResult.NoChange(
-                $"Não foi possível ler o commandline.txt ({exception.Message})."));
+            existingLines = [];
+            originalSha256 = null;
         }
 
         var desired = BuildDesiredLines();
@@ -224,10 +423,14 @@ public abstract class GtaVLaunchParametersActionBase : WindowsOptimizationAction
                 "Os parâmetros gerenciados já estavam na configuração desejada."));
         }
 
-        GtaVCommandLineFile.WriteAtomically(commandLinePath, mergedLines);
+        var appliedSha256 = GtaVCommandLineFile.WriteAtomically(
+            commandLinePath,
+            mergedLines,
+            originalExisted,
+            originalSha256);
 
         return Task.FromResult(WindowsActionApplyResult.ChangedWith(
-            new CommandLineSnapshot(commandLinePath, existingLines, changedFlags),
+            new CommandLineSnapshot(originalExisted, existingLines, appliedSha256, changedFlags),
             $"{NoticeVerb}: {string.Join(", ", changedFlags)}."));
     }
 
@@ -246,9 +449,41 @@ public abstract class GtaVLaunchParametersActionBase : WindowsOptimizationAction
             throw new InvalidOperationException("GTA V precisa estar fechado para restaurar commandline.txt.");
         }
 
+        using var snapshotDocument = JsonDocument.Parse(snapshotJson);
+        if (snapshotDocument.RootElement.TryGetProperty("settingsPath", out _)
+            && !snapshotDocument.RootElement.TryGetProperty("appliedSha256", out _))
+        {
+            throw new InvalidDataException(
+                "Este snapshot legado de commandline.txt não registra o estado aplicado; rollback recusado por segurança.");
+        }
+
         var snapshot = WindowsActionSnapshot.Deserialize<CommandLineSnapshot>(snapshotJson);
-        GtaVCommandLineFile.WriteAtomically(snapshot.SettingsPath, snapshot.OriginalLines);
+        ValidateSnapshot(snapshot);
+        GtaVCommandLineFile.RestoreAtomically(
+            commandLinePath!,
+            snapshot.OriginalExisted,
+            snapshot.OriginalLines,
+            snapshot.AppliedSha256);
         return Task.CompletedTask;
+    }
+
+    private void ValidateSnapshot(CommandLineSnapshot snapshot)
+    {
+        if (string.IsNullOrWhiteSpace(snapshot.AppliedSha256))
+        {
+            throw new InvalidDataException(
+                "Este snapshot legado de commandline.txt não registra o estado aplicado; rollback recusado por segurança.");
+        }
+
+        if (snapshot.OriginalLines is null
+            || snapshot.ChangedFlags is null
+            || snapshot.ChangedFlags.Count == 0
+            || snapshot.ChangedFlags.Any(flag => !ManagedFlags.Contains(flag))
+            || snapshot.AppliedSha256.Length != 64
+            || snapshot.AppliedSha256.Any(character => !Uri.IsHexDigit(character)))
+        {
+            throw new InvalidDataException("The GTA V commandline snapshot is invalid for this action.");
+        }
     }
 }
 

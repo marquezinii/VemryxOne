@@ -41,6 +41,9 @@ public sealed record WindowsActionContext
 
     public required bool IsElevated { get; init; }
 
+    /// <summary>The profile that created the transaction, when execution came from a plan.</summary>
+    public OptimizationProfile? Profile { get; init; }
+
     /// <summary>
     /// True only while the engine is restoring snapshots created by the same
     /// execution after that execution failed or was cancelled. User-requested
@@ -55,6 +58,12 @@ public sealed record WindowsActionApplyResult
 {
     public required bool Changed { get; init; }
 
+    /// <summary>
+    /// Semantic result when no write was needed. A missing precondition is
+    /// different from a verified desired state and remains visible in reports.
+    /// </summary>
+    public ActionExecutionOutcome Outcome { get; init; } = ActionExecutionOutcome.Verified;
+
     public string? SnapshotJson { get; init; }
 
     public IReadOnlyList<string> Messages { get; init; } = Array.Empty<string>();
@@ -64,6 +73,17 @@ public sealed record WindowsActionApplyResult
         return new WindowsActionApplyResult
         {
             Changed = false,
+            Outcome = ActionExecutionOutcome.Verified,
+            Messages = messages
+        };
+    }
+
+    public static WindowsActionApplyResult Skipped(params string[] messages)
+    {
+        return new WindowsActionApplyResult
+        {
+            Changed = false,
+            Outcome = ActionExecutionOutcome.Skipped,
             Messages = messages
         };
     }
@@ -75,6 +95,7 @@ public sealed record WindowsActionApplyResult
         return new WindowsActionApplyResult
         {
             Changed = true,
+            Outcome = ActionExecutionOutcome.Applied,
             SnapshotJson = WindowsActionSnapshot.Serialize(snapshot),
             Messages = messages
         };

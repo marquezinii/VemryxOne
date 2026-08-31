@@ -383,6 +383,7 @@ public sealed class WindowsActionHandlerTests
 
         var batteryResult = await action.ApplyAsync(context, CancellationToken.None);
         Assert.False(batteryResult.Changed);
+        Assert.Equal(ActionExecutionOutcome.Skipped, batteryResult.Outcome);
         Assert.Equal(previous, controller.ActiveScheme);
 
         powerStatus.OnAcPower = true;
@@ -436,23 +437,89 @@ public sealed class WindowsActionHandlerTests
         var result = await action.ApplyAsync(context, CancellationToken.None);
 
         Assert.False(result.Changed);
+        Assert.Equal(ActionExecutionOutcome.Skipped, result.Outcome);
+        Assert.Equal(previous, controller.ActiveScheme);
+    }
+
+    [Fact]
+    public async Task SessionPowerPlan_RollbackVerifiesTheRestoredScheme()
+    {
+        var controller = new FakePowerPlanController();
+        var action = new SessionPerformancePowerPlanAction(controller, new FakePowerStatusProvider());
+        var context = Context(elevated: true);
+        var result = await action.ApplyAsync(context, CancellationToken.None);
+        controller.IgnoreNextActivation = true;
+
+        await Assert.ThrowsAsync<IOException>(() =>
+            action.RollbackAsync(context, result.SnapshotJson, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task SessionPowerPlan_RollbackRefusesConcurrentSchemeChange()
+    {
+        var controller = new FakePowerPlanController();
+        var action = new SessionPerformancePowerPlanAction(controller, new FakePowerStatusProvider());
+        var context = Context(elevated: true);
+        var result = await action.ApplyAsync(context, CancellationToken.None);
+        var newerScheme = Guid.NewGuid();
+        controller.ActiveScheme = newerScheme;
+
+        await Assert.ThrowsAsync<IOException>(() =>
+            action.RollbackAsync(context, result.SnapshotJson, CancellationToken.None));
+
+        Assert.Equal(newerScheme, controller.ActiveScheme);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task SessionPowerPlan_MutateThenFailureRestoresPreviousScheme(bool cancel)
+    {
+        var controller = new FakePowerPlanController
+        {
+            CancelAfterPerformanceActivation = cancel,
+            ThrowAfterPerformanceActivation = !cancel
+        };
+        var previous = controller.ActiveScheme;
+        var action = new SessionPerformancePowerPlanAction(controller, new FakePowerStatusProvider());
+
+        await Assert.ThrowsAnyAsync<Exception>(() => action.ApplyAsync(Context(), CancellationToken.None));
+
         Assert.Equal(previous, controller.ActiveScheme);
     }
 
     [Fact]
     public async Task PciExpressPowerManagement_SetsOffAndRollbackRestoresPreviousPolicy()
     {
-        var controller = new FakePowerPlanController { AspmPolicy = 1 };
+        var previous = new PciExpressAspmPolicy(1, 2);
+        var controller = new FakePowerPlanController { AspmPolicyState = previous };
         var action = new PciExpressPowerManagementAction(controller);
         var context = Context();
 
         var result = await action.ApplyAsync(context, CancellationToken.None);
 
         Assert.True(result.Changed);
-        Assert.Equal(0, controller.AspmPolicy);
+        Assert.Equal(new PciExpressAspmPolicy(0, 0), controller.AspmPolicyState);
 
         await action.RollbackAsync(context, result.SnapshotJson, CancellationToken.None);
-        Assert.Equal(1, controller.AspmPolicy);
+        Assert.Equal(previous, controller.AspmPolicyState);
+    }
+
+    [Fact]
+    public async Task PciExpressPowerManagement_SuccessReturnsSnapshotWithoutRedundantPostWriteRead()
+    {
+        var controller = new FakePowerPlanController
+        {
+            AspmPolicyState = new PciExpressAspmPolicy(1, 2),
+            ThrowOnAspmReadAfterSet = true
+        };
+        var action = new PciExpressPowerManagementAction(controller);
+
+        var result = await action.ApplyAsync(Context(), CancellationToken.None);
+
+        Assert.True(result.Changed);
+        Assert.NotNull(result.SnapshotJson);
+        Assert.Equal(new PciExpressAspmPolicy(0, 0), controller.AspmPolicyState);
     }
 
     [Fact]
@@ -464,6 +531,7 @@ public sealed class WindowsActionHandlerTests
         var result = await action.ApplyAsync(Context(), CancellationToken.None);
 
         Assert.False(result.Changed);
+        Assert.Equal(ActionExecutionOutcome.Verified, result.Outcome);
     }
 
     [Fact]
@@ -475,19 +543,69 @@ public sealed class WindowsActionHandlerTests
         var result = await action.ApplyAsync(Context(), CancellationToken.None);
 
         Assert.False(result.Changed);
+        Assert.Equal(ActionExecutionOutcome.Skipped, result.Outcome);
         Assert.Contains(result.Messages, message => message.Contains("não expõe", StringComparison.Ordinal));
     }
 
     [Fact]
-    public async Task PciExpressPowerManagement_NoChangeWhenSetFails()
+    public async Task PciExpressPowerManagement_SetFailureIsVisible()
     {
         var controller = new FakePowerPlanController { AspmPolicy = 1, AspmSetShouldFail = true };
         var action = new PciExpressPowerManagementAction(controller);
 
-        var result = await action.ApplyAsync(Context(), CancellationToken.None);
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            action.ApplyAsync(Context(), CancellationToken.None));
 
-        Assert.False(result.Changed);
         Assert.Equal(1, controller.AspmPolicy);
+    }
+
+    [Fact]
+    public async Task PciExpressPowerManagement_RollbackRefusesConcurrentChange()
+    {
+        var controller = new FakePowerPlanController
+        {
+            AspmPolicyState = new PciExpressAspmPolicy(1, 2)
+        };
+        var action = new PciExpressPowerManagementAction(controller);
+        var context = Context();
+        var result = await action.ApplyAsync(context, CancellationToken.None);
+        controller.AspmPolicyState = new PciExpressAspmPolicy(0, 1);
+
+        await Assert.ThrowsAsync<IOException>(() =>
+            action.RollbackAsync(context, result.SnapshotJson, CancellationToken.None));
+
+        Assert.Equal(new PciExpressAspmPolicy(0, 1), controller.AspmPolicyState);
+    }
+
+    [Fact]
+    public async Task PciExpressPowerManagement_RollbackRefusesDifferentActiveScheme()
+    {
+        var controller = new FakePowerPlanController
+        {
+            AspmPolicyState = new PciExpressAspmPolicy(1, 2)
+        };
+        var action = new PciExpressPowerManagementAction(controller);
+        var result = await action.ApplyAsync(Context(), CancellationToken.None);
+        controller.ActiveScheme = Guid.NewGuid();
+
+        await Assert.ThrowsAsync<IOException>(
+            () => action.RollbackAsync(Context(), result.SnapshotJson, CancellationToken.None));
+
+        Assert.Equal(new PciExpressAspmPolicy(0, 0), controller.AspmPolicyState);
+    }
+
+    [Fact]
+    public async Task PciExpressPowerManagement_LegacySnapshotWithoutSchemeAndBothPoliciesFailsClosed()
+    {
+        var controller = new FakePowerPlanController { AspmPolicyState = new PciExpressAspmPolicy(0, 0) };
+        var action = new PciExpressPowerManagementAction(controller);
+
+        await Assert.ThrowsAsync<InvalidDataException>(() => action.RollbackAsync(
+            Context(),
+            "{\"previousPolicy\":1}",
+            CancellationToken.None));
+
+        Assert.Equal(new PciExpressAspmPolicy(0, 0), controller.AspmPolicyState);
     }
 
     [Fact]

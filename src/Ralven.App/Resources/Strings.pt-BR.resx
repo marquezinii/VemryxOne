@@ -726,7 +726,7 @@
   <data name="Actions.fivem.legacy.server-cache.repair.UndoSummary" xml:space="preserve"><value>Dados regeneráveis: o FiveM baixa o conteúdo novamente no próximo acesso ao servidor.</value></data>
   <data name="Actions.fivem.legacy.server-cache.repair.RiskLimitations" xml:space="preserve"><value>O primeiro carregamento fica mais lento; clipes antigos do Rockstar Editor podem deixar de funcionar.</value></data>
   <data name="Actions.fivem.legacy.stuck-process.terminate.Name" xml:space="preserve"><value>Encerrar processo travado do FiveM</value></data>
-  <data name="Actions.fivem.legacy.stuck-process.terminate.Description" xml:space="preserve"><value>Encerra um processo do FiveM comprovadamente travado (não responde e mantém arquivo de cache bloqueado) para permitir a limpeza. Nunca faz parte de perfis automáticos.</value></data>
+  <data name="Actions.fivem.legacy.stuck-process.terminate.Description" xml:space="preserve"><value>Encerra um processo do FiveM comprovadamente travado e sem resposta. Isso pode liberar arquivos ainda mantidos por essa instância, mas nunca faz parte de perfis automáticos.</value></data>
   <data name="Actions.fivem.legacy.stuck-process.terminate.DetectionSummary" xml:space="preserve"><value>Verifica se existe processo cuja imagem pertence à instalação do FiveM com Responding=false (não responde a mensagens da interface).</value></data>
   <data name="Actions.fivem.legacy.stuck-process.terminate.ConfirmationSummary" xml:space="preserve"><value>Só encerra o processo depois de confirmar que ele não responde; se estiver respondendo normalmente, a ação não faz nada.</value></data>
   <data name="Actions.fivem.legacy.stuck-process.terminate.UndoSummary" xml:space="preserve"><value>Irreversível: um processo encerrado não pode ser restaurado ao seu estado anterior.</value></data>
@@ -882,11 +882,11 @@
   <data name="Actions.windows.gaming.hybrid-laptop.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não altera energia, GPU nem instala/remove nada.</value></data>
   <data name="Actions.windows.gaming.hybrid-laptop.diagnose.RiskLimitations" xml:space="preserve"><value>Não controla MUX switch nem BIOS por métodos genéricos não documentados; detectar o utilitário do fabricante instalado não confirma que o notebook tem MUX switch ou GPU dedicada.</value></data>
   <data name="Actions.windows.power.pcie-aspm.adjust.Name" xml:space="preserve"><value>Ajustar PCI Express Link State Power Management</value></data>
-  <data name="Actions.windows.power.pcie-aspm.adjust.Description" xml:space="preserve"><value>Desativa o gerenciamento de energia de link do PCI Express (ASPM) no plano de energia ativo, reduzindo picos de latência em troca de um consumo levemente maior.</value></data>
-  <data name="Actions.windows.power.pcie-aspm.adjust.DetectionSummary" xml:space="preserve"><value>Lê o índice atual da configuração ASPM (`powercfg /Q`) do plano de energia ativo.</value></data>
-  <data name="Actions.windows.power.pcie-aspm.adjust.ConfirmationSummary" xml:space="preserve"><value>Confirma que o valor foi definido como Off (0) no plano ativo.</value></data>
-  <data name="Actions.windows.power.pcie-aspm.adjust.UndoSummary" xml:space="preserve"><value>Totalmente reversível: o valor anterior é restaurado no rollback via powercfg.</value></data>
-  <data name="Actions.windows.power.pcie-aspm.adjust.RiskLimitations" xml:space="preserve"><value>Nem todo chipset/placa-mãe expõe essa configuração; quando ausente, a ação não altera nada. A leitura do valor atual depende do texto de saída do `powercfg /Q`, que varia por idioma do Windows -- em builds não testadas nesse idioma, a ação pode não conseguir ler o valor e simplesmente não fará nada.</value></data>
+  <data name="Actions.windows.power.pcie-aspm.adjust.Description" xml:space="preserve"><value>Desativa a economia de energia dos links PCI Express (ASPM) no plano ativo. Isso evita transições de economia do link, mas o efeito perceptível depende do hardware e o consumo pode aumentar.</value></data>
+  <data name="Actions.windows.power.pcie-aspm.adjust.DetectionSummary" xml:space="preserve"><value>Lê os índices AC e DC da configuração ASPM do plano ativo pelas APIs nativas PowerReadACValueIndex e PowerReadDCValueIndex.</value></data>
+  <data name="Actions.windows.power.pcie-aspm.adjust.ConfirmationSummary" xml:space="preserve"><value>Relê AC e DC e confirma Off (0) depois de reativar o plano.</value></data>
+  <data name="Actions.windows.power.pcie-aspm.adjust.UndoSummary" xml:space="preserve"><value>Totalmente reversível: restaura e confirma separadamente os valores AC e DC anteriores.</value></data>
+  <data name="Actions.windows.power.pcie-aspm.adjust.RiskLimitations" xml:space="preserve"><value>Nem todo hardware expõe essa configuração; nesse caso a ação é ignorada. Pode aumentar consumo e temperatura, e não há garantia de ganho perceptível em todo computador.</value></data>
   <data name="Actions.windows.gaming.mouse-polling-rate.guide.Name" xml:space="preserve"><value>Orientar sobre polling rate do mouse</value></data>
   <data name="Actions.windows.gaming.mouse-polling-rate.guide.Description" xml:space="preserve"><value>Quando a CPU está sob carga alta, orienta testar reduzir mouses configurados para 4000/8000 Hz de polling para 1000 Hz, sem alterar nada.</value></data>
   <data name="Actions.windows.gaming.mouse-polling-rate.guide.DetectionSummary" xml:space="preserve"><value>Lê o uso atual de CPU (mesma medição já usada nos diagnósticos de recursos existentes).</value></data>
@@ -972,18 +972,20 @@
   <data name="Runtime.BrokerResultUnconfirmed" xml:space="preserve"><value>O componente administrativo não confirmou o resultado: {0}</value></data>
   <data name="Runtime.UacCancelledRestored" xml:space="preserve"><value>O UAC foi cancelado. Ajustes reversíveis foram restaurados; limpezas concluídas permanecem registradas.</value></data>
   <data name="Runtime.AdminPhaseFailed" xml:space="preserve"><value>A fase administrativa falhou com segurança: {0}</value></data>
-  <data name="Runtime.UacCancelledPreserved" xml:space="preserve"><value>A otimização foi concluída, mas a confirmação do Windows para o plano de energia de alto desempenho foi cancelada. As demais alterações foram mantidas.</value></data>
-  <data name="Runtime.AdminPhaseFailedPreserved" xml:space="preserve"><value>A otimização foi concluída, mas o Windows não permitiu ativar o plano de alto desempenho: {0} As demais alterações foram mantidas.</value></data>
+  <data name="Runtime.UacCancelledPreserved" xml:space="preserve"><value>A otimização foi concluída, mas a confirmação dos ajustes do Windows que exigiam acesso de administrador foi cancelada. As demais alterações foram mantidas.</value></data>
+  <data name="Runtime.AdminPhaseFailedPreserved" xml:space="preserve"><value>A otimização foi concluída, mas o Windows não confirmou ajustes que exigiam acesso de administrador: {0} As demais alterações foram mantidas.</value></data>
   <data name="Runtime.RollbackJournalError" xml:space="preserve"><value>O journal preservou um erro de rollback para diagnóstico.</value></data>
   <data name="Runtime.RollbackConflict" xml:space="preserve"><value>O rollback local encontrou um conflito e preservou o estado mais recente do usuário.</value></data>
   <data name="Runtime.RestoreBlockedFiveM" xml:space="preserve"><value>O FiveM está aberto agora. Feche-o e tente restaurar novamente.</value></data>
   <data name="Runtime.RestoreProcessCheckFailed" xml:space="preserve"><value>O Ralven não consegue confirmar agora que o FiveM está fechado. Confirme que ele está fechado e tente restaurar novamente.</value></data>
+  <data name="Runtime.RestoreIncomplete" xml:space="preserve"><value>Algumas alterações não puderam ser restauradas com segurança. O estado atual foi preservado e registrado no Histórico.</value></data>
   <data name="Runtime.Interrupted.RolledBack" xml:space="preserve"><value>{0} Ajustes reversíveis locais foram restaurados; limpezas confirmadas permanecem no Histórico.</value></data>
   <data name="Runtime.Interrupted.AdminPending" xml:space="preserve"><value>{0} O Histórico indica uma restauração administrativa pendente; use Desfazer para concluí-la com UAC.</value></data>
   <data name="Runtime.Interrupted.RollbackFailed" xml:space="preserve"><value>{0} O rollback local encontrou um conflito e preservou o journal para diagnóstico.</value></data>
   <data name="Runtime.Interrupted.Unconfirmed" xml:space="preserve"><value>{0} O estado final não pôde ser confirmado; consulte o Histórico antes de tentar novamente.</value></data>
   <data name="Runtime.Interrupted.CheckHistory" xml:space="preserve"><value>{0} Consulte o Histórico local para confirmar o estado final da transação.</value></data>
   <data name="History.State.Committed" xml:space="preserve"><value>Concluído</value></data>
+  <data name="History.State.CommittedWithErrors" xml:space="preserve"><value>Concluído com erros</value></data>
   <data name="History.State.AwaitingUac" xml:space="preserve"><value>Aguardando confirmação UAC</value></data>
   <data name="History.State.AdminRollbackPending" xml:space="preserve"><value>Rollback administrativo pendente</value></data>
   <data name="History.State.LocalRollbackPending" xml:space="preserve"><value>Rollback local pendente</value></data>

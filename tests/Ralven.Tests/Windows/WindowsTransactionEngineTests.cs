@@ -11,6 +11,140 @@ namespace Ralven.Tests.Windows;
 public sealed class WindowsTransactionEngineTests
 {
     [Fact]
+    public async Task NewJournal_PersistsThePlanProfile()
+    {
+        var action = new TestGameModeAction();
+        var journals = new InMemoryJournalStore();
+        var engine = new WindowsTransactionEngine(
+            new WindowsActionCatalog([action]),
+            journals);
+        var transactionId = Guid.NewGuid();
+
+        _ = await engine.ExecuteAsync(
+            [action],
+            Context(transactionId, elevated: false) with
+            {
+                Profile = OptimizationProfile.Aggressive
+            },
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(OptimizationProfile.Aggressive, journals.Get(transactionId).Profile);
+    }
+
+    [Fact]
+    public async Task InterruptedJournal_IsFinalizedHonestlyAndCanBeReadAgain()
+    {
+        var action = new TestGameModeAction();
+        var journals = new InMemoryJournalStore();
+        var transactionId = Guid.NewGuid();
+        await journals.SaveAsync(
+            InterruptedJournal(transactionId, action, ActionJournalState.Applying),
+            TestContext.Current.CancellationToken);
+        var engine = new WindowsTransactionEngine(
+            new WindowsActionCatalog([action]),
+            journals);
+
+        var first = await engine.ExecuteAsync(
+            [action],
+            Context(transactionId, elevated: false),
+            cancellationToken: TestContext.Current.CancellationToken);
+        var second = await engine.ExecuteAsync(
+            [action],
+            Context(transactionId, elevated: false),
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(TransactionState.CommittedWithErrors, first.State);
+        Assert.Equal(TransactionState.CommittedWithErrors, second.State);
+        Assert.Equal(0, action.ApplyCount);
+        var entry = Assert.Single(journals.Get(transactionId).Actions);
+        Assert.Equal(ActionJournalState.Failed, entry.State);
+        Assert.Equal(ActionExecutionOutcome.Failed, entry.Outcome);
+    }
+
+    [Fact]
+    public async Task InterruptedReversibleAction_WithDurableSnapshotCanStillRollback()
+    {
+        var action = new TestGameModeAction();
+        var journals = new InMemoryJournalStore();
+        var transactionId = Guid.NewGuid();
+        var journal = InterruptedJournal(transactionId, action, ActionJournalState.Committing);
+        journal.Actions[0].Changed = true;
+        journal.Actions[0].SnapshotJson = "{}";
+        await journals.SaveAsync(journal, TestContext.Current.CancellationToken);
+        var engine = new WindowsTransactionEngine(
+            new WindowsActionCatalog([action]),
+            journals);
+
+        _ = await engine.ExecuteAsync(
+            [action],
+            Context(transactionId, elevated: false),
+            cancellationToken: TestContext.Current.CancellationToken);
+        var rollback = await engine.RollbackAsync(
+            transactionId,
+            isElevated: false,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(TransactionState.RolledBack, rollback.State);
+        Assert.Equal(1, action.RollbackCount);
+    }
+
+    [Fact]
+    public async Task InterruptedRebuildableApply_BeforeCommitCanStillRollback()
+    {
+        var action = new TestRebuildableAction();
+        var journals = new InMemoryJournalStore();
+        var transactionId = Guid.NewGuid();
+        var journal = InterruptedJournal(transactionId, action, ActionJournalState.Applied);
+        journal.Actions[0].Changed = true;
+        journal.Actions[0].SnapshotJson = "{}";
+        await journals.SaveAsync(journal, TestContext.Current.CancellationToken);
+        var engine = new WindowsTransactionEngine(
+            new WindowsActionCatalog([action]),
+            journals);
+
+        _ = await engine.ExecuteAsync(
+            [action],
+            Context(transactionId, elevated: false),
+            cancellationToken: TestContext.Current.CancellationToken);
+        var rollback = await engine.RollbackAsync(
+            transactionId,
+            isElevated: false,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(TransactionState.RolledBack, rollback.State);
+        Assert.Equal(1, action.RollbackCount);
+        Assert.True(journals.Get(transactionId).Actions[0].RollbackSafeAfterInterruption);
+    }
+
+    [Fact]
+    public async Task InterruptedRebuildableCommit_IsNotReportedAsRollbackable()
+    {
+        var action = new TestRebuildableAction();
+        var journals = new InMemoryJournalStore();
+        var transactionId = Guid.NewGuid();
+        var journal = InterruptedJournal(transactionId, action, ActionJournalState.Committing);
+        journal.Actions[0].Changed = true;
+        journal.Actions[0].SnapshotJson = "{}";
+        await journals.SaveAsync(journal, TestContext.Current.CancellationToken);
+        var engine = new WindowsTransactionEngine(
+            new WindowsActionCatalog([action]),
+            journals);
+
+        _ = await engine.ExecuteAsync(
+            [action],
+            Context(transactionId, elevated: false),
+            cancellationToken: TestContext.Current.CancellationToken);
+        var rollback = await engine.RollbackAsync(
+            transactionId,
+            isElevated: false,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(TransactionState.CommittedWithErrors, rollback.State);
+        Assert.Equal(0, action.RollbackCount);
+        Assert.False(journals.Get(transactionId).Actions[0].RollbackSafeAfterInterruption);
+    }
+
+    [Fact]
     public async Task TwoPhaseExecution_PreservesJournalAndCommitsAdministratorAction()
     {
         var standard = new TestGameModeAction();
@@ -86,6 +220,73 @@ public sealed class WindowsTransactionEngineTests
         Assert.Equal(ActionJournalState.Failed, journal.Actions[1].State);
         Assert.Equal(ActionExecutionOutcome.Failed, journal.Actions[1].Outcome);
         Assert.Equal("O Windows recusou a elevação.", journal.Actions[1].OutcomeReason);
+    }
+
+    [Fact]
+    public async Task MarkAdministratorPhaseFailedAsync_FinalizesIntermediateAdministratorEntries()
+    {
+        var power = new TestPowerAction();
+        var hags = new TestHagsAction();
+        var journals = new InMemoryJournalStore();
+        var transactionId = Guid.NewGuid();
+        await journals.SaveAsync(new WindowsTransactionJournal
+        {
+            TransactionId = transactionId,
+            SchemaVersion = 1,
+            CreatedAtUtc = DateTimeOffset.UtcNow,
+            UpdatedAtUtc = DateTimeOffset.UtcNow,
+            WasElevated = true,
+            State = TransactionState.Applying,
+            Actions =
+            [
+                Entry(power, 1, ActionJournalState.Applying),
+                Entry(hags, 2, ActionJournalState.Applied) with
+                {
+                    Changed = true,
+                    SnapshotJson = "{}"
+                }
+            ]
+        }, TestContext.Current.CancellationToken);
+        var engine = new WindowsTransactionEngine(
+            new WindowsActionCatalog([power, hags]),
+            journals);
+
+        var result = await engine.MarkAdministratorPhaseFailedAsync(
+            transactionId,
+            "resultado administrativo não confirmado",
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(TransactionState.CommittedWithErrors, result.State);
+        Assert.All(journals.Get(transactionId).Actions, entry =>
+        {
+            Assert.Equal(ActionJournalState.Failed, entry.State);
+            Assert.Equal(ActionExecutionOutcome.Failed, entry.Outcome);
+        });
+    }
+
+    [Fact]
+    public async Task TerminalLegacyJournal_BackfillsAndPersistsProfile()
+    {
+        var action = new TestGameModeAction();
+        var journals = new InMemoryJournalStore();
+        var transactionId = Guid.NewGuid();
+        var journal = InterruptedJournal(transactionId, action, ActionJournalState.Applying);
+        journal.State = TransactionState.CommittedWithErrors;
+        journal.Actions[0].State = ActionJournalState.Failed;
+        await journals.SaveAsync(journal, TestContext.Current.CancellationToken);
+        var engine = new WindowsTransactionEngine(
+            new WindowsActionCatalog([action]),
+            journals);
+
+        _ = await engine.ExecuteAsync(
+            [action],
+            Context(transactionId, elevated: false) with
+            {
+                Profile = OptimizationProfile.Aggressive
+            },
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(OptimizationProfile.Aggressive, journals.Get(transactionId).Profile);
     }
 
     [Fact]
@@ -275,6 +476,43 @@ public sealed class WindowsTransactionEngineTests
     }
 
     [Fact]
+    public async Task StrictExecution_WhenRebuildableCommitFails_DoesNotClaimRolledBack()
+    {
+        var action = new TestCommitFailingRebuildableAction();
+        var journals = new InMemoryJournalStore();
+        var engine = new WindowsTransactionEngine(
+            new WindowsActionCatalog([action]),
+            journals);
+        var transactionId = Guid.NewGuid();
+
+        var result = await engine.ExecuteAsync(
+            [action],
+            Context(transactionId, elevated: false),
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(TransactionState.CommittedWithErrors, result.State);
+        Assert.Equal(ActionJournalState.Failed, journals.Get(transactionId).Actions[0].State);
+        Assert.Equal(0, action.RollbackCount);
+    }
+
+    [Fact]
+    public async Task StrictExecution_InvalidChangedOutcome_CompensatesDurableSnapshot()
+    {
+        var action = new TestInvalidOutcomeAction();
+        var engine = new WindowsTransactionEngine(
+            new WindowsActionCatalog([action]),
+            new InMemoryJournalStore());
+
+        var result = await engine.ExecuteAsync(
+            [action],
+            Context(Guid.NewGuid(), elevated: false),
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(TransactionState.RolledBack, result.State);
+        Assert.Equal(1, action.RollbackCount);
+    }
+
+    [Fact]
     public async Task IsolatedExecution_WhenJournalFailsAfterWrite_RollsBackWithoutPersistence()
     {
         var action = new TestGameModeAction();
@@ -371,6 +609,52 @@ public sealed class WindowsTransactionEngineTests
         };
     }
 
+    private static WindowsTransactionJournal InterruptedJournal(
+        Guid transactionId,
+        TestAction action,
+        ActionJournalState actionState)
+    {
+        return new WindowsTransactionJournal
+        {
+            TransactionId = transactionId,
+            SchemaVersion = 1,
+            CreatedAtUtc = DateTimeOffset.UtcNow,
+            UpdatedAtUtc = DateTimeOffset.UtcNow,
+            WasElevated = false,
+            State = actionState == ActionJournalState.Committing
+                ? TransactionState.Committing
+                : TransactionState.Applying,
+            Actions =
+            [
+                new WindowsActionJournalEntry
+                {
+                    Sequence = 1,
+                    ActionId = action.Metadata.Id,
+                    Version = action.Metadata.Version,
+                    RequiredPrivilege = action.Metadata.RequiredPrivilege,
+                    Reversibility = action.Metadata.Reversibility,
+                    State = actionState
+                }
+            ]
+        };
+    }
+
+    private static WindowsActionJournalEntry Entry(
+        TestAction action,
+        int sequence,
+        ActionJournalState state)
+    {
+        return new WindowsActionJournalEntry
+        {
+            Sequence = sequence,
+            ActionId = action.Metadata.Id,
+            Version = action.Metadata.Version,
+            RequiredPrivilege = action.Metadata.RequiredPrivilege,
+            Reversibility = action.Metadata.Reversibility,
+            State = state
+        };
+    }
+
     private abstract class TestAction : WindowsOptimizationAction
     {
         public int ApplyCount { get; private set; }
@@ -438,6 +722,47 @@ public sealed class WindowsTransactionEngineTests
             }
 
             return base.ApplyAsync(context, cancellationToken);
+        }
+    }
+
+    private sealed class TestHagsAction : TestAction
+    {
+        public override ActionMetadataDto Metadata { get; } = WindowsActionMetadata.For(
+            OptimizationActionIds.ToggleHags);
+    }
+
+    private class TestRebuildableAction : TestAction
+    {
+        public override ActionMetadataDto Metadata { get; } = WindowsActionMetadata.For(
+            OptimizationActionIds.RepairLegacyServerCache);
+    }
+
+    private sealed class TestCommitFailingRebuildableAction : TestRebuildableAction
+    {
+        public override Task CommitAsync(
+            WindowsActionContext context,
+            string? snapshotJson,
+            CancellationToken cancellationToken)
+        {
+            throw new InvalidOperationException("simulated destructive commit failure");
+        }
+    }
+
+    private sealed class TestInvalidOutcomeAction : TestAction
+    {
+        public override ActionMetadataDto Metadata { get; } = WindowsActionMetadata.For(
+            OptimizationActionIds.EnableGameMode);
+
+        public override Task<WindowsActionApplyResult> ApplyAsync(
+            WindowsActionContext context,
+            CancellationToken cancellationToken)
+        {
+            return Task.FromResult(new WindowsActionApplyResult
+            {
+                Changed = true,
+                Outcome = ActionExecutionOutcome.Verified,
+                SnapshotJson = "{}"
+            });
         }
     }
 

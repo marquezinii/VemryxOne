@@ -91,13 +91,17 @@ public sealed class DisplayPreferencesAction : WindowsOptimizationAction
         cancellationToken.ThrowIfCancellationRequested();
         if (target == GraphicsSettingsTarget.GtaV && gameRoot is null)
         {
-            return Task.FromResult(WindowsActionApplyResult.NoChange(
+            return Task.FromResult(WindowsActionApplyResult.Skipped(
                 "A instalação do GTA V Legacy não foi confirmada; o settings.xml não será alterado."));
         }
 
-        if (!File.Exists(settingsPath))
+        try
         {
-            return Task.FromResult(WindowsActionApplyResult.NoChange(
+            _ = File.GetAttributes(settingsPath);
+        }
+        catch (Exception exception) when (exception is FileNotFoundException or DirectoryNotFoundException)
+        {
+            return Task.FromResult(WindowsActionApplyResult.Skipped(
                 target == GraphicsSettingsTarget.FiveM
                     ? "gta5_settings.xml ainda não existe; abra o FiveM uma vez antes de aplicar a preferência."
                     : "settings.xml ainda não existe; abra o GTA V Legacy uma vez antes de aplicar a preferência."));
@@ -117,6 +121,7 @@ public sealed class DisplayPreferencesAction : WindowsOptimizationAction
         }
 
         var changed = new List<string>();
+        var unavailable = new List<string>();
         foreach (var preference in preferences)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -131,18 +136,20 @@ public sealed class DisplayPreferencesAction : WindowsOptimizationAction
                 .ToArray();
             if (nodes.Length == 0)
             {
+                unavailable.Add(preference.Key);
                 continue;
             }
 
             if (nodes.Length != 1)
             {
-                // Ambiguous location: skip rather than guess which node governs display mode.
+                unavailable.Add(preference.Key);
                 continue;
             }
 
             var attribute = nodes[0].Attribute("value");
             if (attribute is null || !TryParseFlexibleBoolean(attribute.Value, out var current))
             {
+                unavailable.Add(preference.Key);
                 continue;
             }
 
@@ -155,10 +162,16 @@ public sealed class DisplayPreferencesAction : WindowsOptimizationAction
             changed.Add(preference.Key);
         }
 
+        if (unavailable.Count > 0)
+        {
+            return Task.FromResult(WindowsActionApplyResult.Skipped(
+                $"O arquivo não contém valores únicos e compatíveis para: {string.Join(", ", unavailable)}."));
+        }
+
         if (changed.Count == 0)
         {
             return Task.FromResult(WindowsActionApplyResult.NoChange(
-                "Janela e VSync já estavam na preferência solicitada, ou não foram encontrados no arquivo."));
+                "Janela e VSync foram verificadas e já estavam na preferência solicitada."));
         }
 
         var snapshot = transaction.Apply(document, context.TransactionId, originalHash, changed);

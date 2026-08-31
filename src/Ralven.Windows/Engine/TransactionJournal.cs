@@ -30,6 +30,14 @@ public sealed record WindowsActionJournalEntry
 
     public string? SnapshotJson { get; set; }
 
+    /// <summary>
+    /// True only when recovery observed a completed rebuildable Apply before
+    /// its destructive Commit started. This keeps the quarantined snapshot
+    /// restorable after an interrupted process without making post-commit
+    /// failures look reversible.
+    /// </summary>
+    public bool RollbackSafeAfterInterruption { get; set; }
+
     public List<string> Messages { get; init; } = [];
 
     public string? Error { get; set; }
@@ -50,6 +58,12 @@ public sealed record WindowsTransactionJournal
     public required DateTimeOffset UpdatedAtUtc { get; set; }
 
     public required bool WasElevated { get; set; }
+
+    /// <summary>
+    /// Optional for backward compatibility with journals created before the
+    /// profile was persisted explicitly.
+    /// </summary>
+    public OptimizationProfile? Profile { get; set; }
 
     public required TransactionState State { get; set; }
 
