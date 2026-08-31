@@ -44,9 +44,9 @@ internal sealed class PlanValidator
             "plan-product-mismatch",
             "The plan product identity is invalid.");
         Require(
-            plan.Edition == FiveMEdition.Legacy,
-            "plan-edition-unsupported",
-            "Only FiveM Legacy plans are supported by this broker.");
+            IsSupportedScopeAndEdition(plan.Scope, plan.Edition),
+            "plan-scope-unsupported",
+            "The optimization scope and FiveM edition combination is not supported by this broker.");
         Require(plan.IsExecutable, "plan-not-executable", "The plan is not executable.");
         Require(plan.Blocks is { Count: 0 }, "plan-is-blocked", "A blocked plan cannot be executed.");
         Require(plan.Actions is not null, "plan-actions-missing", "The plan action list is missing.");
@@ -78,6 +78,10 @@ internal sealed class PlanValidator
 
         Require(expected.IsExecutable, "plan-rebuild-failed", "The plan cannot be rebuilt safely.");
         Require(
+            expected.Scope == plan.Scope,
+            "plan-scope-mismatch",
+            "The plan scope does not match the rebuilt plan.");
+        Require(
             plan.RequiresElevation == expected.RequiresElevation
                 && plan.ContainsNonReversibleActions == expected.ContainsNonReversibleActions
                 && plan.MaximumRisk == expected.MaximumRisk,
@@ -102,6 +106,15 @@ internal sealed class PlanValidator
 
         return new ValidatedPlan(plan, administratorActions);
     }
+
+    private static bool IsSupportedScopeAndEdition(
+        OptimizationScope scope,
+        FiveMEdition edition) => scope switch
+        {
+            OptimizationScope.FiveMLegacy => edition == FiveMEdition.Legacy,
+            OptimizationScope.GeneralWindows => Enum.IsDefined(edition),
+            _ => false
+        };
 
     private static bool ActionsMatch(
         IReadOnlyList<PlannedActionDto> actual,

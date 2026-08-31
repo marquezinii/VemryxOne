@@ -346,4 +346,7 @@ internal sealed class SyntheticWindowsApplicationInventoryInspector
             InstalledApplicationsComplete: true,
             StartupItemsComplete: true));
     }
+
+    public Task<WindowsApplicationInventorySnapshot> InspectStartupAsync(
+        CancellationToken cancellationToken = default) => InspectAsync(cancellationToken);
 }

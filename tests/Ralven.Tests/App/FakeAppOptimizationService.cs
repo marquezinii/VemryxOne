@@ -17,6 +17,7 @@ public sealed class FakeAppOptimizationService : IAppOptimizationService
     private readonly bool settingsFileExists;
     private readonly IReadOnlyList<AppHistoryRecord> history;
     private readonly bool isFiveMRunning;
+    private readonly FiveMEdition edition;
     private readonly Task<AppGtaVBenchmarkResult>? benchmarkResult;
     private readonly bool? rollbackResult;
     private readonly AppProgressUpdate? rollbackProgressUpdate;
@@ -29,6 +30,7 @@ public sealed class FakeAppOptimizationService : IAppOptimizationService
         Exception? diagnosticException = null,
         IReadOnlyList<AppHistoryRecord>? history = null,
         bool isFiveMRunning = false,
+        FiveMEdition edition = FiveMEdition.Legacy,
         Task<AppGtaVBenchmarkResult>? benchmarkResult = null,
         bool? rollbackResult = null,
         AppProgressUpdate? rollbackProgressUpdate = null)
@@ -38,6 +40,7 @@ public sealed class FakeAppOptimizationService : IAppOptimizationService
         DiagnosticException = diagnosticException;
         this.history = history ?? [];
         this.isFiveMRunning = isFiveMRunning;
+        this.edition = edition;
         this.benchmarkResult = benchmarkResult;
         this.rollbackResult = rollbackResult;
         this.rollbackProgressUpdate = rollbackProgressUpdate;
@@ -63,7 +66,7 @@ public sealed class FakeAppOptimizationService : IAppOptimizationService
 
     public Task<AppDiagnostic> DiagnoseAsync(CancellationToken cancellationToken = default) =>
         DiagnosticException is null
-            ? Task.FromResult(CreateMinimalDiagnostic(isFiveMRunning))
+            ? Task.FromResult(CreateMinimalDiagnostic(isFiveMRunning, edition))
             : Task.FromException<AppDiagnostic>(DiagnosticException);
 
     public Task<IReadOnlyList<AppHistoryRecord>> LoadHistoryAsync(CancellationToken cancellationToken = default) =>
@@ -99,9 +102,9 @@ public sealed class FakeAppOptimizationService : IAppOptimizationService
         CancellationToken cancellationToken = default) =>
         benchmarkResult ?? throw new NotSupportedException();
 
-    private static AppDiagnostic CreateMinimalDiagnostic(bool isFiveMRunning) => new()
+    private static AppDiagnostic CreateMinimalDiagnostic(bool isFiveMRunning, FiveMEdition edition) => new()
     {
-        Edition = FiveMEdition.Legacy,
+        Edition = edition,
         IsFiveMRunning = isFiveMRunning,
         GtaVDetected = false,
         GtaVIsRunning = false,

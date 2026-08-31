@@ -5,7 +5,7 @@ namespace Ralven.Core.Catalog;
 
 public sealed partial class ActionCatalog
 {
-    public const int CurrentVersion = 14;
+    public const int CurrentVersion = 16;
 
     private static readonly string[] NoPrerequisites = [];
     private static readonly string[] RequiresFiveMStoppedFirst = [OptimizationActionIds.VerifyFiveMIsStopped];
@@ -28,6 +28,52 @@ public sealed partial class ActionCatalog
     [
         OptimizationProfile.Aggressive
     ];
+
+    private static readonly OptimizationScope[] FiveMLegacyScope =
+    [
+        OptimizationScope.FiveMLegacy
+    ];
+
+    private static readonly OptimizationScope[] AllScopes =
+    [
+        OptimizationScope.FiveMLegacy,
+        OptimizationScope.GeneralWindows
+    ];
+
+    private static readonly IReadOnlySet<string> GeneralWindowsActionIds = new HashSet<string>(
+    [
+        OptimizationActionIds.DiagnoseBottleneck,
+        OptimizationActionIds.DetectOverlaysAndCaptureSoftware,
+        OptimizationActionIds.DiagnoseNetworkHealth,
+        OptimizationActionIds.DiagnoseThermalThrottling,
+        OptimizationActionIds.DiagnosePagefileCommit,
+        OptimizationActionIds.DetectGpuVendor,
+        OptimizationActionIds.DiagnoseCpuDetails,
+        OptimizationActionIds.DiagnoseGpuDetails,
+        OptimizationActionIds.DiagnoseRamDetails,
+        OptimizationActionIds.DiagnoseStorageHealth,
+        OptimizationActionIds.DiagnoseDriverVersions,
+        OptimizationActionIds.DiagnoseDisplayConfiguration,
+        OptimizationActionIds.DiagnoseSessionSettings,
+        OptimizationActionIds.DiagnoseThrottlingSignal,
+        OptimizationActionIds.DiagnoseResourceUsage,
+        OptimizationActionIds.DiagnosePciLink,
+        OptimizationActionIds.DiagnoseHardwareStability,
+        OptimizationActionIds.ClassifyBottleneck,
+        OptimizationActionIds.CleanUserTemporaryFiles,
+        OptimizationActionIds.EnableGameMode,
+        OptimizationActionIds.DisableBackgroundCapture,
+        OptimizationActionIds.EnableSessionPerformancePowerPlan,
+        OptimizationActionIds.AdjustPciExpressPowerManagement,
+        OptimizationActionIds.ReduceWindowsVisualEffects,
+        OptimizationActionIds.GuideDriverReinstall,
+        OptimizationActionIds.DiagnoseHybridLaptop,
+        OptimizationActionIds.GuideMousePollingRate,
+        OptimizationActionIds.DiagnoseWindowsSecurityHealth,
+        OptimizationActionIds.DiagnoseStartupLoad,
+        OptimizationActionIds.DiagnoseTrimStatus,
+        OptimizationActionIds.DiagnoseMouseAcceleration
+    ], StringComparer.Ordinal);
 
     private readonly IReadOnlyDictionary<string, OptimizationActionDefinition> _byId;
 
@@ -117,6 +163,7 @@ public sealed partial class ActionCatalog
             confirmationSummary,
             undoSummary,
             riskLimitations,
+            GeneralWindowsActionIds.Contains(id) ? AllScopes : FiveMLegacyScope,
             attemptWithoutElevationFirst);
     }
 }

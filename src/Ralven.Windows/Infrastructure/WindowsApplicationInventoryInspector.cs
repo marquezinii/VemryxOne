@@ -7,6 +7,9 @@ public interface IWindowsApplicationInventoryInspector
 {
     Task<WindowsApplicationInventorySnapshot> InspectAsync(
         CancellationToken cancellationToken = default);
+
+    Task<WindowsApplicationInventorySnapshot> InspectStartupAsync(
+        CancellationToken cancellationToken = default);
 }
 
 public enum WindowsApplicationScope
@@ -62,18 +65,29 @@ public sealed class WindowsApplicationInventoryInspector : IWindowsApplicationIn
     private const long MaxEstimatedSizeBytes = 16L * 1024 * 1024 * 1024 * 1024;
 
     private readonly Func<CancellationToken, WindowsApplicationInventoryReadResult> readInventory;
+    private readonly Func<CancellationToken, WindowsApplicationInventoryReadResult> readStartupInventory;
     private readonly Func<DateTimeOffset> utcNow;
 
     public WindowsApplicationInventoryInspector()
-        : this(ReadInventory, static () => DateTimeOffset.UtcNow)
+        : this(ReadInventory, static () => DateTimeOffset.UtcNow, ReadStartupInventory)
     {
     }
 
     internal WindowsApplicationInventoryInspector(
         Func<CancellationToken, WindowsApplicationInventoryReadResult> readInventory,
-        Func<DateTimeOffset>? utcNow = null)
+        Func<DateTimeOffset>? utcNow = null,
+        Func<CancellationToken, WindowsApplicationInventoryReadResult>? readStartupInventory = null)
     {
         this.readInventory = readInventory ?? throw new ArgumentNullException(nameof(readInventory));
+        this.readStartupInventory = readStartupInventory ?? (cancellationToken =>
+        {
+            var result = this.readInventory(cancellationToken);
+            return result with
+            {
+                InstalledApplications = [],
+                InstalledApplicationsComplete = true
+            };
+        });
         this.utcNow = utcNow ?? (() => DateTimeOffset.UtcNow);
     }
 
@@ -82,6 +96,14 @@ public sealed class WindowsApplicationInventoryInspector : IWindowsApplicationIn
     {
         return Task.Run(
             () => BuildSnapshot(readInventory(cancellationToken), cancellationToken),
+            cancellationToken);
+    }
+
+    public Task<WindowsApplicationInventorySnapshot> InspectStartupAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return Task.Run(
+            () => BuildSnapshot(readStartupInventory(cancellationToken), cancellationToken),
             cancellationToken);
     }
 
@@ -207,6 +229,17 @@ public sealed class WindowsApplicationInventoryInspector : IWindowsApplicationIn
             startupItems,
             applicationsComplete,
             startupItemsComplete);
+    }
+
+    private static WindowsApplicationInventoryReadResult ReadStartupInventory(
+        CancellationToken cancellationToken)
+    {
+        var (startupItems, startupItemsComplete) = ReadStartupItems(cancellationToken);
+        return new WindowsApplicationInventoryReadResult(
+            [],
+            startupItems,
+            InstalledApplicationsComplete: true,
+            StartupItemsComplete: startupItemsComplete);
     }
 
     private static (IReadOnlyList<WindowsApplicationInventoryEntry> Items, bool Complete)

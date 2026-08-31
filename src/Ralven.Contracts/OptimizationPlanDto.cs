@@ -27,6 +27,8 @@ public sealed record PlannedActionDto
 
 public sealed record OptimizationPlanDto
 {
+    public OptimizationScope Scope { get; init; } = OptimizationScope.FiveMLegacy;
+
     public required Guid PlanId { get; init; }
 
     public required int SchemaVersion { get; init; }

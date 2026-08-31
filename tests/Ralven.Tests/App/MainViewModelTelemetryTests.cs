@@ -21,6 +21,7 @@ public sealed class MainViewModelTelemetryTests
         var telemetry = new CapturingTelemetryService();
         var viewModel = new MainViewModel(service, telemetry: telemetry);
         await viewModel.InitializeAsync();
+        viewModel.SetOptimizationScope(OptimizationScope.FiveMLegacy);
 
         // The real catalog produces an executable plan with more actions than
         // the telemetry wire format allows; that is what used to make the

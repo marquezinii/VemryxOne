@@ -1,12 +1,110 @@
 # Base de pesquisa
 
-Esta página registra as evidências usadas para definir o escopo e as políticas do Ralven. A revisão atual foi fechada em **18 de julho de 2026**; itens dependentes de versão precisam ser revalidados antes de cada release.
+Esta página registra as evidências usadas para definir o escopo e as políticas do Ralven. A revisão atual foi fechada em **30 de agosto de 2026**; itens dependentes de versão precisam ser revalidados antes de cada release.
 
 ## Como ler
 
 - **Fato**: comportamento documentado por fonte oficial, suporte do Cfx.re ou código-fonte oficial do FiveM Legacy.
 - **Inferência**: decisão prudente derivada desses fatos, ainda sujeita a benchmark e validação em hardware real.
 - **Fora de escopo**: comportamento que não deve ser automatizado pelo produto atual.
+
+## Windows geral
+
+Esta expansão distingue diagnóstico suportado de automação baseada em chaves
+privadas ou heurísticas de internet. O escopo geral usa somente capacidades já
+tipadas no Ralven e não exige FiveM/GTA instalado.
+
+### Energia
+
+**Fato.** O Windows expõe o esquema ativo pelas APIs
+`PowerGetActiveScheme`/`PowerSetActiveScheme` e documenta `powercfg /getactivescheme`,
+`/list` e `/setactive`. O controle pode ser recusado pela ACL de energia da
+máquina e não exige inventar um plano “Ultimate” com dezenas de índices ocultos.
+
+Fontes:
+
+- [Managing Power Schemes](https://learn.microsoft.com/en-us/windows/win32/power/managing-power-schemes)
+- [PowerGetActiveScheme](https://learn.microsoft.com/en-us/windows/win32/api/powersetting/nf-powersetting-powergetactivescheme)
+- [Opções do powercfg](https://learn.microsoft.com/en-us/windows-hardware/design/device-experiences/powercfg-command-line-options)
+
+**Decisão.** O Ralven pode ativar um esquema de desempenho somente após ler o
+GUID atual, verificar alimentação por tomada e guardar o estado anterior para
+rollback. Acesso negado pode acionar o broker tipado; esquema inexistente vira
+`Skipped`, não uma criação improvisada.
+
+### Tela e taxa de atualização
+
+**Fato.** `EnumDisplaySettings` expõe o modo atual e os modos disponíveis por
+display. A própria documentação/suporte do Windows trata taxa dinâmica (DRR) e
+taxa fixa como escolhas contextuais, especialmente em notebooks.
+
+Fontes:
+
+- [EnumDisplaySettings](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumdisplaysettingsa)
+- [Alterar a taxa de atualização no Windows](https://support.microsoft.com/en-us/windows/hardware/display-graphics/change-the-refresh-rate-on-your-monitor-in-windows)
+
+**Decisão.** Comparar a taxa atual com a maior taxa da mesma resolução é um
+diagnóstico útil. O plano geral não troca modo, resolução ou frequência: uma
+alteração automática pode piorar bateria, selecionar combinação incompatível ou
+exigir reinício. A superfície nativa de Display Avançado continua sendo o local
+seguro para a escolha do usuário.
+
+### Inicialização, pagefile, memória e armazenamento
+
+**Fato.** `Run`/`RunOnce` e as pastas Startup são locais documentados de
+inicialização, mas o Windows não fornece uma API pública geral equivalente ao
+botão de desabilitar do Gerenciador de Tarefas para itens arbitrários.
+`Win32_PageFileSetting` descreve configuração persistente de pagefile, que exige
+privilégio e pode só entrar em vigor no próximo boot. `fsutil` documenta o estado
+de delete notification/TRIM, e `Optimize-Volume -ReTrim` é uma manutenção de
+volume, não uma forma universal de “acelerar SSD”.
+
+Fontes:
+
+- [Run e RunOnce](https://learn.microsoft.com/en-us/windows/win32/setupapi/run-and-runonce-registry-keys)
+- [Startup apps](https://learn.microsoft.com/en-us/windows/win32/w8cookbook/startup-apps)
+- [Win32_PageFileSetting](https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/win32-pagefilesetting)
+- [fsutil behavior](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior)
+- [Optimize-Volume](https://learn.microsoft.com/en-us/powershell/module/storage/optimize-volume?view=windowsserver2025-ps)
+
+**Decisão.** Nesta etapa, inicialização, pagefile e memória permanecem somente
+diagnóstico; o Ralven não escreve `StartupApproved`, não dimensiona pagefile por
+heurística de RAM e não implementa “RAM cleaner”. O plano pode consultar a
+política numérica de TRIM sem alteração; mudar a política ou executar ReTrim só
+poderá virar ação futura após existir detecção de filesystem/volume, privilégio
+tipado, verificação e uma apresentação explícita de que ReTrim não possui
+rollback.
+
+### Proteções do Windows e aceleração do ponteiro
+
+**Fato.** `WscGetSecurityProviderHealth` retorna a saúde agregada da categoria
+de proteção solicitada. `SystemParametersInfo` com `SPI_GETMOUSE` retorna os dois
+limiares e o nível de aceleração do ponteiro em um vetor de três inteiros.
+
+Fontes:
+
+- [WscGetSecurityProviderHealth](https://learn.microsoft.com/en-us/windows/win32/api/wscapi/nf-wscapi-wscgetsecurityproviderhealth)
+- [SystemParametersInfo e SPI_GETMOUSE](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfow)
+
+**Decisão.** O plano geral consulta as três categorias de proteção separadamente
+e não interpreta falha da Central de Segurança como estado saudável. A leitura
+do mouse é apenas diagnóstico da configuração do usuário: o Ralven não altera
+proteções, Windows Update, velocidade, limiares ou aceleração automaticamente e
+não deduz o caminho de entrada usado por um jogo a partir desse valor.
+
+### HAGS, VRR e perfis de fabricante
+
+**Fato.** A Microsoft documenta a superfície de Configurações e a capacidade
+DXGI `DXGI_FEATURE_PRESENT_ALLOW_TEARING`, mas essa capacidade não prova que
+VRR está ativo no monitor e não existe contrato público geral para editar HAGS
+ou perfis 3D NVIDIA/AMD de terceiros.
+
+Fonte: [Variable refresh rate displays](https://learn.microsoft.com/en-us/windows/win32/direct3ddxgi/variable-refresh-rate-displays).
+
+**Decisão.** O escopo geral pode relatar fatos comprováveis e abrir a superfície
+nativa, mas não promove HAGS, VRR, G-SYNC/FreeSync ou perfil de fabricante a
+ajuste automático. A existência de uma chave observada em builds atuais não a
+transforma em API suportada.
 
 ## Estado das edições
 

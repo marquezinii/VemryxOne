@@ -40,6 +40,14 @@ public static class ProfilePresentationProvider
         OptimizationProfile profile,
         ActionCatalog? catalog = null)
     {
+        return For(profile, OptimizationScope.FiveMLegacy, catalog);
+    }
+
+    public static OptimizationProfilePresentation For(
+        OptimizationProfile profile,
+        OptimizationScope scope,
+        ActionCatalog? catalog = null)
+    {
         var impactLevel = profile switch
         {
             OptimizationProfile.Light => ProfileImpactLevel.Low,
@@ -48,8 +56,15 @@ public static class ProfilePresentationProvider
             _ => throw new ArgumentOutOfRangeException(nameof(profile), profile, "Unknown optimization profile.")
         };
 
+        if (!Enum.IsDefined(scope))
+        {
+            throw new ArgumentOutOfRangeException(nameof(scope), scope, "Unknown optimization scope.");
+        }
+
         catalog ??= ActionCatalog.Current;
-        var actions = catalog.Actions.Where(action => action.Supports(profile)).ToArray();
+        var actions = catalog.Actions
+            .Where(action => action.Supports(profile) && action.Supports(scope))
+            .ToArray();
 
         var categories = actions
             .Select(action => action.Category)

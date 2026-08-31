@@ -15,8 +15,15 @@ Este documento descreve a arquitetura-alvo e os limites entre componentes. Uma c
 
 ## Áreas de produto
 
-O shell separa a experiência em **Visão geral**, **Sistema**, **Aplicativos** e
-**Jogos**. Aplicativos apresenta dentro do Ralven um inventário local somente
+O shell separa a experiência em **Visão geral**, **Otimizar**, **Sistema**,
+**Aplicativos** e **Jogos**. Otimizar usa o escopo `GeneralWindows`: funciona
+sem FiveM ou GTA V e seleciona exclusivamente ações declaradas para o PC geral.
+Jogos abre o catálogo de títulos e configura o mesmo motor no escopo
+`FiveMLegacy`; somente esse escopo aceita ações de instalação, cache, processo,
+configuração ou gráficos do FiveM/GTA V Legacy. GTAV Enhanced bloqueia o escopo
+especializado, mas nunca bloqueia uma análise geral do Windows.
+
+Aplicativos apresenta dentro do Ralven um inventário local somente
 leitura dos programas desktop registrados e dos itens de inicialização em
 `Run`, `RunOnce` e pastas Startup. Busca, contagens e resultados parciais ficam
 na própria página; as superfícies do Windows e da Microsoft Store permanecem
@@ -182,6 +189,23 @@ Um plano é uma lista ordenada e imutável de ações resolvidas para aquele dia
 - caminhos não podem ser recalculados para outro alvo;
 - conflito entre ações invalida o plano;
 - o broker recebe somente o subconjunto privilegiado já aprovado.
+
+`OptimizationScope` é ortogonal ao fato detectado em `FiveMEdition`:
+
+- `GeneralWindows` aceita uma máquina sem FiveM, com Legacy ou com Enhanced,
+  mas o planejador só inclui definições explicitamente compatíveis com o escopo
+  geral;
+- `FiveMLegacy` preserva o bloqueio quando a instalação não foi encontrada e o
+  bloqueio seguro do Enhanced;
+- toda definição nasce fechada para `FiveMLegacy`; uma ação só entra no plano
+  geral quando o catálogo a marca explicitamente como compartilhada;
+- runtime e broker reconstroem o plano com o mesmo escopo antes de resolver
+  handlers, portanto trocar o campo na UI ou no JSON não amplia a allowlist.
+
+O valor zero de `OptimizationScope` continua sendo `FiveMLegacy` para que um
+journal anterior à introdução do campo mantenha a semântica original. O escopo
+não é inferido por categoria ou prefixo de ID, pois o catálogo histórico contém
+IDs e categorias que atravessam as duas experiências.
 
 O planejamento é uma **função pura**: `PlanBuilder.Build(request, context)` produz sempre o mesmo plano para a mesma entrada. Tudo que não é determinístico — identidade do plano, instante de criação e catálogo — entra por `PlanBuildContext`, resolvido pelo chamador (`PlanBuildContext.New` para um plano novo, `PlanBuildContext.For` para reconstruir um plano existente). O planejador não lê relógio, disco, registro nem estado ambiente.
 
@@ -509,7 +533,10 @@ O pipeline público deve:
 
 ## Não objetivos
 
-- competir com antivírus ou ferramentas de manutenção geral;
+- substituir antivírus ou automatizar manutenção ampla sem diagnóstico e
+  allowlist;
+- instalar driver ou serviço persistente para executar ajustes que as APIs
+  suportadas do Windows já expõem ao processo padrão ou ao broker efêmero;
 - “debloat” irrestrito do Windows;
 - modificar servidores ou recursos de terceiros;
 - burlar pure mode, anti-cheat ou integridade;

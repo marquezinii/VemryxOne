@@ -18,7 +18,7 @@ public static class PlanBuilder
         ArgumentNullException.ThrowIfNull(context);
         ValidateRequest(request);
 
-        var blocks = CreateBlocks(request.Edition);
+        var blocks = CreateBlocks(request.Scope, request.Edition);
         if (blocks.Count > 0)
         {
             return CreatePlan(request, context, [], blocks, []);
@@ -26,6 +26,7 @@ public static class PlanBuilder
 
         var selectedDefinitions = context.Catalog.Actions
             .Where(action => action.Supports(request.Profile))
+            .Where(action => action.Supports(request.Scope))
             .Where(action => action.SupportsWindows(request.DetectedWindows))
             .Where(action => IsEnabled(action.OptionGate, request.Options))
             .ToArray();
@@ -64,6 +65,7 @@ public static class PlanBuilder
 
         return new OptimizationPlanRequestDto
         {
+            Scope = plan.Scope,
             Profile = plan.Profile,
             Edition = plan.Edition,
             Options = plan.Options with { }
@@ -81,6 +83,7 @@ public static class PlanBuilder
 
         return new OptimizationPlanDto
         {
+            Scope = request.Scope,
             PlanId = context.PlanId,
             SchemaVersion = ProductIdentity.PlanSchemaVersion,
             CatalogVersion = ActionCatalog.CurrentVersion,
@@ -103,8 +106,15 @@ public static class PlanBuilder
         };
     }
 
-    private static IReadOnlyList<PlanBlockDto> CreateBlocks(FiveMEdition edition)
+    private static IReadOnlyList<PlanBlockDto> CreateBlocks(
+        OptimizationScope scope,
+        FiveMEdition edition)
     {
+        if (scope == OptimizationScope.GeneralWindows)
+        {
+            return [];
+        }
+
         return edition switch
         {
             FiveMEdition.Legacy => [],
@@ -250,9 +260,13 @@ public static class PlanBuilder
         {
             notices.Add(new PlanNoticeDto
             {
-                Code = "aggressive-prioritizes-performance",
+                Code = request.Scope == OptimizationScope.GeneralWindows
+                    ? "aggressive-windows-prioritizes-performance"
+                    : "aggressive-prioritizes-performance",
                 Severity = PlanNoticeSeverity.Warning,
-                Message = "O perfil agressivo prioriza FPS e responsividade, reduzindo a qualidade visual."
+                Message = request.Scope == OptimizationScope.GeneralWindows
+                    ? "O perfil agressivo prioriza desempenho e responsividade, podendo aumentar consumo de energia."
+                    : "O perfil agressivo prioriza FPS e responsividade, reduzindo a qualidade visual."
             });
         }
 
@@ -296,6 +310,11 @@ public static class PlanBuilder
         if (!Enum.IsDefined(request.Profile))
         {
             throw new ArgumentOutOfRangeException(nameof(request.Profile), request.Profile, "Unknown optimization profile value.");
+        }
+
+        if (!Enum.IsDefined(request.Scope))
+        {
+            throw new ArgumentOutOfRangeException(nameof(request.Scope), request.Scope, "Unknown optimization scope value.");
         }
 
         if (!Enum.IsDefined(request.Edition))

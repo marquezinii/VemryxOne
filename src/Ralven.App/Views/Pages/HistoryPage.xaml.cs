@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Ralven.App.Services;
 using Ralven.App.ViewModels;
+using Ralven.Contracts;
 using UserControl = System.Windows.Controls.UserControl;
 
 namespace Ralven.App.Views.Pages;
@@ -26,7 +27,7 @@ public partial class HistoryPage : UserControl
     {
         if (Window.GetWindow(this) is MainWindow shell)
         {
-            shell.RequestNavigateToOptimizer();
+            shell.RequestNavigateToOptimizer(OptimizationScope.GeneralWindows);
         }
     }
 

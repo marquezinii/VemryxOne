@@ -1,5 +1,8 @@
 namespace Ralven.Windows.Actions;
 
+/// <summary>Resolves a user-facing action result at the application boundary.</summary>
+public delegate string WindowsActionTextResolver(string key, params object?[] arguments);
+
 /// <summary>
 /// Base for the read-only diagnostics. They never change the machine: applying
 /// one always resolves to <see cref="WindowsActionApplyResult.NoChange"/> with
@@ -25,4 +28,28 @@ public abstract class ReadOnlyDiagnosticAction : WindowsOptimizationAction
 
     /// <summary>Builds the message reported to the user for this diagnostic.</summary>
     protected abstract string Describe();
+}
+
+/// <summary>
+/// Read-only diagnostic counterpart for inspectors that already expose an
+/// asynchronous contract. Keeping this separate prevents synchronous actions
+/// from allocating an async state machine and avoids blocking on async I/O.
+/// </summary>
+public abstract class AsyncReadOnlyDiagnosticAction : WindowsOptimizationAction
+{
+    public sealed override async Task<WindowsActionApplyResult> ApplyAsync(
+        WindowsActionContext context,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var message = await DescribeAsync(cancellationToken).ConfigureAwait(false);
+        return WindowsActionApplyResult.NoChange(message);
+    }
+
+    public sealed override Task RollbackAsync(
+        WindowsActionContext context,
+        string? snapshotJson,
+        CancellationToken cancellationToken) => Task.CompletedTask;
+
+    protected abstract Task<string> DescribeAsync(CancellationToken cancellationToken);
 }

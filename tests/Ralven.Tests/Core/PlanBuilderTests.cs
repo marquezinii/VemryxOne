@@ -41,6 +41,10 @@ public sealed class PlanBuilderTests
                 OptimizationActionIds.DiagnosePciLink,
                 OptimizationActionIds.DiagnoseHardwareStability,
                 OptimizationActionIds.ClassifyBottleneck,
+                OptimizationActionIds.DiagnoseWindowsSecurityHealth,
+                OptimizationActionIds.DiagnoseStartupLoad,
+                OptimizationActionIds.DiagnoseTrimStatus,
+                OptimizationActionIds.DiagnoseMouseAcceleration,
                 OptimizationActionIds.DiagnoseCacheStorage,
                 OptimizationActionIds.DiagnoseInstallationHealth,
                 OptimizationActionIds.DiagnoseCrashPatterns,
@@ -340,6 +344,10 @@ public sealed class PlanBuilderTests
                 OptimizationActionIds.DiagnosePciLink,
                 OptimizationActionIds.DiagnoseHardwareStability,
                 OptimizationActionIds.ClassifyBottleneck,
+                OptimizationActionIds.DiagnoseWindowsSecurityHealth,
+                OptimizationActionIds.DiagnoseStartupLoad,
+                OptimizationActionIds.DiagnoseTrimStatus,
+                OptimizationActionIds.DiagnoseMouseAcceleration,
                 OptimizationActionIds.DiagnoseCacheStorage,
                 OptimizationActionIds.DiagnoseInstallationHealth,
                 OptimizationActionIds.DiagnoseCrashPatterns,
@@ -385,6 +393,77 @@ public sealed class PlanBuilderTests
         Assert.False(plan.IsExecutable);
         Assert.Empty(plan.Actions);
         Assert.Equal(PlanBlockCode.EditionNotDetected, Assert.Single(plan.Blocks).Code);
+    }
+
+    [Theory]
+    [InlineData(FiveMEdition.Unknown)]
+    [InlineData(FiveMEdition.Legacy)]
+    [InlineData(FiveMEdition.Enhanced)]
+    public void GeneralWindows_AcceptsEveryEditionAndExcludesSpecializedActions(FiveMEdition edition)
+    {
+        var plan = BuildPlan(new OptimizationPlanRequestDto
+        {
+            Scope = OptimizationScope.GeneralWindows,
+            Profile = OptimizationProfile.Aggressive,
+            Edition = edition,
+            Options = new OptimizationOptionsDto
+            {
+                ServerCacheRepair = CacheRepairPolicy.RepairNow,
+                ApplyGtaVGraphicsPreset = true,
+                ToggleFullscreenOptimizationsExperiment = true,
+                ToggleHagsExperiment = true,
+                GuideDriverReinstall = true
+            }
+        });
+
+        Assert.True(plan.IsExecutable);
+        Assert.Equal(OptimizationScope.GeneralWindows, plan.Scope);
+        Assert.Empty(plan.Blocks);
+        Assert.NotEmpty(plan.Actions);
+        Assert.All(plan.Actions, action =>
+            Assert.True(ActionCatalog.Current.GetRequired(action.Metadata.Id)
+                .Supports(OptimizationScope.GeneralWindows)));
+        Assert.DoesNotContain(OptimizationActionIds.VerifyFiveMIsStopped, Ids(plan));
+        Assert.DoesNotContain(OptimizationActionIds.RepairLegacyServerCache, Ids(plan));
+        Assert.DoesNotContain(OptimizationActionIds.ApplyAggressiveLegacyGraphics, Ids(plan));
+        Assert.DoesNotContain(OptimizationActionIds.ApplyAggressiveGtaVGraphics, Ids(plan));
+        Assert.DoesNotContain(OptimizationActionIds.ToggleHags, Ids(plan));
+        Assert.DoesNotContain(OptimizationActionIds.ToggleFullscreenOptimizations, Ids(plan));
+        Assert.Contains(OptimizationActionIds.GuideDriverReinstall, Ids(plan));
+        Assert.Contains(plan.Notices, notice =>
+            notice.Code == "aggressive-windows-prioritizes-performance" &&
+            !notice.Message.Contains("FPS", StringComparison.OrdinalIgnoreCase));
+        Assert.DoesNotContain(plan.Notices, notice =>
+            notice.Code == "aggressive-prioritizes-performance");
+    }
+
+    [Fact]
+    public void GeneralWindows_CanonicalRequestPreservesScope()
+    {
+        var original = BuildPlan(new OptimizationPlanRequestDto
+        {
+            Scope = OptimizationScope.GeneralWindows,
+            Profile = OptimizationProfile.Balanced,
+            Edition = FiveMEdition.Unknown
+        });
+
+        var canonical = PlanBuilder.CanonicalRequestFor(original);
+        var rebuilt = PlanBuilder.Build(canonical, PlanBuildContext.For(original));
+
+        Assert.Equal(OptimizationScope.GeneralWindows, canonical.Scope);
+        Assert.Equal(original.Scope, rebuilt.Scope);
+        Assert.Equal(Ids(original), Ids(rebuilt));
+    }
+
+    [Fact]
+    public void UndefinedScope_IsRejected()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => BuildPlan(new OptimizationPlanRequestDto
+        {
+            Scope = (OptimizationScope)99,
+            Profile = OptimizationProfile.Light,
+            Edition = FiveMEdition.Legacy
+        }));
     }
 
     [Theory]

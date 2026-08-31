@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using Ralven.App.ViewModels;
+using Ralven.Contracts;
 using UserControl = System.Windows.Controls.UserControl;
 
 namespace Ralven.App.Views.Pages;
@@ -49,7 +50,7 @@ public partial class OverviewPage : UserControl
 
     private void OpenOptimizer_Click(object sender, RoutedEventArgs e)
     {
-        (Window.GetWindow(this) as MainWindow)?.RequestNavigateToOptimizer();
+        (Window.GetWindow(this) as MainWindow)?.RequestNavigateToOptimizer(OptimizationScope.GeneralWindows);
     }
 
     private void OpenHistory_Click(object sender, RoutedEventArgs e)

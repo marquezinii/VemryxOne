@@ -69,5 +69,8 @@ public sealed class ApplicationsPageViewModelTests
     {
         public Task<WindowsApplicationInventorySnapshot> InspectAsync(
             CancellationToken cancellationToken = default) => inspect(cancellationToken);
+
+        public Task<WindowsApplicationInventorySnapshot> InspectStartupAsync(
+            CancellationToken cancellationToken = default) => inspect(cancellationToken);
     }
 }

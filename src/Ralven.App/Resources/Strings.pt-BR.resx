@@ -9,7 +9,7 @@
   <data name="Navigation.System" xml:space="preserve"><value>Sistema</value></data>
   <data name="Navigation.Applications" xml:space="preserve"><value>Aplicativos</value></data>
   <data name="Navigation.Games" xml:space="preserve"><value>Jogos</value></data>
-  <data name="Navigation.Optimizer" xml:space="preserve"><value>Otimizador</value></data>
+  <data name="Navigation.Optimizer" xml:space="preserve"><value>Otimizar</value></data>
   <data name="Navigation.History" xml:space="preserve"><value>Histórico</value></data>
   <data name="Navigation.Settings" xml:space="preserve"><value>Configurações</value></data>
   <data name="Games.Title" xml:space="preserve"><value>Jogos</value></data>
@@ -163,7 +163,7 @@
   <data name="LiveAlert.Dismiss" xml:space="preserve"><value>Fechar</value></data>
   <data name="Account.TitleBar.SignInPrompt" xml:space="preserve"><value>Entrar / Cadastre-se</value></data>
   <data name="Dashboard.Refresh" xml:space="preserve"><value>Reanalisar PC</value></data>
-  <data name="Dashboard.OpenOptimizer" xml:space="preserve"><value>Abrir Otimizador</value></data>
+  <data name="Dashboard.OpenOptimizer" xml:space="preserve"><value>Otimizar PC</value></data>
   <data name="Dashboard.SystemOverview" xml:space="preserve"><value>Seu computador</value></data>
   <data name="Dashboard.Readiness" xml:space="preserve"><value>PRONTIDÃO</value></data>
   <data name="Dashboard.Processor" xml:space="preserve"><value>PROCESSADOR</value></data>
@@ -172,7 +172,7 @@
   <data name="Dashboard.Storage" xml:space="preserve"><value>ARMAZENAMENTO</value></data>
   <data name="Dashboard.Windows" xml:space="preserve"><value>WINDOWS</value></data>
   <data name="Dashboard.Architecture" xml:space="preserve"><value>ARQUITETURA DO SISTEMA</value></data>
-  <data name="Dashboard.ReadinessExplanation" xml:space="preserve"><value>Baseado na memória livre, no processador, no espaço em disco e no que foi encontrado do FiveM nesta máquina. Não é uma promessa de FPS.</value></data>
+  <data name="Dashboard.ReadinessExplanation" xml:space="preserve"><value>Baseado na memória disponível, no processador, no espaço em disco e no hardware gráfico identificado. Não é uma promessa de FPS.</value></data>
   <data name="Profiles.Choose" xml:space="preserve"><value>Escolha o nível</value></data>
   <data name="Profiles.RecommendedHint" xml:space="preserve"><value>Médio é o recomendado para a maioria dos PCs.</value></data>
   <data name="Profiles.Light.Name" xml:space="preserve"><value>Leve</value></data>
@@ -190,6 +190,10 @@
   <data name="Plan.OptimizeNow" xml:space="preserve"><value>Otimizar agora</value></data>
   <data name="Optimizer.Title" xml:space="preserve"><value>Otimizador do FiveM</value></data>
   <data name="Optimizer.Subtitle" xml:space="preserve"><value>Prepare seu computador para jogar com menos travamentos, processos desnecessários e problemas de cache.</value></data>
+  <data name="Optimizer.General.Title" xml:space="preserve"><value>Otimize seu PC</value></data>
+  <data name="Optimizer.General.Subtitle" xml:space="preserve"><value>Revise um plano transparente do Windows com ações seguras que não exigem FiveM nem GTA V.</value></data>
+  <data name="Optimizer.FiveM.Title" xml:space="preserve"><value>Otimizador do FiveM</value></data>
+  <data name="Optimizer.FiveM.Subtitle" xml:space="preserve"><value>Prepare o FiveM sobre GTAV Legacy com diagnósticos, ajustes e ações reversíveis dedicadas.</value></data>
   <data name="Optimizer.NoRemoteScripts" xml:space="preserve"><value>100% LOCAL</value></data>
   <data name="Optimizer.SystemReady" xml:space="preserve"><value>Sistema pronto</value></data>
   <data name="Optimizer.Recommended" xml:space="preserve"><value>OTIMIZAÇÃO RECOMENDADA</value></data>
@@ -333,6 +337,7 @@
   <data name="Plan.Empty.Summary" xml:space="preserve"><value>Nenhuma alteração será feita até que o diagnóstico encontre ações seguras.</value></data>
   <data name="Plan.Empty.LegacyRequired" xml:space="preserve"><value>Selecione uma instalação FiveM Legacy válida ou instale o FiveM e reanalise o PC para preparar ações seguras.</value></data>
   <data name="Plan.Empty.NoSafeActions" xml:space="preserve"><value>Nenhuma ação segura é necessária para o diagnóstico atual.</value></data>
+  <data name="Plan.Empty.GeneralNoSafeActions" xml:space="preserve"><value>Este PC já atende aos alvos seguros do Windows disponíveis para o perfil selecionado.</value></data>
   <data name="Plan.Empty.DiagnosticInProgress" xml:space="preserve"><value>Aguarde o diagnóstico terminar antes de preparar ações.</value></data>
   <data name="Plan.Empty.DiagnosticUnavailable" xml:space="preserve"><value>Não foi possível concluir o diagnóstico. Reanalise o PC antes de preparar ações.</value></data>
   <data name="Plan.ActionsCatalog" xml:space="preserve"><value>{0} ações • catálogo v{1}</value></data>
@@ -350,8 +355,9 @@
   <data name="Diagnosis.CloseGtaVSafely" xml:space="preserve"><value>Feche o GTA V para otimizar com segurança</value></data>
   <data name="Diagnosis.RecommendedProfile" xml:space="preserve"><value>Perfil {0} recomendado para este PC</value></data>
   <data name="Diagnosis.LegacyReady" xml:space="preserve"><value>O diagnóstico encontrou o layout Legacy conhecido e preparou ações compatíveis.</value></data>
+  <data name="Diagnosis.GeneralReady" xml:space="preserve"><value>O Ralven preparou um plano do Windows com base na capacidade local deste PC. O FiveM tem uma experiência dedicada em Jogos.</value></data>
   <data name="Diagnosis.EnhancedUnsupported" xml:space="preserve"><value>A edição Enhanced usa um novo launcher e cache configurável. Esta versão não aplicará regras do Legacy nela.</value></data>
-  <data name="Diagnosis.InstallLegacy" xml:space="preserve"><value>Selecione uma instalação Legacy válida ou instale o FiveM para liberar a execução.</value></data>
+  <data name="Diagnosis.InstallLegacy" xml:space="preserve"><value>A otimização geral do Windows já está disponível. Instale ou selecione o FiveM Legacy apenas para liberar as ações dedicadas ao jogo.</value></data>
   <data name="Diagnosis.FreeDisk" xml:space="preserve"><value>{0} GB livres</value></data>
   <data name="History.ProfileTitle" xml:space="preserve"><value>Perfil {0}</value></data>
   <data name="History.WindowsGamingTitle" xml:space="preserve"><value>Ajustes de jogos do Windows</value></data>
@@ -561,11 +567,11 @@
   <data name="Actions.safety.performance-diagnostics.guide.UndoSummary" xml:space="preserve"><value>Somente leitura: não há nada para desfazer.</value></data>
   <data name="Actions.safety.performance-diagnostics.guide.RiskLimitations" xml:space="preserve"><value>Não injeta overlay nem mede FPS pelo aplicativo; a medição é feita pelo próprio FiveM.</value></data>
   <data name="Actions.safety.network-health.diagnose.Name" xml:space="preserve"><value>Diagnosticar saúde da rede local</value></data>
-  <data name="Actions.safety.network-health.diagnose.Description" xml:space="preserve"><value>Lê contadores de pacotes descartados e com erro das placas de rede ativas, sem enviar tráfego a nenhum servidor.</value></data>
-  <data name="Actions.safety.network-health.diagnose.DetectionSummary" xml:space="preserve"><value>Lê estatísticas já coletadas pelo Windows para as placas de rede ativas (pacotes descartados/com erro).</value></data>
+  <data name="Actions.safety.network-health.diagnose.Description" xml:space="preserve"><value>Lê tipo, velocidade de link e contadores de pacotes descartados ou com erro da interface de rede ativa, sem enviar tráfego a nenhum servidor.</value></data>
+  <data name="Actions.safety.network-health.diagnose.DetectionSummary" xml:space="preserve"><value>Lê tipo, velocidade e estatísticas já coletadas pelo Windows para a interface ativa mais rápida (pacotes descartados/com erro).</value></data>
   <data name="Actions.safety.network-health.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
   <data name="Actions.safety.network-health.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não envia nem recebe tráfego de rede.</value></data>
-  <data name="Actions.safety.network-health.diagnose.RiskLimitations" xml:space="preserve"><value>Não substitui netgraph/cl_drawperf do próprio FiveM para latência real até o servidor.</value></data>
+  <data name="Actions.safety.network-health.diagnose.RiskLimitations" xml:space="preserve"><value>Não mede latência, jitter ou perda no caminho até um serviço externo específico.</value></data>
   <data name="Actions.safety.thermal.diagnose.Name" xml:space="preserve"><value>Diagnosticar temperatura e throttling</value></data>
   <data name="Actions.safety.thermal.diagnose.Description" xml:space="preserve"><value>Tenta ler a zona térmica ACPI exposta pelo Windows; a maioria das placas-mãe não expõe esse dado sem software do fabricante, e isso é informado com honestidade.</value></data>
   <data name="Actions.safety.thermal.diagnose.DetectionSummary" xml:space="preserve"><value>Consulta MSAcpi_ThermalZoneTemperature (WMI) e valida se o valor está numa faixa plausível.</value></data>
@@ -613,13 +619,13 @@
   <data name="Actions.fivem.legacy.storage-health.diagnose.DetectionSummary" xml:space="preserve"><value>Consulta MSFT_PhysicalDisk (Storage Management API), que cobre SATA S.M.A.R.T. e NVMe Health sem driver adicional.</value></data>
   <data name="Actions.fivem.legacy.storage-health.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
   <data name="Actions.fivem.legacy.storage-health.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não repara, formata nem move dados.</value></data>
-  <data name="Actions.fivem.legacy.storage-health.diagnose.RiskLimitations" xml:space="preserve"><value>Reporta todas as unidades físicas detectadas; não afirma com certeza qual delas hospeda o FiveM.</value></data>
+  <data name="Actions.fivem.legacy.storage-health.diagnose.RiskLimitations" xml:space="preserve"><value>Reporta todas as unidades físicas detectadas; a saúde preditiva depende do que cada driver expõe ao Windows.</value></data>
   <data name="Actions.windows.system.driver-versions.diagnose.Name" xml:space="preserve"><value>Diagnosticar build do Windows e versões de driver</value></data>
-  <data name="Actions.windows.system.driver-versions.diagnose.Description" xml:space="preserve"><value>Lê o build exato do Windows e as versões dos drivers de vídeo, rede, áudio e chipset (quando identificável).</value></data>
+  <data name="Actions.windows.system.driver-versions.diagnose.Description" xml:space="preserve"><value>Lê o build exato do Windows e versões de drivers de vídeo, rede, áudio, chipset, armazenamento, USB e Bluetooth (quando identificáveis).</value></data>
   <data name="Actions.windows.system.driver-versions.diagnose.DetectionSummary" xml:space="preserve"><value>Consulta Win32_PnPSignedDriver (WMI) agrupado por classe de dispositivo, mais Environment.OSVersion para o build.</value></data>
   <data name="Actions.windows.system.driver-versions.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
   <data name="Actions.windows.system.driver-versions.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não instala, atualiza nem reverte nenhum driver.</value></data>
-  <data name="Actions.windows.system.driver-versions.diagnose.RiskLimitations" xml:space="preserve"><value>O driver de chipset é identificado por heurística de nome; nem todo fabricante o expõe como classe própria.</value></data>
+  <data name="Actions.windows.system.driver-versions.diagnose.RiskLimitations" xml:space="preserve"><value>Chipset é identificado por heurística de nome e as demais categorias dependem das classes expostas pelo fabricante ao Windows.</value></data>
   <data name="Actions.windows.gaming.display-configuration.diagnose.Name" xml:space="preserve"><value>Diagnosticar resolução, taxa de atualização e HAGS</value></data>
   <data name="Actions.windows.gaming.display-configuration.diagnose.Description" xml:space="preserve"><value>Compara a taxa de atualização configurada com a máxima suportada na resolução atual e lê o estado do HAGS.</value></data>
   <data name="Actions.windows.gaming.display-configuration.diagnose.DetectionSummary" xml:space="preserve"><value>Usa EnumDisplaySettings (Win32) para o modo atual/máximo e o registro de GraphicsDrivers para HwSchMode.</value></data>
@@ -661,7 +667,7 @@
   <data name="Actions.safety.bottleneck-classification.diagnose.DetectionSummary" xml:space="preserve"><value>Combina as leituras já feitas por outros diagnósticos (uso de recursos, temperatura, rede, memória) com o processo de maior uso de CPU no momento (Win32_PerfFormattedData_PerfProc_Process).</value></data>
   <data name="Actions.safety.bottleneck-classification.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
   <data name="Actions.safety.bottleneck-classification.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não encerra nem prioriza nenhum processo.</value></data>
-  <data name="Actions.safety.bottleneck-classification.diagnose.RiskLimitations" xml:space="preserve"><value>É uma classificação por eliminação a partir de sinais locais; 'servidor limitado' é a conclusão quando nenhum sinal local se destaca, não uma medição direta do servidor.</value></data>
+  <data name="Actions.safety.bottleneck-classification.diagnose.RiskLimitations" xml:space="preserve"><value>É uma classificação por eliminação a partir de sinais locais; uma limitação externa é inferida quando nenhum recurso local se destaca, não medida diretamente.</value></data>
   <data name="Actions.gtav.legacy.launch-parameters.diagnose.Name" xml:space="preserve"><value>Diagnosticar parâmetros de inicialização do GTA V</value></data>
   <data name="Actions.gtav.legacy.launch-parameters.diagnose.Description" xml:space="preserve"><value>Lê o commandline.txt do GTA V Legacy standalone (nunca do FiveM, que ignora esse arquivo) e avisa quando parâmetros de reparo ficaram ativos permanentemente.</value></data>
   <data name="Actions.gtav.legacy.launch-parameters.diagnose.DetectionSummary" xml:space="preserve"><value>Lê o commandline.txt na pasta de instalação do GTA V standalone, se existir.</value></data>
@@ -902,6 +908,7 @@
   <data name="Plan.Notice.DiagnosticsRetention" xml:space="preserve"><value>Diagnósticos com mais de {0} dias serão removidos permanentemente.</value></data>
   <data name="Plan.Notice.ServerCacheRepair" xml:space="preserve"><value>Os caches de servidores serão recriados e o primeiro carregamento poderá ficar mais lento; limpar server-cache-priv também pode tornar clipes antigos do Rockstar Editor indisponíveis.</value></data>
   <data name="Plan.Notice.AcPower" xml:space="preserve"><value>O modo de energia de desempenho só será aplicado com o computador ligado à tomada.</value></data>
+  <data name="Plan.Notice.AggressiveWindows" xml:space="preserve"><value>O perfil Agressivo prioriza desempenho e responsividade do Windows e pode aumentar o consumo de energia.</value></data>
   <data name="Plan.Notice.AggressiveVisual" xml:space="preserve"><value>O perfil Agressivo prioriza FPS e responsividade em vez da qualidade visual.</value></data>
   <data name="Results.FiveMStopped" xml:space="preserve"><value>FiveM fechado; é seguro continuar.</value></data>
   <data name="Results.GtaVStopped" xml:space="preserve"><value>GTA V fechado; é seguro continuar.</value></data>
@@ -1042,6 +1049,12 @@
   <data name="Profiles.Presentation.Light.Benefits" xml:space="preserve"><value>Libera espaço e aplica ajustes leves de baixo impacto, preservando quase toda a qualidade visual.</value></data>
   <data name="Profiles.Presentation.Balanced.Benefits" xml:space="preserve"><value>Equilibra qualidade visual, uso de GPU e estabilidade de quadros com ajustes moderados e totalmente reversíveis.</value></data>
   <data name="Profiles.Presentation.Aggressive.Benefits" xml:space="preserve"><value>Prioriza FPS e responsividade em vez de qualidade visual, aplicando todos os ajustes seguros disponíveis.</value></data>
+  <data name="Profiles.Presentation.GeneralWindows.Light.Benefits" xml:space="preserve"><value>Limpa arquivos temporários antigos e aplica ajustes leves de jogos do Windows, preservando a experiência visual.</value></data>
+  <data name="Profiles.Presentation.GeneralWindows.Balanced.Benefits" xml:space="preserve"><value>Combina limpeza segura, ajustes de jogos do Windows e um plano de energia de desempenho reversível.</value></data>
+  <data name="Profiles.Presentation.GeneralWindows.Aggressive.Benefits" xml:space="preserve"><value>Aplica todas as ações compatíveis do Windows, incluindo reduções reversíveis de efeitos visuais para um PC mais responsivo.</value></data>
+  <data name="Profiles.Presentation.FiveMLegacy.Light.Benefits" xml:space="preserve"><value>Libera espaço e aplica ajustes leves do FiveM, preservando quase toda a qualidade visual.</value></data>
+  <data name="Profiles.Presentation.FiveMLegacy.Balanced.Benefits" xml:space="preserve"><value>Equilibra qualidade visual, uso de GPU e estabilidade de quadros no FiveM com ajustes moderados e totalmente reversíveis.</value></data>
+  <data name="Profiles.Presentation.FiveMLegacy.Aggressive.Benefits" xml:space="preserve"><value>Prioriza a responsividade do FiveM em vez da qualidade visual, aplicando todos os ajustes dedicados e seguros disponíveis.</value></data>
   <data name="Profiles.Presentation.Impact.Low" xml:space="preserve"><value>Impacto baixo</value></data>
   <data name="Profiles.Presentation.Impact.Moderate" xml:space="preserve"><value>Impacto moderado</value></data>
   <data name="Profiles.Presentation.Impact.High" xml:space="preserve"><value>Impacto alto</value></data>
@@ -1092,7 +1105,7 @@
   <data name="Dashboard.SessionMonitor.CompletedDetail" xml:space="preserve"><value>A sessão foi observada por cerca de {0}. O monitor continua pronto para a próxima.</value></data>
   <data name="Dashboard.SessionMonitor.ReadUnavailable" xml:space="preserve"><value>LEITURA INDISPONÍVEL</value></data>
   <data name="Dashboard.SessionMonitor.ReadUnavailableDetail" xml:space="preserve"><value>Não foi possível concluir a validação local do processo. O estado anterior foi preservado.</value></data>
-  <data name="Dashboard.SystemOverview.Description" xml:space="preserve"><value>Hardware detectado e disponível para FiveM e GTA V.</value></data>
+  <data name="Dashboard.SystemOverview.Description" xml:space="preserve"><value>Hardware detectado localmente para diagnóstico e otimização.</value></data>
   <data name="Dashboard.Eyebrow" xml:space="preserve"><value>DIAGNÓSTICO LOCAL</value></data>
   <data name="Dashboard.LastScan" xml:space="preserve"><value>Última varredura às {0}</value></data>
   <data name="Dashboard.LastScan.Pending" xml:space="preserve"><value>Analisando…</value></data>
@@ -1303,4 +1316,54 @@
   <data name="Terms.Section10.Title" xml:space="preserve"><value>10. Alterações destes termos</value></data>
   <data name="Terms.Section10.Body" xml:space="preserve"><value>Mudanças materiais serão identificadas por uma nova versão. Quando necessário, solicitaremos novo aceite antes de continuar usando recursos de conta. A versão aceita e a data do aceite ficam registradas para manter esse processo verificável.</value></data>
   <data name="Terms.Section11.Title" xml:space="preserve"><value>11. Lei aplicável e contato</value></data>
+  <data name="Actions.windows.system.security-health.diagnose.Name" xml:space="preserve"><value>Diagnosticar proteções do Windows</value></data>
+  <data name="Actions.windows.system.security-health.diagnose.Description" xml:space="preserve"><value>Lê a saúde agregada de antivírus, firewall e atualizações automáticas pela Central de Segurança do Windows, sem alterar nenhuma proteção.</value></data>
+  <data name="Actions.windows.system.security-health.diagnose.DetectionSummary" xml:space="preserve"><value>Consulta separadamente antivírus, firewall e atualizações automáticas pela API nativa WscGetSecurityProviderHealth.</value></data>
+  <data name="Actions.windows.system.security-health.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca falha por si só.</value></data>
+  <data name="Actions.windows.system.security-health.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não ativa, desativa nem configura nenhuma proteção.</value></data>
+  <data name="Actions.windows.system.security-health.diagnose.RiskLimitations" xml:space="preserve"><value>A saúde agregada não lista produtos nem prova que o Windows está atualizado; falha da API permanece indisponível.</value></data>
+  <data name="Actions.windows.system.startup-load.diagnose.Name" xml:space="preserve"><value>Diagnosticar carga de inicialização</value></data>
+  <data name="Actions.windows.system.startup-load.diagnose.Description" xml:space="preserve"><value>Conta itens registrados em Run, RunOnce e pastas Startup para orientar uma revisão manual, sem carregar comandos nem desabilitar programas.</value></data>
+  <data name="Actions.windows.system.startup-load.diagnose.DetectionSummary" xml:space="preserve"><value>Reutiliza o inventário allowlisted de Run, RunOnce e pastas Startup por usuário e por máquina, lendo somente nomes e origens.</value></data>
+  <data name="Actions.windows.system.startup-load.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; fontes inacessíveis permanecem marcadas como resultado parcial.</value></data>
+  <data name="Actions.windows.system.startup-load.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não executa comandos nem habilita ou desabilita itens de inicialização.</value></data>
+  <data name="Actions.windows.system.startup-load.diagnose.RiskLimitations" xml:space="preserve"><value>Não calcula o impacto do Gerenciador de Tarefas e não inclui serviços ou tarefas agendadas; quantidade sozinha não determina lentidão.</value></data>
+  <data name="Actions.windows.storage.trim-status.diagnose.Name" xml:space="preserve"><value>Diagnosticar política de TRIM</value></data>
+  <data name="Actions.windows.storage.trim-status.diagnose.Description" xml:space="preserve"><value>Consulta a política de notificações de exclusão para NTFS e ReFS pela ferramenta oficial do Windows, sem otimizar ou modificar volumes.</value></data>
+  <data name="Actions.windows.storage.trim-status.diagnose.DetectionSummary" xml:space="preserve"><value>Executa somente fsutil behavior query DisableDeleteNotify e interpreta os estados numéricos documentados de NTFS/ReFS.</value></data>
+  <data name="Actions.windows.storage.trim-status.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com o estado detectado ou uma indicação honesta de indisponibilidade; nenhum volume é alterado.</value></data>
+  <data name="Actions.windows.storage.trim-status.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não executa ReTrim, desfragmentação ou mudança de política.</value></data>
+  <data name="Actions.windows.storage.trim-status.diagnose.RiskLimitations" xml:space="preserve"><value>Notificações habilitadas não comprovam que o SSD, driver ou armazenamento remoto executa TRIM; a ação relata apenas a política do Windows.</value></data>
+  <data name="Actions.windows.input.mouse-acceleration.diagnose.Name" xml:space="preserve"><value>Diagnosticar aceleração do mouse</value></data>
+  <data name="Actions.windows.input.mouse-acceleration.diagnose.Description" xml:space="preserve"><value>Lê os dois limiares e o nível de aceleração do ponteiro configurados pelo Windows, sem mudar a sensação do mouse.</value></data>
+  <data name="Actions.windows.input.mouse-acceleration.diagnose.DetectionSummary" xml:space="preserve"><value>Usa SystemParametersInfo com SPI_GETMOUSE para ler os dois limiares e o nível de aceleração do usuário atual.</value></data>
+  <data name="Actions.windows.input.mouse-acceleration.diagnose.ConfirmationSummary" xml:space="preserve"><value>Sempre é concluída com uma mensagem informativa; nunca altera a configuração.</value></data>
+  <data name="Actions.windows.input.mouse-acceleration.diagnose.UndoSummary" xml:space="preserve"><value>Somente leitura: não muda velocidade, limiares ou aceleração do ponteiro.</value></data>
+  <data name="Actions.windows.input.mouse-acceleration.diagnose.RiskLimitations" xml:space="preserve"><value>Jogos com Raw Input podem ignorar essa configuração, e desativá-la não aumenta FPS nem reduz latência de hardware.</value></data>
+  <data name="ActionResults.WindowsSecurity.Unavailable" xml:space="preserve"><value>Não foi possível consultar a saúde das proteções do Windows neste momento.</value></data>
+  <data name="ActionResults.WindowsSecurity.AllHealthy" xml:space="preserve"><value>Antivírus, firewall e atualizações automáticas estão em estado saudável.</value></data>
+  <data name="ActionResults.WindowsSecurity.Summary" xml:space="preserve"><value>Saúde das proteções do Windows — antivírus: {0}; firewall: {1}; atualizações automáticas: {2}.</value></data>
+  <data name="ActionResults.WindowsSecurity.PartialSuffix" xml:space="preserve"><value> Leitura parcial: uma ou mais proteções não puderam ser consultadas.</value></data>
+  <data name="ActionResults.WindowsSecurity.State.Good" xml:space="preserve"><value>saudável</value></data>
+  <data name="ActionResults.WindowsSecurity.State.NotMonitored" xml:space="preserve"><value>não monitorado pelo Windows</value></data>
+  <data name="ActionResults.WindowsSecurity.State.Poor" xml:space="preserve"><value>requer atenção</value></data>
+  <data name="ActionResults.WindowsSecurity.State.Snoozed" xml:space="preserve"><value>temporariamente adiado</value></data>
+  <data name="ActionResults.WindowsSecurity.State.Unavailable" xml:space="preserve"><value>indisponível</value></data>
+  <data name="ActionResults.StartupLoad.Unavailable" xml:space="preserve"><value>Não foi possível consultar os itens de inicialização neste momento.</value></data>
+  <data name="ActionResults.StartupLoad.PartialSuffix" xml:space="preserve"><value> Leitura parcial: algumas fontes de inicialização não puderam ser consultadas.</value></data>
+  <data name="ActionResults.StartupLoad.NoItems" xml:space="preserve"><value>Nenhum item de inicialização foi encontrado nas fontes monitoradas.</value></data>
+  <data name="ActionResults.StartupLoad.NoItemsAccessible" xml:space="preserve"><value>Nenhum item de inicialização foi encontrado nas fontes acessíveis.</value></data>
+  <data name="ActionResults.StartupLoad.Summary" xml:space="preserve"><value>Foram detectados {0} item(ns) de inicialização (registro: {1}; pastas: {2}). A quantidade sozinha não determina impacto; confira o impacto medido pelo Gerenciador de Tarefas.</value></data>
+  <data name="ActionResults.TrimStatus.AccessDenied" xml:space="preserve"><value>O Windows não permitiu consultar a política de TRIM sem elevação; nenhum volume foi alterado.</value></data>
+  <data name="ActionResults.TrimStatus.Unsupported" xml:space="preserve"><value>A consulta da política de TRIM não é suportada por esta instalação do Windows.</value></data>
+  <data name="ActionResults.TrimStatus.Unavailable" xml:space="preserve"><value>Não foi possível consultar a política de TRIM neste momento.</value></data>
+  <data name="ActionResults.TrimStatus.FileSystemState" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="ActionResults.TrimStatus.PartialSuffix" xml:space="preserve"><value> Leitura parcial: o outro sistema de arquivos não informou um estado numérico documentado.</value></data>
+  <data name="ActionResults.TrimStatus.Summary" xml:space="preserve"><value>Política de TRIM — {0}. Isso informa a política do Windows, não confirma suporte do dispositivo.</value></data>
+  <data name="ActionResults.TrimStatus.State.Enabled" xml:space="preserve"><value>notificações habilitadas</value></data>
+  <data name="ActionResults.TrimStatus.State.Disabled" xml:space="preserve"><value>notificações desabilitadas</value></data>
+  <data name="ActionResults.TrimStatus.State.Unknown" xml:space="preserve"><value>estado desconhecido</value></data>
+  <data name="ActionResults.MouseAcceleration.Unavailable" xml:space="preserve"><value>Não foi possível consultar a aceleração do ponteiro do Windows.</value></data>
+  <data name="ActionResults.MouseAcceleration.Active" xml:space="preserve"><value>A aceleração do ponteiro do Windows está ativa (nível {0}; limiares {1}/{2}). Jogos com Raw Input podem ignorá-la.</value></data>
+  <data name="ActionResults.MouseAcceleration.Inactive" xml:space="preserve"><value>A aceleração do ponteiro do Windows está desativada (limiares {0}/{1}).</value></data>
 </root>

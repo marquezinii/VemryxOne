@@ -21,6 +21,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/Ralven.App/Ralven.App.csproj" />
+    <ProjectReference Include="../../src/Ralven.Broker/Ralven.Broker.csproj" />
     <ProjectReference Include="../../src/Ralven.Contracts/Ralven.Contracts.csproj" />
     <ProjectReference Include="../../src/Ralven.Core/Ralven.Core.csproj" />
     <ProjectReference Include="../../src/Ralven.Windows/Ralven.Windows.csproj" />

@@ -45,6 +45,51 @@ O projeto não aceita implementações que:
 - contornem anti-cheat, pure mode ou verificações de integridade;
 - operem em FiveM/GTAV Enhanced enquanto esse adaptador estiver bloqueado.
 
+## Otimizador geral do Windows
+
+O plano geral usa `OptimizationScope.GeneralWindows` e não exige FiveM ou GTA V
+instalado. Essa independência não amplia a allowlist: cada definição precisa
+declarar explicitamente que suporta o escopo geral, e `PlanBuilder`, runtime e
+broker reconstroem o plano com esse mesmo escopo antes de qualquer execução.
+Uma ação exclusiva de FiveM/GTA nunca entra no plano geral por categoria,
+prefixo de ID, instalação detectada ou fallback. A presença de GTAV Enhanced
+continua bloqueando apenas o módulo especializado.
+
+O primeiro escopo geral reutiliza somente capacidades já estreitas e testadas:
+
+- diagnósticos locais de CPU, GPU, RAM, armazenamento/TRIM, drivers, tela/taxa
+  de atualização, rede, pagefile/commit, energia, WHEA, uso de recursos,
+  throttling, inicialização, proteções do Windows, aceleração do mouse e gargalo
+  provável;
+- limpeza allowlisted de arquivos antigos no diretório temporário do usuário,
+  com idade mínima, prévia e aviso de irreversibilidade;
+- Modo de Jogo e captura histórica em segundo plano pelos dois valores HKCU
+  descritos na seção seguinte;
+- seleção do plano de energia de desempenho com captura/restauração do GUID
+  anterior e somente quando ligado à tomada;
+- ASPM PCI Express apenas quando a configuração existe no plano ativo, com
+  captura e restauração do valor anterior;
+- efeitos visuais allowlisted, preservando legibilidade e suavização de fontes.
+
+Nenhuma dessas ações autoriza mudar pagefile, limpar standby list, instalar ou
+remover driver, alterar taxa de atualização, desabilitar item de inicialização,
+serviço, proteção ou Windows Update. HAGS, afinidade, prioridade, timer,
+debloat, AppX e ajustes de fabricante também não são promovidos ao plano geral.
+Quando o Windows não fornece o fato necessário, o resultado é indisponível ou
+`Skipped`; o aplicativo não adivinha um estado para conseguir escrever.
+
+Os diagnósticos de TRIM e aceleração do mouse são consultas fixas e somente
+leitura: respectivamente `fsutil behavior query DisableDeleteNotify` e
+`SystemParametersInfo(SPI_GETMOUSE)`. O primeiro relata apenas a política de
+delete notification para NTFS/ReFS, sem afirmar suporte do dispositivo; o
+segundo não altera preferências do usuário nem presume que um jogo use o caminho
+de ponteiro do Windows. Nenhum deles atravessa o broker.
+
+As ações compartilhadas de Modo de Jogo e captura preservam a verificação já
+existente de processo FiveM. Assim, uma instalação ausente não impede a
+execução, mas uma sessão FiveM detectada ou uma inspeção ambígua continua
+bloqueando a escrita e a restauração desses valores.
+
 ## Controles de jogos do Windows
 
 As informações de PC e saúde exibidas em **Sistema** são estritamente de

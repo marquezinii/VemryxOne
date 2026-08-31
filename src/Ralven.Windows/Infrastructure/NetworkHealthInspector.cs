@@ -5,7 +5,9 @@ namespace Ralven.Windows.Infrastructure;
 public sealed record NetworkHealthSnapshot(
     bool HasActiveInterface,
     long DiscardedPackets,
-    long ErrorPackets);
+    long ErrorPackets,
+    NetworkInterfaceType? ActiveInterfaceType = null,
+    long? LinkSpeedBitsPerSecond = null);
 
 public interface INetworkHealthInspector
 {
@@ -13,8 +15,8 @@ public interface INetworkHealthInspector
 }
 
 /// <summary>
-/// Reads local network interface counters exposed by the OS (discarded and
-/// errored packets on active, non-loopback adapters). It never pings an
+/// Reads local network interface counters, type and advertised link speed
+/// exposed by the OS for active, non-loopback adapters. It never pings an
 /// external host and never sends network traffic itself; it only reads
 /// statistics the OS already tracks for the adapter.
 /// </summary>
@@ -40,6 +42,8 @@ public sealed class WindowsNetworkHealthInspector : INetworkHealthInspector
         long discarded = 0;
         long errors = 0;
         var found = false;
+        NetworkInterfaceType? fastestInterfaceType = null;
+        long? fastestLinkSpeed = null;
         foreach (var nic in active)
         {
             try
@@ -48,6 +52,13 @@ public sealed class WindowsNetworkHealthInspector : INetworkHealthInspector
                 discarded += statistics.IncomingPacketsDiscarded + statistics.OutgoingPacketsDiscarded;
                 errors += statistics.IncomingPacketsWithErrors + statistics.OutgoingPacketsWithErrors;
                 found = true;
+
+                var speed = nic.Speed;
+                if (speed > 0 && (fastestLinkSpeed is null || speed > fastestLinkSpeed))
+                {
+                    fastestInterfaceType = nic.NetworkInterfaceType;
+                    fastestLinkSpeed = speed;
+                }
             }
             catch (NetworkInformationException)
             {
@@ -55,6 +66,6 @@ public sealed class WindowsNetworkHealthInspector : INetworkHealthInspector
             }
         }
 
-        return new NetworkHealthSnapshot(found, discarded, errors);
+        return new NetworkHealthSnapshot(found, discarded, errors, fastestInterfaceType, fastestLinkSpeed);
     }
 }

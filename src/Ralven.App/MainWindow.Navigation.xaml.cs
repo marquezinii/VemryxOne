@@ -42,6 +42,12 @@ public partial class MainWindow
             return;
         }
 
+        if (tag == "Optimizer")
+        {
+            RequestNavigateToOptimizer(OptimizationScope.GeneralWindows);
+            return;
+        }
+
         ActivateNavItem(item);
         Navigate(tag switch
         {
@@ -57,6 +63,7 @@ public partial class MainWindow
     private void ActivateNavItem(Wpf.Ui.Controls.NavigationViewItem selected)
     {
         DashboardNav.IsActive = ReferenceEquals(selected, DashboardNav);
+        OptimizerNav.IsActive = ReferenceEquals(selected, OptimizerNav);
         SystemNav.IsActive = ReferenceEquals(selected, SystemNav);
         ApplicationsNav.IsActive = ReferenceEquals(selected, ApplicationsNav);
         GamesNav.IsActive = ReferenceEquals(selected, GamesNav);
@@ -99,9 +106,10 @@ public partial class MainWindow
     // confirmação nativos ou cruzam para outra página — precisam voltar para
     // o shell, que continua sendo o único dono desse estado.
 
-    internal void RequestNavigateToOptimizer()
+    internal void RequestNavigateToOptimizer(OptimizationScope scope = OptimizationScope.GeneralWindows)
     {
-        ActivateNavItem(GamesNav);
+        viewModel.SetOptimizationScope(scope);
+        ActivateNavItem(viewModel.OptimizationScope == OptimizationScope.FiveMLegacy ? GamesNav : OptimizerNav);
         Navigate(OptimizerPage);
     }
 
@@ -113,7 +121,7 @@ public partial class MainWindow
 
     internal async Task RequestStartOptimizationAsync()
     {
-        ActivateNavItem(GamesNav);
+        ActivateNavItem(viewModel.OptimizationScope == OptimizationScope.FiveMLegacy ? GamesNav : OptimizerNav);
         Navigate(OptimizerPage);
         await viewModel.StartOptimizationAsync();
         if (closeAfterOptimizationStops)
