@@ -57,9 +57,10 @@ continua bloqueando apenas o módulo especializado.
 
 O primeiro escopo geral reutiliza somente capacidades já estreitas e testadas:
 
-- diagnósticos locais de CPU, GPU, RAM, armazenamento, drivers, tela/taxa de
-  atualização, rede, pagefile/commit, energia, WHEA, uso de recursos,
-  throttling e gargalo provável;
+- diagnósticos locais de CPU, GPU, RAM, armazenamento/TRIM, drivers, tela/taxa
+  de atualização, rede, pagefile/commit, energia, WHEA, uso de recursos,
+  throttling, inicialização, proteções do Windows, aceleração do mouse e gargalo
+  provável;
 - limpeza allowlisted de arquivos antigos no diretório temporário do usuário,
   com idade mínima, prévia e aviso de irreversibilidade;
 - Modo de Jogo e captura histórica em segundo plano pelos dois valores HKCU
@@ -76,6 +77,13 @@ serviço, proteção ou Windows Update. HAGS, afinidade, prioridade, timer,
 debloat, AppX e ajustes de fabricante também não são promovidos ao plano geral.
 Quando o Windows não fornece o fato necessário, o resultado é indisponível ou
 `Skipped`; o aplicativo não adivinha um estado para conseguir escrever.
+
+Os diagnósticos de TRIM e aceleração do mouse são consultas fixas e somente
+leitura: respectivamente `fsutil behavior query DisableDeleteNotify` e
+`SystemParametersInfo(SPI_GETMOUSE)`. O primeiro relata apenas a política de
+delete notification para NTFS/ReFS, sem afirmar suporte do dispositivo; o
+segundo não altera preferências do usuário nem presume que um jogo use o caminho
+de ponteiro do Windows. Nenhum deles atravessa o broker.
 
 As ações compartilhadas de Modo de Jogo e captura preservam a verificação já
 existente de processo FiveM. Assim, uma instalação ausente não impede a

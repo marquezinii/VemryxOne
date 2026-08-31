@@ -567,8 +567,8 @@
   <data name="Actions.safety.performance-diagnostics.guide.UndoSummary" xml:space="preserve"><value>Read-only: there is nothing to undo.</value></data>
   <data name="Actions.safety.performance-diagnostics.guide.RiskLimitations" xml:space="preserve"><value>Does not inject an overlay or measure FPS through the application; FiveM itself performs the measurement.</value></data>
   <data name="Actions.safety.network-health.diagnose.Name" xml:space="preserve"><value>Diagnose local network health</value></data>
-  <data name="Actions.safety.network-health.diagnose.Description" xml:space="preserve"><value>Reads discarded and errored packet counters from active network adapters, without sending traffic to any server.</value></data>
-  <data name="Actions.safety.network-health.diagnose.DetectionSummary" xml:space="preserve"><value>Reads statistics already collected by Windows for active network adapters (discarded and errored packets).</value></data>
+  <data name="Actions.safety.network-health.diagnose.Description" xml:space="preserve"><value>Reads link type, speed, and discarded or errored packet counters from the active network interface, without sending traffic to any server.</value></data>
+  <data name="Actions.safety.network-health.diagnose.DetectionSummary" xml:space="preserve"><value>Reads the type, speed, and Windows counters for the fastest active interface (discarded and errored packets).</value></data>
   <data name="Actions.safety.network-health.diagnose.ConfirmationSummary" xml:space="preserve"><value>Always completes with an informational message; it never fails on its own.</value></data>
   <data name="Actions.safety.network-health.diagnose.UndoSummary" xml:space="preserve"><value>Read-only: does not send or receive network traffic.</value></data>
   <data name="Actions.safety.network-health.diagnose.RiskLimitations" xml:space="preserve"><value>Adapter counters do not measure live application or server latency and do not replace an in-app network diagnostic.</value></data>
@@ -621,11 +621,11 @@
   <data name="Actions.fivem.legacy.storage-health.diagnose.UndoSummary" xml:space="preserve"><value>Read-only: does not repair, format, or move data.</value></data>
   <data name="Actions.fivem.legacy.storage-health.diagnose.RiskLimitations" xml:space="preserve"><value>Reports every detected physical drive; Windows may not expose complete health data for every controller or enclosure.</value></data>
   <data name="Actions.windows.system.driver-versions.diagnose.Name" xml:space="preserve"><value>Diagnose Windows build and driver versions</value></data>
-  <data name="Actions.windows.system.driver-versions.diagnose.Description" xml:space="preserve"><value>Reads the exact Windows build and the video, network, audio and chipset driver versions, when identifiable.</value></data>
+  <data name="Actions.windows.system.driver-versions.diagnose.Description" xml:space="preserve"><value>Reads the exact Windows build and video, network, audio, chipset, storage, USB, and Bluetooth driver versions when identifiable.</value></data>
   <data name="Actions.windows.system.driver-versions.diagnose.DetectionSummary" xml:space="preserve"><value>Queries Win32_PnPSignedDriver (WMI), grouped by device class, plus Environment.OSVersion for the build.</value></data>
   <data name="Actions.windows.system.driver-versions.diagnose.ConfirmationSummary" xml:space="preserve"><value>An informational message always completes the action; it never fails on its own.</value></data>
   <data name="Actions.windows.system.driver-versions.diagnose.UndoSummary" xml:space="preserve"><value>Read-only: does not install, update, or roll back any driver.</value></data>
-  <data name="Actions.windows.system.driver-versions.diagnose.RiskLimitations" xml:space="preserve"><value>The chipset driver is identified using a name heuristic; not every manufacturer exposes it as a separate class.</value></data>
+  <data name="Actions.windows.system.driver-versions.diagnose.RiskLimitations" xml:space="preserve"><value>Chipset uses a name heuristic, and the other categories depend on the device classes manufacturers expose to Windows.</value></data>
   <data name="Actions.windows.gaming.display-configuration.diagnose.Name" xml:space="preserve"><value>Diagnose resolution, refresh rate and HAGS</value></data>
   <data name="Actions.windows.gaming.display-configuration.diagnose.Description" xml:space="preserve"><value>Compares the configured refresh rate with the maximum supported at the current resolution and reads HAGS state.</value></data>
   <data name="Actions.windows.gaming.display-configuration.diagnose.DetectionSummary" xml:space="preserve"><value>Uses EnumDisplaySettings (Win32) for the current/maximum mode and the GraphicsDrivers registry for HwSchMode.</value></data>
@@ -1316,4 +1316,54 @@
   <data name="Terms.Section10.Title" xml:space="preserve"><value>10. Changes to these terms</value></data>
   <data name="Terms.Section10.Body" xml:space="preserve"><value>Material changes will be identified by a new version. When necessary, we will request renewed acceptance before you continue using account features. The accepted version and acceptance date are recorded to keep this process verifiable.</value></data>
   <data name="Terms.Section11.Title" xml:space="preserve"><value>11. Applicable law and contact</value></data>
+  <data name="Actions.windows.system.security-health.diagnose.Name" xml:space="preserve"><value>Diagnose Windows protections</value></data>
+  <data name="Actions.windows.system.security-health.diagnose.Description" xml:space="preserve"><value>Reads the aggregate health of antivirus, firewall and automatic updates through Windows Security Center without changing any protection.</value></data>
+  <data name="Actions.windows.system.security-health.diagnose.DetectionSummary" xml:space="preserve"><value>Queries antivirus, firewall and automatic updates separately through the native WscGetSecurityProviderHealth API.</value></data>
+  <data name="Actions.windows.system.security-health.diagnose.ConfirmationSummary" xml:space="preserve"><value>Always completes with an informational message; it never fails on its own.</value></data>
+  <data name="Actions.windows.system.security-health.diagnose.UndoSummary" xml:space="preserve"><value>Read-only: does not enable, disable or configure any protection.</value></data>
+  <data name="Actions.windows.system.security-health.diagnose.RiskLimitations" xml:space="preserve"><value>Aggregate health does not list products or prove Windows is fully updated; API failures remain unavailable.</value></data>
+  <data name="Actions.windows.system.startup-load.diagnose.Name" xml:space="preserve"><value>Diagnose startup load</value></data>
+  <data name="Actions.windows.system.startup-load.diagnose.Description" xml:space="preserve"><value>Counts items registered in Run, RunOnce and Startup folders to guide a manual review without loading commands or disabling programs.</value></data>
+  <data name="Actions.windows.system.startup-load.diagnose.DetectionSummary" xml:space="preserve"><value>Reuses the allowlisted inventory of Run, RunOnce and Startup folders for the current user and local machine, reading only names and sources.</value></data>
+  <data name="Actions.windows.system.startup-load.diagnose.ConfirmationSummary" xml:space="preserve"><value>Always completes with an informational message; inaccessible sources remain marked as a partial result.</value></data>
+  <data name="Actions.windows.system.startup-load.diagnose.UndoSummary" xml:space="preserve"><value>Read-only: does not execute commands or enable or disable startup items.</value></data>
+  <data name="Actions.windows.system.startup-load.diagnose.RiskLimitations" xml:space="preserve"><value>Does not calculate Task Manager impact or include services and scheduled tasks; quantity alone does not determine slowness.</value></data>
+  <data name="Actions.windows.storage.trim-status.diagnose.Name" xml:space="preserve"><value>Diagnose TRIM policy</value></data>
+  <data name="Actions.windows.storage.trim-status.diagnose.Description" xml:space="preserve"><value>Queries the delete-notification policy for NTFS and ReFS through the official Windows tool without optimizing or changing volumes.</value></data>
+  <data name="Actions.windows.storage.trim-status.diagnose.DetectionSummary" xml:space="preserve"><value>Runs only fsutil behavior query DisableDeleteNotify and interprets the documented numeric NTFS/ReFS states.</value></data>
+  <data name="Actions.windows.storage.trim-status.diagnose.ConfirmationSummary" xml:space="preserve"><value>Always completes with the detected state or an honest unavailable result; no volume is changed.</value></data>
+  <data name="Actions.windows.storage.trim-status.diagnose.UndoSummary" xml:space="preserve"><value>Read-only: does not run ReTrim, defragmentation or policy changes.</value></data>
+  <data name="Actions.windows.storage.trim-status.diagnose.RiskLimitations" xml:space="preserve"><value>Enabled notifications do not prove that the SSD, driver or remote storage executes TRIM; this action reports only Windows policy.</value></data>
+  <data name="Actions.windows.input.mouse-acceleration.diagnose.Name" xml:space="preserve"><value>Diagnose mouse acceleration</value></data>
+  <data name="Actions.windows.input.mouse-acceleration.diagnose.Description" xml:space="preserve"><value>Reads the two thresholds and pointer acceleration level configured by Windows without changing how the mouse feels.</value></data>
+  <data name="Actions.windows.input.mouse-acceleration.diagnose.DetectionSummary" xml:space="preserve"><value>Uses SystemParametersInfo with SPI_GETMOUSE to read both thresholds and the acceleration level for the current user.</value></data>
+  <data name="Actions.windows.input.mouse-acceleration.diagnose.ConfirmationSummary" xml:space="preserve"><value>Always completes with an informational message and never changes the setting.</value></data>
+  <data name="Actions.windows.input.mouse-acceleration.diagnose.UndoSummary" xml:space="preserve"><value>Read-only: does not change pointer speed, thresholds or acceleration.</value></data>
+  <data name="Actions.windows.input.mouse-acceleration.diagnose.RiskLimitations" xml:space="preserve"><value>Games using Raw Input may ignore this setting, and disabling it does not increase FPS or reduce hardware latency.</value></data>
+  <data name="ActionResults.WindowsSecurity.Unavailable" xml:space="preserve"><value>Windows protection health could not be queried right now.</value></data>
+  <data name="ActionResults.WindowsSecurity.AllHealthy" xml:space="preserve"><value>Antivirus, firewall, and automatic updates report a healthy state.</value></data>
+  <data name="ActionResults.WindowsSecurity.Summary" xml:space="preserve"><value>Windows protection health — antivirus: {0}; firewall: {1}; automatic updates: {2}.</value></data>
+  <data name="ActionResults.WindowsSecurity.PartialSuffix" xml:space="preserve"><value> Partial read: one or more protections could not be queried.</value></data>
+  <data name="ActionResults.WindowsSecurity.State.Good" xml:space="preserve"><value>healthy</value></data>
+  <data name="ActionResults.WindowsSecurity.State.NotMonitored" xml:space="preserve"><value>not monitored by Windows</value></data>
+  <data name="ActionResults.WindowsSecurity.State.Poor" xml:space="preserve"><value>needs attention</value></data>
+  <data name="ActionResults.WindowsSecurity.State.Snoozed" xml:space="preserve"><value>temporarily snoozed</value></data>
+  <data name="ActionResults.WindowsSecurity.State.Unavailable" xml:space="preserve"><value>unavailable</value></data>
+  <data name="ActionResults.StartupLoad.Unavailable" xml:space="preserve"><value>Startup items could not be queried right now.</value></data>
+  <data name="ActionResults.StartupLoad.PartialSuffix" xml:space="preserve"><value> Partial read: some startup sources could not be queried.</value></data>
+  <data name="ActionResults.StartupLoad.NoItems" xml:space="preserve"><value>No startup items were found in the monitored sources.</value></data>
+  <data name="ActionResults.StartupLoad.NoItemsAccessible" xml:space="preserve"><value>No startup items were found in the accessible sources.</value></data>
+  <data name="ActionResults.StartupLoad.Summary" xml:space="preserve"><value>Detected {0} startup item(s) (registry: {1}; folders: {2}). Quantity alone does not determine impact; review measured impact in Task Manager.</value></data>
+  <data name="ActionResults.TrimStatus.AccessDenied" xml:space="preserve"><value>Windows did not allow the TRIM policy query without elevation; no volume was changed.</value></data>
+  <data name="ActionResults.TrimStatus.Unsupported" xml:space="preserve"><value>This Windows installation does not support the TRIM policy query.</value></data>
+  <data name="ActionResults.TrimStatus.Unavailable" xml:space="preserve"><value>The TRIM policy could not be queried right now.</value></data>
+  <data name="ActionResults.TrimStatus.FileSystemState" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="ActionResults.TrimStatus.PartialSuffix" xml:space="preserve"><value> Partial read: the other file system did not report a documented numeric state.</value></data>
+  <data name="ActionResults.TrimStatus.Summary" xml:space="preserve"><value>TRIM policy — {0}. This reports Windows policy; it does not confirm device support.</value></data>
+  <data name="ActionResults.TrimStatus.State.Enabled" xml:space="preserve"><value>notifications enabled</value></data>
+  <data name="ActionResults.TrimStatus.State.Disabled" xml:space="preserve"><value>notifications disabled</value></data>
+  <data name="ActionResults.TrimStatus.State.Unknown" xml:space="preserve"><value>unknown state</value></data>
+  <data name="ActionResults.MouseAcceleration.Unavailable" xml:space="preserve"><value>Windows pointer acceleration could not be queried.</value></data>
+  <data name="ActionResults.MouseAcceleration.Active" xml:space="preserve"><value>Windows pointer acceleration is active (level {0}; thresholds {1}/{2}). Games using Raw Input may ignore it.</value></data>
+  <data name="ActionResults.MouseAcceleration.Inactive" xml:space="preserve"><value>Windows pointer acceleration is disabled (thresholds {0}/{1}).</value></data>
 </root>

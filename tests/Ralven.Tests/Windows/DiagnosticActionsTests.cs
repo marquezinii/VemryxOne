@@ -2,6 +2,7 @@ using Ralven.Core.Catalog;
 using Ralven.Windows.Actions;
 using Ralven.Windows.Infrastructure;
 using Microsoft.Win32;
+using System.Net.NetworkInformation;
 using Xunit;
 
 namespace Ralven.Tests.Windows;
@@ -200,6 +201,18 @@ public sealed class DiagnosticActionsTests
         var message = NetworkHealthDiagnosisAction.Classify(snapshot);
 
         Assert.Contains(expectedSubstring, message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void NetworkHealthDiagnosis_ReportsLocalInterfaceTypeAndLinkSpeedWhenAvailable()
+    {
+        var snapshot = new NetworkHealthSnapshot(true, 0, 0, NetworkInterfaceType.Ethernet, 2_500_000_000);
+
+        var message = NetworkHealthDiagnosisAction.Classify(snapshot);
+
+        Assert.Contains("Ethernet", message, StringComparison.Ordinal);
+        Assert.Contains("2", message, StringComparison.Ordinal);
+        Assert.Contains("Gbps", message, StringComparison.Ordinal);
     }
 
     [Fact]

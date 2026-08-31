@@ -63,4 +63,8 @@ public static class OptimizationActionIds
     public const string DiagnoseHybridLaptop = "windows.gaming.hybrid-laptop.diagnose";
     public const string AdjustPciExpressPowerManagement = "windows.power.pcie-aspm.adjust";
     public const string GuideMousePollingRate = "windows.gaming.mouse-polling-rate.guide";
+    public const string DiagnoseWindowsSecurityHealth = "windows.system.security-health.diagnose";
+    public const string DiagnoseStartupLoad = "windows.system.startup-load.diagnose";
+    public const string DiagnoseTrimStatus = "windows.storage.trim-status.diagnose";
+    public const string DiagnoseMouseAcceleration = "windows.input.mouse-acceleration.diagnose";
 }

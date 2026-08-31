@@ -11,7 +11,7 @@ public sealed class ActionCatalogTests
     {
         var catalog = ActionCatalog.Current;
 
-        Assert.Equal(15, ActionCatalog.CurrentVersion);
+        Assert.Equal(16, ActionCatalog.CurrentVersion);
         Assert.NotEmpty(catalog.Actions);
 
         Assert.All(catalog.Actions, action =>
@@ -77,7 +77,11 @@ public sealed class ActionCatalogTests
             OptimizationActionIds.ReduceWindowsVisualEffects,
             OptimizationActionIds.GuideDriverReinstall,
             OptimizationActionIds.DiagnoseHybridLaptop,
-            OptimizationActionIds.GuideMousePollingRate
+            OptimizationActionIds.GuideMousePollingRate,
+            OptimizationActionIds.DiagnoseWindowsSecurityHealth,
+            OptimizationActionIds.DiagnoseStartupLoad,
+            OptimizationActionIds.DiagnoseTrimStatus,
+            OptimizationActionIds.DiagnoseMouseAcceleration
         }.Order(StringComparer.Ordinal);
 
         Assert.Equal(expected, generalIds);

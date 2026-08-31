@@ -865,7 +865,7 @@ public sealed class AppOptimizationService : IAppOptimizationService
 
         return WindowsOptimizationRuntime.Create(
             environment,
-            WindowsOptimizationDependencies.CreateDefault(environment));
+            WindowsOptimizationDependencies.CreateDefault(environment, localization.Format));
     }
 
     internal WindowsOptimizationRuntime CreateRuntimeForPlan(OptimizationPlanDto plan)
@@ -877,7 +877,7 @@ public sealed class AppOptimizationService : IAppOptimizationService
             var environment = WindowsOptimizationEnvironment.DetectDefault();
             return WindowsOptimizationRuntime.Create(
                 environment,
-                WindowsOptimizationDependencies.CreateDefault(environment));
+                WindowsOptimizationDependencies.CreateDefault(environment, localization.Format));
         }
 
         if (plan.Scope != OptimizationScope.FiveMLegacy

@@ -5,7 +5,7 @@ namespace Ralven.Core.Catalog;
 
 public sealed partial class ActionCatalog
 {
-    public const int CurrentVersion = 15;
+    public const int CurrentVersion = 16;
 
     private static readonly string[] NoPrerequisites = [];
     private static readonly string[] RequiresFiveMStoppedFirst = [OptimizationActionIds.VerifyFiveMIsStopped];
@@ -68,7 +68,11 @@ public sealed partial class ActionCatalog
         OptimizationActionIds.ReduceWindowsVisualEffects,
         OptimizationActionIds.GuideDriverReinstall,
         OptimizationActionIds.DiagnoseHybridLaptop,
-        OptimizationActionIds.GuideMousePollingRate
+        OptimizationActionIds.GuideMousePollingRate,
+        OptimizationActionIds.DiagnoseWindowsSecurityHealth,
+        OptimizationActionIds.DiagnoseStartupLoad,
+        OptimizationActionIds.DiagnoseTrimStatus,
+        OptimizationActionIds.DiagnoseMouseAcceleration
     ], StringComparer.Ordinal);
 
     private readonly IReadOnlyDictionary<string, OptimizationActionDefinition> _byId;

@@ -201,6 +201,67 @@ internal sealed class FakeSystemResourceInspector : ISystemResourceInspector
     public SystemResourceSnapshot GetSnapshot() => Snapshot;
 }
 
+internal sealed class FakeWindowsSystemHealthInspector : IWindowsSystemHealthInspector
+{
+    public WindowsSystemHealthSnapshot Snapshot { get; set; } = new(
+        new WindowsSecurityProviderHealth(WindowsSecurityHealthState.Good, 0),
+        new WindowsSecurityProviderHealth(WindowsSecurityHealthState.Good, 0),
+        new WindowsSecurityProviderHealth(WindowsSecurityHealthState.Good, 0),
+        DateTimeOffset.UtcNow);
+
+    public Task<WindowsSystemHealthSnapshot> InspectAsync(
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return Task.FromResult(Snapshot);
+    }
+}
+
+internal sealed class FakeWindowsApplicationInventoryInspector : IWindowsApplicationInventoryInspector
+{
+    public WindowsApplicationInventorySnapshot Snapshot { get; set; } = new(
+        [],
+        [],
+        DateTimeOffset.UtcNow,
+        InstalledApplicationsComplete: true,
+        StartupItemsComplete: true);
+
+    public Task<WindowsApplicationInventorySnapshot> InspectAsync(
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return Task.FromResult(Snapshot);
+    }
+
+    public Task<WindowsApplicationInventorySnapshot> InspectStartupAsync(
+        CancellationToken cancellationToken = default) => InspectAsync(cancellationToken);
+}
+
+internal sealed class FakeTrimStatusInspector : ITrimStatusInspector
+{
+    public TrimStatusSnapshot Snapshot { get; set; } = new(
+        TrimInspectionState.Available,
+        TrimDeleteNotificationState.Enabled,
+        TrimDeleteNotificationState.Enabled);
+
+    public Task<TrimStatusSnapshot> InspectAsync(CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return Task.FromResult(Snapshot);
+    }
+}
+
+internal sealed class FakeMouseAccelerationInspector : IMouseAccelerationInspector
+{
+    public MouseAccelerationSnapshot Snapshot { get; set; } = new(
+        MouseAccelerationInspectionState.Available,
+        6,
+        10,
+        0);
+
+    public MouseAccelerationSnapshot GetSnapshot() => Snapshot;
+}
+
 internal sealed class FakeOverlaySoftwareInspector : IOverlaySoftwareInspector
 {
     public IReadOnlyList<string> Names { get; set; } = [];
@@ -399,6 +460,11 @@ internal static class WindowsTestRuntime
             PowerStatus = new FakePowerStatusProvider(),
             JournalStore = journals,
             SystemResources = new FakeSystemResourceInspector(),
+            ActionText = static (key, _) => key,
+            WindowsSystemHealth = new FakeWindowsSystemHealthInspector(),
+            ApplicationInventory = new FakeWindowsApplicationInventoryInspector(),
+            TrimStatus = new FakeTrimStatusInspector(),
+            MouseAcceleration = new FakeMouseAccelerationInspector(),
             OverlaySoftware = new FakeOverlaySoftwareInspector(),
             NetworkHealth = new FakeNetworkHealthInspector(),
             Thermal = new FakeThermalInspector(),

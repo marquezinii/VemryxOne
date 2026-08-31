@@ -214,7 +214,10 @@ public sealed class DriverVersionsDiagnosisAction : ReadOnlyDiagnosticAction
             ("Vídeo", snapshot.Video),
             ("Rede", snapshot.Network),
             ("Áudio", snapshot.Audio),
-            ("Chipset", snapshot.Chipset)
+            ("Chipset", snapshot.Chipset),
+            ("Armazenamento", snapshot.Storage),
+            ("USB", snapshot.Usb),
+            ("Bluetooth", snapshot.Bluetooth)
         };
 
         var parts = groups
@@ -223,7 +226,7 @@ public sealed class DriverVersionsDiagnosisAction : ReadOnlyDiagnosticAction
 
         var joined = string.Join(" | ", parts);
         return string.IsNullOrEmpty(joined)
-            ? "Não foi possível ler versões de driver de vídeo/rede/áudio/chipset."
+            ? "Não foi possível ler versões de driver de vídeo/rede/áudio/chipset/armazenamento/USB/Bluetooth."
             : joined;
     }
 

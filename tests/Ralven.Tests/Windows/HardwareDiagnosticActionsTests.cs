@@ -146,12 +146,18 @@ public sealed class HardwareDiagnosticActionsTests
             Video: [new DriverVersionInfo("NVIDIA GeForce RTX 4070", "32.0.15.6094")],
             Network: [new DriverVersionInfo("Realtek Ethernet", "10.55.0.1")],
             Audio: [],
-            Chipset: []);
+            Chipset: [],
+            Storage: [new DriverVersionInfo("Samsung NVMe", "3.3.0.2003")],
+            Usb: [new DriverVersionInfo("USB xHCI Host Controller", "10.0.26100.1")],
+            Bluetooth: [new DriverVersionInfo("Intel Wireless Bluetooth", "23.60.0.1")]);
 
         var message = DriverVersionsDiagnosisAction.Classify(snapshot);
 
         Assert.Contains("Vídeo:", message, StringComparison.Ordinal);
         Assert.Contains("Rede:", message, StringComparison.Ordinal);
+        Assert.Contains("Armazenamento:", message, StringComparison.Ordinal);
+        Assert.Contains("USB:", message, StringComparison.Ordinal);
+        Assert.Contains("Bluetooth:", message, StringComparison.Ordinal);
         Assert.DoesNotContain("Áudio:", message, StringComparison.Ordinal);
     }
 
@@ -564,6 +570,9 @@ public sealed class HardwareInspectorSmokeTests
         Assert.NotNull(snapshot.Network);
         Assert.NotNull(snapshot.Audio);
         Assert.NotNull(snapshot.Chipset);
+        Assert.NotNull(snapshot.Storage);
+        Assert.NotNull(snapshot.Usb);
+        Assert.NotNull(snapshot.Bluetooth);
     }
 
     [Fact]

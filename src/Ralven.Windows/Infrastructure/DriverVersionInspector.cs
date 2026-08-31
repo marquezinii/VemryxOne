@@ -9,7 +9,20 @@ public sealed record DriverVersionSnapshot(
     IReadOnlyList<DriverVersionInfo> Video,
     IReadOnlyList<DriverVersionInfo> Network,
     IReadOnlyList<DriverVersionInfo> Audio,
-    IReadOnlyList<DriverVersionInfo> Chipset);
+    IReadOnlyList<DriverVersionInfo> Chipset,
+    IReadOnlyList<DriverVersionInfo> Storage,
+    IReadOnlyList<DriverVersionInfo> Usb,
+    IReadOnlyList<DriverVersionInfo> Bluetooth)
+{
+    public DriverVersionSnapshot(
+        IReadOnlyList<DriverVersionInfo> Video,
+        IReadOnlyList<DriverVersionInfo> Network,
+        IReadOnlyList<DriverVersionInfo> Audio,
+        IReadOnlyList<DriverVersionInfo> Chipset)
+        : this(Video, Network, Audio, Chipset, [], [], [])
+    {
+    }
+}
 
 public interface IDriverVersionInspector
 {
@@ -18,14 +31,15 @@ public interface IDriverVersionInspector
 
 /// <summary>
 /// Reads installed driver versions from WMI Win32_PnPSignedDriver, grouped
-/// by device class. Chipset drivers do not have a dedicated WMI device
+/// by the display, network, audio, storage, USB and Bluetooth device classes.
+/// Chipset drivers do not have a dedicated WMI device
 /// class, so they are approximated by matching "chipset" in the device name
 /// among System-class entries; when nothing matches, the chipset group is
 /// simply empty rather than guessing a device.
 /// </summary>
 public sealed class WindowsDriverVersionInspector : IDriverVersionInspector
 {
-    private static readonly DriverVersionSnapshot Empty = new([], [], [], []);
+    private static readonly DriverVersionSnapshot Empty = new([], [], [], [], [], [], []);
     private static readonly TimedSnapshotCache<DriverVersionSnapshot> Cache = new();
 
     public DriverVersionSnapshot GetSnapshot() => Cache.GetOrRead(Read);
@@ -36,13 +50,19 @@ public sealed class WindowsDriverVersionInspector : IDriverVersionInspector
         var network = new List<DriverVersionInfo>();
         var audio = new List<DriverVersionInfo>();
         var chipset = new List<DriverVersionInfo>();
+        var storage = new List<DriverVersionInfo>();
+        var usb = new List<DriverVersionInfo>();
+        var bluetooth = new List<DriverVersionInfo>();
 
         try
         {
             using var searcher = new ManagementObjectSearcher(
                 "SELECT DeviceName, DriverVersion, DriverDate, DeviceClass FROM Win32_PnPSignedDriver "
                     + "WHERE DeviceClass = 'DISPLAY' OR DeviceClass = 'NET' "
-                    + "OR DeviceClass = 'MEDIA' OR DeviceClass = 'SYSTEM'");
+                    + "OR DeviceClass = 'MEDIA' OR DeviceClass = 'SYSTEM' "
+                    + "OR DeviceClass = 'DISKDRIVE' OR DeviceClass = 'HDC' "
+                    + "OR DeviceClass = 'SCSIADAPTER' OR DeviceClass = 'STORAGE' "
+                    + "OR DeviceClass = 'USB' OR DeviceClass = 'BLUETOOTH'");
             using var results = searcher.Get();
             foreach (ManagementObject entry in results.Cast<ManagementObject>())
             {
@@ -72,6 +92,18 @@ public sealed class WindowsDriverVersionInspector : IDriverVersionInspector
                         case "SYSTEM" when name.Contains("chipset", StringComparison.OrdinalIgnoreCase):
                             chipset.Add(info);
                             break;
+                        case "DISKDRIVE":
+                        case "HDC":
+                        case "SCSIADAPTER":
+                        case "STORAGE":
+                            storage.Add(info);
+                            break;
+                        case "USB":
+                            usb.Add(info);
+                            break;
+                        case "BLUETOOTH":
+                            bluetooth.Add(info);
+                            break;
                     }
                 }
             }
@@ -81,7 +113,7 @@ public sealed class WindowsDriverVersionInspector : IDriverVersionInspector
             return Empty;
         }
 
-        return new DriverVersionSnapshot(video, network, audio, chipset);
+        return new DriverVersionSnapshot(video, network, audio, chipset, storage, usb, bluetooth);
     }
 
     /// <summary>

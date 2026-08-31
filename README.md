@@ -37,7 +37,7 @@ Otimizar analisa e ajusta o Windows sem exigir FiveM ou GTA V. O plano geral re�
 
 | Você vê | O que isso significa |
 | --- | --- |
-| Diagnóstico local | CPU, GPU, memória, armazenamento, rede, energia, drivers, tela, estabilidade e, no módulo especializado, FiveM/GTA V. |
+| Diagnóstico local | CPU, GPU, memória, armazenamento/TRIM, rede, energia, drivers, tela, inicialização, proteções do Windows, mouse, estabilidade e, no módulo especializado, FiveM/GTA V. |
 | Plano antes da execução | Perfil, ações, impacto, privilégios e condições de cada alteração ficam explícitos. |
 | Execução verificável | Snapshot, validação, journal local, progresso real e recuperação fazem parte do fluxo. |
 | Histórico útil | Resultado por ação, relatório técnico sanitizado e comparação local antes/depois. |

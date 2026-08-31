@@ -78,6 +78,16 @@ public sealed record WindowsOptimizationDependencies
 
     public required ISystemResourceInspector SystemResources { get; init; }
 
+    public required WindowsActionTextResolver ActionText { get; init; }
+
+    public required IWindowsSystemHealthInspector WindowsSystemHealth { get; init; }
+
+    public required IWindowsApplicationInventoryInspector ApplicationInventory { get; init; }
+
+    public required ITrimStatusInspector TrimStatus { get; init; }
+
+    public required IMouseAccelerationInspector MouseAcceleration { get; init; }
+
     public required IOverlaySoftwareInspector OverlaySoftware { get; init; }
 
     public required INetworkHealthInspector NetworkHealth { get; init; }
@@ -113,7 +123,8 @@ public sealed record WindowsOptimizationDependencies
     public required IVendorLaptopSoftwareInspector VendorLaptopSoftware { get; init; }
 
     public static WindowsOptimizationDependencies CreateDefault(
-        WindowsOptimizationEnvironment environment)
+        WindowsOptimizationEnvironment environment,
+        WindowsActionTextResolver? actionText = null)
     {
         ArgumentNullException.ThrowIfNull(environment);
         var commandRunner = new ProcessCommandRunner();
@@ -128,6 +139,11 @@ public sealed record WindowsOptimizationDependencies
             PowerStatus = new WindowsPowerStatusProvider(),
             JournalStore = new JsonWindowsTransactionJournalStore(environment.JournalDirectory),
             SystemResources = new WindowsSystemResourceInspector(),
+            ActionText = actionText ?? (static (key, _) => key),
+            WindowsSystemHealth = new WindowsSystemHealthInspector(),
+            ApplicationInventory = new WindowsApplicationInventoryInspector(),
+            TrimStatus = new WindowsTrimStatusInspector(),
+            MouseAcceleration = new WindowsMouseAccelerationInspector(),
             OverlaySoftware = new WindowsOverlaySoftwareInspector(),
             NetworkHealth = new WindowsNetworkHealthInspector(),
             Thermal = new WindowsThermalInspector(),
@@ -211,6 +227,10 @@ public sealed class WindowsOptimizationActionFactory
             CreateAction(OptimizationActionIds.VerifyFiveMIsStopped, options),
             CreateAction(OptimizationActionIds.VerifyGtaVIsStopped, options),
             CreateAction(OptimizationActionIds.DiagnoseBottleneck, options),
+            CreateAction(OptimizationActionIds.DiagnoseWindowsSecurityHealth, options),
+            CreateAction(OptimizationActionIds.DiagnoseStartupLoad, options),
+            CreateAction(OptimizationActionIds.DiagnoseTrimStatus, options),
+            CreateAction(OptimizationActionIds.DiagnoseMouseAcceleration, options),
             CreateAction(OptimizationActionIds.DetectOverlaysAndCaptureSoftware, options),
             CreateAction(OptimizationActionIds.ReadFiveMLegacyLogs, options),
             CreateAction(OptimizationActionIds.GuidePerformanceDiagnostics, options),
@@ -313,6 +333,18 @@ public sealed class WindowsOptimizationActionFactory
                 dependencies.GtaVProcessInspector),
             OptimizationActionIds.DiagnoseBottleneck => new BottleneckDiagnosisAction(
                 dependencies.SystemResources),
+            OptimizationActionIds.DiagnoseWindowsSecurityHealth => new WindowsSecurityHealthDiagnosisAction(
+                dependencies.WindowsSystemHealth,
+                dependencies.ActionText),
+            OptimizationActionIds.DiagnoseStartupLoad => new StartupLoadDiagnosisAction(
+                dependencies.ApplicationInventory,
+                dependencies.ActionText),
+            OptimizationActionIds.DiagnoseTrimStatus => new TrimStatusDiagnosisAction(
+                dependencies.TrimStatus,
+                dependencies.ActionText),
+            OptimizationActionIds.DiagnoseMouseAcceleration => new MouseAccelerationDiagnosisAction(
+                dependencies.MouseAcceleration,
+                dependencies.ActionText),
             OptimizationActionIds.DetectOverlaysAndCaptureSoftware => new OverlaySoftwareDetectionAction(
                 dependencies.OverlaySoftware),
             OptimizationActionIds.ReadFiveMLegacyLogs => new FiveMLegacyLogReaderAction(

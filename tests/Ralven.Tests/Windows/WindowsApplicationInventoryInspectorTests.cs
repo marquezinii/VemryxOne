@@ -95,6 +95,30 @@ public sealed class WindowsApplicationInventoryInspectorTests
         Assert.False(readCalled);
     }
 
+    [Fact]
+    public async Task InspectStartupAsync_DoesNotReadInstalledApplications()
+    {
+        var fullReadCalled = false;
+        var startupResult = new WindowsApplicationInventoryReadResult(
+            [],
+            [new("Startup app", "CurrentUser:RegistryRun", WindowsStartupItemSource.RegistryRun, WindowsApplicationScope.CurrentUser)],
+            InstalledApplicationsComplete: true,
+            StartupItemsComplete: true);
+        var inspector = new WindowsApplicationInventoryInspector(
+            _ =>
+            {
+                fullReadCalled = true;
+                throw new InvalidOperationException("The full inventory should not be read.");
+            },
+            readStartupInventory: _ => startupResult);
+
+        var snapshot = await inspector.InspectStartupAsync(TestContext.Current.CancellationToken);
+
+        Assert.False(fullReadCalled);
+        Assert.Empty(snapshot.InstalledApplications);
+        Assert.Single(snapshot.StartupItems);
+    }
+
     [Theory]
     [InlineData(null, null)]
     [InlineData(0L, null)]

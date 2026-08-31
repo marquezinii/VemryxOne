@@ -234,14 +234,28 @@ public sealed class NetworkHealthDiagnosisAction : ReadOnlyDiagnosticAction
             return "Não foi possível ler estatísticas de nenhuma placa de rede ativa no momento.";
         }
 
+        var link = DescribeLink(snapshot);
         if (snapshot.DiscardedPackets > 0 || snapshot.ErrorPackets > 0)
         {
             return $"Sinais locais de instabilidade de rede: {snapshot.DiscardedPackets} pacote(s) descartado(s) "
                 + $"e {snapshot.ErrorPackets} com erro na(s) placa(s) ativa(s). Isso não mede latência ou "
-                + "jitter até um serviço remoto; confirme pela ferramenta do aplicativo ou jogo afetado.";
+                + $"jitter até um serviço remoto; confirme pela ferramenta do aplicativo ou jogo afetado.{link}";
         }
 
-        return "Nenhum sinal local de perda de pacotes foi encontrado nas placas de rede ativas.";
+        return $"Nenhum sinal local de perda de pacotes foi encontrado nas placas de rede ativas.{link}";
+    }
+
+    private static string DescribeLink(NetworkHealthSnapshot snapshot)
+    {
+        if (snapshot.ActiveInterfaceType is not { } type || snapshot.LinkSpeedBitsPerSecond is not { } speed)
+        {
+            return string.Empty;
+        }
+
+        var speedLabel = speed >= 1_000_000_000
+            ? $"{speed / 1_000_000_000d:0.#} Gbps"
+            : $"{speed / 1_000_000d:0.#} Mbps";
+        return $" Interface ativa mais rápida: {type}, link de {speedLabel}.";
     }
 }
 

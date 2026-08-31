@@ -567,8 +567,8 @@
   <data name="Actions.safety.performance-diagnostics.guide.UndoSummary" xml:space="preserve"><value>Solo lectura: no hay nada que deshacer.</value></data>
   <data name="Actions.safety.performance-diagnostics.guide.RiskLimitations" xml:space="preserve"><value>No inyecta ningún overlay ni mide los FPS desde la aplicación; la medición la realiza el propio FiveM.</value></data>
   <data name="Actions.safety.network-health.diagnose.Name" xml:space="preserve"><value>Diagnosticar salud de la red local</value></data>
-  <data name="Actions.safety.network-health.diagnose.Description" xml:space="preserve"><value>Lee los contadores de paquetes descartados y con error de los adaptadores de red activos, sin enviar tráfico a ningún servidor.</value></data>
-  <data name="Actions.safety.network-health.diagnose.DetectionSummary" xml:space="preserve"><value>Lee estadísticas ya recopiladas por Windows para los adaptadores de red activos (paquetes descartados o con errores).</value></data>
+  <data name="Actions.safety.network-health.diagnose.Description" xml:space="preserve"><value>Lee el tipo, la velocidad del enlace y los contadores de paquetes descartados o con error de la interfaz de red activa, sin enviar tráfico a ningún servidor.</value></data>
+  <data name="Actions.safety.network-health.diagnose.DetectionSummary" xml:space="preserve"><value>Lee el tipo, la velocidad y los contadores de Windows de la interfaz activa más rápida (paquetes descartados o con errores).</value></data>
   <data name="Actions.safety.network-health.diagnose.ConfirmationSummary" xml:space="preserve"><value>Siempre finaliza con un mensaje informativo; nunca falla por sí solo.</value></data>
   <data name="Actions.safety.network-health.diagnose.UndoSummary" xml:space="preserve"><value>Solo lectura: no envía ni recibe tráfico de red.</value></data>
   <data name="Actions.safety.network-health.diagnose.RiskLimitations" xml:space="preserve"><value>Los contadores del adaptador no miden la latencia real de aplicaciones o servidores ni sustituyen un diagnóstico de red interno.</value></data>
@@ -621,11 +621,11 @@
   <data name="Actions.fivem.legacy.storage-health.diagnose.UndoSummary" xml:space="preserve"><value>Solo lectura: no repara, formatea ni mueve datos.</value></data>
   <data name="Actions.fivem.legacy.storage-health.diagnose.RiskLimitations" xml:space="preserve"><value>Informa sobre todas las unidades físicas detectadas; Windows puede no exponer datos completos de salud para cada controlador o gabinete.</value></data>
   <data name="Actions.windows.system.driver-versions.diagnose.Name" xml:space="preserve"><value>Diagnosticar compilación de Windows y versiones de controladores</value></data>
-  <data name="Actions.windows.system.driver-versions.diagnose.Description" xml:space="preserve"><value>Lee la compilación exacta de Windows y las versiones de los controladores de video, red, audio y chipset, cuando son identificables.</value></data>
+  <data name="Actions.windows.system.driver-versions.diagnose.Description" xml:space="preserve"><value>Lee la compilación exacta de Windows y las versiones de controladores de video, red, audio, chipset, almacenamiento, USB y Bluetooth cuando son identificables.</value></data>
   <data name="Actions.windows.system.driver-versions.diagnose.DetectionSummary" xml:space="preserve"><value>Consulta Win32_PnPSignedDriver (WMI), agrupado por clase de dispositivo, y Environment.OSVersion para obtener la compilación.</value></data>
   <data name="Actions.windows.system.driver-versions.diagnose.ConfirmationSummary" xml:space="preserve"><value>Siempre finaliza con un mensaje informativo; nunca falla por sí solo.</value></data>
   <data name="Actions.windows.system.driver-versions.diagnose.UndoSummary" xml:space="preserve"><value>Solo lectura: no instala, actualiza ni revierte ningún controlador.</value></data>
-  <data name="Actions.windows.system.driver-versions.diagnose.RiskLimitations" xml:space="preserve"><value>El controlador del chipset se identifica mediante una heurística de nombres; no todos los fabricantes lo exponen como una clase propia.</value></data>
+  <data name="Actions.windows.system.driver-versions.diagnose.RiskLimitations" xml:space="preserve"><value>El chipset usa una heurística de nombres y las demás categorías dependen de las clases de dispositivo que cada fabricante expone a Windows.</value></data>
   <data name="Actions.windows.gaming.display-configuration.diagnose.Name" xml:space="preserve"><value>Diagnosticar resolución, frecuencia de actualización y HAGS</value></data>
   <data name="Actions.windows.gaming.display-configuration.diagnose.Description" xml:space="preserve"><value>Compara la frecuencia de actualización configurada con el máximo soportado en la resolución actual y lee el estado de HAGS.</value></data>
   <data name="Actions.windows.gaming.display-configuration.diagnose.DetectionSummary" xml:space="preserve"><value>Usa EnumDisplaySettings (Win32) para obtener el modo actual/máximo y el registro de GraphicsDrivers para leer HwSchMode.</value></data>
@@ -1316,4 +1316,54 @@
   <data name="Terms.Section10.Title" xml:space="preserve"><value>10. Cambios en estos términos</value></data>
   <data name="Terms.Section10.Body" xml:space="preserve"><value>Los cambios materiales se identificarán mediante una nueva versión. Cuando sea necesario, solicitaremos una nueva aceptación antes de que continúes usando las funciones de la cuenta. La versión aceptada y la fecha de aceptación quedan registradas para mantener este proceso verificable.</value></data>
   <data name="Terms.Section11.Title" xml:space="preserve"><value>11. Ley aplicable y contacto</value></data>
+  <data name="Actions.windows.system.security-health.diagnose.Name" xml:space="preserve"><value>Diagnosticar protecciones de Windows</value></data>
+  <data name="Actions.windows.system.security-health.diagnose.Description" xml:space="preserve"><value>Lee la salud agregada del antivirus, firewall y actualizaciones automáticas mediante el Centro de seguridad de Windows sin cambiar ninguna protección.</value></data>
+  <data name="Actions.windows.system.security-health.diagnose.DetectionSummary" xml:space="preserve"><value>Consulta por separado antivirus, firewall y actualizaciones automáticas mediante la API nativa WscGetSecurityProviderHealth.</value></data>
+  <data name="Actions.windows.system.security-health.diagnose.ConfirmationSummary" xml:space="preserve"><value>Siempre finaliza con un mensaje informativo; nunca falla por sí solo.</value></data>
+  <data name="Actions.windows.system.security-health.diagnose.UndoSummary" xml:space="preserve"><value>Solo lectura: no activa, desactiva ni configura ninguna protección.</value></data>
+  <data name="Actions.windows.system.security-health.diagnose.RiskLimitations" xml:space="preserve"><value>La salud agregada no enumera productos ni demuestra que Windows esté totalmente actualizado; los fallos de la API permanecen no disponibles.</value></data>
+  <data name="Actions.windows.system.startup-load.diagnose.Name" xml:space="preserve"><value>Diagnosticar carga de inicio</value></data>
+  <data name="Actions.windows.system.startup-load.diagnose.Description" xml:space="preserve"><value>Cuenta elementos registrados en Run, RunOnce y carpetas Inicio para orientar una revisión manual sin cargar comandos ni deshabilitar programas.</value></data>
+  <data name="Actions.windows.system.startup-load.diagnose.DetectionSummary" xml:space="preserve"><value>Reutiliza el inventario permitido de Run, RunOnce y carpetas Inicio para el usuario actual y el equipo, leyendo solo nombres y orígenes.</value></data>
+  <data name="Actions.windows.system.startup-load.diagnose.ConfirmationSummary" xml:space="preserve"><value>Siempre finaliza con un mensaje informativo; las fuentes inaccesibles permanecen marcadas como resultado parcial.</value></data>
+  <data name="Actions.windows.system.startup-load.diagnose.UndoSummary" xml:space="preserve"><value>Solo lectura: no ejecuta comandos ni habilita o deshabilita elementos de inicio.</value></data>
+  <data name="Actions.windows.system.startup-load.diagnose.RiskLimitations" xml:space="preserve"><value>No calcula el impacto del Administrador de tareas ni incluye servicios o tareas programadas; la cantidad por sí sola no determina lentitud.</value></data>
+  <data name="Actions.windows.storage.trim-status.diagnose.Name" xml:space="preserve"><value>Diagnosticar política de TRIM</value></data>
+  <data name="Actions.windows.storage.trim-status.diagnose.Description" xml:space="preserve"><value>Consulta la política de notificaciones de eliminación para NTFS y ReFS mediante la herramienta oficial de Windows sin optimizar ni modificar volúmenes.</value></data>
+  <data name="Actions.windows.storage.trim-status.diagnose.DetectionSummary" xml:space="preserve"><value>Ejecuta únicamente fsutil behavior query DisableDeleteNotify e interpreta los estados numéricos documentados de NTFS/ReFS.</value></data>
+  <data name="Actions.windows.storage.trim-status.diagnose.ConfirmationSummary" xml:space="preserve"><value>Siempre finaliza con el estado detectado o una indicación honesta de no disponibilidad; no modifica ningún volumen.</value></data>
+  <data name="Actions.windows.storage.trim-status.diagnose.UndoSummary" xml:space="preserve"><value>Solo lectura: no ejecuta ReTrim, desfragmentación ni cambios de política.</value></data>
+  <data name="Actions.windows.storage.trim-status.diagnose.RiskLimitations" xml:space="preserve"><value>Las notificaciones habilitadas no demuestran que el SSD, controlador o almacenamiento remoto ejecute TRIM; la acción solo informa la política de Windows.</value></data>
+  <data name="Actions.windows.input.mouse-acceleration.diagnose.Name" xml:space="preserve"><value>Diagnosticar aceleración del ratón</value></data>
+  <data name="Actions.windows.input.mouse-acceleration.diagnose.Description" xml:space="preserve"><value>Lee los dos umbrales y el nivel de aceleración del puntero configurados por Windows sin cambiar la sensación del ratón.</value></data>
+  <data name="Actions.windows.input.mouse-acceleration.diagnose.DetectionSummary" xml:space="preserve"><value>Usa SystemParametersInfo con SPI_GETMOUSE para leer ambos umbrales y el nivel de aceleración del usuario actual.</value></data>
+  <data name="Actions.windows.input.mouse-acceleration.diagnose.ConfirmationSummary" xml:space="preserve"><value>Siempre finaliza con un mensaje informativo y nunca cambia la configuración.</value></data>
+  <data name="Actions.windows.input.mouse-acceleration.diagnose.UndoSummary" xml:space="preserve"><value>Solo lectura: no cambia la velocidad, los umbrales ni la aceleración del puntero.</value></data>
+  <data name="Actions.windows.input.mouse-acceleration.diagnose.RiskLimitations" xml:space="preserve"><value>Los juegos que usan Raw Input pueden ignorar esta configuración, y desactivarla no aumenta los FPS ni reduce la latencia del hardware.</value></data>
+  <data name="ActionResults.WindowsSecurity.Unavailable" xml:space="preserve"><value>No se pudo consultar la salud de las protecciones de Windows en este momento.</value></data>
+  <data name="ActionResults.WindowsSecurity.AllHealthy" xml:space="preserve"><value>El antivirus, el firewall y las actualizaciones automáticas informan un estado saludable.</value></data>
+  <data name="ActionResults.WindowsSecurity.Summary" xml:space="preserve"><value>Salud de las protecciones de Windows — antivirus: {0}; firewall: {1}; actualizaciones automáticas: {2}.</value></data>
+  <data name="ActionResults.WindowsSecurity.PartialSuffix" xml:space="preserve"><value> Lectura parcial: no se pudieron consultar una o más protecciones.</value></data>
+  <data name="ActionResults.WindowsSecurity.State.Good" xml:space="preserve"><value>saludable</value></data>
+  <data name="ActionResults.WindowsSecurity.State.NotMonitored" xml:space="preserve"><value>no supervisado por Windows</value></data>
+  <data name="ActionResults.WindowsSecurity.State.Poor" xml:space="preserve"><value>requiere atención</value></data>
+  <data name="ActionResults.WindowsSecurity.State.Snoozed" xml:space="preserve"><value>pospuesto temporalmente</value></data>
+  <data name="ActionResults.WindowsSecurity.State.Unavailable" xml:space="preserve"><value>no disponible</value></data>
+  <data name="ActionResults.StartupLoad.Unavailable" xml:space="preserve"><value>No se pudieron consultar los elementos de inicio en este momento.</value></data>
+  <data name="ActionResults.StartupLoad.PartialSuffix" xml:space="preserve"><value> Lectura parcial: no se pudieron consultar algunas fuentes de inicio.</value></data>
+  <data name="ActionResults.StartupLoad.NoItems" xml:space="preserve"><value>No se encontraron elementos de inicio en las fuentes supervisadas.</value></data>
+  <data name="ActionResults.StartupLoad.NoItemsAccessible" xml:space="preserve"><value>No se encontraron elementos de inicio en las fuentes accesibles.</value></data>
+  <data name="ActionResults.StartupLoad.Summary" xml:space="preserve"><value>Se detectaron {0} elemento(s) de inicio (registro: {1}; carpetas: {2}). La cantidad por sí sola no determina el impacto; revisa el impacto medido en el Administrador de tareas.</value></data>
+  <data name="ActionResults.TrimStatus.AccessDenied" xml:space="preserve"><value>Windows no permitió consultar la política de TRIM sin elevación; no se modificó ningún volumen.</value></data>
+  <data name="ActionResults.TrimStatus.Unsupported" xml:space="preserve"><value>Esta instalación de Windows no admite la consulta de la política de TRIM.</value></data>
+  <data name="ActionResults.TrimStatus.Unavailable" xml:space="preserve"><value>No se pudo consultar la política de TRIM en este momento.</value></data>
+  <data name="ActionResults.TrimStatus.FileSystemState" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="ActionResults.TrimStatus.PartialSuffix" xml:space="preserve"><value> Lectura parcial: el otro sistema de archivos no informó un estado numérico documentado.</value></data>
+  <data name="ActionResults.TrimStatus.Summary" xml:space="preserve"><value>Política de TRIM — {0}. Esto informa la política de Windows; no confirma la compatibilidad del dispositivo.</value></data>
+  <data name="ActionResults.TrimStatus.State.Enabled" xml:space="preserve"><value>notificaciones habilitadas</value></data>
+  <data name="ActionResults.TrimStatus.State.Disabled" xml:space="preserve"><value>notificaciones deshabilitadas</value></data>
+  <data name="ActionResults.TrimStatus.State.Unknown" xml:space="preserve"><value>estado desconocido</value></data>
+  <data name="ActionResults.MouseAcceleration.Unavailable" xml:space="preserve"><value>No se pudo consultar la aceleración del puntero de Windows.</value></data>
+  <data name="ActionResults.MouseAcceleration.Active" xml:space="preserve"><value>La aceleración del puntero de Windows está activa (nivel {0}; umbrales {1}/{2}). Los juegos que usan Raw Input pueden ignorarla.</value></data>
+  <data name="ActionResults.MouseAcceleration.Inactive" xml:space="preserve"><value>La aceleración del puntero de Windows está desactivada (umbrales {0}/{1}).</value></data>
 </root>

@@ -1,6 +1,6 @@
 # Base de pesquisa
 
-Esta página registra as evidências usadas para definir o escopo e as políticas do Ralven. A revisão atual foi fechada em **18 de julho de 2026**; itens dependentes de versão precisam ser revalidados antes de cada release.
+Esta página registra as evidências usadas para definir o escopo e as políticas do Ralven. A revisão atual foi fechada em **30 de agosto de 2026**; itens dependentes de versão precisam ser revalidados antes de cada release.
 
 ## Como ler
 
@@ -69,9 +69,28 @@ Fontes:
 
 **Decisão.** Nesta etapa, inicialização, pagefile e memória permanecem somente
 diagnóstico; o Ralven não escreve `StartupApproved`, não dimensiona pagefile por
-heurística de RAM e não implementa “RAM cleaner”. TRIM/ReTrim só poderá virar
-ação futura após existir detecção de filesystem/volume, privilégio tipado,
-verificação e uma apresentação explícita de que ReTrim não possui rollback.
+heurística de RAM e não implementa “RAM cleaner”. O plano pode consultar a
+política numérica de TRIM sem alteração; mudar a política ou executar ReTrim só
+poderá virar ação futura após existir detecção de filesystem/volume, privilégio
+tipado, verificação e uma apresentação explícita de que ReTrim não possui
+rollback.
+
+### Proteções do Windows e aceleração do ponteiro
+
+**Fato.** `WscGetSecurityProviderHealth` retorna a saúde agregada da categoria
+de proteção solicitada. `SystemParametersInfo` com `SPI_GETMOUSE` retorna os dois
+limiares e o nível de aceleração do ponteiro em um vetor de três inteiros.
+
+Fontes:
+
+- [WscGetSecurityProviderHealth](https://learn.microsoft.com/en-us/windows/win32/api/wscapi/nf-wscapi-wscgetsecurityproviderhealth)
+- [SystemParametersInfo e SPI_GETMOUSE](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfow)
+
+**Decisão.** O plano geral consulta as três categorias de proteção separadamente
+e não interpreta falha da Central de Segurança como estado saudável. A leitura
+do mouse é apenas diagnóstico da configuração do usuário: o Ralven não altera
+proteções, Windows Update, velocidade, limiares ou aceleração automaticamente e
+não deduz o caminho de entrada usado por um jogo a partir desse valor.
 
 ### HAGS, VRR e perfis de fabricante
 

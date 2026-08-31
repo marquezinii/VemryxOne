@@ -50,6 +50,8 @@ public sealed class SystemAndOverlayInspectorTests
 
         Assert.True(snapshot.DiscardedPackets >= 0);
         Assert.True(snapshot.ErrorPackets >= 0);
+        Assert.True(snapshot.LinkSpeedBitsPerSecond is null or > 0);
+        Assert.Equal(snapshot.ActiveInterfaceType is null, snapshot.LinkSpeedBitsPerSecond is null);
     }
 
     [Fact]
