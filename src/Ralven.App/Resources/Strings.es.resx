@@ -239,7 +239,6 @@
   <data name="History.Notes.Rollback" xml:space="preserve"><value>El rollback restaura solo lo que esa ejecución cambió y conserva lo que modificaste después.</value></data>
   <data name="History.Notes.Local" xml:space="preserve"><value>Todo permanece en este equipo, en la carpeta local de datos de la aplicación.</value></data>
   <data name="Settings.Title" xml:space="preserve"><value>Configuración</value></data>
-  <data name="Settings.Subtitle" xml:space="preserve"><value>Administra apariencia, inicio, actualizaciones y privacidad en un solo lugar.</value></data>
   <data name="Settings.General.Title" xml:space="preserve"><value>General</value></data>
   <data name="Settings.General.Description" xml:space="preserve"><value>Elige cómo se ve, se inicia y se mantiene actualizado Ralven.</value></data>
   <data name="Settings.General.Interface" xml:space="preserve"><value>Interfaz</value></data>

@@ -194,8 +194,8 @@
 
                     <!-- ===================== Configurações ===================== -->
                     <!--
-                        Duas regiões dentro de UM painel: categorias fixas à
-                        esquerda, formulário rolando à direita.
+                        Configurações é uma superfície fixa: categorias
+                        ancoradas à esquerda e formulário rolando à direita.
 
                         A coluna de "notas" de 400px que ficava aqui foi
                         removida. Ela repetia, sempre visível e independente
@@ -211,34 +211,15 @@
                         mover a marcação para outro x:Class quebraria esses
                         nomes de elemento.
                     -->
-                    <Grid x:Name="SettingsPage" Visibility="Collapsed" Margin="28,24,28,28" MaxWidth="1120" HorizontalAlignment="Center">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+                    <Grid x:Name="SettingsPage" Visibility="Collapsed" Background="{DynamicResource PanelFillBrush}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="220" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-                        <Border Grid.Row="0" Style="{StaticResource TitleBlockSurface}">
+                        <Border Grid.Column="0" Background="{DynamicResource CanvasSunkenBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,0,1,0" Padding="14,28">
                             <StackPanel>
-                                <TextBlock Text="{Binding [Settings.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource PageTitleText}" />
-                                <Rectangle Style="{StaticResource TitleAccentRule}" Margin="0,10,0,0" />
-                                <TextBlock Text="{Binding [Settings.Subtitle], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,12,0,0" TextWrapping="Wrap" />
-                            </StackPanel>
-                        </Border>
-
-                        <!-- MaxWidth: um formulário tem largura útil finita.
-                             Esticar o painel até a borda de um monitor
-                             ultrawide produzia 1000px de painel vazio à
-                             direita do último campo; limitando-o, o que sobra
-                             é o plano de fundo da interface, que é intencional. -->
-                        <Border Grid.Row="1" Style="{StaticResource PanelSurface}">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-
-                                <Border Grid.Column="0" Width="220" Background="{DynamicResource CanvasSunkenBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,0,1,0" Padding="14,20">
-                                    <StackPanel>
+                                <TextBlock Text="{Binding [Settings.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SectionText}" Margin="8,0,8,22" />
                                         <RadioButton x:Name="CategoryAccount" GroupName="SettingsCategory" Style="{StaticResource SettingsCategoryItemStyle}" Checked="SettingsCategory_Changed">
                                             <TextBlock Text="{Binding [Settings.Account.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyText}" />
                                         </RadioButton>
@@ -254,11 +235,11 @@
                                         <RadioButton x:Name="CategoryAbout" GroupName="SettingsCategory" Style="{StaticResource SettingsCategoryItemStyle}" Margin="0,4,0,0" Checked="SettingsCategory_Changed">
                                             <TextBlock Text="{Binding [Settings.About.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyText}" />
                                         </RadioButton>
-                                    </StackPanel>
-                                </Border>
+                            </StackPanel>
+                        </Border>
 
-                                <ScrollViewer x:Name="SettingsContentScrollViewer" Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="40,28,40,32">
-                                    <StackPanel MaxWidth="760" HorizontalAlignment="Left">
+                        <ScrollViewer x:Name="SettingsContentScrollViewer" Grid.Column="1" Background="{DynamicResource PanelFillBrush}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="48,36,48,40">
+                            <StackPanel MaxWidth="920" HorizontalAlignment="Center">
 
                                 <!-- ===== Conta ===== -->
                                 <StackPanel x:Name="AccountSettingsCard" Visibility="Collapsed">
@@ -612,10 +593,8 @@
                                     </StackPanel>
                                     <TextBlock Text="{Binding [Brand.FooterCopyright], Source={StaticResource LocalizedStrings}}" Style="{StaticResource CaptionText}" Margin="0,24,0,0" />
                                 </StackPanel>
-                                    </StackPanel>
-                                </ScrollViewer>
-                            </Grid>
-                        </Border>
+                            </StackPanel>
+                        </ScrollViewer>
                     </Grid>
                 </Grid>
             </ui:NavigationView.ContentOverlay>

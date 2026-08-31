@@ -239,7 +239,6 @@
   <data name="History.Notes.Rollback" xml:space="preserve"><value>Rollback restores only what this run changed and preserves anything you changed afterwards.</value></data>
   <data name="History.Notes.Local" xml:space="preserve"><value>Everything stays on this computer, in the app's local data folder.</value></data>
   <data name="Settings.Title" xml:space="preserve"><value>Settings</value></data>
-  <data name="Settings.Subtitle" xml:space="preserve"><value>Manage appearance, startup, updates, and privacy in one place.</value></data>
   <data name="Settings.General.Title" xml:space="preserve"><value>General</value></data>
   <data name="Settings.General.Description" xml:space="preserve"><value>Choose how Ralven looks, starts, and stays up to date.</value></data>
   <data name="Settings.General.Interface" xml:space="preserve"><value>Interface</value></data>
