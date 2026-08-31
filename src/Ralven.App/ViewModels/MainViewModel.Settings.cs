@@ -93,12 +93,36 @@ public sealed partial class MainViewModel
         }
     }
 
+    public bool StartMinimized
+    {
+        get => startMinimized;
+        set
+        {
+            if (SetProperty(ref startMinimized, value))
+            {
+                SettingsChanged(refreshPlan: false);
+            }
+        }
+    }
+
     public bool CheckForUpdates
     {
         get => checkForUpdates;
         set
         {
             if (SetProperty(ref checkForUpdates, value))
+            {
+                SettingsChanged(refreshPlan: false);
+            }
+        }
+    }
+
+    public bool NotifyWhenUpdateAvailable
+    {
+        get => notifyWhenUpdateAvailable;
+        set
+        {
+            if (SetProperty(ref notifyWhenUpdateAvailable, value))
             {
                 SettingsChanged(refreshPlan: false);
             }
@@ -186,19 +210,28 @@ public sealed partial class MainViewModel
             return;
         }
 
-        var preference = language switch
+        SelectLanguagePreference(language switch
         {
             AppLanguage.English => AppLanguagePreference.English,
             AppLanguage.PortugueseBrazil => AppLanguagePreference.PortugueseBrazil,
             AppLanguage.Spanish => AppLanguagePreference.Spanish,
             _ => AppLanguagePreference.English
-        };
+        });
+    }
+
+    public void SelectLanguagePreference(AppLanguagePreference preference)
+    {
+        if (!Enum.IsDefined(preference))
+        {
+            return;
+        }
+
         if (languagePreference == preference)
         {
             return;
         }
 
-        localization.SetLanguage(language);
+        localization.Apply(preference);
         languagePreference = preference;
         RefreshLocalizedState();
         SettingsChanged(refreshPlan: false);
@@ -214,7 +247,9 @@ public sealed partial class MainViewModel
             ? settings.Theme
             : AppThemePreference.System;
         minimizeToTrayOnClose = settings.MinimizeToTrayOnClose;
+        startMinimized = settings.StartMinimized ?? settings.MinimizeToTrayOnClose;
         checkForUpdates = settings.CheckForUpdates;
+        notifyWhenUpdateAvailable = settings.NotifyWhenUpdateAvailable;
         shareAnonymousTelemetry = settings.ShareAnonymousTelemetry;
         telemetry.SetEnabled(shareAnonymousTelemetry);
         shareCrashReports = settings.ShareCrashReports;
@@ -243,7 +278,9 @@ public sealed partial class MainViewModel
         OnPropertyChanged(nameof(IsCloseAppOnCloseSelected));
         OnPropertyChanged(nameof(IsMinimizeToTrayOnCloseSelected));
         OnPropertyChanged(nameof(LaunchAtStartup));
+        OnPropertyChanged(nameof(StartMinimized));
         OnPropertyChanged(nameof(CheckForUpdates));
+        OnPropertyChanged(nameof(NotifyWhenUpdateAvailable));
         OnPropertyChanged(nameof(ShareAnonymousTelemetry));
         OnPropertyChanged(nameof(ShareCrashReports));
         ResetLocalizedPlaceholders(preserveDiagnostic: true);
@@ -255,7 +292,9 @@ public sealed partial class MainViewModel
         Theme = ThemePreference,
         MinimizeToTrayOnClose = MinimizeToTrayOnClose,
         LaunchAtStartup = LaunchAtStartup,
+        StartMinimized = StartMinimized,
         CheckForUpdates = CheckForUpdates,
+        NotifyWhenUpdateAvailable = NotifyWhenUpdateAvailable,
         ShareAnonymousTelemetry = ShareAnonymousTelemetry,
         ShareCrashReports = ShareCrashReports,
         PrivacyConsentVersion = privacyConsentVersion,

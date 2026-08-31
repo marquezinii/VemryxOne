@@ -21,6 +21,7 @@ public partial class MainWindow
         PrivacySettingsPanel.Visibility = ReferenceEquals(sender, CategoryPrivacy) ? Visibility.Visible : Visibility.Collapsed;
         ToolsSettingsPanel.Visibility = ReferenceEquals(sender, CategoryTools) ? Visibility.Visible : Visibility.Collapsed;
         AboutSettingsPanel.Visibility = ReferenceEquals(sender, CategoryAbout) ? Visibility.Visible : Visibility.Collapsed;
+        SettingsContentScrollViewer?.ScrollToTop();
     }
 
     private void SystemTheme_Checked(object sender, RoutedEventArgs e) => ApplyTheme(AppThemePreference.System);
@@ -36,11 +37,12 @@ public partial class MainWindow
             return;
         }
 
-        ApplyLanguage((item.Tag as string) switch
+        ApplyLanguagePreference((item.Tag as string) switch
         {
-            "pt-BR" => AppLanguage.PortugueseBrazil,
-            "es" => AppLanguage.Spanish,
-            _ => AppLanguage.English
+            "pt-BR" => AppLanguagePreference.PortugueseBrazil,
+            "en" => AppLanguagePreference.English,
+            "es" => AppLanguagePreference.Spanish,
+            _ => AppLanguagePreference.Automatic
         });
     }
 
@@ -55,11 +57,11 @@ public partial class MainWindow
         themeManager.Apply(preference);
     }
 
-    private void ApplyLanguage(AppLanguage language)
+    private void ApplyLanguagePreference(AppLanguagePreference preference)
     {
         if (IsLoaded)
         {
-            viewModel.SelectLanguage(language);
+            viewModel.SelectLanguagePreference(preference);
             UpdateAccountButton();
         }
     }
@@ -90,6 +92,15 @@ public partial class MainWindow
         TryOpenExternal(() => Process.Start(new ProcessStartInfo
         {
             FileName = ProductIdentity.RepositoryUrl,
+            UseShellExecute = true
+        }));
+    }
+
+    private void OpenChangelog_Click(object sender, RoutedEventArgs e)
+    {
+        TryOpenExternal(() => Process.Start(new ProcessStartInfo
+        {
+            FileName = ProductIdentity.ReleasesUrl,
             UseShellExecute = true
         }));
     }

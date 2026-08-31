@@ -211,7 +211,7 @@
                         mover a marcação para outro x:Class quebraria esses
                         nomes de elemento.
                     -->
-                    <Grid x:Name="SettingsPage" Visibility="Collapsed" Margin="28,24,28,28">
+                    <Grid x:Name="SettingsPage" Visibility="Collapsed" Margin="28,24,28,28" MaxWidth="1120" HorizontalAlignment="Center">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
@@ -221,6 +221,7 @@
                             <StackPanel>
                                 <TextBlock Text="{Binding [Settings.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource PageTitleText}" />
                                 <Rectangle Style="{StaticResource TitleAccentRule}" Margin="0,10,0,0" />
+                                <TextBlock Text="{Binding [Settings.Subtitle], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,12,0,0" TextWrapping="Wrap" />
                             </StackPanel>
                         </Border>
 
@@ -229,14 +230,14 @@
                              ultrawide produzia 1000px de painel vazio à
                              direita do último campo; limitando-o, o que sobra
                              é o plano de fundo da interface, que é intencional. -->
-                        <Border Grid.Row="1" Style="{StaticResource PanelSurface}" MaxWidth="1120" HorizontalAlignment="Left">
+                        <Border Grid.Row="1" Style="{StaticResource PanelSurface}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
-                                <Border Grid.Column="0" Width="220" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,0,1,0" Padding="14,20">
+                                <Border Grid.Column="0" Width="220" Background="{DynamicResource CanvasSunkenBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,0,1,0" Padding="14,20">
                                     <StackPanel>
                                         <RadioButton x:Name="CategoryAccount" GroupName="SettingsCategory" Style="{StaticResource SettingsCategoryItemStyle}" Checked="SettingsCategory_Changed">
                                             <TextBlock Text="{Binding [Settings.Account.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyText}" />
@@ -256,7 +257,7 @@
                                     </StackPanel>
                                 </Border>
 
-                                <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="40,28,40,32">
+                                <ScrollViewer x:Name="SettingsContentScrollViewer" Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="40,28,40,32">
                                     <StackPanel MaxWidth="760" HorizontalAlignment="Left">
 
                                 <!-- ===== Conta ===== -->
@@ -295,6 +296,7 @@
                                                 <StackPanel Grid.Column="1" Margin="16,0" VerticalAlignment="Center">
                                                     <TextBlock x:Name="AccountSettingsEmailText" Style="{StaticResource BodyStrongText}" />
                                                     <TextBlock x:Name="AccountSettingsUsernameText" Style="{StaticResource SecondaryText}" Margin="0,3,0,0" />
+                                                    <TextBlock Text="{Binding [Settings.Account.PhotoLocalOnly], Source={StaticResource LocalizedStrings}}" Style="{StaticResource CaptionText}" Margin="0,4,0,0" TextWrapping="Wrap" />
                                                 </StackPanel>
                                                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                                                     <Button x:Name="ChangePhotoButton" Content="{Binding [Settings.Account.ChangePhoto], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryButtonStyle}" Height="36" Padding="14,0" Click="ChangePhoto_Click" />
@@ -389,16 +391,22 @@
 
                                 <!-- ===== Geral ===== -->
                                 <StackPanel x:Name="GeneralSettingsPanel">
-                                    <TextBlock Text="{Binding [Settings.General.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SectionText}" Margin="0,0,0,6" />
+                                    <TextBlock Text="{Binding [Settings.General.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SectionText}" />
+                                    <TextBlock Text="{Binding [Settings.General.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,6,0,24" TextWrapping="Wrap" />
 
-                                    <Border Style="{StaticResource SettingRowStyle}">
+                                    <TextBlock Text="{Binding [Settings.General.Interface], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SubsectionText}" Margin="0,0,0,10" />
+
+                                    <Border Style="{StaticResource SettingsCardStyle}">
                                         <Grid>
                                             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                                             <StackPanel Margin="0,0,24,0">
                                                 <TextBlock Text="{Binding [Settings.Language.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyStrongText}" />
-                                                <TextBlock Text="{Binding [Settings.Language.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,3,0,0" />
+                                                <TextBlock Text="{Binding [Settings.Language.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,3,0,0" TextWrapping="Wrap" />
                                             </StackPanel>
-                                            <ComboBox x:Name="LanguageSelector" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource SettingsComboBoxStyle}" SelectedValuePath="Content" SelectionChanged="LanguageSelector_SelectionChanged">
+                                            <ComboBox x:Name="LanguageSelector" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource SettingsComboBoxStyle}" SelectedValuePath="Content" SelectionChanged="LanguageSelector_SelectionChanged"
+                                                      AutomationProperties.Name="{Binding [Settings.Language.Title], Source={StaticResource LocalizedStrings}}"
+                                                      AutomationProperties.HelpText="{Binding [Settings.Language.Description], Source={StaticResource LocalizedStrings}}">
+                                                <ComboBoxItem Tag="auto" Content="{Binding [Settings.Language.Automatic], Source={StaticResource LocalizedStrings}}" />
                                                 <ComboBoxItem Tag="pt-BR" Content="{Binding [Settings.Language.PortugueseBrazil], Source={StaticResource LocalizedStrings}}" />
                                                 <ComboBoxItem Tag="en" Content="{Binding [Settings.Language.English], Source={StaticResource LocalizedStrings}}" />
                                                 <ComboBoxItem Tag="es" Content="{Binding [Settings.Language.Spanish], Source={StaticResource LocalizedStrings}}" />
@@ -406,7 +414,7 @@
                                         </Grid>
                                     </Border>
 
-                                    <Border Style="{StaticResource SettingRowStyle}">
+                                    <Border Style="{StaticResource SettingsCardStyle}">
                                         <StackPanel>
                                             <TextBlock Text="{Binding [Settings.Appearance.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyStrongText}" />
                                             <TextBlock Text="{Binding [Settings.Appearance.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,3,0,14" />
@@ -417,28 +425,66 @@
                                                     <RadioButton x:Name="ThemeLightOption" GroupName="Theme" Style="{StaticResource SegmentedOptionStyle}" Content="{Binding [Settings.Appearance.Light], Source={StaticResource LocalizedStrings}}" Checked="LightTheme_Checked" />
                                                 </StackPanel>
                                             </Border>
+                                            <TextBlock Text="{Binding [Settings.Appearance.MotionSystem], Source={StaticResource LocalizedStrings}}" Style="{StaticResource CaptionText}" Margin="0,12,0,0" TextWrapping="Wrap" />
                                         </StackPanel>
                                     </Border>
 
-                                    <Border Style="{StaticResource SettingRowStyle}">
+                                    <TextBlock Text="{Binding [Settings.General.Startup], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SubsectionText}" Margin="0,18,0,10" />
+
+                                    <Border Style="{StaticResource SettingsCardStyle}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                            <StackPanel Margin="0,0,24,0">
+                                                <TextBlock Text="{Binding [Settings.StartWithWindows.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyStrongText}" />
+                                                <TextBlock Text="{Binding [Settings.StartWithWindows.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,3,0,0" TextWrapping="Wrap" />
+                                            </StackPanel>
+                                            <CheckBox Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding LaunchAtStartup}" AutomationProperties.Name="{Binding [Settings.StartWithWindows.Title], Source={StaticResource LocalizedStrings}}" AutomationProperties.HelpText="{Binding [Settings.StartWithWindows.Description], Source={StaticResource LocalizedStrings}}" />
+                                        </Grid>
+                                    </Border>
+
+                                    <Border Style="{StaticResource SettingsCardStyle}" IsEnabled="{Binding LaunchAtStartup}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                            <StackPanel Margin="0,0,24,0">
+                                                <TextBlock Text="{Binding [Settings.StartMinimized.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyStrongText}" />
+                                                <TextBlock Text="{Binding [Settings.StartMinimized.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,3,0,0" TextWrapping="Wrap" />
+                                            </StackPanel>
+                                            <CheckBox Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding StartMinimized}" AutomationProperties.Name="{Binding [Settings.StartMinimized.Title], Source={StaticResource LocalizedStrings}}" AutomationProperties.HelpText="{Binding [Settings.StartMinimized.Description], Source={StaticResource LocalizedStrings}}" />
+                                        </Grid>
+                                    </Border>
+
+                                    <Border Style="{StaticResource SettingsCardStyle}">
                                         <Grid>
                                             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                                             <StackPanel Margin="0,0,24,0">
                                                 <TextBlock Text="{Binding [Settings.CloseBehavior.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyStrongText}" />
-                                                <TextBlock Text="{Binding [Settings.CloseBehavior.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,3,0,0" />
+                                                <TextBlock Text="{Binding [Settings.CloseBehavior.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,3,0,0" TextWrapping="Wrap" />
                                             </StackPanel>
                                             <CheckBox Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding MinimizeToTrayOnClose}" AutomationProperties.Name="{Binding [Settings.CloseBehavior.Title], Source={StaticResource LocalizedStrings}}" AutomationProperties.HelpText="{Binding [Settings.CloseBehavior.Description], Source={StaticResource LocalizedStrings}}" />
                                         </Grid>
                                     </Border>
 
-                                    <Border Style="{StaticResource SettingRowStyle}" BorderThickness="0">
+                                    <TextBlock Text="{Binding [Settings.General.Updates], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SubsectionText}" Margin="0,18,0,10" />
+
+                                    <Border Style="{StaticResource SettingsCardStyle}">
                                         <Grid>
                                             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                                             <StackPanel Margin="0,0,24,0">
-                                                <TextBlock Text="{Binding [Settings.StartWithWindows.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyStrongText}" />
-                                                <TextBlock Text="{Binding [Settings.StartWithWindows.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,3,0,0" />
+                                                <TextBlock Text="{Binding [Settings.AutomaticUpdates.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyStrongText}" />
+                                                <TextBlock Text="{Binding [Settings.AutomaticUpdates.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,3,0,0" TextWrapping="Wrap" />
                                             </StackPanel>
-                                            <CheckBox Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding LaunchAtStartup}" AutomationProperties.Name="{Binding [Settings.StartWithWindows.Title], Source={StaticResource LocalizedStrings}}" AutomationProperties.HelpText="{Binding [Settings.StartWithWindows.Description], Source={StaticResource LocalizedStrings}}" />
+                                            <CheckBox Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding CheckForUpdates}" AutomationProperties.Name="{Binding [Settings.AutomaticUpdates.Title], Source={StaticResource LocalizedStrings}}" AutomationProperties.HelpText="{Binding [Settings.AutomaticUpdates.Description], Source={StaticResource LocalizedStrings}}" />
+                                        </Grid>
+                                    </Border>
+
+                                    <Border Style="{StaticResource SettingsCardStyle}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                            <StackPanel Margin="0,0,24,0">
+                                                <TextBlock Text="{Binding [Settings.UpdateNotifications.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyStrongText}" />
+                                                <TextBlock Text="{Binding [Settings.UpdateNotifications.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,3,0,0" TextWrapping="Wrap" />
+                                            </StackPanel>
+                                            <CheckBox Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding NotifyWhenUpdateAvailable}" AutomationProperties.Name="{Binding [Settings.UpdateNotifications.Title], Source={StaticResource LocalizedStrings}}" AutomationProperties.HelpText="{Binding [Settings.UpdateNotifications.Description], Source={StaticResource LocalizedStrings}}" />
                                         </Grid>
                                     </Border>
                                 </StackPanel>
@@ -452,8 +498,9 @@
                                     vez, exatamente onde alguém foi procurá-lo.
                                 -->
                                 <StackPanel x:Name="PrivacySettingsPanel" Visibility="Collapsed">
-                                    <TextBlock Text="{Binding [Settings.Privacy.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SectionText}" Margin="0,0,0,6" />
-                                    <Border Style="{StaticResource SettingRowStyle}">
+                                    <TextBlock Text="{Binding [Settings.Privacy.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SectionText}" />
+                                    <TextBlock Text="{Binding [Settings.Privacy.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,6,0,24" TextWrapping="Wrap" />
+                                    <Border Style="{StaticResource SettingsCardStyle}">
                                         <Grid>
                                             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                                             <StackPanel Margin="0,0,24,0">
@@ -464,7 +511,7 @@
                                         </Grid>
                                     </Border>
 
-                                    <Border Style="{StaticResource SettingRowStyle}">
+                                    <Border Style="{StaticResource SettingsCardStyle}">
                                         <Grid>
                                             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                                             <StackPanel Margin="0,0,24,0">
@@ -494,8 +541,9 @@
 
                                 <!-- ===== Ferramentas ===== -->
                                 <StackPanel x:Name="ToolsSettingsPanel" Visibility="Collapsed">
-                                    <TextBlock Text="{Binding [Settings.Tools.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SectionText}" Margin="0,0,0,6" />
-                                    <Border Style="{StaticResource SettingRowStyle}">
+                                    <TextBlock Text="{Binding [Settings.Tools.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SectionText}" />
+                                    <TextBlock Text="{Binding [Settings.Tools.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,6,0,24" TextWrapping="Wrap" />
+                                    <Border Style="{StaticResource SettingsCardStyle}">
                                         <Grid>
                                             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                                             <StackPanel Margin="0,0,24,0">
@@ -506,7 +554,7 @@
                                             <Button Grid.Column="1" VerticalAlignment="Center" Content="{Binding [Settings.CheckForUpdates.Button], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryButtonStyle}" IsEnabled="{Binding CanCheckForUpdatesManually}" Click="CheckForUpdatesManually_Click" />
                                         </Grid>
                                     </Border>
-                                    <Border Style="{StaticResource SettingRowStyle}">
+                                    <Border Style="{StaticResource SettingsCardStyle}">
                                         <Grid>
                                             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                                             <StackPanel Margin="0,0,24,0">
@@ -517,10 +565,13 @@
                                             <Button Grid.Column="1" VerticalAlignment="Center" Content="{Binding [GtaVBenchmark.RunButton], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryButtonStyle}" IsEnabled="{Binding CanRunGtaVBenchmark}" Click="RunGtaVBenchmark_Click" />
                                         </Grid>
                                     </Border>
-                                    <Border Style="{StaticResource SettingRowStyle}" BorderThickness="0">
+                                    <Border Style="{StaticResource SettingsCardStyle}">
                                         <Grid>
                                             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                            <TextBlock Text="{Binding [Settings.Tools.ReportIssue.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyStrongText}" VerticalAlignment="Center" Margin="0,0,24,0" />
+                                            <StackPanel Margin="0,0,24,0">
+                                                <TextBlock Text="{Binding [Settings.Tools.ReportIssue.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyStrongText}" />
+                                                <TextBlock Text="{Binding [Settings.Tools.ReportIssue.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,3,0,0" TextWrapping="Wrap" />
+                                            </StackPanel>
                                             <Button Grid.Column="1" VerticalAlignment="Center" Content="{Binding [Settings.Tools.ReportIssue.Button], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryButtonStyle}" Click="ReportBug_Click" />
                                         </Grid>
                                     </Border>
@@ -528,7 +579,8 @@
 
                                 <!-- ===== Sobre ===== -->
                                 <StackPanel x:Name="AboutSettingsPanel" Visibility="Collapsed">
-                                    <TextBlock Text="{Binding [Settings.About.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SectionText}" Margin="0,0,0,20" />
+                                    <TextBlock Text="{Binding [Settings.About.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SectionText}" />
+                                    <TextBlock Text="{Binding [Settings.About.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,6,0,24" TextWrapping="Wrap" />
                                     <StackPanel Orientation="Horizontal">
                                         <Image Source="Assets/Ralven.png" Width="44" Height="44" Stretch="Uniform" VerticalAlignment="Top" />
                                         <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
@@ -543,9 +595,20 @@
                                     <TextBlock Text="{Binding [Safety.Limits.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource OverlineText}" />
                                     <TextBlock Text="{Binding [Safety.Limits.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,10,0,0" TextWrapping="Wrap" MaxWidth="600" HorizontalAlignment="Left" />
 
-                                    <StackPanel Orientation="Horizontal" Margin="0,24,0,0">
+                                    <Border Style="{StaticResource SettingsCardStyle}" Margin="0,24,0,10">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                            <StackPanel Margin="0,0,24,0">
+                                                <TextBlock Text="{Binding [Settings.About.Discord.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyStrongText}" />
+                                                <TextBlock Text="{Binding [Settings.About.Discord.Detail], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,3,0,0" TextWrapping="Wrap" />
+                                            </StackPanel>
+                                            <Button Grid.Column="1" Content="{Binding [Settings.About.Discord.Action], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryButtonStyle}" VerticalAlignment="Center" Click="Discord_Click" />
+                                        </Grid>
+                                    </Border>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                                         <Button Content="{Binding [Settings.About.Repository], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryButtonStyle}" Click="OpenRepository_Click" />
-                                        <Button Content="{Binding [Settings.About.Discord.Action], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryButtonStyle}" Margin="12,0,0,0" Click="Discord_Click" />
+                                        <Button Content="{Binding [Settings.About.Changelog], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryButtonStyle}" Margin="12,0,0,0" Click="OpenChangelog_Click" />
                                     </StackPanel>
                                     <TextBlock Text="{Binding [Brand.FooterCopyright], Source={StaticResource LocalizedStrings}}" Style="{StaticResource CaptionText}" Margin="0,24,0,0" />
                                 </StackPanel>

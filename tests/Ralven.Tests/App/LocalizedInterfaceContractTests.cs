@@ -688,8 +688,11 @@ public sealed partial class LocalizedInterfaceContractTests
         Assert.Equal(
             new[]
             {
-                "{Binding MinimizeToTrayOnClose}",
                 "{Binding LaunchAtStartup}",
+                "{Binding StartMinimized}",
+                "{Binding MinimizeToTrayOnClose}",
+                "{Binding CheckForUpdates}",
+                "{Binding NotifyWhenUpdateAvailable}",
                 "{Binding ShareAnonymousTelemetry}",
                 "{Binding ShareCrashReports}"
             },
@@ -841,7 +844,7 @@ public sealed partial class LocalizedInterfaceContractTests
 
         Assert.Contains("ToolTip=\"{Binding [Safety.SnapshotRollback]", mainWindow, StringComparison.Ordinal);
         Assert.DoesNotContain("Text=\"{Binding [Safety.SnapshotRollback]", mainWindow, StringComparison.Ordinal);
-        Assert.DoesNotContain("Text=\"{Binding [Settings.Subtitle]", mainWindow, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding [Settings.Subtitle]", mainWindow, StringComparison.Ordinal);
         Assert.Contains("<ui:TitleBar", mainWindow, StringComparison.Ordinal);
 
         // O seletor reserva folga à direita para o chevron: sem ela o valor

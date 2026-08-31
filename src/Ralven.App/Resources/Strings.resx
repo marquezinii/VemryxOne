@@ -239,23 +239,33 @@
   <data name="History.Notes.Rollback" xml:space="preserve"><value>Rollback restores only what this run changed and preserves anything you changed afterwards.</value></data>
   <data name="History.Notes.Local" xml:space="preserve"><value>Everything stays on this computer, in the app's local data folder.</value></data>
   <data name="Settings.Title" xml:space="preserve"><value>Settings</value></data>
-  <data name="Settings.Subtitle" xml:space="preserve"><value>Customize the app without weakening the selected optimization profile.</value></data>
+  <data name="Settings.Subtitle" xml:space="preserve"><value>Manage appearance, startup, updates, and privacy in one place.</value></data>
   <data name="Settings.General.Title" xml:space="preserve"><value>General</value></data>
+  <data name="Settings.General.Description" xml:space="preserve"><value>Choose how Ralven looks, starts, and stays up to date.</value></data>
+  <data name="Settings.General.Interface" xml:space="preserve"><value>Interface</value></data>
+  <data name="Settings.General.Startup" xml:space="preserve"><value>Startup and background</value></data>
+  <data name="Settings.General.Updates" xml:space="preserve"><value>Updates</value></data>
   <data name="Settings.Language.Title" xml:space="preserve"><value>Language</value></data>
-  <data name="Settings.Language.Description" xml:space="preserve"><value>Detected from Windows on first launch. You can change it at any time.</value></data>
+  <data name="Settings.Language.Description" xml:space="preserve"><value>Follow Windows automatically or choose a language.</value></data>
+  <data name="Settings.Language.Automatic" xml:space="preserve"><value>Windows (automatic)</value></data>
   <data name="Settings.Language.English" xml:space="preserve"><value>English</value></data>
   <data name="Settings.Language.PortugueseBrazil" xml:space="preserve"><value>Português (Brasil)</value></data>
   <data name="Settings.Language.Spanish" xml:space="preserve"><value>Español</value></data>
   <data name="Settings.Appearance.Title" xml:space="preserve"><value>Appearance</value></data>
   <data name="Settings.Appearance.Description" xml:space="preserve"><value>Choose a theme or automatically follow Windows.</value></data>
+  <data name="Settings.Appearance.MotionSystem" xml:space="preserve"><value>Animations follow the Windows accessibility setting.</value></data>
   <data name="Settings.Appearance.System" xml:space="preserve"><value>System</value></data>
   <data name="Settings.Appearance.Dark" xml:space="preserve"><value>Dark</value></data>
   <data name="Settings.Appearance.Light" xml:space="preserve"><value>Light</value></data>
   <data name="Settings.CloseBehavior.Title" xml:space="preserve"><value>Minimize to system tray</value></data>
-  <data name="Settings.CloseBehavior.Close" xml:space="preserve"><value>Exit Ralven</value></data>
-  <data name="Settings.CloseBehavior.Tray" xml:space="preserve"><value>Keep running in the notification area</value></data>
   <data name="Settings.StartWithWindows.Title" xml:space="preserve"><value>Start with Windows</value></data>
   <data name="Settings.StartWithWindows.Description" xml:space="preserve"><value>Open Ralven after you sign in.</value></data>
+  <data name="Settings.StartMinimized.Title" xml:space="preserve"><value>Start minimized</value></data>
+  <data name="Settings.StartMinimized.Description" xml:space="preserve"><value>When opened with Windows, keep Ralven in the notification area.</value></data>
+  <data name="Settings.AutomaticUpdates.Title" xml:space="preserve"><value>Check for updates automatically</value></data>
+  <data name="Settings.AutomaticUpdates.Description" xml:space="preserve"><value>Check for a newer public version when Ralven starts.</value></data>
+  <data name="Settings.UpdateNotifications.Title" xml:space="preserve"><value>Update notifications</value></data>
+  <data name="Settings.UpdateNotifications.Description" xml:space="preserve"><value>Show a Windows notification when Ralven finds a new version.</value></data>
   <data name="Safety.Limits.Title" xml:space="preserve"><value>Safety limits</value></data>
   <data name="Safety.Limits.Description" xml:space="preserve"><value>Ralven never disables Defender, Firewall, UAC, Windows Update, the page file or critical services; it does not use BCDEdit/HPET, injection, hooks or Realtime priority.</value></data>
   <data name="Safety.EnhancedBlocked" xml:space="preserve"><value>FiveM Enhanced: blocked in this version until its official layout has been tested.</value></data>
@@ -416,9 +426,8 @@
   <data name="Settings.CloseBehavior.Description" xml:space="preserve"><value>When clicking X, Ralven will minimize to the system tray instead of closing.</value></data>
   <data name="Settings.Telemetry.Title" xml:space="preserve"><value>Help improve Ralven</value></data>
   <data name="Settings.Telemetry.Description" xml:space="preserve"><value>Send anonymized technical telemetry only if you choose to.</value></data>
-  <data name="Settings.Telemetry.Sends" xml:space="preserve"><value>✓ Sends: categorized errors, execution time, and version.</value></data>
-  <data name="Settings.Telemetry.NeverSends" xml:space="preserve"><value>✕ Never sends: files, documents, history, or personal data.</value></data>
   <data name="Settings.Privacy.Title" xml:space="preserve"><value>Privacy</value></data>
+  <data name="Settings.Privacy.Description" xml:space="preserve"><value>Choose which optional technical data may leave this computer.</value></data>
   <data name="Settings.CrashReports.Title" xml:space="preserve"><value>Send automatic crash reports</value></data>
   <data name="Settings.CrashReports.Description" xml:space="preserve"><value>Send sanitized stack traces when Ralven crashes or hits an unexpected error.</value></data>
   <data name="PrivacyConsent.WindowTitle" xml:space="preserve"><value>Privacy and diagnostics - Ralven</value></data>
@@ -435,18 +444,19 @@
   <data name="PrivacyConsent.CrashReports.Title" xml:space="preserve"><value>Send automatic error and crash reports</value></data>
   <data name="PrivacyConsent.CrashReports.Description" xml:space="preserve"><value>Sanitized stack traces and app version when Ralven crashes or hits an unexpected error.</value></data>
   <data name="PrivacyConsent.Continue" xml:space="preserve"><value>Continue</value></data>
-  <data name="Privacy.Collects.Title" xml:space="preserve"><value>WITH YOUR OPTIONS, WE MAY COLLECT</value></data>
-  <data name="Privacy.Collects.Items" xml:space="preserve"><value>• Ralven version
-• General Windows version and architecture
-• Duration and outcome of optimizations
-• Technical identifiers of actions
-• CPU and GPU model (no serial number)
-• Approximate RAM range
-• Sanitized error codes
-• Sanitized stack traces in crash reports
-• App version where the error occurred</value></data>
-  <data name="Privacy.DoesNotCollect.Title" xml:space="preserve"><value>WE DO NOT COLLECT</value></data>
-  <data name="Privacy.DoesNotCollect.Items" xml:space="preserve"><value>• Username
+  <data name="Privacy.Collects.Title" xml:space="preserve"><value>WITH YOUR OPTIONS, TELEMETRY MAY COLLECT</value></data>
+  <data name="Privacy.Collects.Items" xml:space="preserve"><value>• Ralven version and environment
+• Windows version, build, and architecture
+• Optimization duration, result, profile, and actions
+• CPU and GPU model and RAM range
+• FiveM/GTA V detection, edition, and target count
+• Disk type and free-space range
+• Approximate run time and usage frequency
+• Range of running FiveM/GTA processes
+• Sanitized error category
+• Sanitized stack trace if you allow crash reports</value></data>
+  <data name="Privacy.DoesNotCollect.Title" xml:space="preserve"><value>THIS TELEMETRY DOES NOT COLLECT</value></data>
+  <data name="Privacy.DoesNotCollect.Items" xml:space="preserve"><value>• Username, e-mail, or account ID
 • Computer name
 • Personal files
 • Browsing history
@@ -1222,13 +1232,13 @@
   <data name="Account.PasswordReset.Sent" xml:space="preserve"><value>If there's an account for this e-mail, we sent the recovery instructions.</value></data>
   <data name="Account.Verification.ResentConfirmation" xml:space="preserve"><value>We resent the confirmation e-mail.</value></data>
   <data name="Account.Verification.PleaseConfirm" xml:space="preserve"><value>Confirm your e-mail to continue.</value></data>
-  <data name="Settings.Account.ChangePassword" xml:space="preserve"><value>Change password</value></data>
   <data name="Settings.Account.SignInButton" xml:space="preserve"><value>Sign in / Create account</value></data>
   <data name="Settings.Account.NewEmailLabel" xml:space="preserve"><value>New e-mail</value></data>
   <data name="History.Empty.Detail" xml:space="preserve"><value>Your runs, results, and rollback options will appear here after the first optimization.</value></data>
   <data name="Settings.Tools.ReportIssue.Title" xml:space="preserve"><value>Report a problem</value></data>
+  <data name="Settings.Tools.ReportIssue.Description" xml:space="preserve"><value>Open the form to describe the problem and choose whether to include a sanitized log excerpt.</value></data>
   <data name="Account.ViewTooltip" xml:space="preserve"><value>View my account</value></data>
-  <data name="Settings.Account.SignedOutDescription" xml:space="preserve"><value>Sign in or create an account to sync your preferences.</value></data>
+  <data name="Settings.Account.SignedOutDescription" xml:space="preserve"><value>Sign in or create an account to manage your profile and plan.</value></data>
   <data name="Settings.Tools.ReportIssue.Button" xml:space="preserve"><value>Report a bug</value></data>
   <data name="Account.SignInButton" xml:space="preserve"><value>Sign in / Create account</value></data>
   <data name="Account.SignInTooltip" xml:space="preserve"><value>Sign in or create an account</value></data>
@@ -1246,15 +1256,16 @@
   <data name="Settings.Account.Plan.UnavailableDetail" xml:space="preserve"><value>Your current access couldn't be verified. No Pro feature is unlocked while this status is unavailable.</value></data>
   <data name="Settings.Account.Plan.Refresh" xml:space="preserve"><value>Refresh</value></data>
   <data name="Settings.Account.ChangePhoto" xml:space="preserve"><value>Change photo</value></data>
+  <data name="Settings.Account.PhotoLocalOnly" xml:space="preserve"><value>Your profile photo is stored only on this computer.</value></data>
   <data name="Settings.Account.Unavailable" xml:space="preserve"><value>Account access is not available in this installation.</value></data>
   <data name="Report.ViewHistoryButton" xml:space="preserve"><value>View history</value></data>
   <data name="Settings.Account.CurrentPasswordPlaceholder" xml:space="preserve"><value>Confirm to change your password, e-mail, or delete your account</value></data>
   <data name="Settings.Account.Delete" xml:space="preserve"><value>Delete account</value></data>
   <data name="Settings.Tools.Title" xml:space="preserve"><value>Tools</value></data>
+  <data name="Settings.Tools.Description" xml:space="preserve"><value>Maintenance and support actions to use only when needed.</value></data>
   <data name="Settings.Account.CurrentPasswordLabel" xml:space="preserve"><value>Current password</value></data>
   <data name="Settings.Account.RemovePhoto" xml:space="preserve"><value>Remove</value></data>
   <data name="Progress.CancelHelp" xml:space="preserve"><value>Cancellation is requested safely after the current action.</value></data>
-  <data name="Settings.Account.NewPasswordPlaceholder" xml:space="preserve"><value>At least 8 characters</value></data>
   <data name="Settings.Account.Security.Title" xml:space="preserve"><value>Security</value></data>
   <data name="Settings.Account.Security.Description" xml:space="preserve"><value>Manage the credential used to access your account.</value></data>
   <data name="Settings.Account.PasswordLabel" xml:space="preserve"><value>Password</value></data>

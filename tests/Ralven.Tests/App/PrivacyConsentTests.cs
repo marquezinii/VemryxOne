@@ -265,6 +265,8 @@ public sealed class AppSettingsSerializationTests
         Assert.True(settings.ShareAnonymousTelemetry);
         Assert.False(settings.ShareCrashReports);
         Assert.Null(settings.PrivacyConsentVersion);
+        Assert.Null(settings.StartMinimized);
+        Assert.True(settings.NotifyWhenUpdateAvailable);
     }
 
     [Fact]
@@ -352,7 +354,9 @@ public sealed class AppSettingsSerializationTests
             Theme = AppThemePreference.Dark,
             MinimizeToTrayOnClose = false,
             LaunchAtStartup = true,
+            StartMinimized = false,
             CheckForUpdates = false,
+            NotifyWhenUpdateAvailable = false,
             ShareAnonymousTelemetry = false,
             ShareCrashReports = false,
             PrivacyConsentVersion = 3
@@ -384,7 +388,9 @@ public sealed class PrivacyConsentOutcomeBuilderTests
         Theme = AppThemePreference.Dark,
         MinimizeToTrayOnClose = false,
         LaunchAtStartup = true,
+        StartMinimized = false,
         CheckForUpdates = false,
+        NotifyWhenUpdateAvailable = false,
         ShareAnonymousTelemetry = true,
         ShareCrashReports = true,
         PrivacyConsentVersion = null
@@ -451,7 +457,9 @@ public sealed class PrivacyConsentOutcomeBuilderTests
         Assert.Equal(current.Theme, result.Theme);
         Assert.Equal(current.MinimizeToTrayOnClose, result.MinimizeToTrayOnClose);
         Assert.Equal(current.LaunchAtStartup, result.LaunchAtStartup);
+        Assert.Equal(current.StartMinimized, result.StartMinimized);
         Assert.Equal(current.CheckForUpdates, result.CheckForUpdates);
+        Assert.Equal(current.NotifyWhenUpdateAvailable, result.NotifyWhenUpdateAvailable);
     }
 
 }
