@@ -11,53 +11,62 @@ internal static class GpuAdapterRegistryReader
 {
     private const string VideoRegistryPath = @"SYSTEM\CurrentControlSet\Control\Video";
 
-    public static IReadOnlyList<GpuRegistryAdapter> ReadAll()
+    public static IReadOnlyList<GpuRegistryAdapter> ReadAll() => ReadSafely(ReadRegistry);
+
+    internal static IReadOnlyList<GpuRegistryAdapter> ReadSafely(
+        Func<IReadOnlyList<GpuRegistryAdapter>> read)
     {
-        var adapters = new List<GpuRegistryAdapter>();
         try
         {
-            using var video = Registry.LocalMachine.OpenSubKey(VideoRegistryPath);
-            if (video is null)
+            return read();
+        }
+        catch (Exception exception) when (exception is System.Security.SecurityException
+            or UnauthorizedAccessException
+            or System.ComponentModel.Win32Exception
+            or IOException)
+        {
+            return [];
+        }
+    }
+
+    private static IReadOnlyList<GpuRegistryAdapter> ReadRegistry()
+    {
+        var adapters = new List<GpuRegistryAdapter>();
+        using var video = Registry.LocalMachine.OpenSubKey(VideoRegistryPath);
+        if (video is null)
+        {
+            return adapters;
+        }
+
+        foreach (var deviceKeyName in video.GetSubKeyNames())
+        {
+            using var device = video.OpenSubKey(deviceKeyName);
+            if (device is null)
             {
-                return adapters;
+                continue;
             }
 
-            foreach (var deviceKeyName in video.GetSubKeyNames())
+            foreach (var adapterKeyName in device.GetSubKeyNames().Where(IsAdapterSubKey))
             {
-                using var device = video.OpenSubKey(deviceKeyName);
-                if (device is null)
+                using var adapter = device.OpenSubKey(adapterKeyName);
+                var description = (adapter?.GetValue("DriverDesc") as string)?.Trim();
+                if (string.IsNullOrWhiteSpace(description)
+                    || description.Contains("Basic Render", StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
 
-                foreach (var adapterKeyName in device.GetSubKeyNames().Where(IsAdapterSubKey))
+                var vramBytes = adapter?.GetValue("HardwareInformation.qwMemorySize") switch
                 {
-                    using var adapter = device.OpenSubKey(adapterKeyName);
-                    var description = (adapter?.GetValue("DriverDesc") as string)?.Trim();
-                    if (string.IsNullOrWhiteSpace(description)
-                        || description.Contains("Basic Render", StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    var vramBytes = adapter?.GetValue("HardwareInformation.qwMemorySize") switch
-                    {
-                        long value and > 0 => value,
-                        int value and > 0 => (long)value,
-                        _ => (long?)null
-                    };
-                    adapters.Add(new GpuRegistryAdapter(
-                        description,
-                        vramBytes,
-                        adapter?.GetValue("MatchingDeviceId") as string));
-                }
+                    long value and > 0 => value,
+                    int value and > 0 => (long)value,
+                    _ => (long?)null
+                };
+                adapters.Add(new GpuRegistryAdapter(
+                    description,
+                    vramBytes,
+                    adapter?.GetValue("MatchingDeviceId") as string));
             }
-        }
-        catch (Exception exception) when (exception is System.Security.SecurityException
-            or UnauthorizedAccessException
-            or System.ComponentModel.Win32Exception)
-        {
-            return [];
         }
 
         return adapters;

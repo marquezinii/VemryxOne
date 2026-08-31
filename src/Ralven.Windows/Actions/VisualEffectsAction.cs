@@ -14,11 +14,19 @@ internal sealed record VisualEffectsSnapshot(
     VisualEffectsState Previous,
     VisualEffectsState Applied);
 
+internal sealed record MenuShowDelaySnapshot(
+    int PreviousMilliseconds,
+    int AppliedMilliseconds);
+
 public interface IVisualEffectsController
 {
     VisualEffectsState Get();
 
     void Set(VisualEffectsState state);
+
+    int GetMenuShowDelay();
+
+    void SetMenuShowDelay(int milliseconds);
 }
 
 public sealed class WindowsVisualEffectsController : IVisualEffectsController
@@ -29,6 +37,8 @@ public sealed class WindowsVisualEffectsController : IVisualEffectsController
     private const uint SpiSetUiEffects = 0x103F;
     private const uint SpiGetClientAreaAnimation = 0x1042;
     private const uint SpiSetClientAreaAnimation = 0x1043;
+    private const uint SpiGetMenuShowDelay = 0x006A;
+    private const uint SpiSetMenuShowDelay = 0x006B;
     private const uint SpifUpdateIniFile = 0x0001;
     private const uint SpifSendChange = 0x0002;
 
@@ -66,6 +76,30 @@ public sealed class WindowsVisualEffectsController : IVisualEffectsController
             SpiSetAnimation,
             animation.Size,
             ref animation,
+            SpifUpdateIniFile | SpifSendChange))
+        {
+            throw new Win32Exception(Marshal.GetLastWin32Error());
+        }
+    }
+
+    public int GetMenuShowDelay()
+    {
+        uint milliseconds = 0;
+        if (!SystemParametersInfoUnsignedInteger(SpiGetMenuShowDelay, 0, ref milliseconds, 0))
+        {
+            throw new Win32Exception(Marshal.GetLastWin32Error());
+        }
+
+        return checked((int)milliseconds);
+    }
+
+    public void SetMenuShowDelay(int milliseconds)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(milliseconds);
+        if (!SystemParametersInfoPointer(
+            SpiSetMenuShowDelay,
+            checked((uint)milliseconds),
+            IntPtr.Zero,
             SpifUpdateIniFile | SpifSendChange))
         {
             throw new Win32Exception(Marshal.GetLastWin32Error());
@@ -118,6 +152,22 @@ public sealed class WindowsVisualEffectsController : IVisualEffectsController
         uint parameter,
         ref AnimationInfo value,
         uint flags);
+
+    [DllImport("user32.dll", EntryPoint = "SystemParametersInfoW", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SystemParametersInfoUnsignedInteger(
+        uint action,
+        uint parameter,
+        ref uint value,
+        uint flags);
+
+    [DllImport("user32.dll", EntryPoint = "SystemParametersInfoW", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SystemParametersInfoPointer(
+        uint action,
+        uint parameter,
+        IntPtr value,
+        uint flags);
 }
 
 public sealed class VisualEffectsAction : WindowsOptimizationAction
@@ -152,10 +202,29 @@ public sealed class VisualEffectsAction : WindowsOptimizationAction
         try
         {
             controller.Set(desired);
+            if (controller.Get() != desired)
+            {
+                throw new IOException("Windows did not apply the requested visual effects settings.");
+            }
         }
-        catch
+        catch (Exception applyException)
         {
-            controller.Set(previous);
+            try
+            {
+                controller.Set(previous);
+                if (controller.Get() != previous)
+                {
+                    throw new IOException("Windows did not restore the previous visual effects settings after apply failed.");
+                }
+            }
+            catch (Exception restoreException)
+            {
+                throw new AggregateException(
+                    "Applying and restoring the Windows visual effects settings both failed.",
+                    applyException,
+                    restoreException);
+            }
+
             throw;
         }
 
@@ -178,6 +247,104 @@ public sealed class VisualEffectsAction : WindowsOptimizationAction
         }
 
         controller.Set(snapshot.Previous);
+        if (controller.Get() != snapshot.Previous)
+        {
+            throw new IOException("Windows did not restore the previous visual effects settings.");
+        }
+
+        return Task.CompletedTask;
+    }
+}
+
+public sealed class MenuShowDelayAction : WindowsOptimizationAction
+{
+    private const int MaximumDelayMilliseconds = 100;
+    private readonly IVisualEffectsController controller;
+    private readonly WindowsActionTextResolver text;
+
+    public MenuShowDelayAction(
+        IVisualEffectsController controller,
+        WindowsActionTextResolver text)
+    {
+        this.controller = controller ?? throw new ArgumentNullException(nameof(controller));
+        this.text = text ?? throw new ArgumentNullException(nameof(text));
+    }
+
+    public override ActionMetadataDto Metadata { get; } = WindowsActionMetadata.For(
+        OptimizationActionIds.ReduceMenuShowDelay);
+
+    public override Task<WindowsActionApplyResult> ApplyAsync(
+        WindowsActionContext context,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var previous = controller.GetMenuShowDelay();
+        var applied = Math.Min(previous, MaximumDelayMilliseconds);
+        if (previous == applied)
+        {
+            return Task.FromResult(WindowsActionApplyResult.NoChange(
+                text("ActionResults.MenuShowDelay.AlreadyOptimized")));
+        }
+
+        try
+        {
+            controller.SetMenuShowDelay(applied);
+            if (controller.GetMenuShowDelay() != applied)
+            {
+                throw new IOException("Windows did not apply the requested menu show delay.");
+            }
+        }
+        catch (Exception applyException)
+        {
+            try
+            {
+                controller.SetMenuShowDelay(previous);
+                if (controller.GetMenuShowDelay() != previous)
+                {
+                    throw new IOException("Windows did not restore the previous menu show delay after apply failed.");
+                }
+            }
+            catch (Exception restoreException)
+            {
+                throw new AggregateException(
+                    "Applying and restoring the Windows menu show delay both failed.",
+                    applyException,
+                    restoreException);
+            }
+
+            throw;
+        }
+
+        return Task.FromResult(WindowsActionApplyResult.ChangedWith(
+            new MenuShowDelaySnapshot(previous, applied),
+            text("ActionResults.MenuShowDelay.Applied")));
+    }
+
+    public override Task RollbackAsync(
+        WindowsActionContext context,
+        string? snapshotJson,
+        CancellationToken cancellationToken)
+    {
+        var snapshot = WindowsActionSnapshot.Deserialize<MenuShowDelaySnapshot>(snapshotJson);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (snapshot.AppliedMilliseconds != MaximumDelayMilliseconds
+            || snapshot.PreviousMilliseconds <= MaximumDelayMilliseconds)
+        {
+            throw new InvalidDataException("The menu show delay snapshot is outside this action's supported values.");
+        }
+
+        if (controller.GetMenuShowDelay() != snapshot.AppliedMilliseconds)
+        {
+            throw new IOException(
+                "Menu show delay changed after optimization; rollback refused to overwrite newer settings.");
+        }
+
+        controller.SetMenuShowDelay(snapshot.PreviousMilliseconds);
+        if (controller.GetMenuShowDelay() != snapshot.PreviousMilliseconds)
+        {
+            throw new IOException("Windows did not restore the previous menu show delay.");
+        }
+
         return Task.CompletedTask;
     }
 }

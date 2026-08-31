@@ -530,6 +530,130 @@ public sealed class WindowsActionHandlerTests
         Assert.Equal(new VisualEffectsState(true, false, true), controller.State);
     }
 
+    [Fact]
+    public async Task VisualEffectsApply_PostconditionFailureRestoresPreviousSettings()
+    {
+        var controller = new FakeVisualEffectsController { IgnoreNextStateSet = true };
+        var action = new VisualEffectsAction(controller);
+
+        await Assert.ThrowsAsync<IOException>(() =>
+            action.ApplyAsync(Context(), CancellationToken.None));
+
+        Assert.Equal(new VisualEffectsState(true, true, true), controller.State);
+    }
+
+    [Fact]
+    public async Task VisualEffectsApply_ReportsWhenFailedApplyCannotBeRestored()
+    {
+        var controller = new FakeVisualEffectsController();
+        var partialState = new VisualEffectsState(true, false, false);
+        controller.StateSetResults.Enqueue(partialState);
+        controller.StateSetResults.Enqueue(null);
+        var action = new VisualEffectsAction(controller);
+
+        var exception = await Assert.ThrowsAsync<AggregateException>(() =>
+            action.ApplyAsync(Context(), CancellationToken.None));
+
+        Assert.Equal(2, exception.InnerExceptions.Count);
+        Assert.Equal(partialState, controller.State);
+    }
+
+    [Fact]
+    public async Task MenuShowDelayApply_VerifiesAndRollsBack()
+    {
+        var controller = new FakeVisualEffectsController();
+        var action = new MenuShowDelayAction(controller, Text);
+        var context = Context();
+
+        var result = await action.ApplyAsync(context, CancellationToken.None);
+
+        Assert.True(result.Changed);
+        Assert.Equal(100, controller.MenuShowDelay);
+        Assert.Equal("ActionResults.MenuShowDelay.Applied", Assert.Single(result.Messages));
+
+        await action.RollbackAsync(context, result.SnapshotJson, CancellationToken.None);
+
+        Assert.Equal(400, controller.MenuShowDelay);
+    }
+
+    [Fact]
+    public async Task MenuShowDelayApply_DoesNotIncreaseFasterExistingValue()
+    {
+        var controller = new FakeVisualEffectsController { MenuShowDelay = 75 };
+        var action = new MenuShowDelayAction(controller, Text);
+
+        var result = await action.ApplyAsync(Context(), CancellationToken.None);
+
+        Assert.False(result.Changed);
+        Assert.Equal(75, controller.MenuShowDelay);
+        Assert.Equal("ActionResults.MenuShowDelay.AlreadyOptimized", Assert.Single(result.Messages));
+    }
+
+    [Fact]
+    public async Task MenuShowDelayRollback_PreservesNewerUserChoice()
+    {
+        var controller = new FakeVisualEffectsController();
+        var action = new MenuShowDelayAction(controller, Text);
+        var context = Context();
+        var result = await action.ApplyAsync(context, CancellationToken.None);
+        controller.MenuShowDelay = 75;
+
+        await Assert.ThrowsAsync<IOException>(() =>
+            action.RollbackAsync(context, result.SnapshotJson, CancellationToken.None));
+        Assert.Equal(75, controller.MenuShowDelay);
+    }
+
+    [Fact]
+    public async Task MenuShowDelayApply_PostconditionFailureRestoresPreviousValue()
+    {
+        var controller = new FakeVisualEffectsController { IgnoreNextMenuShowDelaySet = true };
+        var action = new MenuShowDelayAction(controller, Text);
+
+        await Assert.ThrowsAsync<IOException>(() =>
+            action.ApplyAsync(Context(), CancellationToken.None));
+
+        Assert.Equal(400, controller.MenuShowDelay);
+    }
+
+    [Fact]
+    public async Task MenuShowDelayApply_ReportsWhenFailedApplyCannotBeRestored()
+    {
+        var controller = new FakeVisualEffectsController();
+        controller.MenuShowDelaySetResults.Enqueue(101);
+        controller.MenuShowDelaySetResults.Enqueue(null);
+        var action = new MenuShowDelayAction(controller, Text);
+
+        var exception = await Assert.ThrowsAsync<AggregateException>(() =>
+            action.ApplyAsync(Context(), CancellationToken.None));
+
+        Assert.Equal(2, exception.InnerExceptions.Count);
+        Assert.Equal(101, controller.MenuShowDelay);
+    }
+
+    [Fact]
+    public async Task MenuShowDelayRollback_RejectsSnapshotOutsideAllowlist()
+    {
+        var action = new MenuShowDelayAction(new FakeVisualEffectsController(), Text);
+        var snapshot = WindowsActionSnapshot.Serialize(new MenuShowDelaySnapshot(400, 99));
+
+        await Assert.ThrowsAsync<InvalidDataException>(() =>
+            action.RollbackAsync(Context(), snapshot, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task MenuShowDelayRollback_VerifiesRestoredValue()
+    {
+        var controller = new FakeVisualEffectsController();
+        var action = new MenuShowDelayAction(controller, Text);
+        var context = Context();
+        var result = await action.ApplyAsync(context, CancellationToken.None);
+        controller.IgnoreNextMenuShowDelaySet = true;
+
+        await Assert.ThrowsAsync<IOException>(() =>
+            action.RollbackAsync(context, result.SnapshotJson, CancellationToken.None));
+        Assert.Equal(100, controller.MenuShowDelay);
+    }
+
     private static WindowsActionContext Context(bool elevated = false)
     {
         return new WindowsActionContext
@@ -539,4 +663,6 @@ public sealed class WindowsActionHandlerTests
             IsElevated = elevated
         };
     }
+
+    private static string Text(string key, params object?[] _) => key;
 }

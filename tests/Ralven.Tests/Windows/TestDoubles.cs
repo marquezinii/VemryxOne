@@ -107,9 +107,61 @@ internal sealed class FakeVisualEffectsController : IVisualEffectsController
 {
     public VisualEffectsState State { get; set; } = new(true, true, true);
 
+    public int MenuShowDelay { get; set; } = 400;
+
+    public bool IgnoreNextStateSet { get; set; }
+
+    public bool IgnoreNextMenuShowDelaySet { get; set; }
+
+    public Queue<VisualEffectsState?> StateSetResults { get; } = new();
+
+    public Queue<int?> MenuShowDelaySetResults { get; } = new();
+
     public VisualEffectsState Get() => State;
 
-    public void Set(VisualEffectsState state) => State = state;
+    public void Set(VisualEffectsState state)
+    {
+        if (StateSetResults.TryDequeue(out var result))
+        {
+            if (result is not null)
+            {
+                State = result;
+            }
+
+            return;
+        }
+
+        if (IgnoreNextStateSet)
+        {
+            IgnoreNextStateSet = false;
+            return;
+        }
+
+        State = state;
+    }
+
+    public int GetMenuShowDelay() => MenuShowDelay;
+
+    public void SetMenuShowDelay(int milliseconds)
+    {
+        if (MenuShowDelaySetResults.TryDequeue(out var result))
+        {
+            if (result.HasValue)
+            {
+                MenuShowDelay = result.Value;
+            }
+
+            return;
+        }
+
+        if (IgnoreNextMenuShowDelaySet)
+        {
+            IgnoreNextMenuShowDelaySet = false;
+            return;
+        }
+
+        MenuShowDelay = milliseconds;
+    }
 }
 
 internal sealed class FakePowerStatusProvider(bool isOnAcPower = true) : IPowerStatusProvider

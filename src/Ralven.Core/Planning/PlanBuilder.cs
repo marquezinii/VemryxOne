@@ -288,6 +288,7 @@ public static class PlanBuilder
             ActionOptionGate.ApplyLegacyGraphicsPreset => options.ApplyLegacyGraphicsPreset,
             ActionOptionGate.ApplyGtaVGraphicsPreset => options.ApplyGtaVGraphicsPreset,
             ActionOptionGate.ReduceWindowsVisualEffects => options.ReduceWindowsVisualEffects,
+            ActionOptionGate.ReduceMenuShowDelay => options.ReduceMenuShowDelay,
             ActionOptionGate.TerminateStuckFiveMProcess => options.TerminateStuckFiveMProcess,
             ActionOptionGate.RecreateFiveMLocalData => options.RecreateFiveMLocalData,
             ActionOptionGate.RepairStaleAuthData => options.RepairStaleAuthData,

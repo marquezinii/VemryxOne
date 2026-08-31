@@ -69,7 +69,8 @@ O primeiro escopo geral reutiliza somente capacidades já estreitas e testadas:
   anterior e somente quando ligado à tomada;
 - ASPM PCI Express apenas quando a configuração existe no plano ativo, com
   captura e restauração do valor anterior;
-- efeitos visuais allowlisted, preservando legibilidade e suavização de fontes.
+- efeitos visuais e atraso de menus allowlisted via `SystemParametersInfo`, com
+  verificação e rollback, preservando legibilidade e suavização de fontes.
 
 Nenhuma dessas ações autoriza mudar pagefile, limpar standby list, instalar ou
 remover driver, alterar taxa de atualização, desabilitar item de inicialização,

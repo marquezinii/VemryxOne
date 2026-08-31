@@ -11,7 +11,7 @@ public sealed class ActionCatalogTests
     {
         var catalog = ActionCatalog.Current;
 
-        Assert.Equal(16, ActionCatalog.CurrentVersion);
+        Assert.Equal(17, ActionCatalog.CurrentVersion);
         Assert.NotEmpty(catalog.Actions);
 
         Assert.All(catalog.Actions, action =>
@@ -75,6 +75,7 @@ public sealed class ActionCatalogTests
             OptimizationActionIds.EnableSessionPerformancePowerPlan,
             OptimizationActionIds.AdjustPciExpressPowerManagement,
             OptimizationActionIds.ReduceWindowsVisualEffects,
+            OptimizationActionIds.ReduceMenuShowDelay,
             OptimizationActionIds.GuideDriverReinstall,
             OptimizationActionIds.DiagnoseHybridLaptop,
             OptimizationActionIds.GuideMousePollingRate,

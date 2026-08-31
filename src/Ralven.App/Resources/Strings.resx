@@ -212,6 +212,8 @@
   <data name="Optimizer.Result.PartialTitle" xml:space="preserve"><value>Completed with failures</value></data>
   <data name="Optimizer.NextStep" xml:space="preserve"><value>NEXT RECOMMENDED STEP</value></data>
   <data name="Optimizer.PlanTitle" xml:space="preserve"><value>Optimization plan</value></data>
+  <data name="Optimizer.AutomaticAnalysis.Header" xml:space="preserve"><value>{0} automatic checks</value></data>
+  <data name="Optimizer.AutomaticAnalysis.Description" xml:space="preserve"><value>Ralven checks these items automatically during optimization to understand the PC's current state. No action is required from you.</value></data>
   <data name="Optimizer.Table.Action" xml:space="preserve"><value>ACTION</value></data>
   <data name="Optimizer.Table.Description" xml:space="preserve"><value>WHAT IT DOES</value></data>
   <data name="Optimizer.Table.Risk" xml:space="preserve"><value>RISK</value></data>
@@ -340,7 +342,7 @@
   <data name="Plan.Empty.GeneralNoSafeActions" xml:space="preserve"><value>This PC already matches the safe Windows targets available for the selected profile.</value></data>
   <data name="Plan.Empty.DiagnosticInProgress" xml:space="preserve"><value>Wait for the diagnostic to finish before preparing actions.</value></data>
   <data name="Plan.Empty.DiagnosticUnavailable" xml:space="preserve"><value>The diagnostic could not be completed. Try scanning your PC again before preparing actions.</value></data>
-  <data name="Plan.ActionsCatalog" xml:space="preserve"><value>{0} actions • catalog v{1}</value></data>
+  <data name="Plan.ActionsCatalog" xml:space="preserve"><value>{0} adjustments • catalog v{1}</value></data>
   <data name="Plan.ActionsCompletedSummary" xml:space="preserve"><value>{0} actions completed. {1}</value></data>
   <data name="Diagnosis.Partial" xml:space="preserve"><value>Partial diagnostics</value></data>
   <data name="Diagnosis.CouldNotScanAgain" xml:space="preserve"><value>Could not scan again right now</value></data>
@@ -477,6 +479,7 @@
 {0}</value></data>
   <data name="Brand.FooterCopyright" xml:space="preserve"><value>© 2026 Ralven</value></data>
   <data name="Plan.VerifiedActions.Label" xml:space="preserve"><value>VERIFIED ACTIONS</value></data>
+  <data name="Plan.AppliedAdjustments.Label" xml:space="preserve"><value>ADJUSTMENTS TO APPLY</value></data>
   <data name="Progress.ElapsedFormat" xml:space="preserve"><value>Elapsed {0}</value></data>
   <data name="Progress.RemainingFormat" xml:space="preserve"><value>About {0} remaining</value></data>
   <data name="Progress.Finishing" xml:space="preserve"><value>Finishing...</value></data>
@@ -893,9 +896,15 @@
   <data name="Actions.windows.appearance.visual-effects.reduce.Name" xml:space="preserve"><value>Reduce Windows visual effects</value></data>
   <data name="Actions.windows.appearance.visual-effects.reduce.Description" xml:space="preserve"><value>Reduces animations and transparency while preserving readability and font smoothing.</value></data>
   <data name="Actions.windows.appearance.visual-effects.reduce.DetectionSummary" xml:space="preserve"><value>Reads the current state of Windows animations and transparency effects.</value></data>
-  <data name="Actions.windows.appearance.visual-effects.reduce.ConfirmationSummary" xml:space="preserve"><value>Confirms that the effects were reduced while preserving font smoothing.</value></data>
+  <data name="Actions.windows.appearance.visual-effects.reduce.ConfirmationSummary" xml:space="preserve"><value>Reads the state again and confirms that the effects were reduced while preserving font smoothing.</value></data>
   <data name="Actions.windows.appearance.visual-effects.reduce.UndoSummary" xml:space="preserve"><value>Fully reversible: the previous visual-effects state is restored during rollback.</value></data>
   <data name="Actions.windows.appearance.visual-effects.reduce.RiskLimitations" xml:space="preserve"><value>Changes the desktop's appearance while preserving readability and font smoothing.</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.Name" xml:space="preserve"><value>Make Windows menus more responsive</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.Description" xml:space="preserve"><value>Limits the menu opening delay to 100 ms without increasing a value that is already lower.</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.DetectionSummary" xml:space="preserve"><value>Reads the current menu opening delay through the official Windows API.</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.ConfirmationSummary" xml:space="preserve"><value>Reads the setting again and confirms that the delay matches the applied target.</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.UndoSummary" xml:space="preserve"><value>Fully reversible: rollback restores the previous menu opening delay.</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.RiskLimitations" xml:space="preserve"><value>Changes how quickly Windows menus open; the perceived effect can vary by PC and usage.</value></data>
   <data name="Runtime.ApplyingAction" xml:space="preserve"><value>Applying {0}</value></data>
   <data name="Runtime.ActionCompleted" xml:space="preserve"><value>Completed: {0}</value></data>
   <data name="Runtime.ValidatingTransaction" xml:space="preserve"><value>Validating transaction {0}.</value></data>
@@ -1366,4 +1375,6 @@
   <data name="ActionResults.MouseAcceleration.Unavailable" xml:space="preserve"><value>Windows pointer acceleration could not be queried.</value></data>
   <data name="ActionResults.MouseAcceleration.Active" xml:space="preserve"><value>Windows pointer acceleration is active (level {0}; thresholds {1}/{2}). Games using Raw Input may ignore it.</value></data>
   <data name="ActionResults.MouseAcceleration.Inactive" xml:space="preserve"><value>Windows pointer acceleration is disabled (thresholds {0}/{1}).</value></data>
+  <data name="ActionResults.MenuShowDelay.AlreadyOptimized" xml:space="preserve"><value>Windows menu opening delay was already optimized.</value></data>
+  <data name="ActionResults.MenuShowDelay.Applied" xml:space="preserve"><value>Windows menu opening responsiveness was adjusted.</value></data>
 </root>

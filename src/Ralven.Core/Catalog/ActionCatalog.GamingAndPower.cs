@@ -104,6 +104,23 @@ public sealed partial class ActionCatalog
         return
         [
             Define(
+                OptimizationActionIds.ReduceMenuShowDelay,
+                "Tornar menus do Windows mais responsivos",
+                "Limita a 100 ms o atraso de abertura dos menus sem aumentar um valor menor já escolhido pelo usuário.",
+                ActionCategory.Appearance,
+                ActionRisk.Low,
+                ActionReversibility.FullyReversible,
+                RequiredPrivilege.StandardUser,
+                BalancedAndAggressive,
+                requiresFiveMStopped: false,
+                progressWeight: 2,
+                expectedImpact: "Torna a abertura de menus em cascata mais imediata.",
+                ActionOptionGate.ReduceMenuShowDelay,
+                detectionSummary: "Lê o atraso atual de abertura dos menus pela API oficial SystemParametersInfo do Windows.",
+                confirmationSummary: "Relê e confirma que o atraso não ultrapassa 100 ms.",
+                undoSummary: "Totalmente reversível: o atraso anterior é restaurado no rollback.",
+                riskLimitations: "Muda somente a velocidade de abertura de menus em cascata; o efeito percebido varia conforme o uso."),
+            Define(
                 OptimizationActionIds.ReduceWindowsVisualEffects,
                 "Reduzir efeitos visuais do Windows",
                 "Reduz animações e transparências preservando legibilidade e suavização de fontes.",
@@ -117,7 +134,7 @@ public sealed partial class ActionCatalog
                 expectedImpact: "Reduz trabalho visual do desktop em computadores limitados.",
                 ActionOptionGate.ReduceWindowsVisualEffects,
                 detectionSummary: "Lê o estado atual de animações e transparências do Windows.",
-                confirmationSummary: "Confirma que os efeitos foram reduzidos preservando a suavização de fontes.",
+                confirmationSummary: "Relê e confirma que os efeitos foram reduzidos preservando a suavização de fontes.",
                 undoSummary: "Totalmente reversível: o estado anterior dos efeitos é restaurado no rollback.",
                 riskLimitations: "Muda a aparência do desktop; preserva legibilidade e suavização de fontes.")
         ];

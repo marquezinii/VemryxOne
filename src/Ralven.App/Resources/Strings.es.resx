@@ -208,6 +208,8 @@
   <data name="Optimizer.Result.PartialTitle" xml:space="preserve"><value>Completado con errores</value></data>
   <data name="Optimizer.NextStep" xml:space="preserve"><value>SIGUIENTE PASO RECOMENDADO</value></data>
   <data name="Optimizer.PlanTitle" xml:space="preserve"><value>Plan de optimización</value></data>
+  <data name="Optimizer.AutomaticAnalysis.Header" xml:space="preserve"><value>{0} comprobaciones automáticas</value></data>
+  <data name="Optimizer.AutomaticAnalysis.Description" xml:space="preserve"><value>Ralven comprueba estos elementos automáticamente durante la optimización para conocer el estado actual del equipo. No necesitas hacer nada.</value></data>
   <data name="Optimizer.Details.Detection" xml:space="preserve"><value>CÓMO SE DETECTA</value></data>
   <data name="Optimizer.Details.Confirmation" xml:space="preserve"><value>CÓMO SE CONFIRMA</value></data>
   <data name="Optimizer.Details.Undo" xml:space="preserve"><value>CÓMO DESHACER</value></data>
@@ -340,7 +342,7 @@
   <data name="Plan.Empty.GeneralNoSafeActions" xml:space="preserve"><value>Esta PC ya cumple los objetivos seguros de Windows disponibles para el perfil seleccionado.</value></data>
   <data name="Plan.Empty.DiagnosticInProgress" xml:space="preserve"><value>Espera a que termine el diagnóstico antes de preparar acciones.</value></data>
   <data name="Plan.Empty.DiagnosticUnavailable" xml:space="preserve"><value>No se pudo completar el diagnóstico. Vuelve a analizar tu computadora antes de preparar acciones.</value></data>
-  <data name="Plan.ActionsCatalog" xml:space="preserve"><value>{0} acciones • catálogo v{1}</value></data>
+  <data name="Plan.ActionsCatalog" xml:space="preserve"><value>{0} ajustes • catálogo v{1}</value></data>
   <data name="Plan.ActionsCompletedSummary" xml:space="preserve"><value>{0} acciones completadas. {1}</value></data>
   <data name="Diagnosis.Partial" xml:space="preserve"><value>Diagnóstico parcial</value></data>
   <data name="Diagnosis.CouldNotScanAgain" xml:space="preserve"><value>No se pudo escanear de nuevo en este momento</value></data>
@@ -477,6 +479,7 @@
 {0}</value></data>
   <data name="Brand.FooterCopyright" xml:space="preserve"><value>© 2026 Ralven</value></data>
   <data name="Plan.VerifiedActions.Label" xml:space="preserve"><value>ACCIONES VERIFICADAS</value></data>
+  <data name="Plan.AppliedAdjustments.Label" xml:space="preserve"><value>AJUSTES QUE SE APLICARÁN</value></data>
   <data name="Progress.ElapsedFormat" xml:space="preserve"><value>Transcurrido {0}</value></data>
   <data name="Progress.RemainingFormat" xml:space="preserve"><value>Quedan aproximadamente {0}</value></data>
   <data name="Progress.Finishing" xml:space="preserve"><value>Finalizando...</value></data>
@@ -893,9 +896,15 @@
   <data name="Actions.windows.appearance.visual-effects.reduce.Name" xml:space="preserve"><value>Reducir efectos visuales de Windows</value></data>
   <data name="Actions.windows.appearance.visual-effects.reduce.Description" xml:space="preserve"><value>Reduce animaciones y transparencia mientras conserva la legibilidad y el suavizado de fuentes.</value></data>
   <data name="Actions.windows.appearance.visual-effects.reduce.DetectionSummary" xml:space="preserve"><value>Lee el estado actual de las animaciones y transparencias de Windows.</value></data>
-  <data name="Actions.windows.appearance.visual-effects.reduce.ConfirmationSummary" xml:space="preserve"><value>Confirma que se hayan reducido los efectos sin desactivar el suavizado de fuentes.</value></data>
+  <data name="Actions.windows.appearance.visual-effects.reduce.ConfirmationSummary" xml:space="preserve"><value>Vuelve a leer el estado y confirma que se hayan reducido los efectos sin desactivar el suavizado de fuentes.</value></data>
   <data name="Actions.windows.appearance.visual-effects.reduce.UndoSummary" xml:space="preserve"><value>Totalmente reversible: el estado anterior de los efectos se restaura durante la reversión.</value></data>
   <data name="Actions.windows.appearance.visual-effects.reduce.RiskLimitations" xml:space="preserve"><value>Cambia la apariencia del escritorio; conserva la legibilidad y el suavizado de fuentes.</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.Name" xml:space="preserve"><value>Hacer más receptivos los menús de Windows</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.Description" xml:space="preserve"><value>Limita el retraso de apertura de los menús a 100 ms sin aumentar un valor que ya sea menor.</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.DetectionSummary" xml:space="preserve"><value>Lee el retraso actual de apertura de los menús mediante la API oficial de Windows.</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.ConfirmationSummary" xml:space="preserve"><value>Vuelve a leer la configuración y confirma que el retraso coincide con el objetivo aplicado.</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.UndoSummary" xml:space="preserve"><value>Totalmente reversible: la reversión restaura el retraso anterior de apertura de los menús.</value></data>
+  <data name="Actions.windows.appearance.menu-show-delay.reduce.RiskLimitations" xml:space="preserve"><value>Cambia la velocidad de apertura de los menús; el efecto percibido puede variar según el equipo y el uso.</value></data>
   <data name="Runtime.ApplyingAction" xml:space="preserve"><value>Aplicando {0}</value></data>
   <data name="Runtime.ActionCompleted" xml:space="preserve"><value>Completado: {0}</value></data>
   <data name="Runtime.ValidatingTransaction" xml:space="preserve"><value>Validando transacción {0}.</value></data>
@@ -1366,4 +1375,6 @@
   <data name="ActionResults.MouseAcceleration.Unavailable" xml:space="preserve"><value>No se pudo consultar la aceleración del puntero de Windows.</value></data>
   <data name="ActionResults.MouseAcceleration.Active" xml:space="preserve"><value>La aceleración del puntero de Windows está activa (nivel {0}; umbrales {1}/{2}). Los juegos que usan Raw Input pueden ignorarla.</value></data>
   <data name="ActionResults.MouseAcceleration.Inactive" xml:space="preserve"><value>La aceleración del puntero de Windows está desactivada (umbrales {0}/{1}).</value></data>
+  <data name="ActionResults.MenuShowDelay.AlreadyOptimized" xml:space="preserve"><value>El retraso de apertura de los menús de Windows ya estaba optimizado.</value></data>
+  <data name="ActionResults.MenuShowDelay.Applied" xml:space="preserve"><value>Se ajustó la respuesta de apertura de los menús de Windows.</value></data>
 </root>

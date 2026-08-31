@@ -18,6 +18,7 @@ public sealed class FakeAppOptimizationService : IAppOptimizationService
     private readonly IReadOnlyList<AppHistoryRecord> history;
     private readonly bool isFiveMRunning;
     private readonly FiveMEdition edition;
+    private readonly OptimizationProfile recommendedProfile;
     private readonly Task<AppGtaVBenchmarkResult>? benchmarkResult;
     private readonly bool? rollbackResult;
     private readonly AppProgressUpdate? rollbackProgressUpdate;
@@ -31,6 +32,7 @@ public sealed class FakeAppOptimizationService : IAppOptimizationService
         IReadOnlyList<AppHistoryRecord>? history = null,
         bool isFiveMRunning = false,
         FiveMEdition edition = FiveMEdition.Legacy,
+        OptimizationProfile recommendedProfile = OptimizationProfile.Balanced,
         Task<AppGtaVBenchmarkResult>? benchmarkResult = null,
         bool? rollbackResult = null,
         AppProgressUpdate? rollbackProgressUpdate = null)
@@ -41,6 +43,7 @@ public sealed class FakeAppOptimizationService : IAppOptimizationService
         this.history = history ?? [];
         this.isFiveMRunning = isFiveMRunning;
         this.edition = edition;
+        this.recommendedProfile = recommendedProfile;
         this.benchmarkResult = benchmarkResult;
         this.rollbackResult = rollbackResult;
         this.rollbackProgressUpdate = rollbackProgressUpdate;
@@ -66,7 +69,7 @@ public sealed class FakeAppOptimizationService : IAppOptimizationService
 
     public Task<AppDiagnostic> DiagnoseAsync(CancellationToken cancellationToken = default) =>
         DiagnosticException is null
-            ? Task.FromResult(CreateMinimalDiagnostic(isFiveMRunning, edition))
+            ? Task.FromResult(CreateMinimalDiagnostic(isFiveMRunning, edition, recommendedProfile))
             : Task.FromException<AppDiagnostic>(DiagnosticException);
 
     public Task<IReadOnlyList<AppHistoryRecord>> LoadHistoryAsync(CancellationToken cancellationToken = default) =>
@@ -102,26 +105,29 @@ public sealed class FakeAppOptimizationService : IAppOptimizationService
         CancellationToken cancellationToken = default) =>
         benchmarkResult ?? throw new NotSupportedException();
 
-    private static AppDiagnostic CreateMinimalDiagnostic(bool isFiveMRunning, FiveMEdition edition) => new()
-    {
-        Edition = edition,
-        IsFiveMRunning = isFiveMRunning,
-        GtaVDetected = false,
-        GtaVIsRunning = false,
-        GtaVGraphicsSettingsPath = string.Empty,
-        CpuName = "Test CPU",
-        GpuName = "Test GPU",
-        TotalMemoryGiB = 16,
-        AvailableMemoryGiB = 8,
-        LogicalProcessorCount = 8,
-        FreeDiskGiB = 100,
-        LegacyCacheBytes = 0,
-        OsLabel = "Windows 11",
-        ReadinessScore = 80,
-        RecommendedProfile = OptimizationProfile.Balanced,
-        PerformancePressure = PerformancePressureLevel.Low,
-        StreamingSoftware = new StreamingSoftwareSnapshot([], DateTimeOffset.UtcNow, true, true)
-    };
+    private static AppDiagnostic CreateMinimalDiagnostic(
+        bool isFiveMRunning,
+        FiveMEdition edition,
+        OptimizationProfile recommendedProfile) => new()
+        {
+            Edition = edition,
+            IsFiveMRunning = isFiveMRunning,
+            GtaVDetected = false,
+            GtaVIsRunning = false,
+            GtaVGraphicsSettingsPath = string.Empty,
+            CpuName = "Test CPU",
+            GpuName = "Test GPU",
+            TotalMemoryGiB = 16,
+            AvailableMemoryGiB = 8,
+            LogicalProcessorCount = 8,
+            FreeDiskGiB = 100,
+            LegacyCacheBytes = 0,
+            OsLabel = "Windows 11",
+            ReadinessScore = 80,
+            RecommendedProfile = recommendedProfile,
+            PerformancePressure = PerformancePressureLevel.Low,
+            StreamingSoftware = new StreamingSoftwareSnapshot([], DateTimeOffset.UtcNow, true, true)
+        };
 }
 
 /// <summary>

@@ -1,4 +1,5 @@
 using Ralven.Contracts;
+using Ralven.Windows.Infrastructure;
 
 namespace Ralven.App.Services;
 
@@ -16,24 +17,40 @@ internal static class HardwareProfileAdvisor
     public static HardwareProfileAssessment Assess(
         double totalMemoryGiB,
         double availableMemoryGiB,
-        int logicalProcessorCount,
         double freeDiskGiB,
-        bool gpuWasIdentified)
+        CpuSnapshot? cpu,
+        IReadOnlyList<GpuAdapterDetails> gpus)
     {
-        var processors = Math.Max(1, logicalProcessorCount);
+        ArgumentNullException.ThrowIfNull(gpus);
+
+        var hasDiscreteGpu = gpus.Any(gpu => gpu.KindGuess == GpuKindGuess.LikelyDiscrete);
+        var hasOnlyIntegratedGpu = gpus.Count > 0
+            && gpus.All(gpu => gpu.KindGuess == GpuKindGuess.LikelyIntegrated);
+        var bestDiscreteVramBytes = gpus
+            .Where(gpu => gpu.KindGuess == GpuKindGuess.LikelyDiscrete)
+            .Select(gpu => gpu.VramBytes ?? 0)
+            .DefaultIfEmpty()
+            .Max();
+
         var score = totalMemoryGiB >= 16 ? 25 : totalMemoryGiB >= 8 ? 15 : 7;
         score += availableMemoryGiB >= 8 ? 15 : availableMemoryGiB >= 4 ? 10 : availableMemoryGiB >= 2 ? 6 : 2;
-        score += processors >= 12 ? 20 : processors >= 8 ? 16 : processors >= 4 ? 10 : 5;
+        score += cpu is null
+            ? 5
+            : cpu.PhysicalCores >= 8 ? 20 : cpu.PhysicalCores >= 6 ? 16 : cpu.PhysicalCores >= 4 ? 10 : 5;
         score += freeDiskGiB >= 30 ? 20 : freeDiskGiB >= 15 ? 13 : freeDiskGiB >= 8 ? 7 : 3;
-        score += gpuWasIdentified ? 20 : 5;
+        score += hasDiscreteGpu
+            ? bestDiscreteVramBytes >= 8L * 1024 * 1024 * 1024 ? 20
+                : bestDiscreteVramBytes >= 4L * 1024 * 1024 * 1024 ? 15
+                : 10
+            : hasOnlyIntegratedGpu ? 8 : gpus.Count > 0 ? 10 : 5;
         score = Math.Clamp(score, 0, 100);
 
         var pressurePoints = 0;
         pressurePoints += totalMemoryGiB < 12 ? 3 : 0;
         pressurePoints += availableMemoryGiB < 3 ? 2 : 0;
-        pressurePoints += processors <= 4 ? 2 : 0;
+        pressurePoints += cpu is not null && cpu.PhysicalCores <= 4 ? 2 : 0;
         pressurePoints += freeDiskGiB < 12 ? 2 : 0;
-        pressurePoints += gpuWasIdentified ? 0 : 1;
+        pressurePoints += hasOnlyIntegratedGpu ? 2 : 0;
         var pressure = pressurePoints >= 4
             ? PerformancePressureLevel.High
             : pressurePoints >= 1
@@ -45,8 +62,10 @@ internal static class HardwareProfileAdvisor
             : pressure == PerformancePressureLevel.Low
               && totalMemoryGiB >= 24
               && availableMemoryGiB >= 8
-              && processors >= 12
+              && cpu is { PhysicalCores: >= 8, LogicalThreads: >= 12 }
               && freeDiskGiB >= 30
+              && hasDiscreteGpu
+              && bestDiscreteVramBytes >= 8L * 1024 * 1024 * 1024
                 ? OptimizationProfile.Light
                 : OptimizationProfile.Balanced;
 

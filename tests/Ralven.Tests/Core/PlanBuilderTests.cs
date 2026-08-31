@@ -77,6 +77,7 @@ public sealed class PlanBuilderTests
         Assert.Equal(ActionRisk.Moderate, plan.MaximumRisk);
         Assert.Contains(OptimizationActionIds.DisableBackgroundCapture, Ids(plan));
         Assert.Contains(OptimizationActionIds.EnableSessionPerformancePowerPlan, Ids(plan));
+        Assert.Contains(OptimizationActionIds.ReduceMenuShowDelay, Ids(plan));
         Assert.Contains(OptimizationActionIds.ApplyBalancedLegacyGraphics, Ids(plan));
         Assert.Contains(OptimizationActionIds.ApplyBalancedGtaVGraphics, Ids(plan));
         Assert.DoesNotContain(OptimizationActionIds.ApplyAggressiveLegacyGraphics, Ids(plan));
@@ -94,6 +95,7 @@ public sealed class PlanBuilderTests
         Assert.Equal(ActionRisk.High, plan.MaximumRisk);
         Assert.Contains(OptimizationActionIds.ApplyAggressiveLegacyGraphics, Ids(plan));
         Assert.Contains(OptimizationActionIds.ApplyAggressiveGtaVGraphics, Ids(plan));
+        Assert.Contains(OptimizationActionIds.ReduceMenuShowDelay, Ids(plan));
         Assert.Contains(OptimizationActionIds.ReduceWindowsVisualEffects, Ids(plan));
         Assert.DoesNotContain(OptimizationActionIds.ApplyBalancedLegacyGraphics, Ids(plan));
         Assert.DoesNotContain(OptimizationActionIds.ApplyBalancedGtaVGraphics, Ids(plan));
@@ -312,6 +314,7 @@ public sealed class PlanBuilderTests
             ApplyLegacyGraphicsPreset = false,
             ApplyGtaVGraphicsPreset = false,
             ReduceWindowsVisualEffects = false,
+            ReduceMenuShowDelay = false,
             AdjustPciExpressPowerManagement = false
         };
 

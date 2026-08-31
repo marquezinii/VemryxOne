@@ -66,7 +66,13 @@ public partial class OptimizerPage : UserControl
         try
         {
             ProfileSpectrum.SelectedIndex = vm.IsAggressiveSelected ? 2 : vm.IsBalancedSelected ? 1 : 0;
-            ProfileSpectrum.RecommendedIndex = vm.IsAggressiveRecommended ? 2 : vm.IsBalancedRecommended ? 1 : 0;
+            ProfileSpectrum.RecommendedIndex = vm.IsAggressiveRecommended
+                ? 2
+                : vm.IsBalancedRecommended
+                    ? 1
+                    : vm.IsLightRecommended
+                        ? 0
+                        : -1;
         }
         finally
         {

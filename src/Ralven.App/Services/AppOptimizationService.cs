@@ -118,7 +118,12 @@ public sealed class AppOptimizationService : IAppOptimizationService
             // Run independent I/O-bound operations concurrently to reduce total diagnosis time
             var installationTask = Task.Run(() => DetectFiveMInstallation(), cancellationToken);
             var memoryStatusTask = Task.Run(() => NativeMemoryStatus.Query(), cancellationToken);
-            var gpuNamesTask = Task.Run(() => ResourceComparisonCapture.GetGpuNames(), cancellationToken);
+            var gpuDetailsTask = Task.Run(
+                () => new WindowsGpuDetailsInspector().GetSnapshot(),
+                cancellationToken);
+            var cpuDetailsTask = Task.Run(
+                () => new WindowsCpuInspector().GetSnapshot(),
+                cancellationToken);
             var cpuNameTask = Task.Run(() => ResourceComparisonCapture.GetCpuName(localization), cancellationToken);
             var memoryLayoutTask = Task.Run(GetMemoryModuleLayout, cancellationToken);
             var osLabelTask = Task.Run(GetOperatingSystemLabel, cancellationToken);
@@ -138,8 +143,14 @@ public sealed class AppOptimizationService : IAppOptimizationService
                 ? GetLegacyServerCacheBytes(installation.Root, cancellationToken)
                 : 0L;
 
-            var gpuNames = await gpuNamesTask.ConfigureAwait(false);
-            var gpuWasIdentified = gpuNames.Count > 0;
+            var gpuDetails = await gpuDetailsTask.ConfigureAwait(false);
+            var cpuDetails = await cpuDetailsTask.ConfigureAwait(false);
+            var gpuNames = gpuDetails
+                .Select(gpu => gpu.DriverDescription)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Order(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+            var gpuWasIdentified = gpuNames.Length > 0;
             var gpuName = gpuWasIdentified
                 ? string.Join(" / ", gpuNames)
                 : localization.GetString("Diagnosis.GpuFallback");
@@ -154,9 +165,9 @@ public sealed class AppOptimizationService : IAppOptimizationService
             var assessment = HardwareProfileAdvisor.Assess(
                 memoryGiB,
                 availableMemoryGiB,
-                logicalProcessorCount,
                 freeDiskGiB,
-                gpuWasIdentified);
+                cpuDetails,
+                gpuDetails);
 
             var notices = BuildDiagnosticNotices(gtaV, cacheBytes, freeDiskGiB);
 

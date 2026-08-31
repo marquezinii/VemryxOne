@@ -5,7 +5,7 @@ namespace Ralven.Core.Catalog;
 
 public sealed partial class ActionCatalog
 {
-    public const int CurrentVersion = 16;
+    public const int CurrentVersion = 17;
 
     private static readonly string[] NoPrerequisites = [];
     private static readonly string[] RequiresFiveMStoppedFirst = [OptimizationActionIds.VerifyFiveMIsStopped];
@@ -66,6 +66,7 @@ public sealed partial class ActionCatalog
         OptimizationActionIds.EnableSessionPerformancePowerPlan,
         OptimizationActionIds.AdjustPciExpressPowerManagement,
         OptimizationActionIds.ReduceWindowsVisualEffects,
+        OptimizationActionIds.ReduceMenuShowDelay,
         OptimizationActionIds.GuideDriverReinstall,
         OptimizationActionIds.DiagnoseHybridLaptop,
         OptimizationActionIds.GuideMousePollingRate,

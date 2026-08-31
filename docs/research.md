@@ -92,6 +92,23 @@ do mouse é apenas diagnóstico da configuração do usuário: o Ralven não alt
 proteções, Windows Update, velocidade, limiares ou aceleração automaticamente e
 não deduz o caminho de entrada usado por um jogo a partir desse valor.
 
+### Responsividade da interface
+
+**Fato.** `SystemParametersInfo` expõe contratos públicos para consultar e
+alterar animações da interface e `SPI_GETMENUSHOWDELAY`/
+`SPI_SETMENUSHOWDELAY` representam, em milissegundos, o tempo que o Windows
+aguarda antes de abrir um menu em cascata.
+
+Fonte:
+
+- [SystemParametersInfo](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfow)
+
+**Decisão.** Os perfis Médio e Agressivo podem limitar o atraso dos menus a
+100 ms, sem aumentar um valor menor já escolhido pelo usuário. O perfil
+Agressivo também pode reduzir animações allowlisted. As duas ações releem suas
+pós-condições e guardam os valores anteriores para rollback; suavização de
+fontes e parâmetros de acessibilidade não relacionados permanecem intactos.
+
 ### HAGS, VRR e perfis de fabricante
 
 **Fato.** A Microsoft documenta a superfície de Configurações e a capacidade

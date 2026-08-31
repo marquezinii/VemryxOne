@@ -27,6 +27,12 @@ public sealed class MainViewModelTelemetryTests
         // the telemetry wire format allows; that is what used to make the
         // validator reject the event and silently drop it.
         Assert.True(viewModel.PlannedActions.Count > TelemetryEventValidator.MaxActionIds);
+        Assert.NotEmpty(viewModel.PlannedAdjustments);
+        Assert.NotEmpty(viewModel.InformationalPlannedActions);
+        Assert.Equal(
+            viewModel.PlannedActions.Count,
+            viewModel.PlannedAdjustments.Count + viewModel.InformationalPlannedActions.Count);
+        Assert.Equal(viewModel.PlannedAdjustments.Count, viewModel.SelectedActionCount);
 
         await viewModel.StartOptimizationAsync();
 
