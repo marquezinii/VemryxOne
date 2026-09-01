@@ -15,6 +15,36 @@ namespace Ralven.Tests.App;
 public sealed class MainViewModelUpdateCheckTests
 {
     [Fact]
+    public async Task InitializeAsync_ChecksAgainOnEveryAppLaunchWhenEnabled()
+    {
+        var releaseUpdateService = new FakeReleaseUpdateService();
+
+        await new MainViewModel(
+            new FakeAppOptimizationService(new AppSettings(), settingsFileExists: false),
+            releaseUpdateService: releaseUpdateService).InitializeAsync();
+        await new MainViewModel(
+            new FakeAppOptimizationService(new AppSettings(), settingsFileExists: true),
+            releaseUpdateService: releaseUpdateService).InitializeAsync();
+
+        Assert.Equal(2, releaseUpdateService.CheckForUpdateCallCount);
+    }
+
+    [Fact]
+    public async Task InitializeAsync_DoesNotCheckAutomaticallyWhenDisabled()
+    {
+        var releaseUpdateService = new FakeReleaseUpdateService();
+        var viewModel = new MainViewModel(
+            new FakeAppOptimizationService(
+                new AppSettings { CheckForUpdates = false },
+                settingsFileExists: true),
+            releaseUpdateService: releaseUpdateService);
+
+        await viewModel.InitializeAsync();
+
+        Assert.Equal(0, releaseUpdateService.CheckForUpdateCallCount);
+    }
+
+    [Fact]
     public async Task CheckForUpdatesManuallyAsync_NoUpdateAvailable_SetsUpToDateMessageAndKeepsBannerHidden()
     {
         var releaseUpdateService = new FakeReleaseUpdateService(updateToReturn: null);

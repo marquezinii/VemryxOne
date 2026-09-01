@@ -419,7 +419,36 @@ jobs:
           ASSET_VERSION: ${{ needs.build_audit.outputs.asset_version }}
         run: |
           if (gh release view $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY 2>$null) {
-            throw "Release '$env:RELEASE_TAG' already exists; refusing to overwrite it."
+            if ($env:RELEASE_CHANNEL -ne 'stable') {
+              throw "Release '$env:RELEASE_TAG' already exists; refusing to overwrite it."
+            }
+
+            # A rerun after the release was created but before the stable feed
+            # was published must be recoverable. Continue only when the two
+            # updater trust artifacts already public are byte-identical to
+            # this audited candidate; otherwise fail closed without changing
+            # the existing release or feed.
+            $verificationRoot = Join-Path $env:RUNNER_TEMP ("ralven-existing-release-" + [Guid]::NewGuid().ToString('N'))
+            New-Item -ItemType Directory -Force -Path $verificationRoot | Out-Null
+            try {
+              gh release download $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY `
+                --pattern Ralven-signed-update-manifest.json `
+                --pattern Ralven-Runtime-win-x64.zip `
+                --dir $verificationRoot
+              if ($LASTEXITCODE -ne 0) { throw 'Could not download updater artifacts from the existing release.' }
+              foreach ($asset in @('Ralven-signed-update-manifest.json', 'Ralven-Runtime-win-x64.zip')) {
+                $local = Join-Path (Resolve-Path ./release) $asset
+                $published = Join-Path $verificationRoot $asset
+                if (-not (Test-Path -LiteralPath $published -PathType Leaf) -or
+                    (Get-FileHash -LiteralPath $local -Algorithm SHA256).Hash -ne
+                    (Get-FileHash -LiteralPath $published -Algorithm SHA256).Hash) {
+                  throw "Existing release updater asset '$asset' does not match this audited candidate."
+                }
+              }
+              Write-Host "Existing stable release matches the audited updater artifacts; resuming feed publication."
+              exit 0
+            }
+            finally { Remove-Item -LiteralPath $verificationRoot -Recurse -Force }
           }
 
           $assets = @(
@@ -469,3 +498,20 @@ jobs:
             if ($LASTEXITCODE -ne 0) { throw 'Publishing the signed update feed failed.' }
           }
           finally { Pop-Location }
+
+          $expected = (Get-Content -LiteralPath ./release/Ralven-signed-update-manifest.json -Raw).Trim()
+          $feedUri = 'https://fivemcleaner-telemetry.felipemarquesini10.workers.dev/update/manifest'
+          $published = $null
+          foreach ($attempt in 1..6) {
+            try {
+              $published = (Invoke-WebRequest -Uri $feedUri -Method Get -Headers @{ 'Cache-Control' = 'no-cache' }).Content.Trim()
+              if ($published -eq $expected) { break }
+            }
+            catch {
+              if ($attempt -eq 6) { throw }
+            }
+            if ($attempt -lt 6) { Start-Sleep -Seconds 5 }
+          }
+          if ($published -ne $expected) {
+            throw 'The public update feed did not expose the signed release that was just published.'
+          }
