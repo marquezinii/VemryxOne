@@ -5,7 +5,7 @@ const assetPrefix = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const socialImagePath = `${assetPrefix || "/Ralven"}/og.png`;
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://marquezinii.github.io/"),
+  metadataBase: new URL("https://vemryx.com/"),
   title: "Ralven — Mais desempenho. Menos complicação.",
   description:
     "Diagnóstico, manutenção e otimização transparente do Windows, com recursos especializados para FiveM em GTA V Legacy.",

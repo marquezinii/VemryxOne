@@ -1,12 +1,10 @@
 export type Language = "pt" | "en";
 
 export const DOWNLOAD_URL =
-  "https://github.com/marquezinii/Ralven/releases/latest/download/Ralven-Setup-latest-win-x64.exe";
-export const GITHUB_URL = "https://github.com/marquezinii/Ralven";
+  "https://vemryx.com/Ralven/download/";
+export const GITHUB_URL = "https://github.com/marquezinii/VemryxOne";
 export const DISCORD_URL = "https://discord.gg/bazcuQB9n6";
-// Ralven does not have a verified custom domain yet. Keep public navigation
-// on the canonical repository instead of publishing an invented URL.
-export const BRAND_HOME_URL = GITHUB_URL;
+export const BRAND_HOME_URL = "https://vemryx.com/";
 export const ICON_URL = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/icon.png`;
 
 export const copy = {
@@ -32,7 +30,7 @@ export const copy = {
       body: "Diagnóstico, manutenção e otimização transparente do Windows, com decisões técnicas claras, progresso real, rollback e recursos especializados para FiveM em GTA V Legacy.",
       download: "Download do instalador",
       github: "Ver código no GitHub",
-      releaseNote: "Download pelo GitHub Releases · sem cadastro",
+      releaseNote: "Download oficial Vemryx · sem cadastro",
       included: "Runtime incluído",
       windows: "Windows 11 recomendado",
       rollback: "Rollback disponível",
@@ -190,7 +188,7 @@ export const copy = {
       installerItems: [
         "Runtime incluído no instalador",
         "Atalho e desinstalação integrados",
-        "Atualizações via GitHub Releases",
+        "Atualizações pela Vemryx",
         "Sem download de dependências desconhecidas",
       ],
     },
@@ -277,7 +275,7 @@ export const copy = {
       body: "Transparent Windows diagnostics, maintenance and optimization with clear technical decisions, real progress, rollback and specialized support for FiveM on GTA V Legacy.",
       download: "Download installer",
       github: "View code on GitHub",
-      releaseNote: "Download via GitHub Releases · no account required",
+      releaseNote: "Official Vemryx download · no account required",
       included: "Runtime included",
       windows: "Windows 11 recommended",
       rollback: "Rollback available",
@@ -435,7 +433,7 @@ export const copy = {
       installerItems: [
         "Runtime included in the installer",
         "Integrated shortcut and uninstaller",
-        "Updates through GitHub Releases",
+        "Updates through Vemryx",
         "No unknown dependency downloads",
       ],
     },
@@ -469,7 +467,7 @@ export const copy = {
         ],
         [
           "How do updates work?",
-          "The app checks the public GitHub release. When a newer stable version exists, it notifies you and asks for confirmation before downloading and installing.",
+          "The app checks Vemryx's signed public update feed. When a newer stable version exists, it notifies you and asks for confirmation before downloading and installing.",
         ],
         [
           "Does the application collect my data?",
