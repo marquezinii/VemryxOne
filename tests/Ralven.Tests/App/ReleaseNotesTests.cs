@@ -11,15 +11,12 @@ public sealed class ReleaseNotesCatalogTests
     [Fact]
     public void Versions_ContainsTheCurrentRelease()
     {
-        var entry = Assert.Single(ReleaseNotesCatalog.Versions);
+        var entry = ReleaseNotesCatalog.Versions[0];
 
-        Assert.Equal("1.6.0", entry.Version);
+        Assert.Equal("1.6.1", entry.Version);
         Assert.Equal(
             [
-                ReleaseNoteCategory.Added,
-                ReleaseNoteCategory.Improved,
-                ReleaseNoteCategory.Fixed,
-                ReleaseNoteCategory.Security
+                ReleaseNoteCategory.Improved
             ],
             entry.Categories);
     }
@@ -33,10 +30,10 @@ public sealed class ReleaseNotesCatalogTests
     [Fact]
     public void Find_KnownVersion_ReturnsTheMatchingEntry()
     {
-        var entry = ReleaseNotesCatalog.Find("1.6.0");
+        var entry = ReleaseNotesCatalog.Find("1.6.1");
 
         Assert.NotNull(entry);
-        Assert.Equal("1.6.0", entry!.Version);
+        Assert.Equal("1.6.1", entry!.Version);
     }
 }
 
