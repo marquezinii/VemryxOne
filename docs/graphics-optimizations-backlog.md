@@ -96,7 +96,8 @@ ações entraram no catálogo (versão 11):
   — **implementado**. `FullscreenOptimizationsRegistryAction`.
 - `windows.gaming.hags.toggle` (🧪, **Agressivo apenas**, opt-in via
   `OptimizationOptionsDto.ToggleHagsExperiment`, `RequiresRestart=true`,
-  `RequiredPrivilege.Administrator` com `AttemptWithoutElevationFirst`) —
+  `RequiredPrivilege.Administrator`; a implementação atual sempre delega ao
+  broker para preservar a proveniência verificável do rollback) —
   **implementado**. `HagsToggleAction`.
 
 **O que foi implementado, especificamente:** o mecanismo de aplicar/reverter
@@ -224,7 +225,7 @@ ferramentas que fazem isso (nvidiaProfileInspector e similares) usam a
 NVAPI de forma não documentada/não suportada oficialmente. Isso já é a
 política registrada em `docs/safety.md` e reforçada pelo próprio texto do
 `GpuVendorDetectionAction`: *"Ajustes de perfil 3D devem ser feitos apenas
-pelo painel oficial do fabricante... o Vemryx One não escreve nem
+pelo painel oficial do fabricante... o Ralven não escreve nem
 sobrescreve esses perfis."* Quase toda a lista de "configurações possíveis"
 proposta cai direto nessa regra já existente, não é uma decisão nova.
 
@@ -304,32 +305,33 @@ proposta cai direto nessa regra já existente, não é uma decisão nova.
 
 ## 13. Energia e CPU (lote proposto e parcialmente implementado em 26/07/2026, sétima rodada)
 
-**Contexto que decide a maior parte desta seção**: o Vemryx One hoje é
+**Contexto que decide a maior parte desta seção**: o Ralven continua sendo
 uma ferramenta transacional de "aplicar uma vez, verificar, confirmar,
 reverter se necessário" — o usuário clica em "Otimizar", o app aplica um
-conjunto de ações e confirma. **Não existe hoje um processo de segundo
-plano que observe o FiveM/GTA V iniciar e terminar** para aplicar algo "só
-durante a sessão" e desfazê-lo automaticamente "ao fechar o jogo". A maior
-parte deste lote (plano de energia próprio ativado só durante a sessão,
+conjunto de ações e confirma. A Visão geral agora oferece um monitor manual,
+local e somente leitura que observa o ciclo de uma sessão FiveM enquanto o
+Ralven permanece aberto. Ele não aplica ações, não persiste estado e não
+garante recuperação após o aplicativo fechar. A maior parte deste lote (plano
+de energia próprio ativado só durante a sessão,
 prioridade de processo testada e restaurada ao fechar, afinidade de CPU,
 core parking, timer resolution solicitado enquanto o jogo está aberto)
-**pressupõe exatamente esse tipo de vigilância de ciclo de vida**, que este
-produto não tem.
+**pressupõe um executor com estado persistido e rollback após falha**, que o
+monitor somente leitura deliberadamente não oferece.
 
 Implementar esses itens "pela metade" — por exemplo, subir a prioridade do
 processo do GTA uma vez, sem qualquer garantia de que ela será restaurada
-quando o jogo fechar minutos ou horas depois, com o Vemryx One já
+quando o jogo fechar minutos ou horas depois, com o Ralven já
 fechado — quebraria o princípio central de segurança deste projeto: toda
 ação reversível tem que ter um caminho garantido de reversão. Por isso,
-esta rodada **implementou o que já cabe no modelo atual (ajuste único,
-reversível, sem depender de vigilância contínua)** e documentou o resto
+esta rodada **implementou o que já cabe no modelo transacional (ajuste único,
+reversível) e uma fundação de observação sem mutações** e documentou o resto
 como uma decisão de arquitetura pendente, não como algo "esquecido".
 
 ### Implementado nesta rodada
 
 | Item | Classificação | Perfis | Observação |
 | --- | --- | --- | --- |
-| Ajustar PCI Express Link State Power Management | ✅ | Médio e Agressivo | **Implementado** — `windows.power.pcie-aspm.adjust`/`PciExpressPowerManagementAction`, via `powercfg /Q` + `/set{a,d}cvalueindex` no plano ativo (mesmo mecanismo documentado já usado por `SessionPerformancePowerPlanAction`). Totalmente reversível; se o computador não expõe essa configuração, ou a leitura do texto do `powercfg` não bate (varia por idioma do Windows), a ação simplesmente não faz nada, nunca falha. |
+| Ajustar PCI Express Link State Power Management | ✅ | Médio e Agressivo | **Implementado** — `windows.power.pcie-aspm.adjust`/`PciExpressPowerManagementAction`. Lê AC/DC pelas APIs nativas `PowerReadACValueIndex`/`PowerReadDCValueIndex`, aplica `/set{a,d}cvalueindex` de forma transacional, reativa o plano, relê a pós-condição e restaura AC/DC separadamente. Hardware sem o setting vira `Skipped`; falha parcial é compensada e falha real não é reportada como sucesso. O mecanismo é oficial, mas o benefício perceptível depende do hardware. |
 
 ### Já coberto por infraestrutura existente, sem mudança de código
 
@@ -344,34 +346,32 @@ como uma decisão de arquitetura pendente, não como algo "esquecido".
 | Mouse polling: alertar/recomendar teste de 1000 Hz | **Implementado** — `windows.gaming.mouse-polling-rate.guide`/`MousePollingRateGuidanceAction`, condicionado à carga de CPU observada (não à taxa de polling real do mouse, que este app não consegue ler — ver limitação abaixo). |
 | Mouse polling: detectar stutter coincidente com movimento do mouse | 🚫 **Não implementado** — exigiria telemetria contínua correlacionando eventos de mouse com frametime em tempo real; este produto só faz leituras pontuais (snapshot), não telemetria contínua. |
 
-### Pendente de decisão de arquitetura (não implementado nesta rodada)
+### Ainda pendente para ações mutáveis por sessão
 
-Todos os itens abaixo pressupõem um processo de vigilância de ciclo de
-vida (detectar início/fim do FiveM/GTA V) que este produto não tem hoje.
-Implementá-los exigiria antes uma decisão de arquitetura (ex.: um serviço
-leve residente na bandeja, já existente para notificações, ganhar essa
-responsabilidade; ou um processo separado) — decisão que deve ser tomada
-explicitamente pelo usuário/mantenedor antes de qualquer código, não
-decidida implicitamente ao implementar um item isolado.
+O monitor somente leitura agora fornece eventos locais validados de início e
+fim enquanto o Ralven está aberto. Todos os itens abaixo ainda exigem uma
+decisão separada sobre execução, estado persistente, recuperação após crash ou
+encerramento do app e rollback idempotente. Essa responsabilidade não deve ser
+acoplada implicitamente ao monitor da interface.
 
 | Item | Classificação pedida | Por que depende de vigilância de sessão |
 | --- | --- | --- |
-| Criar plano `Vemryx One Gaming` (duplicar, ativar só na sessão, restaurar ao fechar) | ✅ | "Ativar apenas durante a sessão" e "restaurar ao fechar FiveM" exigem saber quando o FiveM abre/fecha. `powercfg` já suporta duplicar/criar/importar planos — a parte tecnicamente viável (`powercfg -duplicatescheme`) não é o problema; o problema é o gatilho de início/fim. |
+| Criar plano `Ralven Gaming` (duplicar, ativar só na sessão, restaurar ao fechar) | ✅ | "Ativar apenas durante a sessão" e "restaurar ao fechar FiveM" exigem saber quando o FiveM abre/fecha. `powercfg` já suporta duplicar/criar/importar planos — a parte tecnicamente viável (`powercfg -duplicatescheme`) não é o problema; o problema é o gatilho de início/fim. |
 | Configurar comportamento diferente para desktop/notebook | ✅ | Viável tecnicamente (já detectamos bateria/notebook na seção 12), mas só faz sentido dentro do plano de sessão acima. |
 | Não permitir economia agressiva de CPU / não desligar disco durante o jogo | ✅ | Mesma dependência — são configurações do plano de sessão proposto. |
 | Configurar refrigeração ativa em notebooks | 🟡 | Depende do utilitário do fabricante (seção 12) — mesma limitação de API, mesma dependência de sessão. |
 | Ajustar estado mínimo do processador / modo de boost | 🟡 | Tecnicamente são configurações de `powercfg` (viável), mas "só durante a sessão" tem a mesma dependência. |
-| Detectar processo real do GTA dentro do FiveM | ✅ | Tecnicamente simples (o app já tem `IFiveMProcessInspector`/`IGtaVProcessInspector`); o que falta é o gatilho de sessão para as ações que dependem dessa detecção continuamente. |
+| Detectar processo real do GTA dentro do FiveM | ✅ | O monitor somente leitura agora valida processos FiveM/CitizenFX pelo nome e pela imagem dentro da raiz Legacy. Isso fornece observação, não autorização para executar ações condicionais. |
 | Prioridade `Above Normal`/teste `High`, restaurar ao fechar | 🟡/🧪 | Exige monitorar o processo até ele fechar para restaurar — sem isso, "restaurar ao fechar" não pode ser garantido. |
 | Afinidade de CPU (P-cores/E-cores, CCDs, restaurar ao terminar) | 🧪 | Mesma dependência; também exige detectar a topologia real da CPU (híbrida Intel, múltiplos CCDs AMD) de forma confiável, pesquisa ainda não feita. |
 | Core parking (alterar só dentro do plano, restaurar ao fechar) | 🧪 | Mesma dependência de sessão. |
 | Timer resolution (solicitar enquanto o jogo está aberto, liberar ao fechar, medir latência/consumo) | 🧪 | Mesma dependência de sessão; medir "latência e consumo" também exigiria a infraestrutura de benchmark antes/depois ainda não construída para esse propósito. |
 
 **Recomendação para uma futura sessão**: antes de implementar qualquer um
-destes, decidir e documentar (em `docs/architecture.md`) como o app vai
-detectar o ciclo de vida do FiveM/GTA V em tempo real e garantir reversão
-mesmo se o Vemryx One for fechado antes do jogo. Só depois faz sentido
-portar os itens ✅/🟡/🧪 desta tabela para o catálogo.
+destes, decidir e documentar (em `docs/architecture.md`) o executor de ações,
+a persistência mínima do estado anterior, a recuperação após crash ou
+encerramento e o rollback idempotente. Só depois faz sentido portar os itens
+✅/🟡/🧪 desta tabela para o catálogo.
 
 ## Resumo por perfil
 

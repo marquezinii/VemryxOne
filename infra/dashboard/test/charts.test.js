@@ -19,13 +19,13 @@ import {
 } from '../assets/charts.js';
 import { DONUT_COLORS } from '../assets/rendering.js';
 
-test('dashboard uses the Vemryx visual tokens', () => {
-  const styles = readFileSync(new URL('../assets/styles.css', import.meta.url), 'utf8');
+test('dashboard uses the Ralven visual tokens', () => {
+  const styles = readFileSync(new URL('../assets/brand.css', import.meta.url), 'utf8');
 
-  assert.deepEqual(DONUT_COLORS.slice(0, 3), ['#5B7CFF', '#27C8FF', '#32D583']);
-  assert.match(styles, /--bg:#0B0D12/);
-  assert.match(styles, /--accent:#4B64F2/);
-  assert.doesNotMatch(styles, /--orange|#ff7a18/i);
+  assert.deepEqual(DONUT_COLORS.slice(0, 3), ['#FFFFFF', '#A6A7AC', '#32D583']);
+  assert.match(styles, /--bg:\s*#0A0A0B/i);
+  assert.match(styles, /--accent:\s*#FFFFFF/i);
+  assert.doesNotMatch(styles, /#4B64F2|#5B7CFF|#27C8FF|#8297FF|Bahnschrift/i);
 });
 
 test('toBarSeries maps arbitrary label/value keys into a uniform shape', () => {
@@ -46,7 +46,7 @@ test('toBarSeries returns an empty array for null/undefined input', () => {
 });
 
 test('formatAppVersion shows only stable SemVer from raw telemetry labels', () => {
-  assert.equal(formatAppVersion('FiveMCleaner.exe 1.2.0+build.8'), '1.2.0');
+  assert.equal(formatAppVersion('Ralven.exe 1.2.0+build.8'), '1.2.0');
   assert.equal(formatAppVersion('v1.1.3'), '1.1.3');
   assert.equal(formatAppVersion('unknown'), 'Versão desconhecida');
 });
@@ -229,6 +229,7 @@ test('toBugReportRow maps a row into the bug report table\'s column order', () =
   const row = {
     received_at: '2026-07-26T10:00:00.000Z',
     category: 'Falha na otimização',
+    bug_code: 'APP_OPT_ACTION_EXECUTION',
     summary: 'O preset não terminou',
     app_version: '1.0.4',
     profile: 'Médio',
@@ -245,6 +246,7 @@ test('toBugReportRow maps a row into the bug report table\'s column order', () =
   // Other cells should match exactly
   assert.deepEqual(cells.slice(1), [
     'Falha na otimização',
+    'APP_OPT_ACTION_EXECUTION',
     'O preset não terminou',
     '1.0.4',
     'Médio',
@@ -258,6 +260,7 @@ test('toBugReportRow shows a placeholder for missing email and "não" when there
   const row = {
     received_at: '2026-07-26T10:00:00.000Z',
     category: 'x',
+    bug_code: null,
     summary: 'x',
     app_version: '1.0.4',
     profile: 'Médio',
@@ -267,6 +270,6 @@ test('toBugReportRow shows a placeholder for missing email and "não" when there
   };
 
   const cells = toBugReportRow(row);
-  assert.equal(cells[6], '—');
+  assert.equal(cells[7], '—');
   assert.equal(cells.at(-1), 'não');
 });

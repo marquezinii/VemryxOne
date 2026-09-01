@@ -1,6 +1,12 @@
-# Vemryx One telemetry + dashboard API Worker
+# Ralven telemetry + dashboard API Worker
 
-**Deployed** at `https://fivemcleaner-telemetry.felipemarquesini10.workers.dev`.
+**Deployed** at
+`https://fivemcleaner-telemetry.felipemarquesini10.workers.dev`.
+
+The hostname, Cloudflare Worker name, D1 database name/ID and Firebase project
+ID are pre-existing external infrastructure identifiers. They remain unchanged
+until a separately provisioned migration exists; none of them is exposed as
+Ralven product branding in the UI.
 
 This is the Cloudflare Worker + D1 backend for the anonymous telemetry
 pipeline described in [`docs/telemetry.md`](../../docs/telemetry.md) and the
@@ -28,27 +34,32 @@ summary, optional email, optional plain-text log excerpt capped at 100 KB).
   dashboard's filters, not a second deployment. (An earlier
   `env.development`/`env.production` named-environment design was removed:
   it added no benefit since D1 already distinguishes rows by that column.)
-- `schema.sql` — the D1 tables: `telemetry_events` (one row per optimization
-  run, including the version-2-consent hardware profile), 
-  `telemetry_event_actions` (one row per applied action ID, for "most used
-  function"), `login_attempts` and `admin_sessions` (custom dashboard auth).
-  Applied to the real database already.
-- `migrations/` — incremental changes for the already deployed D1 database.
-  The account migration adds a unique username plus the accepted terms version
-  and timestamp. `schema.sql` remains the complete snapshot for a new local
-  database.
+- `migrations/` — the authoritative D1 history. `0000_initial_schema.sql`
+  provides the historical baseline for an empty database; later files evolve
+  it incrementally. The release workflow adopts the known legacy bootstrap
+  only when its v5/profile-terms shape is confirmed, then applies every later
+  migration (including `0006_telemetry_event_idempotency.sql`) before the
+  Worker deploys. Use `wrangler d1 migrations apply`, never `schema.sql`, for
+  a database that may later receive an upgrade.
+- `schema.sql` — a human-readable current-schema reference. It is not a deploy
+  or bootstrap input because it does not record migration history.
 - `src/validateEvent.js` — pure, dependency-free validation of one event or a
   batch. The Worker never trusts client-side validation alone; every field is
   re-checked against the same allowlist server-side.
 - `src/index.js` — routes: `POST /telemetry` (ingest), `POST /admin/login` /
   `POST /admin/logout`, `GET /api/stats/:name[.csv]` (protected), plus CORS
   handling (`src/cors.js`) for every response since the dashboard is served
-  from a different origin than this Worker.
+  from a different origin than this Worker. Telemetry accepts up to 16 events
+  per request so its events and normalized actions fit in one atomic D1 batch.
 - `src/liveAlert/` — the single-row admin broadcast the dashboard writes
   (`POST /admin/live-alert`, session-protected) and the desktop app polls at
   startup plus once an hour (`GET /live-alert`, public, rate limited). See
   `docs/superpowers/specs/2026-08-17-live-alerts-design.md`.
 - `src/auth/` — the custom admin authentication (see below).
+- `src/billing/` — provider webhook verification/reconciliation and the
+  authenticated, provider-neutral entitlement read model. This is a safe
+  foundation only: no public checkout or automatic Pro grant exists yet. See
+  [`docs/billing.md`](../../docs/billing.md).
 - `src/stats/` — `queries.js` (pure SQL+params builders, one per dashboard
   chart) and `csv.js` (pure CSV serialization for the export feature).
   Available `:name` values: `runs-per-day`, `os-versions`, `app-versions`,
@@ -89,7 +100,7 @@ URL), authentication is a small, self-contained system:
   the window passes.
 - **Sessions**: server-side, revocable (`admin_sessions`, `src/auth/
   sessionStore.js`) — a random 256-bit session ID is the *only* thing stored
-  in the browser cookie (`HttpOnly`, `Secure`, `SameSite=None`), so logout
+  in the browser cookie (`__Host-`, `HttpOnly`, `Secure`, `SameSite=None`), so logout
   or manually clearing the table actually invalidates it immediately, unlike
   a stateless signed token that can only be waited out. `SameSite=None`
   (not `Strict`/`Lax`) is required because the dashboard (`*.pages.dev`) and
@@ -97,11 +108,12 @@ URL), authentication is a small, self-contained system:
   domains — a stricter policy silently never sends the cookie back on a
   cross-site `fetch`, which is exactly what made the first deployment's
   login appear to succeed but leave the dashboard stuck on the login screen.
-- **CSRF e limites de entrada**: toda mutação sob `/admin/*` exige o `Origin`
-  exato de `DASHBOARD_ORIGIN`; todos os corpos JSON públicos são lidos com
-  limite de bytes por rota antes do parse. Isso mantém o cookie cross-site
-  necessário sem aceitar mutações administrativas de outras páginas e impede
-  buffering irrestrito de payloads anônimos.
+- **CSRF e limites de entrada**: a publicação do alerta exige o `Origin`
+  exato de `DASHBOARD_ORIGIN`, o cabeçalho `X-Ralven-Csrf-Token` e
+  `Content-Type: application/json` exato. O token é derivado no Worker da
+  sessão e de `ADMIN_CSRF_SECRET`, fica somente em memória no dashboard e é
+  recuperado em `GET /admin/csrf` após um recarregamento. Todos os JSON
+  continuam limitados por rota antes do parse.
 - **Swappable by design**: `src/auth/passwordAuthProvider.js` exposes exactly
   three functions — `login`, `logout`, `requireSession` — and `index.js` only
   ever calls those three. A future OAuth-based provider (Google/GitHub, or
@@ -181,6 +193,32 @@ lookup (`LIVE_ALERT_LIMITER`, 30/60s per IP) — it is read-only, unauthenticate
 by necessity (every installed app reads it), and never exposes anything more
 sensitive than the one message an admin chose to broadcast.
 
+## Billing foundation
+
+`GET /account/entitlements` uses the same verified Firebase UID as the profile
+routes and returns only the current tier, entitlement keys and validity. Missing
+or expired access is a normal `free` response; provider identifiers are never
+returned.
+
+`POST /billing/mercado-pago/webhook` verifies the Mercado Pago signature over
+the signed request envelope, fetches `GET /preapproval/{id}` with a Worker-only
+Access Token, and matches the canonical reference, BRL amount and currency to a
+server-side checkout intent before updating billing state. It deliberately does
+not trust or persist the webhook body and does not grant Pro in this foundation.
+Both required credentials are Worker secrets:
+
+```bash
+wrangler secret put MERCADO_PAGO_ACCESS_TOKEN
+wrangler secret put MERCADO_PAGO_WEBHOOK_SECRET
+```
+
+Do not apply the billing migration or configure production credentials until
+the activation blockers in [`docs/billing.md`](../../docs/billing.md) are
+resolved. Until a provider cancellation flow exists, account deletion returns
+`409 billing-cancellation-required` when a local checkout or subscription is
+linked, so it cannot remove the only mapping while the provider may continue
+charging.
+
 Legacy Worker product tables (`user_accounts` / sessions), if still present on
 remote D1 from the pre-Firebase system, are not migrated. There are no real
 users to preserve; cleanup is a separate authorized deploy/migration task.
@@ -197,25 +235,20 @@ no test data was left behind).
 
 ```bash
 npm install
-npm run db:bootstrap:local        # creates a fresh local database from schema.sql
+npm run db:bootstrap:local        # creates a fresh local database through migrations
 npm run db:migrate:local          # applies pending migrations to an existing local database
+npm run test:migrations           # empty, historical, and failed-migration local D1 checks
 
 npm run hash-admin-password       # prints the ADMIN_PASSWORD_HASH value
 wrangler secret put ADMIN_PASSWORD_HASH
 wrangler secret put IP_HASH_SECRET   # any long random string
+wrangler secret put ADMIN_CSRF_SECRET # distinct long random string
+wrangler secret put MERCADO_PAGO_ACCESS_TOKEN
+wrangler secret put MERCADO_PAGO_WEBHOOK_SECRET
 
-wrangler d1 migrations apply fivemcleaner-telemetry --remote   # touches the real database — ask first
+wrangler d1 migrations apply fivemcleaner-telemetry --remote   # captures a D1 backup; touches the real database — ask first
 wrangler deploy   # touches Cloudflare — ask first
 ```
-
-`RELEASE_MANIFEST_JSON` is the complete signed stable update manifest served by
-`GET /update/manifest`. The official stable-release workflow validates the
-manifest against the embedded public key and publishes it automatically with
-`wrangler secret put RELEASE_MANIFEST_JSON` immediately before deploying this
-Worker. Do not hand-author, truncate, or commit that value. A manual repair is
-part of the authorized release procedure only and must pipe the generated
-`release/Vemryx One-signed-update-manifest.json` file unchanged into the same
-Wrangler command. Preview releases do not update this stable feed.
 
 The real deployment uses plain `wrangler deploy`/`npm run deploy` with no
 `--env` — the old `deploy:development`/`deploy:production` scripts targeted

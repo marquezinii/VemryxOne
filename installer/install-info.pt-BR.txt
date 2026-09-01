@@ -1,14 +1,14 @@
-O Vemryx One inclui o runtime do .NET e todas as dependências necessárias para
+O Ralven inclui o runtime do .NET e todas as dependências necessárias para
 executar o aplicativo no Windows 10 versão 2004 (build 19041) ou mais recente e
 no Windows 11, em sistemas compatíveis com x64. Nenhum runtime, script ou pacote
 adicional será baixado durante a instalação.
 
 O instalador é executado por usuário e não pede acesso administrativo. O
-Vemryx One solicita elevação somente quando uma otimização escolhida realmente
+Ralven solicita elevação somente quando uma otimização escolhida realmente
 precisa alterar uma configuração protegida do Windows.
 
 Configurações, logs, backups e atualizações baixadas ficam em
-%LOCALAPPDATA%\FiveMCleaner, fora da pasta de instalação. Na desinstalação você
+%LOCALAPPDATA%\Ralven, fora da pasta de instalação. Na desinstalação você
 escolhe se deseja preservar esses dados; o padrão é preservar.
 
 O atalho na Área de Trabalho vem marcado por padrão. A inicialização com o
@@ -19,9 +19,9 @@ Atualizações futuras são oferecidas dentro do aplicativo, com a sua confirma�
 Em geral não é necessário baixar este instalador de novo.
 
 Baixe o instalador somente em:
-https://marquezinii.github.io/VemryxOne/
+https://vemryx.com/Ralven/
 ou na release oficial:
-https://github.com/marquezinii/VemryxOne/releases
+https://vemryx.com/Ralven/
 
 Antes de executar, confira o arquivo .sha256 publicado junto do instalador:
-  (Get-FileHash .\VemryxOne-Setup-*-win-x64.exe -Algorithm SHA256).Hash
+  (Get-FileHash .\Ralven-Setup-*-win-x64.exe -Algorithm SHA256).Hash

@@ -316,7 +316,7 @@ No modo integrador, o agente deve:
     preservado fora de Git/PR/CHANGELOG;
 13. reconstruir a simulação local da próxima versão com
     `scripts\Install-DevelopmentShortcut.ps1 -Build` e confirmar que o atalho
-    `Vemryx One - Desenvolvimento` aponta para
+    `Ralven - Desenvolvimento` aponta para
     `scripts\Start-DevelopmentApp.ps1`;
 14. garantir que `origin/dev/proxima-versao` reflita o estado integrado e validado;
 15. após confirmação de merge e validação, remover worktrees locais temporários e
@@ -324,9 +324,9 @@ No modo integrador, o agente deve:
     PR já mergeadas podem ser removidas como limpeza normal.
 
 Ao concluir qualquer tarefa — exceto tarefas que envolvam diretamente
-instalador/updater (`Vemryx.One.Updater`, `Vemryx.One.UpdateRuntime`,
-`Vemryx.One.ReleaseTool`, `installer/`, fluxos de staging/ativação/rollback) —
-o agente deve **sempre** reconstruir o atalho `Vemryx One - Desenvolvimento`
+instalador/updater (`Ralven.Updater`, `Ralven.UpdateRuntime`,
+`Ralven.ReleaseTool`, `installer/`, fluxos de staging/ativação/rollback) —
+o agente deve **sempre** reconstruir o atalho `Ralven - Desenvolvimento`
 com `scripts\Install-DevelopmentShortcut.ps1 -Build`, executado a partir do
 próprio checkout/worktree da tarefa, para que ele reflita o app com as
 últimas mudanças implementadas, pronto para o usuário testar quando quiser.
@@ -336,7 +336,7 @@ Isso vale tanto para tarefas isoladas quanto para a integração da
 O script não aponta o atalho para o worktree que o executou: ele espelha a
 árvore de trabalho atual (exceto `.git`, `bin`, `obj`, `artifacts`,
 `node_modules`) para uma pasta irmã fixa e permanente,
-`VemryxOne-dev-shortcut`, e aponta o atalho para essa cópia estável. Assim
+`Ralven-dev-shortcut`, e aponta o atalho para essa cópia estável. Assim
 o atalho nunca fica órfão quando um worktree de tarefa é removido após o
 merge — a próxima tarefa ou integração que reconstruir o atalho simplesmente
 sobrescreve o espelho com o estado mais recente.
@@ -374,6 +374,21 @@ trabalho, diagnostique a causa e relate a limitação real.
 
 ## Publicação oficial
 
+### Retenção e custo do R2
+
+- O bucket `ralven-releases` mantém os objetos versionados das **7 releases
+  SemVer mais recentes**. A limpeza ocorre somente ao final de uma publicação
+  bem-sucedida e deve falhar de forma segura se a release corrente não estiver
+  entre as versões preservadas.
+- Os aliases e manifestos em `stable/` nunca participam da limpeza por versão.
+  Não crie expiração por idade para `releases/`: ela poderia remover a versão
+  pública atual durante um intervalo longo sem lançamento.
+- O lifecycle do bucket pode abortar uploads multipart incompletos após 1 dia;
+  ele não deve expirar artefatos completos.
+- Mantenha um alerta de orçamento da conta Cloudflare em **US$ 5**. O alerta é
+  informativo, não um limite rígido; preserve cache imutável, retenção e
+  monitoramento de uso.
+
 É disparada somente por frase como “publicar versão”, “lançar versão”, “criar
 release”, “publicar atualização” ou “fazer release oficial”. Ela sempre parte
 do estado já integrado e consistente de `dev/proxima-versao`; branches
@@ -387,7 +402,8 @@ Ao ser disparada, a IA deve:
 2. confirmar que `PROJECT_STATE.md` representa o estado integrado atual e continua
    compacto; corrigir inconsistências de estado antes de gerar notas públicas;
 3. calcular a próxima versão com [Semantic Versioning](https://semver.org/lang/pt-BR/),
-   usando todas as mudanças efetivamente integradas desde a última tag;
+   usando todas as mudanças efetivamente integradas desde a última **GitHub
+   Release estável publicada**;
 4. atualizar todos os arquivos de versão, `CHANGELOG.md`, notas de release,
    instalador, site e demais artefatos de distribuição, sem divergências;
 5. fazer merge de `dev/proxima-versao` para `main`, salvo se uma comparação
@@ -403,6 +419,19 @@ Um push autorizado não permite ocultar falhas: build, testes, lint, typecheck,
 empacotamento e validação de versão devem passar, ou o bloqueio deve ser
 informado claramente.
 
+### Tags sem release publicada
+
+Antes de calcular a versão, confirme no GitHub a última release estável, além
+das tags existentes. Uma tag sem GitHub Release pública não é uma versão
+publicada e não pode reduzir o intervalo de mudanças das Release Notes.
+
+- nunca mova, reaproveite, force-push ou apague uma tag publicada/protegida;
+- escolha a próxima versão SemVer disponível após a maior tag estável existente;
+- gere changelog e Release Notes a partir da última GitHub Release estável,
+  incluindo as mudanças presentes em qualquer tag sem release;
+- trate uma tag sem release como pendência de publicação até a próxima release
+  estável válida concluir todo o fluxo.
+
 ### Levantamento das mudanças integradas
 
 O passo 3 ("calcular a próxima versão... usando todas as mudanças
@@ -411,9 +440,9 @@ efetivamente integradas desde a última tag") e o passo 4 ("atualizar...
 lembrança aproximada do que foi feito. Antes de escrever qualquer changelog,
 nota de release ou classificar a versão, a IA que publica deve:
 
-1. determinar o intervalo exato: da última tag publicada (`git describe
-   --tags --abbrev=0` a partir de `main`, ou a versão registrada em
-   `PROJECT_STATE.md`) até o `HEAD` atual de `dev/proxima-versao`;
+1. determinar o intervalo exato: da última **GitHub Release estável publicada**
+   (confirmada por `gh release view`/API; não apenas por `git describe`) até o
+   `HEAD` atual de `dev/proxima-versao`;
 2. listar **todos** os commits desse intervalo (`git log <última-tag>..HEAD
    --oneline` em `dev/proxima-versao`) e, quando existirem, os Pull Requests
    correspondentes — não confiar apenas na memória da sessão ou em um
@@ -471,7 +500,7 @@ obrigatório.
 
 - Tag: `vMAJOR.MINOR.PATCH` (ex.: `v1.4.2`) — sem `v` duplicado, sem espaços
   e sem formato alternativo.
-- Título: `Vemryx One vMAJOR.MINOR.PATCH` (ex.: `Vemryx One v1.4.2`).
+- Título: `Ralven vMAJOR.MINOR.PATCH` (ex.: `Ralven v1.4.2`).
 
 **Tipo de release**
 
@@ -542,7 +571,7 @@ seção inteira — nunca escreva algo como "Nenhuma alteração"):
    em seções diferentes; agrupe alterações muito pequenas quando fizer
    sentido, mas sem esconder mudanças relevantes.
 7. Preserve nomes oficiais de funcionalidades, telas e componentes públicos
-   do Vemryx One.
+   do Ralven.
 8. Nunca inclua hashes de commit, nomes de branch internas, caminhos locais,
    worktrees, prompts, nomes de agentes de IA, detalhes de processo interno,
    segredos, tokens ou dados pessoais.
@@ -563,7 +592,7 @@ changelog técnico.
 O corpo da GitHub Release é consumido automaticamente pelo sistema oficial
 de notificações do Discord. Por isso:
 
-- não insira um cabeçalho manual como "Vemryx One vX.Y.Z está disponível"
+- não insira um cabeçalho manual como "Ralven vX.Y.Z está disponível"
   nem repita a versão no início do corpo — o sistema do Discord já cria esse
   cabeçalho a partir do título/tag;
 - não adicione links genéricos de download no corpo só para o Discord — a
@@ -675,7 +704,7 @@ Nova tarefa
 → criar branch pelo objetivo da mudança
 → criar/reutilizar worktree exclusivo
 → implementar e testar
-→ reconstruir Vemryx One - Desenvolvimento (exceto tarefas de instalador/updater)
+→ reconstruir Ralven - Desenvolvimento (exceto tarefas de instalador/updater)
 → commit(s) profissionais
 → push automático somente da branch da tarefa
 → criar/atualizar PR automático → dev/proxima-versao
@@ -689,7 +718,7 @@ Integração solicitada
 → validar estado combinado
 → consolidar PROJECT_STATE como snapshot curto, sem cronologia
 → não atualizar PROJECT_HISTORY rotineiramente
-→ reconstruir Vemryx One - Desenvolvimento
+→ reconstruir Ralven - Desenvolvimento
 → atualizar origin/dev/proxima-versao
 → limpar worktrees/branches temporários já mergeados
 → dev pronta

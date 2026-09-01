@@ -1,8 +1,8 @@
 [CmdletBinding()]
 param(
-    # The assembled portable runtime tree (artifacts/FiveMCleaner-win-x64),
+    # The assembled portable runtime tree (artifacts/Ralven-win-x64),
     # containing Runtime\versions\<version>\ (App + broker\ copies of
-    # Core/Windows) and FiveMCleaner.Launcher.exe at its root.
+    # Core/Windows) and Ralven.Launcher.exe at its root.
     [Parameter(Mandatory)]
     [string]$RuntimeDirectory,
 
@@ -19,8 +19,8 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-# Distinctive PRIVATE members from Vemryx.One.Core / Vemryx.One.Windows
-# source. KeepPublicApi=true (see build/obfuscation/VemryxOne.Obfuscar.xml)
+# Distinctive PRIVATE members from Ralven.Core / Ralven.Windows
+# source. KeepPublicApi=true (see build/obfuscation/Ralven.Obfuscar.xml)
 # means Obfuscar renames exactly these - private methods and fully-internal
 # types - while leaving the public surface alone. Their original UTF-8 name
 # bytes live verbatim in a compiled assembly's #Strings metadata heap (ECMA-335)
@@ -38,9 +38,9 @@ $ErrorActionPreference = 'Stop'
 # also can't appear in a hardened OR un-hardened build, so absence alone does
 # not create a false pass without also checking the array here is non-empty).
 $forbiddenMarkers = @(
-    'CreateVerificationAndBottleneckActions' # private method, Vemryx.One.Core
-    'GraphicsTargetProcessGuard'             # internal sealed class, Vemryx.One.Windows
-    'AddCitizenFxCandidate'                  # private method, Vemryx.One.Windows
+    'CreateVerificationAndBottleneckActions' # private method, Ralven.Core
+    'GraphicsTargetProcessGuard'             # internal sealed class, Ralven.Windows
+    'AddCitizenFxCandidate'                  # private method, Ralven.Windows
 )
 if ($forbiddenMarkers.Count -eq 0) {
     throw 'No obfuscation markers configured; this check would silently pass everything.'
@@ -89,15 +89,15 @@ function Test-FileHardened {
 $runtimeRoot = [System.IO.Path]::GetFullPath($RuntimeDirectory)
 $versionRoot = Join-Path $runtimeRoot "Runtime\versions\$Version"
 
-Test-FileHardened -Path (Join-Path $versionRoot 'FiveMCleaner.Core.dll') -Label 'App Core.dll'
-Test-FileHardened -Path (Join-Path $versionRoot 'FiveMCleaner.Windows.dll') -Label 'App Windows.dll'
-Test-FileHardened -Path (Join-Path $versionRoot 'broker\FiveMCleaner.Core.dll') -Label 'Broker Core.dll'
-Test-FileHardened -Path (Join-Path $versionRoot 'broker\FiveMCleaner.Windows.dll') -Label 'Broker Windows.dll'
-Test-FileHardened -Path (Join-Path $runtimeRoot 'FiveMCleaner.Launcher.exe') -Label 'Launcher single-file bundle'
+Test-FileHardened -Path (Join-Path $versionRoot 'Ralven.Core.dll') -Label 'App Core.dll'
+Test-FileHardened -Path (Join-Path $versionRoot 'Ralven.Windows.dll') -Label 'App Windows.dll'
+Test-FileHardened -Path (Join-Path $versionRoot 'broker\Ralven.Core.dll') -Label 'Broker Core.dll'
+Test-FileHardened -Path (Join-Path $versionRoot 'broker\Ralven.Windows.dll') -Label 'Broker Windows.dll'
+Test-FileHardened -Path (Join-Path $runtimeRoot 'Ralven.Launcher.exe') -Label 'Launcher single-file bundle'
 
 # The portable/runtime ZIPs and the installer are repackagings of this same
 # $RuntimeDirectory tree with no separate compilation step (Build-Portable.ps1
-# zips $finalRoot as-is; installer/VemryxOne.iss's [Files] section sources
+# zips $finalRoot as-is; installer/Ralven.iss's [Files] section sources
 # "{#SourceDir}\*" - the same tree - verbatim). Scanning them too is
 # redundant with the checks above by construction, but cheap, and catches a
 # packaging-step regression (e.g. a future change that zips a different,
@@ -107,9 +107,9 @@ if ($PortableZipPath) {
     try {
         Expand-Archive -LiteralPath $PortableZipPath -DestinationPath $zipScratch
         $zipVersionRoot = Join-Path $zipScratch "Runtime\versions\$Version"
-        Test-FileHardened -Path (Join-Path $zipVersionRoot 'FiveMCleaner.Core.dll') -Label 'Portable ZIP: App Core.dll'
-        Test-FileHardened -Path (Join-Path $zipVersionRoot 'broker\FiveMCleaner.Core.dll') -Label 'Portable ZIP: Broker Core.dll'
-        Test-FileHardened -Path (Join-Path $zipScratch 'FiveMCleaner.Launcher.exe') -Label 'Portable ZIP: Launcher bundle'
+        Test-FileHardened -Path (Join-Path $zipVersionRoot 'Ralven.Core.dll') -Label 'Portable ZIP: App Core.dll'
+        Test-FileHardened -Path (Join-Path $zipVersionRoot 'broker\Ralven.Core.dll') -Label 'Portable ZIP: Broker Core.dll'
+        Test-FileHardened -Path (Join-Path $zipScratch 'Ralven.Launcher.exe') -Label 'Portable ZIP: Launcher bundle'
     }
     finally {
         if (Test-Path -LiteralPath $zipScratch) { Remove-Item -LiteralPath $zipScratch -Recurse -Force }
@@ -120,8 +120,8 @@ if ($RuntimeZipPath) {
     $runtimeZipScratch = Join-Path ([System.IO.Path]::GetTempPath()) ("fmc-verify-runtime-" + [Guid]::NewGuid().ToString('N'))
     try {
         Expand-Archive -LiteralPath $RuntimeZipPath -DestinationPath $runtimeZipScratch
-        Test-FileHardened -Path (Join-Path $runtimeZipScratch 'FiveMCleaner.Core.dll') -Label 'Runtime ZIP: Core.dll'
-        Test-FileHardened -Path (Join-Path $runtimeZipScratch 'broker\FiveMCleaner.Core.dll') -Label 'Runtime ZIP: Broker Core.dll'
+        Test-FileHardened -Path (Join-Path $runtimeZipScratch 'Ralven.Core.dll') -Label 'Runtime ZIP: Core.dll'
+        Test-FileHardened -Path (Join-Path $runtimeZipScratch 'broker\Ralven.Core.dll') -Label 'Runtime ZIP: Broker Core.dll'
     }
     finally {
         if (Test-Path -LiteralPath $runtimeZipScratch) { Remove-Item -LiteralPath $runtimeZipScratch -Recurse -Force }
@@ -157,8 +157,8 @@ if ($InstallerPath) {
                 Write-Warning "7-Zip could not open the installer as an archive (format not supported by this 7-Zip build); skipped the direct installer-payload extraction check: $InstallerPath"
             }
             else {
-                $extractedCore = @(Get-ChildItem -LiteralPath $installerScratch -Recurse -Filter 'FiveMCleaner.Core.dll' -File)
-                $extractedLauncher = @(Get-ChildItem -LiteralPath $installerScratch -Recurse -Filter 'FiveMCleaner.Launcher.exe' -File)
+                $extractedCore = @(Get-ChildItem -LiteralPath $installerScratch -Recurse -Filter 'Ralven.Core.dll' -File)
+                $extractedLauncher = @(Get-ChildItem -LiteralPath $installerScratch -Recurse -Filter 'Ralven.Launcher.exe' -File)
                 if ($extractedCore.Count -eq 0 -or $extractedLauncher.Count -eq 0) {
                     $failures.Add("Installer payload extraction did not yield the expected Core.dll/Launcher.exe files: $InstallerPath")
                 }
@@ -175,7 +175,7 @@ if ($InstallerPath) {
         }
     }
     else {
-        Write-Warning '7-Zip not found; skipped the direct installer-payload extraction check (covered indirectly: the installer packages the already-verified runtime tree verbatim, see installer/VemryxOne.iss).'
+        Write-Warning '7-Zip not found; skipped the direct installer-payload extraction check (covered indirectly: the installer packages the already-verified runtime tree verbatim, see installer/Ralven.iss).'
     }
 }
 

@@ -1,0 +1,88 @@
+using Ralven.Contracts;
+
+namespace Ralven.Core.Catalog;
+
+public enum ProfileImpactLevel
+{
+    Low,
+    Moderate,
+    High
+}
+
+/// <summary>
+/// Structural facts about an optimization mode, derived from the action
+/// catalog so the presentation can never drift from what actually runs. The
+/// human-facing text (benefits, risks, variability note) is localized by the
+/// UI; these facts anchor it to the real plan.
+/// </summary>
+public sealed record OptimizationProfilePresentation
+{
+    public required OptimizationProfile Profile { get; init; }
+
+    public required ProfileImpactLevel ImpactLevel { get; init; }
+
+    /// <summary>Distinct categories analyzed for this profile, ordered.</summary>
+    public required IReadOnlyList<ActionCategory> AnalyzedCategories { get; init; }
+
+    /// <summary>True when the profile can include irreversible/rebuildable actions.</summary>
+    public required bool ContainsNonReversible { get; init; }
+
+    /// <summary>True when the profile can require an administrator prompt.</summary>
+    public required bool RequiresElevation { get; init; }
+
+    /// <summary>The highest action risk the profile can reach.</summary>
+    public required ActionRisk MaximumRisk { get; init; }
+}
+
+public static class ProfilePresentationProvider
+{
+    public static OptimizationProfilePresentation For(
+        OptimizationProfile profile,
+        ActionCatalog? catalog = null)
+    {
+        return For(profile, OptimizationScope.FiveMLegacy, catalog);
+    }
+
+    public static OptimizationProfilePresentation For(
+        OptimizationProfile profile,
+        OptimizationScope scope,
+        ActionCatalog? catalog = null)
+    {
+        var impactLevel = profile switch
+        {
+            OptimizationProfile.Light => ProfileImpactLevel.Low,
+            OptimizationProfile.Balanced => ProfileImpactLevel.Moderate,
+            OptimizationProfile.Aggressive => ProfileImpactLevel.High,
+            _ => throw new ArgumentOutOfRangeException(nameof(profile), profile, "Unknown optimization profile.")
+        };
+
+        if (!Enum.IsDefined(scope))
+        {
+            throw new ArgumentOutOfRangeException(nameof(scope), scope, "Unknown optimization scope.");
+        }
+
+        catalog ??= ActionCatalog.Current;
+        var actions = catalog.Actions
+            .Where(action => action.Supports(profile) && action.Supports(scope))
+            .ToArray();
+
+        var categories = actions
+            .Select(action => action.Category)
+            .Distinct()
+            .OrderBy(category => (int)category)
+            .ToArray();
+
+        return new OptimizationProfilePresentation
+        {
+            Profile = profile,
+            ImpactLevel = impactLevel,
+            AnalyzedCategories = categories,
+            ContainsNonReversible = actions.Any(action =>
+                action.Reversibility is ActionReversibility.Irreversible
+                    or ActionReversibility.RebuildableData),
+            RequiresElevation = actions.Any(action =>
+                action.RequiredPrivilege == RequiredPrivilege.Administrator),
+            MaximumRisk = actions.Max(action => action.Risk)
+        };
+    }
+}

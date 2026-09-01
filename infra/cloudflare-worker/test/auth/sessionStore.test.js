@@ -54,7 +54,7 @@ test('readSessionCookie returns null when the cookie is absent', () => {
   assert.equal(readSessionCookie(''), null);
 });
 
-test('buildSessionCookie marks the cookie HttpOnly, Secure, and SameSite=None', () => {
+test('buildSessionCookie uses a host-only secure cookie with the required cross-site policy', () => {
   // SameSite=None (not Strict/Lax) is required because the dashboard and
   // the Worker are on different registrable domains -- genuinely
   // cross-site, so a stricter policy would silently never send the cookie
@@ -62,6 +62,9 @@ test('buildSessionCookie marks the cookie HttpOnly, Secure, and SameSite=None', 
   const cookie = buildSessionCookie('the-session-id', '2026-01-01T12:00:00Z');
 
   assert.match(cookie, new RegExp(`^${SESSION_COOKIE_NAME}=the-session-id;`));
+  assert.match(SESSION_COOKIE_NAME, /^__Host-/);
+  assert.match(cookie, /Path=\//);
+  assert.doesNotMatch(cookie, /Domain=/);
   assert.match(cookie, /HttpOnly/);
   assert.match(cookie, /Secure/);
   assert.match(cookie, /SameSite=None/);
@@ -70,5 +73,7 @@ test('buildSessionCookie marks the cookie HttpOnly, Secure, and SameSite=None', 
 test('buildExpiredSessionCookie clears the cookie in the past', () => {
   const cookie = buildExpiredSessionCookie();
 
+  assert.match(cookie, new RegExp(`^${SESSION_COOKIE_NAME}=`));
+  assert.doesNotMatch(cookie, /Domain=/);
   assert.match(cookie, /Expires=Thu, 01 Jan 1970/);
 });

@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
-    # The assembled portable runtime tree (artifacts/FiveMCleaner-win-x64),
-    # containing Runtime\versions\<version>\FiveMCleaner.exe.
+    # The assembled portable runtime tree (artifacts/Ralven-win-x64),
+    # containing Runtime\versions\<version>\Ralven.exe.
     [Parameter(Mandatory)]
     [string]$RuntimeDirectory,
 
@@ -17,7 +17,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $runtimeRoot = [System.IO.Path]::GetFullPath($RuntimeDirectory)
-$appExecutable = Join-Path $runtimeRoot "Runtime\versions\$Version\FiveMCleaner.exe"
+$appExecutable = Join-Path $runtimeRoot "Runtime\versions\$Version\Ralven.exe"
 if (-not (Test-Path -LiteralPath $appExecutable -PathType Leaf)) {
     throw "Hardened app executable not found: $appExecutable"
 }

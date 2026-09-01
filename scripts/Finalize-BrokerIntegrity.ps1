@@ -12,11 +12,11 @@ $ErrorActionPreference = 'Stop'
 
 $workspace = [System.IO.Path]::GetFullPath((Split-Path -Parent $PSScriptRoot))
 $artifactsRoot = Join-Path $workspace 'artifacts'
-$portableRoot = Join-Path $artifactsRoot 'FiveMCleaner-win-x64'
+$portableRoot = Join-Path $artifactsRoot 'Ralven-win-x64'
 $versionRoot = Join-Path $portableRoot "Runtime\versions\$Version"
 $brokerManifest = Join-Path $versionRoot 'broker-integrity.json'
-$runtimeArchive = Join-Path $artifactsRoot 'FiveMCleaner-Runtime-win-x64.zip'
-$portableArchive = Join-Path $artifactsRoot 'FiveMCleaner-win-x64.zip'
+$runtimeArchive = Join-Path $artifactsRoot 'Ralven-Runtime-win-x64.zip'
+$portableArchive = Join-Path $artifactsRoot 'Ralven-win-x64.zip'
 
 foreach ($required in @($versionRoot, $brokerManifest)) {
     if (-not (Test-Path -LiteralPath $required)) {

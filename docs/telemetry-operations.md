@@ -29,8 +29,14 @@ rota autorizados.
 - valide a serialização do cliente, incluindo `environment: Production`;
 - execute `npm.cmd test` em `infra/cloudflare-worker` e `infra/dashboard`;
 - execute o build e os testes Release do .NET;
-- usando credenciais Cloudflare, execute uma consulta remota ao D1 para
-  confirmar a migration e o último evento recebido;
+- usando credenciais Cloudflare, aplique as migrations com
+  `wrangler d1 migrations apply fivemcleaner-telemetry --remote` antes do
+  deploy do Worker e antes de criar a GitHub Release; o Wrangler captura o
+  backup D1 dessa operação;
+- execute `scripts/Test-ProductionDiagnostics.ps1`: o gate envia um evento
+  anônimo sintético, confirma o contrato completo no D1 usado pelo dashboard e
+  remove a linha; também envia um crash sintético marcado
+  `ralven.release_smoke=true` e exige o aceite do Sentry;
 - instale o artefato Release, dê consentimento e execute uma otimização
   controlada; registre versão, horário UTC e identificador de smoke test;
 - confirme o `202` no Worker, a linha no D1 e a visibilidade no dashboard;
@@ -38,11 +44,12 @@ rota autorizados.
 
 ## Diagnóstico seguro
 
-Não envie telemetria ao Sentry e não use FormSubmit como fallback. Diagnósticos
-de otimização usam apenas Worker + D1; crashes usam Sentry como diagnóstico
-essencial; relatos manuais usam `/bugs`. Uma resposta 2xx, incluindo 202, remove o lote
-da fila. Falhas de rede, 429 e 5xx ficam na fila para nova tentativa; rejeições
-4xx permanentes são descartadas para não criar retry infinito.
+Não envie telemetria de otimização ao Sentry e não use FormSubmit como fallback.
+Diagnósticos de otimização usam apenas Worker + D1; crashes usam Sentry dentro
+dos relatórios opcionais, ativados por padrão e desativáveis pelo usuário;
+relatos manuais usam `/bugs`. Uma resposta 2xx, incluindo 202, remove o lote da
+fila. Falhas de rede, 429 e 5xx ficam na fila para nova tentativa; rejeições 4xx
+permanentes são descartadas para não criar retry infinito.
 
 Como compatibilidade de migração, o Worker classifica qualquer payload sem
 `environment` como `Production`. Clientes atuais devem continuar enviando o
@@ -52,6 +59,7 @@ campo explicitamente; `null` ou valores desconhecidos continuam rejeitados.
 
 ```powershell
 npx.cmd wrangler d1 execute fivemcleaner-telemetry --remote --command "SELECT COUNT(*) AS total, MAX(received_at) AS last_received FROM telemetry_events"
+npx.cmd wrangler d1 execute fivemcleaner-telemetry --remote --command "SELECT five_m_install_detected FROM telemetry_events LIMIT 1; SELECT terms_version FROM account_profiles LIMIT 1; SELECT message, active, updated_at FROM live_alert WHERE id = 1"
 npx.cmd wrangler deployments list --name fivemcleaner-telemetry
 ```
 

@@ -22,8 +22,8 @@ export default function Home() {
   useEffect(() => {
     document.documentElement.lang = language === "pt" ? "pt-BR" : "en";
     document.title = language === "pt"
-      ? "Vemryx One — Otimização transparente para FiveM"
-      : "Vemryx One — Transparent optimization for FiveM";
+      ? "Ralven — Mais desempenho. Menos complicação."
+      : "Ralven — More performance. Less complexity.";
   }, [language]);
 
   return (

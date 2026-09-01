@@ -1,0 +1,169 @@
+using System.Security.Cryptography;
+using Xunit;
+
+namespace Ralven.Tests.App;
+
+public sealed class PublicExposureHardeningTests
+{
+    [Fact]
+    public void StableRelease_RequiresExactOriginMainBeforeSecretBearingSteps()
+    {
+        var root = FindRepositoryRoot();
+        var workflow = File.ReadAllText(Path.Combine(root, ".github", "workflows", "release.yml"));
+
+        var provenanceGuard = workflow.IndexOf(
+            "Stable release tag must point to the current origin/main commit.",
+            StringComparison.Ordinal);
+        var firstSecretReference = workflow.IndexOf("${{ secrets.", StringComparison.Ordinal);
+
+        Assert.True(provenanceGuard >= 0, "Stable releases must validate the trusted origin/main commit.");
+        Assert.True(
+            firstSecretReference > provenanceGuard,
+            "The provenance guard must run before any workflow secret is referenced.");
+        Assert.Contains("refs/remotes/origin/main", workflow, StringComparison.Ordinal);
+        Assert.Contains("trusted_commit: ${{ steps.release.outputs.trusted_commit }}", workflow, StringComparison.Ordinal);
+        Assert.Equal(2, workflow.Split("ref: ${{ needs.build_audit.outputs.trusted_commit }}", StringSplitOptions.None).Length - 1);
+    }
+
+    [Fact]
+    public void ReleaseSigning_IsIsolatedFromBuildAndProductionPublishing()
+    {
+        var root = FindRepositoryRoot();
+        var workflow = File.ReadAllText(Path.Combine(root, ".github", "workflows", "release.yml"));
+        var buildEnd = workflow.IndexOf("  sign_release:", StringComparison.Ordinal);
+        var publishStart = workflow.IndexOf("  publish:", buildEnd, StringComparison.Ordinal);
+
+        Assert.True(buildEnd > 0, "The unsigned build and signing jobs must remain separate.");
+        Assert.True(publishStart > buildEnd, "The signing job must complete before publishing.");
+        Assert.DoesNotContain("SIGNING_PRIVATE_KEY", workflow[..buildEnd], StringComparison.Ordinal);
+        Assert.Contains("environment: release-signing", workflow, StringComparison.Ordinal);
+        Assert.Contains("environment: production", workflow, StringComparison.Ordinal);
+        Assert.Contains("BROKER_INTEGRITY_SIGNING_PRIVATE_KEY", workflow, StringComparison.Ordinal);
+        Assert.Contains("RELEASE_SIGNING_PRIVATE_KEY", workflow[buildEnd..publishStart], StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void StableRelease_PreparesAndProvesDiagnosticsBeforePublication()
+    {
+        var root = FindRepositoryRoot();
+        var workflow = File.ReadAllText(Path.Combine(root, ".github", "workflows", "release.yml"));
+
+        var prepare = workflow.IndexOf("- name: Prepare production diagnostics backend", StringComparison.Ordinal);
+        var migrate = workflow.IndexOf("wrangler d1 migrations apply", prepare, StringComparison.Ordinal);
+        var deploy = workflow.IndexOf("wrangler deploy", migrate, StringComparison.Ordinal);
+        var smoke = workflow.IndexOf("Test-ProductionDiagnostics.ps1", deploy, StringComparison.Ordinal);
+        var publish = workflow.IndexOf("- name: Create public release", smoke, StringComparison.Ordinal);
+        var feed = workflow.IndexOf("- name: Publish signed stable feed", publish, StringComparison.Ordinal);
+
+        Assert.True(prepare >= 0);
+        Assert.True(migrate > prepare);
+        Assert.True(deploy > migrate);
+        Assert.True(smoke > deploy);
+        Assert.True(publish > smoke);
+        Assert.True(feed > publish);
+    }
+
+    [Fact]
+    public void StableRelease_HardensAndSmokeTestsTheRuntimeBeforePublication()
+    {
+        var root = FindRepositoryRoot();
+        var workflow = File.ReadAllText(Path.Combine(root, ".github", "workflows", "release.yml"));
+
+        var hardenedBuild = workflow.IndexOf("Build-Installer.ps1 -Version $env:ASSET_VERSION -Harden", StringComparison.Ordinal);
+        var finalizeBroker = workflow.IndexOf("Finalize-BrokerIntegrity.ps1", hardenedBuild, StringComparison.Ordinal);
+        var runtimeSmoke = workflow.IndexOf("Test-HardenedRuntime.ps1", finalizeBroker, StringComparison.Ordinal);
+        var installerTest = workflow.IndexOf("Test-Installer.ps1", runtimeSmoke, StringComparison.Ordinal);
+        var publish = workflow.IndexOf("- name: Create public release", installerTest, StringComparison.Ordinal);
+
+        Assert.True(hardenedBuild >= 0);
+        Assert.True(finalizeBroker > hardenedBuild);
+        Assert.True(runtimeSmoke > finalizeBroker);
+        Assert.True(installerTest > runtimeSmoke);
+        Assert.True(publish > installerTest);
+        Assert.Contains("name: obfuscation-maps-", workflow, StringComparison.Ordinal);
+        Assert.Contains("retention-days: 90", workflow, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void StableRelease_PublishesVersionedArtifactsBeforeSignedVemryxFeeds()
+    {
+        var root = FindRepositoryRoot();
+        var workflow = File.ReadAllText(Path.Combine(root, ".github", "workflows", "release.yml"));
+
+        var versioned = workflow.IndexOf("- name: Publish versioned release artifacts to Vemryx", StringComparison.Ordinal);
+        var createRelease = workflow.IndexOf("- name: Create public release", versioned, StringComparison.Ordinal);
+        var stableFeed = workflow.IndexOf("- name: Publish signed stable feed to Vemryx", createRelease, StringComparison.Ordinal);
+        var runtimeFeed = workflow.IndexOf("https://vemryx.com/Ralven/releases/runtime-manifest.json", stableFeed, StringComparison.Ordinal);
+        var installerFeed = workflow.IndexOf("https://vemryx.com/Ralven/releases/installer-manifest.json", stableFeed, StringComparison.Ordinal);
+        var verifyExactManifest = workflow.IndexOf("$published -ne $expected", installerFeed, StringComparison.Ordinal);
+
+        Assert.True(versioned >= 0);
+        Assert.True(createRelease > versioned);
+        Assert.True(stableFeed > createRelease);
+        Assert.True(runtimeFeed > stableFeed);
+        Assert.True(installerFeed > stableFeed);
+        Assert.True(verifyExactManifest > installerFeed);
+        Assert.Contains("ralven-releases/releases/$env:RELEASE_TAG", workflow, StringComparison.Ordinal);
+        Assert.DoesNotContain("release-assets.githubusercontent.com", workflow, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void RuntimeTrustAnchors_AreSeparatedByPurpose()
+    {
+        var root = FindRepositoryRoot();
+        var project = File.ReadAllText(Path.Combine(root, "src", "Ralven.App", "Ralven.App.csproj"));
+        var updater = File.ReadAllText(Path.Combine(root, "src", "Ralven.App", "Services", "SignedManifestUpdateService.cs"));
+        var broker = File.ReadAllText(Path.Combine(root, "src", "Ralven.App", "Services", "BrokerIntegrityVerifier.cs"));
+
+        Assert.Contains("Assets/update-manifest-public-key.pem", project, StringComparison.Ordinal);
+        Assert.Contains("Assets/broker-integrity-public-key.pem", project, StringComparison.Ordinal);
+        Assert.Contains("Assets.update-manifest-public-key.pem", updater, StringComparison.Ordinal);
+        Assert.Contains("Assets.broker-integrity-public-key.pem", broker, StringComparison.Ordinal);
+
+        var updateKey = File.ReadAllText(Path.Combine(root, "src", "Ralven.App", "Assets", "update-manifest-public-key.pem"));
+        var brokerKey = File.ReadAllText(Path.Combine(root, "src", "Ralven.App", "Assets", "broker-integrity-public-key.pem"));
+        Assert.NotEqual(updateKey, brokerKey);
+
+        using var brokerVerifier = ECDsa.Create();
+        brokerVerifier.ImportFromPem(brokerKey);
+        Assert.Equal(32, brokerVerifier.ExportParameters(includePrivateParameters: false).Q.X!.Length);
+    }
+
+    [Fact]
+    public void PublicDistribution_UsesOnlyTheVemryxSiteAndSignedFeeds()
+    {
+        var root = FindRepositoryRoot();
+        var updater = File.ReadAllText(Path.Combine(root, "src", "Ralven.App", "Services", "SignedManifestUpdateService.cs"));
+        var mainWindow = File.ReadAllText(Path.Combine(root, "src", "Ralven.App", "MainWindow.xaml.cs"));
+
+        Assert.Contains("https://vemryx.com/Ralven/", updater, StringComparison.Ordinal);
+        Assert.DoesNotContain("api.github.com", updater, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("GitHubReleaseUpdateService", mainWindow, StringComparison.Ordinal);
+        Assert.False(File.Exists(Path.Combine(root, ".github", "workflows", "pages.yml")));
+    }
+
+    [Fact]
+    public void Startup_DoesNotWriteRawExceptionsToDeveloperSpecificPath()
+    {
+        var root = FindRepositoryRoot();
+        var appSource = File.ReadAllText(Path.Combine(root, "src", "Ralven.App", "App.xaml.cs"));
+
+        Assert.DoesNotContain(@"C:\Projetos\ralven-debug.log", appSource, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string FindRepositoryRoot()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null)
+        {
+            if (File.Exists(Path.Combine(directory.FullName, "Ralven.slnx")))
+            {
+                return directory.FullName;
+            }
+
+            directory = directory.Parent;
+        }
+
+        throw new DirectoryNotFoundException("Could not locate the repository root.");
+    }
+}

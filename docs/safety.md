@@ -1,6 +1,6 @@
 # Modelo de segurança
 
-O Vemryx One altera configurações de alto impacto potencial. Segurança, explicabilidade e reversão são requisitos funcionais; não são uma tela de aviso adicionada depois.
+O Ralven altera configurações de alto impacto potencial. Segurança, explicabilidade e reversão são requisitos funcionais; não são uma tela de aviso adicionada depois.
 
 ## Invariantes
 
@@ -8,7 +8,10 @@ Uma ação aceita pelo produto precisa respeitar todos os itens abaixo:
 
 1. **Escopo conhecido** — instalação e edição foram identificadas sem ambiguidade.
 2. **Legacy somente** — GTAV Enhanced retorna bloqueio seguro.
-3. **Processos encerrados** — nenhuma escrita ou limpeza ocorre com processos FiveM ativos.
+3. **Processos encerrados** — nenhuma nova escrita ou limpeza começa com
+   processos FiveM ativos. A única exceção é a compensação imediata e estreita
+   do snapshot criado pela própria execução que acabou de falhar, descrita em
+   "Controles de jogos do Windows"; ela apenas restaura o estado prévio.
 4. **Alvo canônico** — o caminho final foi resolvido e permanece dentro do diretório esperado.
 5. **Privilégio mínimo** — elevação acontece apenas para uma operação administrativa tipada.
 6. **Prévia completa** — o usuário vê o que será alterado, por quê, risco e rollback.
@@ -38,9 +41,120 @@ O projeto não aceita implementações que:
   como caminho de otimização do FiveM);
 - sobrescrevam perfil NVIDIA ou ativem/limpem shader cache à força;
 - removam dados de autenticação, entitlement, plugins ou configurações em perfis automáticos;
-- escondam ações, usem ofuscação ou baixem código executável depois da instalação;
+- escondam ações, usem ofuscação para ocultar ações ou payloads, ou baixem código executável depois da instalação;
 - contornem anti-cheat, pure mode ou verificações de integridade;
 - operem em FiveM/GTAV Enhanced enquanto esse adaptador estiver bloqueado.
+
+## Otimizador geral do Windows
+
+O plano geral usa `OptimizationScope.GeneralWindows` e não exige FiveM ou GTA V
+instalado. Essa independência não amplia a allowlist: cada definição precisa
+declarar explicitamente que suporta o escopo geral, e `PlanBuilder`, runtime e
+broker reconstroem o plano com esse mesmo escopo antes de qualquer execução.
+Uma ação exclusiva de FiveM/GTA nunca entra no plano geral por categoria,
+prefixo de ID, instalação detectada ou fallback. A presença de GTAV Enhanced
+continua bloqueando apenas o módulo especializado.
+
+O primeiro escopo geral reutiliza somente capacidades já estreitas e testadas:
+
+- diagnósticos locais de CPU, GPU, RAM, armazenamento/TRIM, drivers, tela/taxa
+  de atualização, rede, pagefile/commit, energia, WHEA, uso de recursos,
+  throttling, inicialização, proteções do Windows, aceleração do mouse e gargalo
+  provável;
+- limpeza allowlisted de arquivos antigos no diretório temporário do usuário,
+  com idade mínima, prévia e aviso de irreversibilidade;
+- Modo de Jogo e captura histórica em segundo plano pelos dois valores HKCU
+  descritos na seção seguinte;
+- seleção do plano de energia de desempenho com captura/restauração do GUID
+  anterior e somente quando ligado à tomada;
+- ASPM PCI Express apenas quando a configuração existe no plano ativo, com
+  captura separada de AC/DC, compensação de falha parcial, pós-verificação e
+  restauração dos dois valores sem sobrescrever uma escolha posterior;
+- efeitos visuais e atraso de menus allowlisted via `SystemParametersInfo`, com
+  verificação e rollback, preservando legibilidade e suavização de fontes.
+
+Nenhuma dessas ações autoriza mudar pagefile, limpar standby list, instalar ou
+remover driver, alterar taxa de atualização, desabilitar item de inicialização,
+serviço, proteção ou Windows Update. HAGS, afinidade, prioridade, timer,
+debloat, AppX e ajustes de fabricante também não são promovidos ao plano geral.
+Quando o Windows não fornece o fato necessário, o resultado é indisponível ou
+`Skipped`; o aplicativo não adivinha um estado para conseguir escrever.
+
+Os diagnósticos de TRIM e aceleração do mouse são consultas fixas e somente
+leitura: respectivamente `fsutil behavior query DisableDeleteNotify` e
+`SystemParametersInfo(SPI_GETMOUSE)`. O primeiro relata apenas a política de
+delete notification para NTFS/ReFS, sem afirmar suporte do dispositivo; o
+segundo não altera preferências do usuário nem presume que um jogo use o caminho
+de ponteiro do Windows. Nenhum deles atravessa o broker.
+
+As ações compartilhadas de Modo de Jogo e captura preservam a verificação já
+existente de processo FiveM. Assim, uma instalação ausente não impede a
+execução, mas uma sessão FiveM detectada ou uma inspeção ambígua continua
+bloqueando a escrita e a restauração desses valores.
+
+## Controles de jogos do Windows
+
+As informações de PC e saúde exibidas em **Sistema** são estritamente de
+leitura. A saúde vem da API nativa da Central de Segurança do Windows em três
+consultas independentes; falha, serviço parado ou resultado parcial permanece
+explícito como indisponível e não é reinterpretado como seguro ou inseguro. O
+estado de atualização automática não comprova que o Windows está atualizado e
+o painel não busca, baixa, instala ou aprova atualizações. Essas leituras não
+usam broker, elevação, PowerShell, linha de comando ou acesso de rede.
+
+As ações que abrem Segurança do Windows, Windows Update e Sobre continuam
+secundárias e delegam qualquer alteração às superfícies protegidas do próprio
+sistema operacional.
+
+O painel **Sistema > Jogos do Windows** é uma exceção explícita ao antigo
+comportamento somente de atalhos da página Sistema, não uma autorização para
+alterações genéricas no Windows. Seu escopo é fixo:
+
+- lê e altera somente `HKCU\Software\Microsoft\GameBar\AutoGameModeEnabled`
+  e `HKCU\Software\Microsoft\Windows\CurrentVersion\GameDVR\HistoricalCaptureEnabled`;
+- aceita somente valores `DWORD` ausentes, `0` ou `1`; tipo ou conteúdo
+  inesperado torna o painel indisponível, sem tentativa de correção;
+- mostra o estado detectado e exige confirmação antes da escrita;
+- bloqueia aplicação e restauração enquanto o FiveM estiver ativo e repete essa
+  verificação na fronteira de cada escrita; se não puder confirmar que o
+  processo está encerrado, não inicia uma nova alteração;
+- se o FiveM iniciar depois de uma escrita da mesma execução e a etapa seguinte
+  falhar, o motor pode restaurar imediatamente apenas o snapshot recém-aplicado
+  por essa execução. Essa compensação estreita evita deixar uma alteração
+  parcial; não autoriza nova aplicação nem restauração solicitada pelo usuário
+  ou pelo Histórico enquanto o FiveM estiver aberto;
+- roda como usuário padrão, sem broker ou elevação;
+- executa as duas ações tipadas em uma transação estrita e registra o estado
+  anterior de cada valor; uma falha aciona tentativa de reversão e o resultado
+  real, inclusive conflito ou falha de restauração, permanece no Histórico;
+- a restauração não sobrescreve um valor alterado posteriormente por outro
+  programa e, por isso, pode terminar com conflito em vez de prometer sucesso;
+- não remove a Game Bar, não impede gravação manual e não promete ganho
+  universal de FPS ou desempenho.
+
+O painel nunca aceita caminho, hive, nome de valor, ação ou comando fornecido
+pela UI. Qualquer novo ajuste geral do Windows exige ação própria, evidência,
+detecção, confirmação, validação, reversibilidade e testes independentes.
+
+## Inventário de aplicativos e inicialização
+
+A página **Aplicativos** faz somente descoberta local como usuário padrão:
+
+- lê os registros de desinstalação em HKCU/HKLM nas visões de 32 e 64 bits para
+  nome, versão, fabricante e tamanho estimado;
+- lê apenas os nomes registrados em `Run`/`RunOnce` e os nomes de arquivos nas
+  pastas Startup; conteúdo de comandos não é carregado nem exibido;
+- nunca lê ou executa `UninstallString` e nunca lê ou escreve
+  `StartupApproved`;
+- trata acesso negado e fontes indisponíveis como resultado parcial explícito,
+  sem transformar ausência de dados em sucesso completo;
+- não instala, atualiza, desinstala, habilita ou desabilita software e não usa o
+  broker.
+
+As ações secundárias continuam abrindo superfícies confiáveis do Windows para
+qualquer alteração. Uma futura operação de pacote ou inicialização exige
+contrato tipado, confirmação, verificação e rollback próprios; texto descoberto
+no registro nunca pode ser promovido a comando executável.
 
 ## Escopo de edição gráfica
 
@@ -120,12 +234,14 @@ condições abaixo simultaneamente:
 - nunca faz parte de nenhum perfil automático (`ActionOptionGate` próprio,
   desligado por padrão; precisa ser habilitado explicitamente fora dos
   perfis padrão);
-- só toca em algum arquivo depois de detectar, no log mais recente do
-  FiveM, um padrão textual já conhecido de erro de entitlement/autenticação
-  — caso contrário, a ação não faz nada e informa isso;
+- só toca em algum arquivo depois de detectar, em log recente dentro da janela
+  da sessão, uma frase completa allowlisted de erro de entitlement/autenticação
+  — log antigo, timestamp futuro ou substring ambígua falham fechados;
 - move os itens para quarentena em vez de apagar diretamente, preservando a
   reversibilidade até a confirmação final da transação, igual ao padrão já
   usado para `server-cache`/`server-cache-priv`;
+- vincula o snapshot aos pais canônicos e ao manifesto SHA-256 exato da
+  quarentena; conteúdo novo, alterado ou reparse point impede commit/rollback;
 - exige que o FiveM esteja fechado, como qualquer outra limpeza condicionada.
 
 ### Limpeza condicionada
@@ -141,6 +257,22 @@ condições abaixo simultaneamente:
 | `ros_id.dat` + `DigitalEntitlements`                                      | FiveM encerrado; padrão de erro de entitlement detectado no log; ação opt-in       | exigirá novo login no próximo início do FiveM                        |
 
 A limpeza de cache não entra implicitamente nos modos Leve, Médio ou Agressivo.
+
+### Monitor de sessão somente leitura
+
+O monitor de sessão da Visão geral é uma capacidade manual e local, limitada ao
+FiveM sobre GTAV Legacy. Uma presença positiva exige nome de processo
+allowlisted e imagem canônica dentro da raiz FiveM diagnosticada, com validação
+contra reparse points. Falha de enumeração ou leitura da imagem é estado
+indeterminado, nunca presença nem ausência confirmada; duas ausências
+confirmadas consecutivas são necessárias para encerrar a sessão.
+
+O monitor mantém apenas estado e duração em memória, continua funcionando com
+o Ralven na bandeja e termina quando o aplicativo fecha. Ele não usa rede,
+telemetria, persistência, broker, leitura de memória, hooks ou injeção e não
+altera FiveM, GTA V ou Windows. Sua existência não autoriza prioridade,
+afinidade, plano de energia, timer resolution ou qualquer outra mutação por
+sessão sem arquitetura própria de rollback e recuperação.
 
 ### Encerramento de processo travado
 
@@ -215,12 +347,15 @@ preserva as ações já `Committed` e conclui a transação como
 falha reverte só a própria ação" — é a correção de um caso em que ele não
 estava sendo respeitado entre as duas fases da mesma transação.
 
-Além disso, a única ação administrativa hoje (`EnableSessionPerformancePowerPlan`)
-tenta primeiro **sem elevação**: muitas configurações do Windows permitem
-que um usuário comum troque o plano de energia ativo, e só um resultado
-genuíno de acesso negado (distinguido de "este plano não existe neste PC")
-aciona o broker e o UAC. Isso reduz quantas vezes o UAC aparece sem abrir
-mão de elevar quando o Windows realmente exige.
+As ações administrativas (`EnableSessionPerformancePowerPlan` e o experimento
+opt-in `ToggleHags`) não são executadas na fase de usuário padrão. O broker
+elevado valida o plano e mantém em `HKLM` a cópia autoritativa dos campos do
+journal que controlam ações administrativas. Essa cópia protegida é atualizada
+antes do journal local a cada transição e restaura um arquivo local atrasado ou
+adulterado. Rollback elevado falha fechado quando o recibo não existe, está
+corrompido ou não corresponde à identidade das ações; recibos terminais são
+retidos para impedir replay. Registros legados sem recibo continuam visíveis no
+histórico, mas não oferecem rollback administrativo.
 
 Esse modelo atende ao requisito de "tratar erro sem interromper
 inutilmente todo o processo" sem abrir mão de nenhum dos invariantes de
@@ -298,7 +433,7 @@ A interface e a maior parte do motor executam sem elevação. O broker administr
 Uma operação em arquivos `%LOCALAPPDATA%` ou `%APPDATA%` normalmente não precisa do broker.
 
 Desde 26/07/2026, o broker também grava um log local de ciclo de vida
-(`%LOCALAPPDATA%\FiveMCleaner\Logs\broker-diagnostics.log`, apenas nome do
+(`%LOCALAPPDATA%\Ralven\Logs\broker-diagnostics.log`, apenas nome do
 evento + timestamp + ID de transação, sem caminhos, sem dados do plano) em
 marcos como `broker-started`, `pipe-connected`, `elevation-confirmed`,
 `action-started`, `terminal-event-sent`. Cada linha é gravada com
@@ -314,17 +449,21 @@ Não é possível garantir ausência de falsos positivos em todos os produtos. O
 - binários e instalador assinados;
 - builds determinísticos e hashes de release publicados;
 - código-fonte correspondente a cada release;
-- sem packers, ofuscação ou payload embutido inesperado; a única exceção de
-  atualização é o `FiveMCleaner.Updater.exe` autocontido, empacotado pelo
-  instalador, copiado para `%LOCALAPPDATA%\FiveMCleaner\Updater` e limitado a
+- sem packers ou payload embutido inesperado. A distribuição de release
+  ofusca assemblies internos de `Core` e `Windows` após a compilação e antes
+  de hash, assinatura e empacotamento; isso não é evasão de antivírus e é
+  verificado no pipeline. O código-fonte permanece disponível para auditoria;
+  veja [hardening da release](release-hardening.md). A única exceção de
+  atualização é o `Ralven.Updater.exe` autocontido, empacotado pelo
+  instalador, copiado para `%LOCALAPPDATA%\Ralven\Updater` e limitado a
   executar o instalador GitHub já validado por nome, caminho, tamanho e SHA-256;
 - sem persistência, driver, injeção ou manipulação de processo;
 - manifesto do broker com escopo mínimo;
 - comunicação clara de cada alteração administrativa.
 
-O instalador ainda não possui assinatura digital de uma autoridade pública e pode não possuir reputação no SmartScreen. O usuário deve conferir o GitHub Release e o SHA-256, mas essa conferência não autoriza evasão: o Vemryx One não desativa proteções, não cria exclusões e não recomenda renomear, reempacotar ou ofuscar binários para evitar detecção. Se a política do computador bloquear o instalador, a alternativa segura é não executá-lo, compilar o código revisado ou aguardar uma release assinada. Veja [release, integridade e simulação](release-preview.md).
+O instalador ainda não possui assinatura digital de uma autoridade pública e pode não possuir reputação no SmartScreen. O usuário deve conferir o GitHub Release e o SHA-256, mas essa conferência não autoriza evasão: o Ralven não desativa proteções, não cria exclusões e não recomenda renomear, reempacotar ou ofuscar binários para evitar detecção. Se a política do computador bloquear o instalador, a alternativa segura é não executá-lo, compilar o código revisado ou aguardar uma release assinada. Veja [release, integridade e simulação](release-preview.md).
 
-Uma exceção de antivírus recomendada pelo suporte do FiveM para um erro específico não autoriza o Vemryx One a criar essa exceção automaticamente.
+Uma exceção de antivírus recomendada pelo suporte do FiveM para um erro específico não autoriza o Ralven a criar essa exceção automaticamente.
 
 ## Dados e privacidade
 
@@ -338,17 +477,16 @@ O diagnóstico permanece local por padrão. Relatórios exportados devem:
 
 O formulário de bug é uma exceção explícita ao processamento apenas local: depois do clique em **Enviar**, os campos autorizados (somente texto — categoria, resumo, descrição, versão, perfil, e-mail e log opcionais) são encaminhados ao Worker Cloudflare do projeto (rota `/bugs`), não mais ao FormSubmit. Não há mais anexo/captura de tela nesse formulário. O app não envia esse conteúdo em segundo plano, não repete automaticamente uma falha e oferece cópia local do texto. Consulte [Relatos de bug e privacidade](bug-reports.md) antes de usar o canal.
 
-Os diagnósticos técnicos essenciais incluem apenas categorias allowlisted de
-erro, duração e resultado de uma otimização, versão do aplicativo, Windows e
-arquitetura. Hardware detalhado, perfil e IDs das ações são dados opcionais,
-controlados em Configurações. Eles não leem nem enviam logs, arquivos,
-documentos, histórico, caminhos, identificador de máquina ou outros dados
-pessoais. A especificação, o provedor e o limite de metadados de transporte
-estão documentados em [Diagnósticos essenciais, dados opcionais e privacidade](telemetry.md).
+Os diagnósticos técnicos, incluindo categoria allowlisted de erro, duração e
+resultado de uma otimização, versão do aplicativo, Windows, arquitetura,
+hardware, perfil e IDs das ações, são opcionais e controlados em
+Configurações. Eles não leem nem enviam logs, arquivos, documentos, histórico,
+caminhos, identificador de máquina ou outros dados pessoais. A especificação,
+o provedor e o limite de metadados de transporte estão documentados em
+[Diagnósticos essenciais, dados opcionais e privacidade](telemetry.md).
 
-O relatório automático de falhas (Sentry) também é um diagnóstico essencial e
-nunca roda no broker elevado (`ICrashReportingService` só existe na camada
-App). O DSN vem de um arquivo
+O relatório automático de falhas (Sentry) também é opcional e nunca roda no
+broker elevado (`ICrashReportingService` só existe na camada App). O DSN vem de um arquivo
 de configuração por ambiente, nunca de um literal no código-fonte; todo
 evento é sanitizado (`CrashReportSanitizer`, reaproveitando `ReportSanitizer`)
 antes de sair do processo, removendo nome de máquina, IP, identificador de
@@ -357,7 +495,7 @@ usuário e qualquer caminho pessoal. Detalhes completos em
 
 O scaffold do painel administrativo (`infra/dashboard/`) e do Worker que o
 alimenta (`infra/cloudflare-worker/`) não fazem parte do aplicativo
-Vemryx One distribuído: rodam apenas na infraestrutura Cloudflare, nunca
+Ralven distribuído: rodam apenas na infraestrutura Cloudflare, nunca
 no processo do usuário nem no broker. A senha de administrador nunca fica em
 texto puro em nenhum lugar do repositório — só um hash PBKDF2 gerado
 localmente, guardado exclusivamente como Secret do Worker.

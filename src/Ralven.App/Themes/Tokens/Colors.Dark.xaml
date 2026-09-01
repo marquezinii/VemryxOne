@@ -1,0 +1,164 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--
+        Tokens semânticos de cor — tema escuro. Fonte única de verdade:
+        ThemeManager troca este dicionário por Colors.Light.xaml inteiro,
+        nunca sobrescreve chave a chave. Nenhuma página referencia um valor
+        hexadecimal diretamente; sempre um destes DynamicResource.
+
+        DIREÇÃO RALVEN
+        ===============
+        A marca é deliberadamente monocromática: carvão, grafite, cinzas e
+        branco estruturam toda superfície e interação. Cor fica reservada a
+        estados semânticos reais (sucesso, aviso, erro e informação).
+    -->
+
+    <!-- Paleta canônica. Estes seis valores vêm diretamente do brand book. -->
+    <Color x:Key="RalvenCharcoalColor">#0A0A0B</Color>
+    <Color x:Key="RalvenGraphiteColor">#111214</Color>
+    <Color x:Key="RalvenDarkGrayColor">#1D1E21</Color>
+    <Color x:Key="RalvenGrayColor">#2D2E33</Color>
+    <Color x:Key="RalvenLightGrayColor">#A6A7AC</Color>
+    <Color x:Key="RalvenWhiteColor">#FFFFFF</Color>
+
+    <Color x:Key="CanvasBaseColor">#0A0A0B</Color>
+    <Color x:Key="CanvasSunkenColor">#0A0A0B</Color>
+    <Color x:Key="Surface1Color">#111214</Color>
+    <Color x:Key="Surface2Color">#1D1E21</Color>
+    <Color x:Key="Surface3Color">#2D2E33</Color>
+    <Color x:Key="SurfaceRailColor">#111214</Color>
+    <Color x:Key="SurfaceAccentWashColor">#1D1E21</Color>
+
+    <SolidColorBrush x:Key="CanvasBaseBrush" Color="{StaticResource CanvasBaseColor}" />
+    <SolidColorBrush x:Key="CanvasSunkenBrush" Color="{StaticResource CanvasSunkenColor}" />
+    <SolidColorBrush x:Key="Surface1Brush" Color="{StaticResource Surface1Color}" />
+    <SolidColorBrush x:Key="Surface2Brush" Color="{StaticResource Surface2Color}" />
+    <SolidColorBrush x:Key="Surface3Brush" Color="{StaticResource Surface3Color}" />
+    <SolidColorBrush x:Key="SurfaceRailBrush" Color="{StaticResource SurfaceRailColor}" />
+    <SolidColorBrush x:Key="SurfaceAccentWashBrush" Color="{StaticResource SurfaceAccentWashColor}" />
+
+    <!--
+        Luz ambiente sutil da marca. Um único brush radial, estático e
+        cacheado pela GPU, pintado atrás de todo o conteúdo da janela.
+    -->
+    <RadialGradientBrush x:Key="AmbientLightBrush"
+                         GradientOrigin="0.10,1.04"
+                         Center="0.10,1.04"
+                         RadiusX="1.00"
+                         RadiusY="1.20">
+        <GradientStop Color="#18FFFFFF" Offset="0" />
+        <GradientStop Color="#0CA6A7AC" Offset="0.32" />
+        <GradientStop Color="#042D2E33" Offset="0.62" />
+        <GradientStop Color="#000A0A0B" Offset="1" />
+    </RadialGradientBrush>
+
+    <!--
+        Preenchimento dos painéis com variação discreta entre as superfícies
+        oficiais da marca.
+    -->
+    <LinearGradientBrush x:Key="PanelFillBrush" StartPoint="0.85,0" EndPoint="0.15,1">
+        <GradientStop Color="#1D1E21" Offset="0" />
+        <GradientStop Color="#17181A" Offset="0.55" />
+        <GradientStop Color="#111214" Offset="1" />
+    </LinearGradientBrush>
+
+    <!-- Traço. Fina separa dentro de um bloco, média contorna um bloco,
+         grossa delimita algo operável (campo, seletor). -->
+    <SolidColorBrush x:Key="BorderSubtleBrush" Color="#2D2E33" />
+    <SolidColorBrush x:Key="BorderDefaultBrush" Color="#47484D" />
+    <SolidColorBrush x:Key="BorderStrongBrush" Color="#A6A7AC" />
+
+    <!-- Aresta da luz ambiente no topo de uma superfície elevada. -->
+    <LinearGradientBrush x:Key="EdgeLightBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#14FFFFFF" Offset="0" />
+        <GradientStop Color="#00FFFFFF" Offset="0.30" />
+        <GradientStop Color="#00FFFFFF" Offset="1" />
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="GridLineBrush" Color="#2D2E33" />
+    <SolidColorBrush x:Key="TickMarkBrush" Color="#5B5C61" />
+
+    <!--
+        Fundo de uma região grande de conteúdo. Era a retícula de papel
+        milimetrado do visual anterior; virou a queda de luz vertical da
+        interface — mais claro no alto, mais
+        fundo embaixo. Substituir o DrawingBrush ladrilhado por um gradiente
+        também removeu o custo de tiling em janelas grandes.
+
+        Precisa viver em cada dicionário de tema: o pincel congela suas
+        cores no momento em que é criado, e o tema troca por dicionário.
+    -->
+    <LinearGradientBrush x:Key="SheetGridBrush" StartPoint="0,0" EndPoint="0.35,1">
+        <GradientStop Color="#00000000" Offset="0" />
+        <GradientStop Color="#14000000" Offset="1" />
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#A6A7AC" />
+    <SolidColorBrush x:Key="TextTertiaryBrush" Color="#A6A7AC" />
+    <SolidColorBrush x:Key="AppTextOnAccentBrush" Color="#0A0A0B" />
+
+    <SolidColorBrush x:Key="AccentBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="AccentTextBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="AccentBrightBrush" Color="#A6A7AC" />
+    <SolidColorBrush x:Key="AccentDeepBrush" Color="#A6A7AC" />
+    <SolidColorBrush x:Key="AccentWashBrush" Color="#2D2E33" />
+    <SolidColorBrush x:Key="AccentSoftBrush" Color="#1D1E21" />
+    <LinearGradientBrush x:Key="AccentGradientBrush" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#FFFFFF" Offset="0" />
+        <GradientStop Color="#A6A7AC" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="FiveMGameTileBrush" StartPoint="0.92,0" EndPoint="0.08,1">
+        <GradientStop Color="#E61D1E21" Offset="0" />
+        <GradientStop Color="#C70A0A0B" Offset="1" />
+    </LinearGradientBrush>
+    <RadialGradientBrush x:Key="FiveMGameTileArtworkBrush"
+                         GradientOrigin="0.5,0.2"
+                         Center="0.5,0.2"
+                         RadiusX="0.82"
+                         RadiusY="0.78">
+        <GradientStop Color="#26FF7100" Offset="0" />
+        <GradientStop Color="#0AFF7100" Offset="0.52" />
+        <GradientStop Color="#000A0A0B" Offset="1" />
+    </RadialGradientBrush>
+    <SolidColorBrush x:Key="FiveMGameTileBorderBrush" Color="#4DFFFFFF" />
+    <SolidColorBrush x:Key="FiveMGameTileLabelBrush" Color="#33111214" />
+
+    <SolidColorBrush x:Key="BrandInkBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="GamingAccentBrush" Color="#A6A7AC" />
+
+    <SolidColorBrush x:Key="SuccessBaseBrush" Color="#32D583" />
+    <SolidColorBrush x:Key="SuccessSurfaceBrush" Color="#10271F" />
+    <SolidColorBrush x:Key="SuccessBorderBrush" Color="#246247" />
+
+    <SolidColorBrush x:Key="WarningBaseBrush" Color="#F5B942" />
+    <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#2A2212" />
+    <SolidColorBrush x:Key="WarningBorderBrush" Color="#68521E" />
+
+    <SolidColorBrush x:Key="DangerBaseBrush" Color="#F04438" />
+    <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#2B1518" />
+    <SolidColorBrush x:Key="DangerBorderBrush" Color="#6D2C31" />
+
+    <SolidColorBrush x:Key="InfoBaseBrush" Color="#7DD3FC" />
+    <SolidColorBrush x:Key="InfoSurfaceBrush" Color="#10232D" />
+    <SolidColorBrush x:Key="InfoBorderBrush" Color="#21546B" />
+
+    <SolidColorBrush x:Key="RevertBaseBrush" Color="#A58BFA" />
+
+    <SolidColorBrush x:Key="NeutralBaseBrush" Color="#A6A7AC" />
+
+    <!-- Interruptor no padrão Fluent do Windows 11: trilho vazado quando
+         desligado, aceso pelo acento quando ligado. -->
+    <SolidColorBrush x:Key="ToggleTrackOffBrush" Color="#00000000" />
+    <SolidColorBrush x:Key="ToggleTrackOffHoverBrush" Color="#2D2E33" />
+    <SolidColorBrush x:Key="ToggleThumbBrush" Color="#A6A7AC" />
+    <SolidColorBrush x:Key="ToggleThumbOnBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="ScrollThumbBrush" Color="#5B5C61" />
+    <SolidColorBrush x:Key="ScrollThumbHoverBrush" Color="#A6A7AC" />
+    <SolidColorBrush x:Key="FocusRingBrush" Color="#FFFFFF" />
+
+    <DropShadowEffect x:Key="Elevation1Shadow" Color="#0A0A0B" Opacity="0.40" BlurRadius="14" ShadowDepth="2" Direction="270" />
+    <DropShadowEffect x:Key="Elevation2Shadow" Color="#0A0A0B" Opacity="0.52" BlurRadius="28" ShadowDepth="6" Direction="270" />
+    <DropShadowEffect x:Key="Elevation3Shadow" Color="#0A0A0B" Opacity="0.68" BlurRadius="52" ShadowDepth="14" Direction="270" />
+</ResourceDictionary>

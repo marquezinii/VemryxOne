@@ -1,25 +1,26 @@
 {
-  "name": "vemryx-one-telemetry-worker",
+  "name": "ralven-telemetry-worker",
   "private": true,
   "version": "0.1.0",
   "type": "module",
   "engines": {
     "node": ">=24.19.0 <25"
   },
-  "description": "Vemryx One anonymous telemetry + admin dashboard API Cloudflare Worker (D1-backed). Deployed at https://fivemcleaner-telemetry.felipemarquesini10.workers.dev.",
+  "description": "Ralven anonymous telemetry + admin dashboard API Cloudflare Worker (D1-backed).",
   "scripts": {
     "test": "node --test",
     "hash-admin-password": "node scripts/hash-admin-password.mjs",
     "dev": "wrangler dev",
-    "db:bootstrap:local": "wrangler d1 execute fivemcleaner-telemetry --local --file=./schema.sql",
+    "db:bootstrap:local": "wrangler d1 migrations apply fivemcleaner-telemetry --local",
     "db:migrate:local": "wrangler d1 migrations apply fivemcleaner-telemetry --local",
+    "test:migrations": "node --test test/migrations.test.js",
     "deploy": "wrangler deploy"
   },
   "devDependencies": {
-    "wrangler": "^4.125.0"
+    "wrangler": "^4.127.0"
   },
   "allowScripts": {
     "esbuild@0.28.1": true,
-    "workerd@1.20260804.1": true
+    "workerd@1.20260826.1": true
   }
 }

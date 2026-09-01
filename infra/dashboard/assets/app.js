@@ -1,4 +1,4 @@
-import { buildStatsUrl, buildCsvUrl, buildBugsUrl, buildUpdaterEventsUrl, requestJson, resolveApiBase, getLiveAlert, setLiveAlert } from './api.js';
+import { buildStatsUrl, buildCsvUrl, buildBugsUrl, buildBugsCsvUrl, buildUpdaterEventsUrl, requestJson, resolveApiBase, getCsrfToken, getLiveAlert, setLiveAlert } from './api.js';
 import {
   toBarSeries,
   toCombinedBarSeries,
@@ -27,6 +27,8 @@ import { drawBarChart, drawDonutChart, drawLineChart, DONUT_COLORS } from './ren
 // form POSTs the admin password there. So it is honored only when the
 // dashboard itself is served from localhost -- a production host always
 // talks to the real Worker and ignores any `?api=`.
+// This hostname is the immutable identifier of the already-deployed Worker;
+// it is not a user-facing product name.
 const DEFAULT_API_BASE = 'https://fivemcleaner-telemetry.felipemarquesini10.workers.dev';
 const API_BASE = resolveApiBase(DEFAULT_API_BASE, location.hostname, new URLSearchParams(location.search));
 
@@ -48,6 +50,7 @@ const CHART_DEFINITIONS = [
 ];
 
 async function main() {
+  let csrfToken = null;
   const loginView = document.getElementById('login-view');
   const dashboardView = document.getElementById('dashboard-view');
   const loginForm = document.getElementById('login-form');
@@ -57,6 +60,7 @@ async function main() {
   const recentFailuresBody = document.getElementById('recent-failures-body');
   const recentFailuresCsvLink = document.getElementById('csv-recent-failures');
   const bugReportsBody = document.getElementById('bug-reports-body');
+  const bugReportsCsvLink = document.getElementById('csv-bug-reports');
   const updaterEventsBody = document.getElementById('updater-events-body');
   const refreshStatus = document.getElementById('refresh-status');
   const liveAlertForm = document.getElementById('live-alert-form');
@@ -104,6 +108,13 @@ async function main() {
       return;
     }
 
+    const body = await response.json().catch(() => null);
+    if (typeof body?.csrfToken !== 'string') {
+      loginError.textContent = 'Não foi possível iniciar a sessão com segurança.';
+      return;
+    }
+
+    csrfToken = body.csrfToken;
     showDashboard();
     await Promise.all([refreshAll(), loadLiveAlertStatus()]);
   });
@@ -171,7 +182,7 @@ async function main() {
       return;
     }
 
-    const result = await setLiveAlert(API_BASE, { message, active: true });
+    const result = await setLiveAlert(API_BASE, { message, active: true }, csrfToken);
     if (result.error || result.unauthorized) {
       liveAlertError.textContent = 'Erro ao enviar o aviso.';
       return;
@@ -182,7 +193,7 @@ async function main() {
 
   liveAlertDeactivate.addEventListener('click', async () => {
     liveAlertError.textContent = '';
-    const result = await setLiveAlert(API_BASE, { active: false });
+    const result = await setLiveAlert(API_BASE, { active: false }, csrfToken);
     if (result.error || result.unauthorized) {
       liveAlertError.textContent = 'Erro ao desativar o aviso.';
       return;
@@ -230,7 +241,7 @@ async function main() {
   }
 
   function renderBugReports(rows) {
-    renderTableBody(bugReportsBody, rows, toBugReportRow, 8);
+    renderTableBody(bugReportsBody, rows, toBugReportRow, 9);
   }
 
   function renderUpdaterEvents(rows) {
@@ -280,6 +291,7 @@ async function main() {
     }
 
     renderBugReports(bugReports.unauthorized || bugReports.error ? [] : bugReports.data);
+    bugReportsCsvLink.href = buildBugsCsvUrl(API_BASE, filters);
     renderUpdaterEvents(updaterEvents.unauthorized || updaterEvents.error ? [] : updaterEvents.data);
 
     document.getElementById('tile-total-runs').textContent = sumBy(runsPerDay.data, 'runs');
@@ -335,6 +347,18 @@ async function main() {
     showLogin();
     loginError.textContent = 'Não foi possível conectar à telemetria. Verifique se o Worker está no ar.';
   } else {
+    const csrf = await getCsrfToken(API_BASE);
+    if (csrf.unauthorized) {
+      showLogin();
+      return;
+    }
+    if (csrf.error || typeof csrf.data?.csrfToken !== 'string') {
+      showLogin();
+      loginError.textContent = 'Não foi possível iniciar a sessão com segurança.';
+      return;
+    }
+
+    csrfToken = csrf.data.csrfToken;
     showDashboard();
     await Promise.all([refreshAll(), loadLiveAlertStatus()]);
   }

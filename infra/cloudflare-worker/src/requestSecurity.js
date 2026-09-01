@@ -1,11 +1,11 @@
-/** Parses a JSON request without ever buffering more than `maximumBytes`. */
-export async function readBoundedJson(request, maximumBytes) {
-  const declaredLength = Number(request.headers.get('Content-Length'));
-  if ((Number.isFinite(declaredLength) && declaredLength > maximumBytes) || !request.body) {
+/** Parses a JSON Request or Response without buffering more than `maximumBytes`. */
+export async function readBoundedJson(message, maximumBytes) {
+  const declaredLength = Number(message.headers.get('Content-Length'));
+  if ((Number.isFinite(declaredLength) && declaredLength > maximumBytes) || !message.body) {
     return null;
   }
 
-  const reader = request.body.getReader();
+  const reader = message.body.getReader();
   const decoder = new TextDecoder('utf-8', { fatal: true });
   let bytesRead = 0;
   let json = '';
@@ -26,4 +26,9 @@ export async function readBoundedJson(request, maximumBytes) {
     console.error('readBoundedJson failed:', err?.message || 'unknown');
     return null;
   }
+}
+
+/** Admin JSON endpoints intentionally accept only the exact media type. */
+export function hasExactJsonContentType(request) {
+  return request.headers.get('Content-Type') === 'application/json';
 }

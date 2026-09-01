@@ -10,7 +10,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $workspace = [System.IO.Path]::GetFullPath((Split-Path -Parent $PSScriptRoot))
-$installerScript = Join-Path $workspace 'installer\VemryxOne.iss'
+$installerScript = Join-Path $workspace 'installer\Ralven.iss'
 
 if (-not (Test-Path -LiteralPath $installerScript -PathType Leaf)) {
     throw "Installer script not found: $installerScript"
@@ -18,15 +18,15 @@ if (-not (Test-Path -LiteralPath $installerScript -PathType Leaf)) {
 
 $scriptText = Get-Content -LiteralPath $installerScript -Raw
 $requiredPatterns = [ordered]@{
-    'public Vemryx One product name' = '#define AppName "Vemryx One"'
-    'public Vemryx One installer name' = '#define InstallerBaseName "VemryxOne-Setup-"'
+    'public Ralven product name' = '#define AppName "Ralven"'
+    'public Ralven installer name' = '#define InstallerBaseName "Ralven-Setup-"'
     'stable AppId'                  = 'AppId=\{#StableAppId\}'
-    'legacy launcher bridge'        = '#define AppExeName "FiveMCleaner\.Launcher\.exe"'
+    'Ralven launcher entry point'   = '#define AppExeName "Ralven\.Launcher\.exe"'
     'per-user install'              = 'PrivilegesRequired=lowest'
     'Windows 10 2004 minimum'       = 'MinVersion=10\.0\.19041'
     'x64-compatible runtime gate'   = 'ArchitecturesAllowed=x64compatible'
     'modern system-aware theme'     = 'WizardStyle=modern dynamic'
-    'official application icon'     = 'SetupIconFile=.*VemryxOne\.ico'
+    'official application icon'     = 'SetupIconFile=.*Ralven\.ico'
     'proportional wizard artwork'   = 'WizardImageFile=\{#InstallerArtworkPath\}'
     'dark wizard artwork'           = 'WizardImageFileDynamicDark=\{#InstallerArtworkPathDark\}'
     'ultra lzma compression'        = 'Compression=lzma2/ultra'
@@ -40,10 +40,10 @@ $requiredPatterns = [ordered]@{
     'safe close through RM'         = 'CloseApplications=yes'
     'no automatic app restart'      = 'RestartApplications=no'
     'no automatic reboot after run' = 'RestartIfNeededByRun=no'
-    'concurrent setup guard'        = 'SetupMutex=FiveMCleaner\.Setup\.'
+    'concurrent setup guard'        = 'SetupMutex=Ralven\.Setup\.'
     'desktop shortcut enabled by default' = 'Name: "desktopicon"; Description: "\{cm:DesktopIcon\}"; GroupDescription:'
-    'startup disabled by default'   = 'Name: "startup"; Description: "\{cm:StartWithWindows\}"; GroupDescription: "\{cm:AdditionalShortcuts\}:"; Flags: unchecked'
-    'startup ownership cleanup'     = 'ValueName: "FiveMCleaner"; Flags: deletevalue uninsdeletevalue; Tasks: not startup'
+    'startup enabled by default'    = '(?m)^Name: "startup"; Description: "\{cm:StartWithWindows\}"; GroupDescription: "\{cm:AdditionalShortcuts\}:"\s*$'
+    'startup ownership cleanup'     = 'ValueName: "Ralven"; Flags: deletevalue uninsdeletevalue; Tasks: not startup'
     'no launch in silent installs'  = 'Flags: nowait postinstall skipifsilent'
     'auto-update relaunch gated'    = 'Check: IsAutomaticUpdateRelaunch'
     'auto-update needs explicit opt-in' = "WizardSilent and[\s\S]*\{param:AUTOUPDATE\|no\}"
@@ -51,7 +51,7 @@ $requiredPatterns = [ordered]@{
     'redirection guard'             = 'RedirectionGuard=yes'
     'explicit user-data removal'    = 'RemoveUserDataQuestion='
     'silent uninstall preserves data' = 'SuppressibleMsgBox\([\s\S]*IDNO\) = IDYES'
-    'fixed user-data directory'     = "DelTree\(ExpandConstant\('\{localappdata\}\\FiveMCleaner'\), True, True, True\)"
+    'fixed user-data directory'     = "DelTree\(ExpandConstant\('\{localappdata\}\\Ralven'\), True, True, True\)"
 }
 
 foreach ($entry in $requiredPatterns.GetEnumerator()) {
@@ -70,7 +70,7 @@ $forbiddenPatterns = [ordered]@{
     'shell execution helper'  = '(?im)\b(ShellExec|Exec|CreateProcess)\s*\('
     'broad install deletion'  = '(?im)^\s*Type\s*:\s*filesandordirs\b'
     'unchecked desktop shortcut' = 'Name: "desktopicon";.*Flags: unchecked'
-    'startup checked by default' = 'Name: "startup"; Description: "\{cm:StartWithWindows\}"; GroupDescription: "\{cm:AdditionalShortcuts\}:"\s*$'
+    'unchecked startup' = 'Name: "startup";.*Flags: unchecked'
 }
 
 foreach ($entry in $forbiddenPatterns.GetEnumerator()) {
@@ -80,7 +80,7 @@ foreach ($entry in $forbiddenPatterns.GetEnumerator()) {
 }
 
 $deleteStatements = @([regex]::Matches($scriptText, '(?im)^\s*DelTree\s*\([^\r\n]+\);'))
-$expectedDeleteStatement = "DelTree(ExpandConstant('{localappdata}\FiveMCleaner'), True, True, True);"
+$expectedDeleteStatement = "DelTree(ExpandConstant('{localappdata}\Ralven'), True, True, True);"
 if ($deleteStatements.Count -ne 1 -or
     $deleteStatements[0].Value.Trim() -ne $expectedDeleteStatement) {
     throw 'Installer script contains an unapproved local data deletion.'
@@ -98,8 +98,7 @@ foreach ($infoRelative in @(
     foreach ($needle in @(
         'LOCALAPPDATA',
         'sha256',
-        'marquezinii.github.io/VemryxOne',
-        'github.com/marquezinii/VemryxOne/releases'
+        'vemryx.com/Ralven'
     )) {
         if ($infoText -notmatch [regex]::Escape($needle)) {
             throw "Installer info contract missing '$needle' in $infoRelative."
@@ -158,14 +157,16 @@ if (-not [string]::IsNullOrWhiteSpace($PublishDirectory)) {
     }
     $versionRoot = "Runtime\versions\$ExpectedVersion"
     foreach ($requiredFile in @(
-        'FiveMCleaner.Launcher.exe',
+        'Ralven.Launcher.exe',
         'Runtime\active.json',
-        "$versionRoot\FiveMCleaner.exe",
-        "$versionRoot\FiveMCleaner.runtimeconfig.json",
+        "$versionRoot\Ralven.exe",
+        "$versionRoot\Ralven.runtimeconfig.json",
+        "$versionRoot\Sentry.dll",
+        "$versionRoot\Config\appsettings.Production.json",
         "$versionRoot\coreclr.dll",
         "$versionRoot\hostfxr.dll",
-        "$versionRoot\broker\FiveMCleaner.Broker.exe",
-        "$versionRoot\broker\FiveMCleaner.Broker.runtimeconfig.json"
+        "$versionRoot\broker\Ralven.Broker.exe",
+        "$versionRoot\broker\Ralven.Broker.runtimeconfig.json"
     )) {
         $candidate = Join-Path $resolvedPublish $requiredFile
         if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) {
@@ -173,10 +174,29 @@ if (-not [string]::IsNullOrWhiteSpace($PublishDirectory)) {
         }
     }
 
-    $runtimeConfig = Get-Content -LiteralPath (Join-Path $resolvedPublish "$versionRoot\FiveMCleaner.runtimeconfig.json") -Raw | ConvertFrom-Json
+    $runtimeConfig = Get-Content -LiteralPath (Join-Path $resolvedPublish "$versionRoot\Ralven.runtimeconfig.json") -Raw | ConvertFrom-Json
     if (-not $runtimeConfig.runtimeOptions.includedFrameworks -or
         @($runtimeConfig.runtimeOptions.includedFrameworks).Count -lt 2) {
         throw 'Runtime config does not prove a self-contained Windows Desktop publish.'
+    }
+
+    $productionConfig = Get-Content `
+        -LiteralPath (Join-Path $resolvedPublish "$versionRoot\Config\appsettings.Production.json") `
+        -Raw | ConvertFrom-Json
+    if ($productionConfig.environment -ne 'Production') {
+        throw 'Release payload diagnostics environment is not Production.'
+    }
+    if ($productionConfig.telemetryEndpoint -ne
+        'https://fivemcleaner-telemetry.felipemarquesini10.workers.dev/telemetry') {
+        throw 'Release payload telemetry endpoint is not the allowlisted production endpoint.'
+    }
+    $sentryDsn = $null
+    if (-not [Uri]::TryCreate($productionConfig.sentryDsn, [UriKind]::Absolute, [ref]$sentryDsn) -or
+        $sentryDsn.Scheme -ne [Uri]::UriSchemeHttps -or
+        -not $sentryDsn.Host.EndsWith('.sentry.io', [StringComparison]::OrdinalIgnoreCase) -or
+        [string]::IsNullOrWhiteSpace($sentryDsn.UserInfo) -or
+        -not ($sentryDsn.Segments[-1].Trim('/') -as [long])) {
+        throw 'Release payload Sentry DSN is invalid.'
     }
 
     $debugFiles = @(Get-ChildItem -LiteralPath $resolvedPublish -Recurse -File |

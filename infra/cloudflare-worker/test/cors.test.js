@@ -13,6 +13,7 @@ test('buildCorsHeaders returns matching headers when origin equals the allowed o
 
   assert.equal(headers['Access-Control-Allow-Origin'], 'http://localhost:8788');
   assert.equal(headers['Access-Control-Allow-Credentials'], 'true');
+  assert.match(headers['Access-Control-Allow-Headers'], /X-Ralven-Csrf-Token/);
 });
 
 test('buildCorsHeaders returns nothing when the origin does not match', () => {

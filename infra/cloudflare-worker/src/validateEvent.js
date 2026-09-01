@@ -1,9 +1,10 @@
 // Pure, dependency-free validation for one telemetry event. Kept separate
 // from index.js so it can be unit tested without Miniflare/wrangler and
-// without a D1 binding. Mirrors Vemryx One.App.Services.TelemetryEventValidator
+// without a D1 binding. Mirrors Ralven.App.Services.TelemetryEventValidator
 // on the .NET side -- the Worker never trusts client-side validation alone.
 
 import { ALLOWED_ENVIRONMENTS } from './environments.js';
+import { ALLOWED_BUG_CODES } from './bugCodes.js';
 
 export const ALLOWED_EVENT_NAMES = new Set([
   'optimization-completed',
@@ -49,7 +50,10 @@ export const MAX_ACTION_IDS = 30;
 // FormSubmitAnonymousTelemetryService / CloudflareTelemetryTransport.
 export const MAX_EXECUTION_TIME_MS = 86_400_000;
 
-export const MAX_BATCH_SIZE = 50;
+// Each event uses one insert plus up to MAX_ACTION_IDS action-link inserts.
+// Keeping this at 16 lets D1 execute the entire request atomically (496
+// statements at most), within its 500-statement batch limit.
+export const MAX_BATCH_SIZE = 16;
 
 // Old and future clients must not silently lose telemetry if they omit this
 // classification field. The production Worker is the only public endpoint,
@@ -57,6 +61,8 @@ export const MAX_BATCH_SIZE = 50;
 
 const ACTION_ID_PATTERN = /^[A-Za-z0-9.-]+$/;
 const CONTROL_CHARACTER_PATTERN = /[\x00-\x1F\x7F]/;
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const EMPTY_UUID = '00000000-0000-0000-0000-000000000000';
 
 function isValidShortField(value) {
   if (value === undefined || value === null) {
@@ -81,10 +87,12 @@ export function validateEvent(event) {
   }
 
   const {
+    eventId,
     eventName,
     executionTimeMs,
     appVersion,
     errorCategory,
+    bugCode,
     environment: submittedEnvironment,
     osVersion,
     systemArchitecture,
@@ -106,6 +114,16 @@ export function validateEvent(event) {
     elevationUsed,
     processCountAtStart,
   } = event;
+
+  // Compatibility bridge: released clients without eventId still reach the
+  // Worker. New clients persist their own UUID, which is the idempotent path.
+  const normalizedEventId = eventId === undefined
+    ? crypto.randomUUID()
+    : typeof eventId === 'string' && UUID_PATTERN.test(eventId) && eventId !== EMPTY_UUID
+      ? eventId.toLowerCase()
+      : null;
+
+  if (normalizedEventId === null) return null;
 
   if (typeof eventName !== 'string' || !ALLOWED_EVENT_NAMES.has(eventName)) {
     return null;
@@ -132,6 +150,14 @@ export function validateEvent(event) {
     errorCategory !== undefined &&
     errorCategory !== null &&
     (typeof errorCategory !== 'string' || !ALLOWED_ERROR_CATEGORIES.has(errorCategory))
+  ) {
+    return null;
+  }
+
+  if (
+    bugCode !== undefined &&
+    bugCode !== null &&
+    (typeof bugCode !== 'string' || !ALLOWED_BUG_CODES.has(bugCode))
   ) {
     return null;
   }
@@ -244,10 +270,12 @@ export function validateEvent(event) {
   }
 
   return {
+    eventId: normalizedEventId,
     eventName,
     executionTimeMs: Math.trunc(executionTimeMs),
     appVersion,
     errorCategory: errorCategory ?? null,
+    bugCode: bugCode ?? null,
     environment,
     osVersion: osVersion ?? null,
     systemArchitecture: systemArchitecture ?? null,

@@ -1,0 +1,121 @@
+using Ralven.App.Services;
+using Ralven.App.ViewModels;
+using System.Globalization;
+using Xunit;
+
+namespace Ralven.Tests.App;
+
+/// <summary>
+/// Exercises <see cref="MainViewModel.CheckForUpdatesManuallyAsync"/> -- the
+/// "Procurar atualizações" button in Settings. Unlike the silent startup
+/// check, this must always report an explicit outcome: either the update
+/// banner becomes visible, or <see cref="MainViewModel.ManualUpdateCheckMessage"/>
+/// states the app is already on the latest version (or that the check failed).
+/// </summary>
+public sealed class MainViewModelUpdateCheckTests
+{
+    [Fact]
+    public async Task InitializeAsync_ChecksAgainOnEveryAppLaunchWhenEnabled()
+    {
+        var releaseUpdateService = new FakeReleaseUpdateService();
+
+        await new MainViewModel(
+            new FakeAppOptimizationService(new AppSettings(), settingsFileExists: false),
+            releaseUpdateService: releaseUpdateService).InitializeAsync();
+        await new MainViewModel(
+            new FakeAppOptimizationService(new AppSettings(), settingsFileExists: true),
+            releaseUpdateService: releaseUpdateService).InitializeAsync();
+
+        Assert.Equal(2, releaseUpdateService.CheckForUpdateCallCount);
+    }
+
+    [Fact]
+    public async Task InitializeAsync_DoesNotCheckAutomaticallyWhenDisabled()
+    {
+        var releaseUpdateService = new FakeReleaseUpdateService();
+        var viewModel = new MainViewModel(
+            new FakeAppOptimizationService(
+                new AppSettings { CheckForUpdates = false },
+                settingsFileExists: true),
+            releaseUpdateService: releaseUpdateService);
+
+        await viewModel.InitializeAsync();
+
+        Assert.Equal(0, releaseUpdateService.CheckForUpdateCallCount);
+    }
+
+    [Fact]
+    public async Task CheckForUpdatesManuallyAsync_NoUpdateAvailable_SetsUpToDateMessageAndKeepsBannerHidden()
+    {
+        var releaseUpdateService = new FakeReleaseUpdateService(updateToReturn: null);
+        var viewModel = new MainViewModel(
+            new FakeAppOptimizationService(new AppSettings(), settingsFileExists: false),
+            releaseUpdateService: releaseUpdateService);
+
+        await viewModel.CheckForUpdatesManuallyAsync();
+
+        Assert.Equal(1, releaseUpdateService.CheckForUpdateCallCount);
+        Assert.False(viewModel.IsUpdateBannerVisible);
+        Assert.False(string.IsNullOrEmpty(viewModel.ManualUpdateCheckMessage));
+        Assert.False(viewModel.IsCheckingForUpdatesManually);
+    }
+
+    [Fact]
+    public async Task CheckForUpdatesManuallyAsync_UpdateAvailable_ShowsBannerAndClearsManualMessage()
+    {
+        var update = FakeReleaseUpdateService.CreateUpdate("99.0.0");
+        var releaseUpdateService = new FakeReleaseUpdateService(updateToReturn: update);
+        var viewModel = new MainViewModel(
+            new FakeAppOptimizationService(new AppSettings(), settingsFileExists: false),
+            releaseUpdateService: releaseUpdateService);
+
+        await viewModel.CheckForUpdatesManuallyAsync();
+
+        Assert.True(viewModel.IsUpdateBannerVisible);
+        Assert.Null(viewModel.ManualUpdateCheckMessage);
+    }
+
+    [Fact]
+    public async Task CheckForUpdatesManuallyAsync_AlreadyKnownUpdate_StillPerformsAFreshCheckUnlikeTheSilentVariant()
+    {
+        var update = FakeReleaseUpdateService.CreateUpdate("99.0.0");
+        var releaseUpdateService = new FakeReleaseUpdateService(updateToReturn: update);
+        var viewModel = new MainViewModel(
+            new FakeAppOptimizationService(new AppSettings(), settingsFileExists: false),
+            releaseUpdateService: releaseUpdateService);
+        await viewModel.CheckForUpdatesManuallyAsync();
+
+        await viewModel.CheckForUpdatesManuallyAsync();
+
+        Assert.Equal(2, releaseUpdateService.CheckForUpdateCallCount);
+    }
+
+    [Fact]
+    public async Task CheckForUpdatesManuallyAsync_TransportFailure_SetsFailureMessageInsteadOfThrowing()
+    {
+        var releaseUpdateService = new FakeReleaseUpdateService(exceptionToThrow: new HttpRequestException("boom"));
+        var viewModel = new MainViewModel(
+            new FakeAppOptimizationService(new AppSettings(), settingsFileExists: false),
+            localization: new LocalizationService(CultureInfo.GetCultureInfo("pt-BR")),
+            releaseUpdateService: releaseUpdateService);
+
+        await viewModel.CheckForUpdatesManuallyAsync();
+
+        Assert.False(viewModel.IsUpdateBannerVisible);
+        Assert.DoesNotContain("boom", viewModel.ManualUpdateCheckMessage, StringComparison.Ordinal);
+        Assert.Contains("Verifique a internet", viewModel.ManualUpdateCheckMessage, StringComparison.Ordinal);
+        Assert.False(viewModel.IsCheckingForUpdatesManually);
+    }
+
+    [Fact]
+    public async Task CheckForUpdatesManuallyAsync_NoReleaseUpdateServiceConfigured_DoesNothingAndNeverThrows()
+    {
+        var viewModel = new MainViewModel(
+            new FakeAppOptimizationService(new AppSettings(), settingsFileExists: false));
+
+        await viewModel.CheckForUpdatesManuallyAsync();
+
+        Assert.Null(viewModel.ManualUpdateCheckMessage);
+        Assert.False(viewModel.IsCheckingForUpdatesManually);
+    }
+}

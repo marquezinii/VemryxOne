@@ -23,7 +23,8 @@ Thumbs.db
 .pypirc
 *.pem
 *.key
-!src/Vemryx.One.App/Assets/release-public-key.pem
+!src/Ralven.App/Assets/update-manifest-public-key.pem
+!src/Ralven.App/Assets/broker-integrity-public-key.pem
 *.pfx
 *.p12
 *.snk

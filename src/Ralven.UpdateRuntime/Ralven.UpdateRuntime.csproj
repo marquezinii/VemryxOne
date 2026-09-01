@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>$(RalvenWindowsTargetFramework)</TargetFramework>
+    <AssemblyName>Ralven.UpdateRuntime</AssemblyName>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" />
+    <ProjectReference Include="..\Ralven.Contracts\Ralven.Contracts.csproj" />
+  </ItemGroup>
+</Project>

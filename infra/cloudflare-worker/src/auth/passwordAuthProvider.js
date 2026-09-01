@@ -10,7 +10,7 @@
 // the same signatures for index.js to use it instead, with no changes to
 // the routing or the rest of the Worker.
 
-import { hashIp, verifyPassword } from './crypto.js';
+import { createCsrfToken, hashIp, verifyPassword } from './crypto.js';
 import {
   FAILURE_WINDOW_MS,
   LOCKOUT_DURATION_MS,
@@ -162,9 +162,13 @@ export function createPasswordAuthProvider(env, now = () => new Date()) {
 
       await saveLoginAttempt(db, ipHash, stateAfterSuccess());
       const session = createSessionRow(nowValue);
+      const csrfToken = await createCsrfToken(session.id, env.ADMIN_CSRF_SECRET);
+      if (!csrfToken) {
+        return jsonResponse({ error: 'server-misconfigured' }, 500);
+      }
       await saveSession(db, session);
 
-      return jsonResponse({ success: true }, 200, {
+      return jsonResponse({ success: true, csrfToken }, 200, {
         'Set-Cookie': buildSessionCookie(session.id, session.expires_at),
       });
     },
@@ -194,7 +198,7 @@ export function createPasswordAuthProvider(env, now = () => new Date()) {
         return { authorized: false, response: jsonResponse({ error: 'unauthorized' }, 401) };
       }
 
-      return { authorized: true };
+      return { authorized: true, sessionId };
     },
   };
 }

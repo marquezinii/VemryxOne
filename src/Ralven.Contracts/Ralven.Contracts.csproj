@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>$(RalvenTargetFramework)</TargetFramework>
+    <RootNamespace>Ralven.Contracts</RootNamespace>
+    <AssemblyName>Ralven.Contracts</AssemblyName>
+  </PropertyGroup>
+</Project>

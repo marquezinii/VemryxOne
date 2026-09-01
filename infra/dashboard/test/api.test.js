@@ -4,9 +4,11 @@ import {
   buildStatsUrl,
   buildCsvUrl,
   buildBugsUrl,
+  buildBugsCsvUrl,
   buildUpdaterEventsUrl,
   requestJson,
   resolveApiBase,
+  getCsrfToken,
   getLiveAlert,
   setLiveAlert,
 } from '../assets/api.js';
@@ -44,6 +46,14 @@ test('buildCsvUrl appends .csv to the stat name and keeps the filters', () => {
 
   assert.equal(url.pathname, '/api/stats/runs-per-day.csv');
   assert.equal(url.searchParams.get('version'), '1.0.4');
+});
+
+test('buildBugsCsvUrl keeps bug report filters on the CSV endpoint', () => {
+  const url = new URL(buildBugsCsvUrl(BASE, { environment: 'Production', category: 'optimization' }));
+
+  assert.equal(url.pathname, '/api/bugs.csv');
+  assert.equal(url.searchParams.get('environment'), 'Production');
+  assert.equal(url.searchParams.get('category'), 'optimization');
 });
 
 test('requestJson returns unauthorized:true on a 401 without throwing', async () => {
@@ -155,7 +165,7 @@ test('resolveApiBase refuses non-loopback or malformed destinations even on loca
 
 test('resolveApiBase never honors ?api= on a production host', () => {
   const override = 'https://evil.example';
-  for (const hostname of ['fivemcleaner.pages.dev', 'telemetry.example.workers.dev', 'dashboard.example.com']) {
+  for (const hostname of ['ralven.pages.dev', 'telemetry.example.workers.dev', 'dashboard.example.com']) {
     assert.equal(
       resolveApiBase(BASE, hostname, new URLSearchParams({ api: override })),
       BASE,
@@ -185,6 +195,19 @@ test('getLiveAlert requests the public /live-alert endpoint with credentials', a
   assert.deepEqual(result.data, { id: '2026-08-17T12:00:00.000Z', message: 'oi', active: true });
 });
 
+test('getCsrfToken reads the session-bound token from the protected endpoint', async () => {
+  let capturedUrl;
+  const fakeFetch = async (url) => {
+    capturedUrl = url;
+    return new Response(JSON.stringify({ csrfToken: 'token' }), { status: 200 });
+  };
+
+  const result = await getCsrfToken(BASE, fakeFetch);
+
+  assert.equal(capturedUrl, `${BASE}/admin/csrf`);
+  assert.deepEqual(result.data, { csrfToken: 'token' });
+});
+
 test('setLiveAlert posts message and active to /admin/live-alert', async () => {
   let capturedUrl;
   let capturedOptions;
@@ -194,10 +217,11 @@ test('setLiveAlert posts message and active to /admin/live-alert', async () => {
     return new Response(JSON.stringify({ success: true }), { status: 200 });
   };
 
-  await setLiveAlert(BASE, { message: 'oi', active: true }, fakeFetch);
+  await setLiveAlert(BASE, { message: 'oi', active: true }, 'csrf-token', fakeFetch);
 
   assert.equal(capturedUrl, `${BASE}/admin/live-alert`);
   assert.equal(capturedOptions.method, 'POST');
+  assert.equal(capturedOptions.headers['X-Ralven-Csrf-Token'], 'csrf-token');
   assert.deepEqual(JSON.parse(capturedOptions.body), { message: 'oi', active: true });
 });
 
@@ -208,7 +232,7 @@ test('setLiveAlert omits message from the body when deactivating without resendi
     return new Response(JSON.stringify({ success: true }), { status: 200 });
   };
 
-  await setLiveAlert(BASE, { active: false }, fakeFetch);
+  await setLiveAlert(BASE, { active: false }, 'csrf-token', fakeFetch);
 
   assert.deepEqual(JSON.parse(capturedOptions.body), { active: false });
 });

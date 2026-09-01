@@ -1,0 +1,16 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Color x:Key="RalvenColorCharcoal">#FF0A0A0B</Color>
+    <Color x:Key="RalvenColorGraphite">#FF111214</Color>
+    <Color x:Key="RalvenColorDarkGray">#FF1D1E21</Color>
+    <Color x:Key="RalvenColorGray">#FF2D2E33</Color>
+    <Color x:Key="RalvenColorLightGray">#FFA6A7AC</Color>
+    <Color x:Key="RalvenColorWhite">#FFFFFFFF</Color>
+
+    <SolidColorBrush x:Key="RalvenCharcoalBrush" Color="{StaticResource RalvenColorCharcoal}" />
+    <SolidColorBrush x:Key="RalvenGraphiteBrush" Color="{StaticResource RalvenColorGraphite}" />
+    <SolidColorBrush x:Key="RalvenDarkGrayBrush" Color="{StaticResource RalvenColorDarkGray}" />
+    <SolidColorBrush x:Key="RalvenGrayBrush" Color="{StaticResource RalvenColorGray}" />
+    <SolidColorBrush x:Key="RalvenLightGrayBrush" Color="{StaticResource RalvenColorLightGray}" />
+    <SolidColorBrush x:Key="RalvenWhiteBrush" Color="{StaticResource RalvenColorWhite}" />
+</ResourceDictionary>

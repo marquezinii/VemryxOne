@@ -5,6 +5,56 @@ segue [Semantic Versioning](https://semver.org/lang/pt-BR/): correções usam
 `patch`, melhorias compatíveis usam `minor` e mudanças incompatíveis usam
 `major`.
 
+## [1.6.0] - 2026-09-01
+
+### Adicionado
+
+- Ralven passa a oferecer Visão geral do sistema, inventário de aplicativos,
+  biblioteca de jogos e um cartão dedicado ao FiveM, com diagnósticos locais
+  para contextualizar o plano antes de qualquer alteração.
+- Adicionados monitoramento local da sessão FiveM e controles opt-in de jogos
+  do Windows, com detecção, verificação e reversão dentro dos limites de
+  segurança do produto.
+- A revisão do plano agora detalha ações, pré-condições, efeitos esperados e
+  limitações para tornar a decisão do usuário mais clara.
+
+### Melhorado
+
+- A experiência pública e o aplicativo foram consolidados sob a identidade
+  Ralven, incluindo recursos visuais, instalador, documentação e fluxos de
+  atualização.
+- Preferências iniciais foram ajustadas: iniciar com o Windows, minimizar para
+  a bandeja, procurar atualizações e avisar sobre atualizações vêm ativados em
+  novas instalações; iniciar minimizado continua opcional e depende da
+  inicialização com o Windows.
+- Relatórios opcionais, telemetria e crash reporting passaram a compartilhar
+  uma escolha de privacidade clara e reversível.
+
+### Corrigido
+
+- Corrigida a preservação das escolhas de inicialização durante atualizações do
+  instalador e mantido o opt-out explícito para o usuário.
+- Corrigida a rota de distribuição: downloads e atualizações passam a usar
+  `vemryx.com/Ralven/` e o feed assinado da Vemryx, sem depender do GitHub Pages.
+- Corrigida a compatibilidade da telemetria legada e reforçadas validações de
+  ações do otimizador para reportar estados reais com segurança.
+
+### Segurança
+
+- Reforçados consentimento para crash reports, idempotência de telemetria,
+  proteção CSRF administrativa e isolamento das chaves de assinatura da release.
+- A fundação de billing e entitlements foi preparada no backend com validação
+  server-side e falha segura; ela não habilita checkout público nem cobrança
+  automática nesta versão.
+
+### Alterações técnicas
+
+- O workflow estável publica instalador, runtime, hashes e manifestos assinados
+  no armazenamento da Vemryx, conserva somente as 7 releases SemVer mais
+  recentes e preserva os aliases estáveis.
+- Atualizadas dependências de infraestrutura e do site, incluindo o patch de
+  segurança do Next.js e o Wrangler do Worker.
+
 ## [1.5.1] - 2026-08-24
 
 ### Corrigido

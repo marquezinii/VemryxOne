@@ -23,8 +23,8 @@ segurança, siga [SECURITY.md](../SECURITY.md) e use o relato privado do GitHub.
 O formulário envia sempre:
 
 - identificador aleatório do relato;
-- categoria, resumo e descrição digitados;
-- versão do Vemryx One;
+- categoria e motivo escolhidos em listas fechadas, além de resumo e descrição digitados;
+- versão do Ralven;
 - perfil selecionado.
 
 Opcionalmente, o usuário também pode informar:
@@ -41,7 +41,7 @@ e-mail é o único dado de contato, e só existe se o próprio usuário digitá-
 
 ## Onde os dados ficam
 
-O relato completo (categoria, resumo, descrição, versão, perfil, resumo
+O relato completo (categoria estável, código técnico allowlisted, resumo, descrição, versão, perfil, resumo
 técnico, e-mail e trecho de log) é gravado apenas na tabela `bug_reports`
 do D1 do Worker — não há bucket de armazenamento de arquivos nem qualquer
 outro serviço de terceiros envolvido. O painel administrativo lista os
@@ -55,18 +55,22 @@ para a descrição quanto para o trecho de log opcional.
 O botão **Copiar relato** cria texto no clipboard com todos os campos
 preenchidos, incluindo e-mail e log quando fornecidos. O conteúdo pode
 então ser revisado e publicado manualmente no
-[formulário de bug do GitHub](https://github.com/marquezinii/VemryxOne/issues/new?template=bug_report.yml).
+[formulário de bug do GitHub](https://github.com/marquezinii/Ralven/issues/new?template=bug_report.yml).
 
 ## Estado da entrega
 
-A rota `/bugs` (ingestão) e `/api/bugs` (listagem autenticada para o
-painel) estão **implantadas e testadas em produção** no mesmo Worker que já
-servia `/telemetry`
+A rota `/bugs` (ingestão) e `/api/bugs` (listagem autenticada) estão
+**implantadas e testadas em produção** no mesmo Worker que já servia `/telemetry`
 (`https://fivemcleaner-telemetry.felipemarquesini10.workers.dev`), com a
-tabela `bug_reports` do D1 já migrada (colunas `email`/`log_text`, sem
-`attachment_key`). Um envio sintético de ponta a ponta foi validado após o
+tabela `bug_reports` do D1 já migrada para o contrato anterior (colunas
+`email`/`log_text`, sem `attachment_key`). Um envio sintético de ponta a ponta foi validado após o
 deploy (HTTP 202, linha conferida no D1 e removida em seguida). O app já
 aponta `RemoteServicesOptions.BugReportEndpoint` para essa rota — o recurso
 só passa a valer para quem usa o app quando a próxima versão pública for
 lançada e instalada, já que quem está com uma versão anterior instalada
 continua rodando o código antigo até atualizar.
+
+O contrato tipado desta versão adiciona `bug_code` e a exportação
+`/api/bugs.csv`. A migration `0008_bug_report_code.sql` precisa ser aplicada
+antes de publicar o Worker correspondente; esses dois acréscimos não devem ser
+descritos como ativos em produção antes dessa implantação.

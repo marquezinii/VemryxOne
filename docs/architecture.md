@@ -13,6 +13,59 @@ Este documento descreve a arquitetura-alvo e os limites entre componentes. Uma c
 - bloquear GTAV Enhanced até existir adaptador próprio;
 - permitir testes sem alterar a máquina do desenvolvedor.
 
+## Áreas de produto
+
+O shell separa a experiência em **Visão geral**, **Otimizar**, **Sistema**,
+**Aplicativos** e **Jogos**. Otimizar usa o escopo `GeneralWindows`: funciona
+sem FiveM ou GTA V e seleciona exclusivamente ações declaradas para o PC geral.
+Jogos abre o catálogo de títulos e configura o mesmo motor no escopo
+`FiveMLegacy`; somente esse escopo aceita ações de instalação, cache, processo,
+configuração ou gráficos do FiveM/GTA V Legacy. GTAV Enhanced bloqueia o escopo
+especializado, mas nunca bloqueia uma análise geral do Windows.
+
+Aplicativos apresenta dentro do Ralven um inventário local somente
+leitura dos programas desktop registrados e dos itens de inicialização em
+`Run`, `RunOnce` e pastas Startup. Busca, contagens e resultados parciais ficam
+na própria página; as superfícies do Windows e da Microsoft Store permanecem
+como ações secundárias para alterações que o Ralven não executa. Jogos abre um
+catálogo interno que hoje contém somente FiveM sobre GTAV Legacy; o card leva ao
+otimizador especializado existente e mantém Jogos como a categoria ativa. Sistema apresenta internamente o diagnóstico de
+hardware já coletado pelo aplicativo e consulta, somente para leitura, a saúde
+agregada de antivírus, firewall e configuração de atualizações automáticas pela
+API nativa da Central de Segurança do Windows. Os atalhos para as superfícies
+nativas permanecem como ações secundárias. A mesma área oferece um painel
+dedicado de jogos do Windows: ele lê o Modo de Jogo e a gravação histórica em
+segundo plano e, com confirmação explícita, aplica somente as duas ações tipadas
+já existentes.
+
+`WindowsSystemHealthInspector` faz três consultas independentes e preserva
+resultados parciais. Falha da API ou serviço indisponível resulta em estado
+indisponível, nunca em uma afirmação de proteção boa ou ruim. A leitura de
+configuração automática não afirma que não existem atualizações pendentes; essa
+consulta não usa broker, elevação, PowerShell, linha de comando ou rede.
+
+Esse painel não recebe IDs ou comandos escolhidos pela interface. O serviço de
+aplicação constrói uma lista fixa com `GameModeRegistryAction` e
+`GameDvrRegistryAction`, executa-a como usuário padrão pelo mesmo motor
+transacional e armazenamento local de histórico, e valida o estado depois da
+escrita. O fluxo não exige que o FiveM esteja instalado, mas a aplicação e a
+restauração são bloqueadas enquanto algum processo do FiveM estiver ativo. A
+presença do processo é verificada novamente na fronteira de cada escrita e uma
+falha nessa verificação bloqueia a alteração. Apenas a compensação imediata do
+snapshot criado pela própria execução falha pode restaurar o estado anterior;
+uma restauração solicitada depois continua bloqueada com o FiveM aberto. O painel não amplia o planejador
+de perfis, não usa o broker e não cria um executor genérico de registro.
+
+`WindowsApplicationInventoryInspector`, em `Ralven.Windows`, faz a leitura como
+usuário padrão e devolve um snapshot normalizado com completude separada por
+área. Ele não lê nem executa `UninstallString`, não lê nem escreve
+`StartupApproved`, não altera o registro e não atravessa o broker.
+
+Integração com catálogos de pacotes, como WinGet, ainda não faz parte desta
+fundação. Quando existir, cada operação deverá usar contratos tipados, origem
+identificada e confirmação explícita; o broker não pode virar um executor de
+linha de comando genérico.
+
 ## Componentes
 
 ## Autenticação Firebase
@@ -42,7 +95,7 @@ em `account_profiles`, sempre indexado pelo UID já validado do token, nunca
 por um valor enviado pelo cliente. A criação do perfil exige ID token com
 `email_verified=true` e a aceitação da versão vigente dos termos; até ambos
 existirem, a conta fica em `ProfileCompletionRequired`, não em `SignedIn`.
-`AccountProfileService` (`Vemryx.One.App/Services`) chama essa rota depois
+`AccountProfileService` (`Ralven.App/Services`) chama essa rota depois
 da confirmação de e-mail; se o usuário escolhido já existir, a resposta é
 `409 username-taken` e a conta Firebase já criada é preservada — a janela de
 conta pede outro nome de usuário em vez de descartar o cadastro. A exclusão
@@ -50,14 +103,27 @@ remove primeiro o perfil pelo UID autenticado e só então a conta Firebase;
 se o Firebase recusar a exclusão, o perfil é restaurado antes de informar a
 falha.
 
+## Cobrança e entitlements
+
+A fundação de cobrança fica no Worker e no D1, separada da autenticação
+Firebase e das políticas de otimização. O aplicativo pode ler apenas o snapshot
+server-side de acesso da própria UID em `GET /account/entitlements`; IDs e
+estados do provedor não são contratos do cliente. Notificações do Mercado Pago
+são autenticadas por HMAC e sempre reconciliadas contra o recurso canônico e um
+checkout intent criado pelo servidor. O corpo da notificação, um redirect de
+checkout ou o estado `authorized` de uma assinatura não concedem Pro. Veja
+[Cobrança e acesso pago](billing.md) para o contrato e os bloqueadores de
+ativação. Enquanto um checkout ou assinatura local existir, a exclusão do perfil
+é bloqueada; o fluxo futuro deve cancelar no provedor antes de remover o vínculo.
+
 | Projeto                  | Responsabilidade                                                    | Não deve conhecer                                        |
 | ------------------------ | ------------------------------------------------------------------- | -------------------------------------------------------- |
-| `Vemryx.One.App`       | WPF, navegação, prévia, progresso e confirmação                     | APIs administrativas ou detalhes de registro             |
-| `Vemryx.One.Contracts` | DTOs, IDs, estados (inclusive transacionais), erros e contratos entre processos | WPF ou implementação Windows                  |
-| `Vemryx.One.Core`      | casos de uso, composição de perfis, políticas, transação e rollback | controles visuais ou comandos shell                      |
-| `Vemryx.One.Windows`   | descoberta de hardware/instalação e adaptadores Windows/FiveM       | decisão de qual perfil o usuário deve escolher           |
-| `Vemryx.One.Broker`    | executor elevado com allowlist mínima                               | navegação, telemetria ou lógica de produto ampla         |
-| `Vemryx.One.Tests`     | contratos, políticas, falhas, rollback e doubles de sistema         | dependência de uma instalação real para testes unitários |
+| `Ralven.App`       | WPF, navegação, prévia, progresso e confirmação                     | APIs administrativas ou detalhes de registro             |
+| `Ralven.Contracts` | DTOs, IDs, estados (inclusive transacionais), erros e contratos entre processos | WPF ou implementação Windows                  |
+| `Ralven.Core`      | casos de uso, composição de perfis, políticas, transação e rollback | controles visuais ou comandos shell                      |
+| `Ralven.Windows`   | descoberta de hardware/instalação e adaptadores Windows/FiveM       | decisão de qual perfil o usuário deve escolher           |
+| `Ralven.Broker`    | executor elevado com allowlist mínima                               | navegação, telemetria ou lógica de produto ampla         |
+| `Ralven.Tests`     | contratos, políticas, falhas, rollback e doubles de sistema         | dependência de uma instalação real para testes unitários |
 
 ## Fronteira de confiança
 
@@ -111,7 +177,7 @@ documentação: como detectar, como confirmar, como desfazer, riscos/limitaçõe
 
 IDs são estáveis para que relatórios e snapshots continuem interpretáveis entre versões. Os campos de pré-requisito, criticidade, versões do Windows e documentação vivem em `ActionMetadataDto`/`OptimizationActionDefinition`.
 
-Pré-requisito, criticidade e privilégio alimentam o motor de execução. Os quatro campos de documentação (`DetectionSummary`, `ConfirmationSummary`, `UndoSummary`, `RiskLimitations`) hoje são obrigatórios por teste e participam da verificação de integridade do plano, mas **ainda não são exibidos na interface**; expô-los na revisão do plano continua sendo trabalho em aberto.
+Pré-requisito, criticidade e privilégio alimentam o motor de execução. Os quatro campos de documentação (`DetectionSummary`, `ConfirmationSummary`, `UndoSummary`, `RiskLimitations`) são obrigatórios por teste, participam da verificação de integridade do plano e aparecem de forma localizada nos detalhes expansíveis de cada ação durante a revisão do plano.
 
 `ActionMetadataDto.MatchesExactly` é a única comparação de metadados do projeto. O broker elevado e o catálogo Windows rejeitam um plano cujos metadados divergem do catálogo local, e ambos delegam a esse método — antes cada fronteira repetia a lista de campos e as duas versões haviam divergido.
 
@@ -124,13 +190,30 @@ Um plano é uma lista ordenada e imutável de ações resolvidas para aquele dia
 - conflito entre ações invalida o plano;
 - o broker recebe somente o subconjunto privilegiado já aprovado.
 
+`OptimizationScope` é ortogonal ao fato detectado em `FiveMEdition`:
+
+- `GeneralWindows` aceita uma máquina sem FiveM, com Legacy ou com Enhanced,
+  mas o planejador só inclui definições explicitamente compatíveis com o escopo
+  geral;
+- `FiveMLegacy` preserva o bloqueio quando a instalação não foi encontrada e o
+  bloqueio seguro do Enhanced;
+- toda definição nasce fechada para `FiveMLegacy`; uma ação só entra no plano
+  geral quando o catálogo a marca explicitamente como compartilhada;
+- runtime e broker reconstroem o plano com o mesmo escopo antes de resolver
+  handlers, portanto trocar o campo na UI ou no JSON não amplia a allowlist.
+
+O valor zero de `OptimizationScope` continua sendo `FiveMLegacy` para que um
+journal anterior à introdução do campo mantenha a semântica original. O escopo
+não é inferido por categoria ou prefixo de ID, pois o catálogo histórico contém
+IDs e categorias que atravessam as duas experiências.
+
 O planejamento é uma **função pura**: `PlanBuilder.Build(request, context)` produz sempre o mesmo plano para a mesma entrada. Tudo que não é determinístico — identidade do plano, instante de criação e catálogo — entra por `PlanBuildContext`, resolvido pelo chamador (`PlanBuildContext.New` para um plano novo, `PlanBuildContext.For` para reconstruir um plano existente). O planejador não lê relógio, disco, registro nem estado ambiente.
 
 Isso é o que torna a validação possível: tanto o broker elevado quanto `WindowsOptimizationRuntime` **replanejam** o plano recebido e o comparam campo a campo. A reconstrução da requisição canônica vive em `PlanBuilder.CanonicalRequestFor`, em um único lugar, em vez de repetida em cada fronteira.
 
 ### Resultado
 
-`ActionExecutionOutcome` (`Vemryx.One.Contracts`) é o estado semântico usado por progresso e relatório:
+`ActionExecutionOutcome` (`Ralven.Contracts`) é o estado semântico usado por progresso e relatório:
 
 - `Verified` — máquina já estava no estado desejado; nenhuma escrita ocorreu;
 - `Applied` — alteração e pós-condição confirmadas;
@@ -145,13 +228,13 @@ Esse enum é independente do estado transacional do journal
 (`ActionJournalState`), que continua controlando elegibilidade de
 rollback, e do estado da transação inteira (`TransactionState`).
 
-Os três vivem em `Vemryx.One.Contracts` (`OptimizationEnums.cs` e
+Os três vivem em `Ralven.Contracts` (`OptimizationEnums.cs` e
 `TransactionEnums.cs`) porque são vocabulário compartilhado entre App, Windows
-e Broker — antes App e Broker importavam `Vemryx.One.Windows.Engine` só para
+e Broker — antes App e Broker importavam `Ralven.Windows.Engine` só para
 enxergar o estado da transação.
 
 **Contrato durável.** Os três são persistidos *pelo nome* (camelCase) em
-`%LOCALAPPDATA%\FiveMCleaner\Transactions\{id}.json`, que sobrevive à versão
+`%LOCALAPPDATA%\Ralven\Transactions\{id}.json`, que sobrevive à versão
 que o escreveu. Renomear, remover ou renumerar um membro torna journals
 existentes ilegíveis e destrói silenciosamente a capacidade de rollback de quem
 já tem o aplicativo instalado. Membros só podem ser **acrescentados ao final**.
@@ -172,12 +255,14 @@ Perfil → Política de hardware → Ações propostas → Prévia do usuário �
 
 Isso permite:
 
-- desmarcar uma ação sem criar um quarto perfil;
 - testar cada ação isoladamente;
 - comparar versões de um perfil;
 - impedir que “Agressivo” se torne sinônimo de mudanças irreversíveis.
 
-Cache é um módulo de manutenção separado e não entra implicitamente nesses perfis.
+A prévia atual explica o plano imutável do perfil, mas não funciona como editor
+arbitrário de ações. Opções de manutenção que exigem consentimento próprio são
+controles separados, não itens pré-marcados na composição do perfil. Cache é um
+módulo de manutenção separado e não entra implicitamente nesses perfis.
 
 ## Adaptador FiveM Legacy
 
@@ -192,6 +277,22 @@ Responsabilidades:
 - calcular tamanho de caches sem segui-los para fora do root canônico.
 
 O parser XML altera apenas chaves presentes. Um arquivo inválido gera ação de reparo separada; nunca é substituído por um template genérico.
+
+### Monitor local de sessão FiveM
+
+O monitor da Visão geral é iniciado manualmente e permanece ativo enquanto o
+Ralven estiver aberto, inclusive na bandeja. Ele usa exclusivamente a raiz
+Legacy já diagnosticada e só confirma uma sessão quando o nome allowlisted e o
+caminho canônico da imagem do processo pertencem à instalação validada, sem
+atravessar reparse points. Leituras incompletas são tratadas como
+indeterminadas, e duas ausências confirmadas consecutivas são exigidas para
+encerrar uma sessão.
+
+Esse monitor é somente leitura: o estado e a duração ficam apenas em memória,
+não há persistência, telemetria, rede, broker nem alteração no jogo ou no
+Windows. Ele termina quando o aplicativo fecha e, por isso, não autoriza plano
+de energia, prioridade, afinidade, timer resolution ou qualquer outra ação
+mutável condicionada ao ciclo de vida do FiveM.
 
 ## Guard de GTAV Enhanced
 
@@ -212,9 +313,13 @@ Progresso é calculado por passos concluídos e pesos declarados. Mensagens deve
 ## Diagnósticos essenciais e dados opcionais
 
 `IAnonymousTelemetryService` é uma fronteira da camada App, separada do
-serviço de otimização. A preferência persistida `AppSettings.ShareAnonymousTelemetry`
-nasce como `true` em instalações novas e controla hardware, perfil e ações;
-os diagnósticos essenciais continuam ativos. O
+serviço de otimização. Após a confirmação do aviso de privacidade vigente, o
+serviço permanece habilitado para diagnósticos essenciais allowlisted. As
+preferências persistidas `AppSettings.ShareAnonymousTelemetry` e
+`AppSettings.ShareCrashReports` são mantidas por compatibilidade e formam o
+controle único `ShareOptionalReports`: ambas nascem como `true`, mas qualquer
+opt-out legado falso prevalece. Quando o controle é desativado, campos
+opcionais também são retirados de eventos que já estavam na fila. O
 contrato `AnonymousTelemetryEvent` não aceita payload livre: contém o nome
 allowlisted do evento, duração, versão, categoria de erro allowlisted em
 falha e, desde a versão 2 do consentimento, um perfil de hardware (CPU/GPU/
@@ -232,14 +337,15 @@ privacidade: [telemetry.md](telemetry.md) e [bug-reports.md](bug-reports.md).
 ### Relatório de falhas e configuração centralizada
 
 `ICrashReportingService` (implementação `SentryCrashReportingService`) é
-outra fronteira da camada App, análoga à de telemetria e parte dos diagnósticos
-essenciais; nunca é referenciada por `Core`/`Windows`/`Broker`. `MainWindow` a inicializa
-uma única vez, logo depois que o fluxo de consentimento resolve, usando
+outra fronteira da camada App, análoga à de telemetria e opcional; nunca é
+referenciada por `Core`/`Windows`/`Broker`. `MainWindow` a inicializa uma única
+vez somente quando `ShareOptionalReports` e o aviso vigente autorizam,
+usando
 `RemoteServicesOptionsLoader` para ler o DSN de um arquivo de configuração
 por ambiente (`Config/appsettings.{Development,Production}.json`, com
 `appsettings.json` como base sem DSN) — nenhum identificador remoto fica
 hardcoded em código-fonte. `AppEnvironment.Resolve()` decide entre
-Development/Production (variável `FIVEMCLEANER_ENVIRONMENT`, com fallback
+Development/Production (variável `RALVEN_ENVIRONMENT`, com fallback
 por configuração de build), permitindo separar no Sentry os erros do
 desenvolvedor dos erros de usuários finais sem duplicar DSN nem projeto.
 Todo evento passa por `CrashReportSanitizer` (reaproveitando
@@ -277,19 +383,14 @@ preservando intactas as ações já `Committed`; a transação se estabiliza em
 `CommittedWithErrors` e o resumo deixa explícito que as demais alterações
 foram mantidas.
 
-**Ações administrativas com `AttemptWithoutElevationFirst` tentam sem UAC
-primeiro.** `EnableSessionPerformancePowerPlan` e (desde 26/07/2026)
-`ToggleHags` usam esse sinalizador em `ActionMetadataDto`: o motor a inclui
-na fase de usuário padrão mesmo sem elevação; se o Windows genuinamente
-recusar (`UnauthorizedAccessException`, distinguido de outros tipos de
-"não deu certo" — por exemplo `PowerPlanActivationOutcome.AccessDenied`
-versus "este PC não tem esse plano" via código de saída/mensagem do
-`powercfg`), o motor devolve a ação para `DeferredPrivilege` em vez de
-marcá-la como falha — só então o broker elevado é acionado. Em muitas
-configurações do Windows um usuário comum já pode trocar o plano de
-energia, então nenhum UAC chega a aparecer; `ToggleHags` na prática quase
-sempre precisa de elevação (escreve em `HKLM`), mas usa o mesmo mecanismo
-por consistência.
+**Ações classificadas como administrativas sempre passam pelo broker.**
+`EnableSessionPerformancePowerPlan` e `ToggleHags` permanecem pendentes na
+fase de usuário padrão e só são aplicadas depois da validação elevada. Isso
+permite que o broker mantenha em `HKLM` a parte autoritativa do journal
+administrativo (identidade, estado, outcome e snapshot), selada antes da cópia
+local a cada transição. O carregamento reconcilia um journal local atrasado com
+esse recibo protegido; um arquivo gravável pelo usuário nunca é promovido a
+autoridade apenas por declarar uma ação como concluída.
 
 **Ações opt-in de perfil Agressivo, nunca automáticas** (também desde
 26/07/2026): `windows.gaming.gpu-preference-mismatch.diagnose` (👁,
@@ -349,19 +450,20 @@ importante para o roadmap**: `windows.power.pcie-aspm.adjust`
 (`PciExpressPowerManagementAction`, Médio/Agressivo) e
 `windows.gaming.mouse-polling-rate.guide` (`MousePollingRateGuidanceAction`,
 todos os perfis) foram implementados por caberem no modelo transacional
-atual (ajuste único, reversível, sem depender de vigilância contínua). A
-maior parte do lote pedido nessa rodada — plano de energia próprio
+atual (ajuste único, reversível, sem depender de vigilância contínua). O ASPM
+lê AC/DC pelas APIs nativas, aplica ambos com compensação e só confirma depois
+de reler a pós-condição; sua documentação não promete ganho universal. O
+monitor local descrito acima agora observa início e fim de sessões em modo
+somente leitura, mas não persiste estado nem permanece ativo após o Ralven
+fechar. A maior parte do lote pedido nessa rodada — plano de energia próprio
 ativado/restaurado por sessão, prioridade de processo restaurada ao
 fechar, afinidade de CPU, core parking, timer resolution solicitado
-enquanto o jogo está aberto — **não foi implementada porque pressupõe um
-processo de vigilância de ciclo de vida do FiveM/GTA V (detectar
-início/fim em tempo real) que este produto não tem**. O Vemryx One é
-hoje "aplicar uma vez, verificar, confirmar, reverter se necessário", não
-um serviço residente que reage a um processo abrindo/fechando. Ver
+enquanto o jogo está aberto — **continua não implementada porque exige
+recuperação e rollback garantidos mesmo se o aplicativo encerrar de forma
+inesperada**. O monitor somente leitura não satisfaz esse contrato. Ver
 `docs/graphics-optimizations-backlog.md`, seção 13, para a lista completa
-e a recomendação de que uma sessão futura decida essa arquitetura de
-vigilância explicitamente antes de portar qualquer um desses itens para o
-catálogo.
+e a decisão arquitetural que ainda precisa anteceder qualquer ação mutável
+por sessão.
 
 Cancelamento:
 
@@ -372,11 +474,11 @@ Cancelamento:
 
 ## Persistência
 
-O MVP grava somente sob `%LOCALAPPDATA%\FiveMCleaner`:
+O MVP grava somente sob `%LOCALAPPDATA%\Ralven`:
 
 - `Transactions/<id>.json`: plano, estados por ação e snapshots pequenos necessários ao rollback;
 - `Requests/<id>.json`: solicitação efêmera e de uso único consumida atomicamente pelo broker;
-- `settings.json`: preferências do próprio Vemryx One;
+- `settings.json`: preferências do próprio Ralven;
 - `crash.log`: exceções fatais locais, criado apenas quando necessário.
 
 Esses arquivos têm durabilidades diferentes e isso muda o que pode ser alterado:
@@ -415,7 +517,7 @@ Testes de integração que alteram Windows ou FiveM devem ser opt-in, isolados e
 
 O processo WPF não instala sua própria atualização. Após a confirmação do
 usuário, ele baixa e verifica o setup oficial, copia o
-`FiveMCleaner.Updater.exe` self-contained para `%LOCALAPPDATA%\FiveMCleaner\Updater`
+`Ralven.Updater.exe` self-contained para `%LOCALAPPDATA%\Ralven\Updater`
 e encerra. O atualizador aceita apenas um contrato fixo: instalador sob
 `Updates`, tamanho, SHA-256, PID do processo pai e log sob `Logs`; ele repete a
 verificação de integridade, espera o PID terminar sem encerrar processos de
@@ -433,7 +535,10 @@ O pipeline público deve:
 
 ## Não objetivos
 
-- competir com antivírus ou ferramentas de manutenção geral;
+- substituir antivírus ou automatizar manutenção ampla sem diagnóstico e
+  allowlist;
+- instalar driver ou serviço persistente para executar ajustes que as APIs
+  suportadas do Windows já expõem ao processo padrão ou ao broker efêmero;
 - “debloat” irrestrito do Windows;
 - modificar servidores ou recursos de terceiros;
 - burlar pure mode, anti-cheat ou integridade;

@@ -5,11 +5,12 @@
 
 ## 1. Snapshot
 
-- **Produto:** Vemryx One, aplicativo desktop Windows para otimização transparente, reversível e orientada por diagnóstico do FiveM para **GTAV Legacy**.
+- **Produto:** Ralven, aplicativo desktop Windows para otimização transparente, reversível e orientada por diagnóstico do FiveM para **GTAV Legacy**.
 - **Integração:** `dev/proxima-versao` é a branch de integração da próxima versão; `main` representa a linha pública/estável. O fluxo de branches, worktrees, Pull Requests, integração e release é definido em `AI_RULES.md`.
-- **Último estado consolidado neste documento-fonte:** 24/08/2026, após a publicação estável da identidade Vemryx One. Antes de qualquer trabalho, confirme o estado real com Git e os testes atuais.
+- **Último estado consolidado neste documento-fonte:** 01/09/2026, após a auditoria final integrada de interface, otimizações, histórico, inventário, autenticação, privacidade, telemetria e cadeia de atualização. Antes de qualquer trabalho, confirme o estado real com Git e os testes atuais.
 - **Release pública atual:** `v1.5.0`, publicada em 24/08/2026 a partir do commit integrado em `main`. O runtime assinado, instalador, hashes, manifesto e feed estável do updater foram publicados e validados.
-- **Atalho de desenvolvimento:** `Vemryx One - Desenvolvimento` usa `scripts\Start-DevelopmentApp.ps1`. Conforme `AI_RULES.md`, deve ser reconstruído com `scripts\Install-DevelopmentShortcut.ps1 -Build` (executado a partir do checkout/worktree da própria tarefa) ao final de toda tarefa que gerar mudanças no app — isolada ou de integração —, exceto tarefas de instalador/updater. O script espelha a árvore de trabalho atual para a pasta irmã fixa `VemryxOne-dev-shortcut` e aponta o atalho para essa cópia estável, então ele nunca fica órfão quando um worktree de tarefa é removido após o merge.
+- **Próxima release pública:** a última release continua `v1.5.0`; Ralven ainda não foi publicado. A versão da nova geração só é definida no fluxo oficial de release, a partir das mudanças desde `v1.5.0`, sem aliases de execução, instalação ou atualização para gerações sem suporte.
+- **Atalho de desenvolvimento:** `Ralven - Desenvolvimento` usa `scripts\Start-DevelopmentApp.ps1`. Conforme `AI_RULES.md`, deve ser reconstruído com `scripts\Install-DevelopmentShortcut.ps1 -Build` quando aplicável. O script espelha a árvore para a pasta irmã fixa `Ralven-dev-shortcut`, sem ficar órfão após a remoção de um worktree.
 
 ## 2. Objetivo e invariantes de segurança
 
@@ -30,19 +31,19 @@ Documentos normativos: `docs/safety.md` e `docs/architecture.md`.
 
 ### Solução .NET
 
-`Vemryx.One.slnx` separa responsabilidades. A árvore de `src/` possui nove projetos principais:
+`Ralven.slnx` separa responsabilidades. A árvore de `src/` possui nove projetos principais:
 
-- `Vemryx.One.App` — WPF, navegação, localização, tema, conta, apresentação, progresso e interação.
-- `Vemryx.One.Contracts` — DTOs, IDs, enums e contratos compartilhados; os estados persistidos de transação e journal são contratos duráveis append-only.
-- `Vemryx.One.Core` — catálogo de ações, perfis, planejamento e regras independentes de Windows/UI; o planejamento é puro e recebe explicitamente suas entradas variáveis.
-- `Vemryx.One.Windows` — descoberta e adaptadores Windows, filesystem, registro, diagnósticos e ações permitidas.
-- `Vemryx.One.Broker` — processo administrativo efêmero e allowlisted; sem shell/comandos arbitrários.
-- `Vemryx.One.Launcher` — inicialização/ativação do runtime e coordenação do fluxo de atualização.
-- `Vemryx.One.Updater` — atualização independente e staging/aplicação da atualização.
-- `Vemryx.One.UpdateRuntime` — contratos/estado durável usados pela cadeia de atualização e recuperação.
-- `Vemryx.One.ReleaseTool` — suporte à preparação/validação de artefatos de release.
+- `Ralven.App` — WPF, navegação, localização, tema, conta, apresentação, progresso e interação.
+- `Ralven.Contracts` — DTOs, IDs, enums e contratos compartilhados; os estados persistidos de transação e journal são contratos duráveis append-only.
+- `Ralven.Core` — catálogo de ações, perfis, planejamento e regras independentes de Windows/UI; o planejamento é puro e recebe explicitamente suas entradas variáveis.
+- `Ralven.Windows` — descoberta e adaptadores Windows, filesystem, registro, diagnósticos e ações permitidas.
+- `Ralven.Broker` — processo administrativo efêmero e allowlisted; sem shell/comandos arbitrários.
+- `Ralven.Launcher` — inicialização/ativação do runtime e coordenação do fluxo de atualização.
+- `Ralven.Updater` — atualização independente e staging/aplicação da atualização.
+- `Ralven.UpdateRuntime` — contratos/estado durável usados pela cadeia de atualização e recuperação.
+- `Ralven.ReleaseTool` — suporte à preparação/validação de artefatos de release.
 
-Testes .NET ficam em `tests/Vemryx.One.Tests/`.
+Testes .NET ficam em `tests/Ralven.Tests/`.
 
 A toolchain integrada usa .NET 10 LTS com SDK 10.0.303, C# 14 fixo e NuGet Central Package Management em `Directory.Packages.props`. Os testes usam xUnit v3 sobre Microsoft Testing Platform, com cobertura via `coverlet.MTP`.
 
@@ -50,16 +51,16 @@ A toolchain integrada usa .NET 10 LTS com SDK 10.0.303, C# 14 fixo e NuGet Centr
 
 - `infra/cloudflare-worker/` — backend Cloudflare Worker + D1 para telemetria, relatos de bug e perfil de conta.
 - `infra/dashboard/` — painel administrativo privado da telemetria/bugs.
-- `website/` — fonte única do site/landing page, gerada como export estático nativo do Next.js para GitHub Pages.
+- `https://vemryx.com/Ralven/` — página pública e origem dos downloads; manifestos assinados e artefatos versionados são servidos pelo Worker do site a partir de R2 privado.
 - `installer/` — Inno Setup 7 em arquitetura x64.
 - `scripts/` — build, validação, release, smoke tests e launcher de desenvolvimento.
-- `.github/workflows/` — CI de .NET/site/Worker/dashboard, Pages, SBOM e release. Dependabot cobre NuGet, npm e Actions; o CodeQL usa o default setup do GitHub para C#, JavaScript/TypeScript e Actions.
+- `.github/workflows/` — CI de .NET/Worker/dashboard, SBOM e release. O site público vive no repositório Vemryx; Dependabot cobre NuGet, npm da infraestrutura e Actions.
 
 Node 24.19 LTS é o baseline versionado para site, Worker e dashboard.
 
 ### Persistência local
 
-Preferências, journals, solicitações efêmeras, filas e logs locais ficam sob `%LOCALAPPDATA%\FiveMCleaner`; não gravar dados mutáveis na pasta de instalação.
+Preferências, journals, solicitações efêmeras, filas e logs locais ficam sob `%LOCALAPPDATA%\Ralven`; não gravar dados mutáveis na pasta de instalação. Na primeira abertura, o importador allowlisted pode copiar dados pessoais compatíveis de gerações sem suporte, sem sobrescrever nem alterar a origem.
 
 ## 4. Estado funcional relevante
 
@@ -67,9 +68,16 @@ Preferências, journals, solicitações efêmeras, filas e logs locais ficam sob
 
 - Aplicação WPF com WPF-UI/Fluent, Mica, tema claro/escuro/sistema e localização.
 - Janela principal inicia/restaura maximizada e preserva comportamento de bandeja.
+- Configurações ocupa uma superfície fixa na área principal, com navegação lateral e conteúdo rolável; reúne preferências funcionais de inicialização/bandeja, aparência e idioma, privacidade, atualizações e conta. O idioma automático é apresentado como **Idioma do sistema**.
 - Visão geral apresenta diagnóstico/prontidão e monitoramento local de recursos; coleta pausa quando a superfície não está ativa.
+- Visão geral também monitora localmente início/fim de sessão do FiveM (`FiveMSessionStateTracker`/`FiveMSessionProbe`), por leitura passiva de processo/janela, sem hook, leitura de memória ou ação mutável automática; continua ativo com o app minimizado/na bandeja (decisão de produto), pois esse é o cenário normal de uso.
+- Aba **Sistema** reúne o diagnóstico local existente e a saúde agregada somente leitura de antivírus, firewall e atualizações automáticas da Central de Segurança do Windows; indisponibilidade da API é explícita e nunca vira afirmação de proteção. Também tem controles reais de jogos do Windows (Modo de Jogos, captura em segundo plano) sobre chaves HKCU allowlisted, com snapshot/journal/rollback via `WindowsTransactionEngine` e refresh ao voltar para a página.
+- Aba **Aplicativos** inventaria localmente programas desktop registrados e entradas `Run`/`RunOnce`/pastas Startup, com busca, contagens e resultado parcial; não afirma cobrir tarefas agendadas/MSIX, não executa `UninstallString`, não altera `StartupApproved` nem escreve no Registro.
+- Aba **Jogos** é o catálogo de títulos compatíveis; hoje mostra FiveM sobre GTAV Legacy e encaminha para o fluxo especializado existente, sem habilitar outros jogos ou GTAV Enhanced.
+- Revisão do plano do Otimizador detalha por ação: como é detectada, o que a confirmação verifica, como é desfeita e riscos/limitações; texto cai no conteúdo do catálogo quando a chave de localização não existe.
 - Redesenho visual completo (20/08, direção "Câmara Âmbar"): tokens de tema (`Themes/Tokens/*.xaml`), `Controls.xaml`, `Surfaces.xaml`, `Typography.xaml` e as páginas Visão geral/Otimizador/Histórico foram redesenhadas; `ArcProgress`/`CoreVisual`/`CoreVisualPalette` (cena 3D antiga do Otimizador) foram removidos nesse redesenho.
-- Aba **Otimizador**: trilha Preparar → Executar → Resultado, seleção Leve/Médio/Agressivo, resumo do computador, execução/progresso e resultado.
+- Aba **Otimizador**: plano geral `GeneralWindows`, independente de FiveM/GTA, na trilha Preparar → Executar → Resultado; usa somente ações explicitamente permitidas para esse escopo e preserva a experiência especializada `FiveMLegacy` em Jogos.
+- Nos perfis padrão, cache/reparo permanece opt-in: Leve limita mutações a limpeza temporária segura e Modo de Jogo; Médio adiciona captura, energia e ajustes moderados reversíveis; Agressivo adiciona somente o conjunto conservador de aparência/responsividade. O perfil FiveM mantém ações próprias de GTAV Legacy e bloqueia com segurança processos/sessões incompatíveis.
 - Animações do Otimizador evitam `ScaleTransform` em elementos interativos, seguindo a regra já adotada para impedir deslocamento de listas no hover.
 - Smoke de captura aceita seleção de página via `--capture-page=Optimizer|History|Settings|Dashboard` e tema via `--capture-theme=light|dark` (só sob `--capture=`, não persiste).
 - Painel de **Notas da Versão** (`ReleaseNotesWindow`) é exibido automaticamente após um update bem-sucedido, controlado por `ReleaseNotesEvaluator`/`ReleaseNotesCatalog` e pelo campo `LastSeenReleaseNotesVersion` das configurações (mostra de novo só quando existem notas mais recentes que a última vista).
@@ -78,19 +86,20 @@ Preferências, journals, solicitações efêmeras, filas e logs locais ficam sob
 
 ### Motor de otimização e diagnóstico
 
-- `ActionCatalog.CurrentVersion` mais recente registrado: **14**.
-- Diagnósticos cobrem FiveM/GTA, CPU, GPU, RAM, armazenamento, cache, processos, rede, pagefile/commit, drivers, monitor, HAGS, energia, WHEA, sinais de throttling e outros dados obtidos por APIs nativas/best-effort.
+- `ActionCatalog.CurrentVersion` mais recente registrado: **20**.
+- Diagnósticos cobrem FiveM/GTA, CPU, GPU, RAM, armazenamento/TRIM, cache, processos, rede, pagefile/commit, drivers, taxa de atualização, aceleração do mouse, energia, WHEA, sinais de throttling e outros dados obtidos por APIs nativas/best-effort.
 - Existem diagnósticos somente leitura para gargalo provável, overlays/captura, logs do FiveM e orientação de medição pelas ferramentas oficiais do FiveM.
 - Relatório estruturado e relatório técnico sanitizado podem ser copiados/salvos explicitamente pelo usuário.
-- Relatos de bug são classificados automaticamente por `BugCodeClassifier`/`BugCode` (enum de códigos estáveis) antes do envio, para agrupar causas semelhantes no dashboard sem exigir triagem manual de texto livre.
-- Journal, snapshots e rollback preservam rastreabilidade das ações; a revalidação de planos compara integralmente os metadados de ações e usa a reconstrução canônica da requisição.
+- Falhas automáticas usam `BugCodeClassifier`; relatos manuais escolhem um motivo localizado mapeado para o mesmo `BugCode` allowlisted, permitindo agrupamento estável sem enviar classificação arbitrária.
+- Journal, snapshots e rollback preservam rastreabilidade das ações; ações administrativas exigem um receipt autoritativo protegido em HKLM/Registry64 antes de permitir rollback, e receipt ausente/corrompido falha fechado. A revalidação de planos compara integralmente os metadados de ações e usa a reconstrução canônica da requisição.
 - Ações XML de gráficos usam uma transação segura compartilhada; inspeção de processos e adaptadores de GPU têm primitivas de leitura separadas das mutações.
+- A recomendação de perfil considera o hardware detectado; ações persistentes mantêm resultado semântico, verificação e rollback estritos, com snapshots legados incompatíveis falhando fechados.
 - Diagnóstico de criadores reconhece OBS, Streamlabs Desktop e TikTok LIVE Studio sem fechar processos nem inferir que uma live está ativa.
 
 ### Conta e autenticação
 
 - Autenticação do aplicativo usa **Firebase Authentication REST** para cadastro, login, verificação de e-mail, recuperação, reautenticação, alteração de e-mail/senha e exclusão de conta.
-- O ID Token fica em memória; refresh token opcional é persistido protegido por DPAPI. O **Firebase UID** é o identificador interno permanente, nunca o e-mail.
+- O ID Token fica em memória; refresh token opcional é persistido protegido por DPAPI somente quando a escolha explícita de manter sessão permanece ativa em refresh/reautenticação. Logout só conclui após remover e verificar o estado persistido. O **Firebase UID** é o identificador interno permanente, nunca o e-mail.
 - Perfil complementar (nome, sobrenome e username único) é armazenado no Worker/D1, indexado pelo UID autenticado.
 - Worker valida ID Token Firebase por RS256/JWKS, incluindo `aud`, `iss`, expiração e `sub`.
 - Login com Google usa OAuth2 + PKCE com redirect loopback; a confirmação local é estática, responsiva e usa o ícone oficial sem afetar a validação do fluxo.
@@ -98,44 +107,47 @@ Preferências, journals, solicitações efêmeras, filas e logs locais ficam sob
 - Exclusão de conta remove o perfil Worker/D1 antes da conta Firebase e tenta compensar a remoção do perfil se a exclusão Firebase falhar.
 - Segredos/configuração local de Google não são versionados; overlays `Config/appsettings.{Development,Production}.local.json` são git-ignorados.
 - Gerenciamento de conta fica em Configurações. Avatar é normalizado e armazenado **somente localmente** por enquanto; não existe backend de avatar.
+- Card de conta mostra o plano (Free/Pro) lido de `GET /account/entitlements` (`CloudflareAccountEntitlementService`), autenticado pelo mesmo ID Token Firebase; nenhum dado de provedor de pagamento é exposto ao cliente.
 
 ### Telemetria, bugs e backend
 
 - FormSubmit foi removido do código de desenvolvimento. O transporte atual usa Cloudflare Worker/D1.
 - Infraestrutura registrada como ativa: `/telemetry`, `POST /bugs`, `GET /api/bugs` e `GET /live-alert`/`POST /admin/live-alert` (aviso ao vivo do dashboard para o app, painel dedicado no dashboard); relatos de bug são texto, e-mail opcional e trecho de log opcional. **Não há anexo/R2**.
-- Telemetria e crash reporting obedecem consentimento e allowlists; falhas de envio nunca devem bloquear ou alterar o resultado da otimização.
-- Consentimento de privacidade na versão **5** (`PrivacyConsentPolicy`): diagnósticos essenciais agora incluem detecção do FiveM/GTA V, edição do GTA V e contagem de alvos; dados opcionais (sob consentimento) incluem build do Windows, tipo de disco, espaço livre, timestamp da execução, frequência de uso, backup e contagem de processos no início. Schema/migration/`INSERT` do Worker (`0004_telemetry_v5_fields.sql`) já ingerem todos os campos.
+- Telemetria e crash reporting obedecem consentimento e allowlists; falhas de envio nunca devem bloquear ou alterar o resultado da otimização. Após confirmar o aviso vigente, somente diagnósticos essenciais allowlisted são transmitidos; telemetria detalhada e crash reports sanitizados compartilham a opção **Relatórios opcionais**, habilitada por padrão em novas instalações e desativável a qualquer momento.
+- Consentimento de privacidade na versão **8** (`PrivacyConsentPolicy`): além do `BugCode` fechado para classificação, ele separa o conjunto essencial da telemetria detalhada sem ampliar os campos coletados. Todas as stacks passam por sanitização. A migration `0008_bug_report_code.sql` e o código consumidor estão preparados, mas ainda não foram implantados; devem ser aplicados juntos no próximo deploy do Worker.
 - Serviço de telemetria anônima expõe contadores de saúde (`SuccessfulSends`, `FailedSends`, `IsHealthy`) e grava falhas best-effort em `telemetry_failures.log` na pasta local da fila, sem nunca lançar para o chamador.
-- Sentry é usado para crash reporting do aplicativo, com sanitização/configuração centralizada e sem transformar o SDK em dependência das camadas Core/Windows/Broker.
+- Sentry é usado para crash reporting somente após a confirmação do aviso e com **Relatórios opcionais** ativos, com sanitização/configuração centralizada e sem transformar o SDK em dependência das camadas Core/Windows/Broker.
 - Dashboard administrativo possui filtros, visão de telemetria e bugs e tratamento defensivo de falhas de rede/respostas inválidas.
 - Cookies administrativos cross-site usam `SameSite=None`; toda mutação `POST /admin/*` exige a origem exata do dashboard, e o dashboard publica CSP restritiva/anti-frame.
+- Fundação de cobrança (Mercado Pago) no Worker/D1: `billing_checkout_intents`, `billing_webhook_events` (idempotente por `provider_request_id`) e `billing_subscriptions` já suportam reconciliação, enquanto `account_entitlements` é o snapshot fail-closed lido por `GET /account/entitlements`. Ainda não existe checkout público nem mutação automática de entitlement; isso pertence à próxima fase. O webhook verifica a assinatura HMAC do envelope assinado, nunca confia no corpo da requisição e busca o estado real no provedor antes de qualquer gravação; ver `docs/billing.md`.
 
 ### Atualização e distribuição
 
 - Cadeia de atualização é independente/transacional, com staging, validações de origem/integridade, estado durável, health receipt, recuperação/rollback e proteção contra downgrade conforme documentação específica.
 - Launcher/Updater tratam locks transitórios e corridas de processo; broker e fluxos elevados possuem timeouts para evitar bloqueio indefinido. Espera pelo processo pai é compartilhada entre Launcher e Updater via `ParentProcessWait` (UpdateRuntime); hashing/extração/verificação de pacote roda fora da UI thread com `CancellationToken` propagado; comparação de hash do manifesto é em tempo constante; `RecoveryCoordinator` completa journals órfãos quando o piso anti-downgrade já avançou por outro caminho.
 - Instalador Inno Setup 7 é self-contained `win-x64`, usa setup x64 e mantém tarefas como atalho e startup configuráveis no modo interativo.
-- Pipeline de endurecimento por ofuscação da release (`scripts/Invoke-Obfuscation.ps1`, config em `build/obfuscation/VemryxOne.Obfuscar.xml`): ofusca Core/Windows embutidos no bundle single-file do Launcher; `scripts/Test-HardenedRuntime.ps1`/`scripts/Test-NoUnobfuscatedAssemblies.ps1` validam determinismo e ausência de assemblies não ofuscados; gate fail-closed integrado a `scripts/Build-Portable.ps1`/`Build-Installer.ps1` e ao workflow de release. Ver `docs/release-hardening.md`.
+- Não existem aliases de executável, instalador ou atualização para gerações sem suporte. O importador inicial conserva apenas dados pessoais compatíveis, é unidirecional, allowlisted e protegido contra reparse points; ver `RALVEN_MIGRATION.md`.
+- Pipeline de endurecimento por ofuscação da release (`scripts/Invoke-Obfuscation.ps1`, config em `build/obfuscation/Ralven.Obfuscar.xml`): ofusca Core/Windows embutidos no bundle single-file do Launcher; `scripts/Test-HardenedRuntime.ps1`/`scripts/Test-NoUnobfuscatedAssemblies.ps1` validam determinismo e ausência de assemblies não ofuscados; gate fail-closed integrado a `scripts/Build-Portable.ps1`/`Build-Installer.ps1` e ao workflow de release. Ver `docs/release-hardening.md`.
 - Site público, README, instalador, manifesto/checksums e release devem permanecer coerentes com a versão realmente publicada.
 
 ## 5. Pendências e decisões abertas
 
 Somente itens ainda relevantes devem permanecer aqui. Quando resolvidos e integrados, remova-os em vez de criar uma cronologia.
 
-1. **Ideia futura — watcher de sessão FiveM/GTA** (não é uma decisão bloqueada, é backlog de funcionalidade): ajustes que precisariam ser aplicados/restaurados durante o ciclo de vida do jogo (prioridade, afinidade, core parking, timer resolution e semelhantes) são um candidato de funcionalidade futura. Continuam fora do catálogo até existir uma arquitetura segura de monitoramento e reversão mesmo se o Vemryx One for encerrado. Ver `docs/graphics-optimizations-backlog.md` para o design ainda a amadurecer.
+1. **Ideia futura — reaplicar tweaks durante a sessão FiveM/GTA** (backlog de funcionalidade, não decisão bloqueada): o monitor local de sessão (§4) só observa presença/ausência; ajustes que precisariam ser aplicados/restaurados durante o ciclo de vida do jogo (prioridade, afinidade, core parking, timer resolution e semelhantes) continuam fora do catálogo até existir arquitetura segura de reversão mesmo se o Ralven for encerrado. Ver `docs/graphics-optimizations-backlog.md`.
 2. **GTAV Enhanced** — sem suporte operacional; requer adaptador/projeto específico antes de habilitar qualquer ação.
 3. **Authenticode público** — executáveis e instalador ainda não possuem assinatura de publisher confiável; a implementação depende de certificado/conta externa e deve assinar antes dos hashes e manifestos finais.
 4. **Próximas majors do frontend** — TypeScript 7 ainda excede o peer range suportado pelo `typescript-eslint` vigente, e ESLint 10 ainda não é aceito por plugins do stack Next. O estado suportado permanece TypeScript 6 e ESLint 9 até os peers oficiais convergirem.
-5. **Vulnerabilidades reportadas pelo Dependabot no repositório** — os alertas abertos foram zerados após a integração dos PRs atualizáveis; novas atualizações devem continuar sendo avaliadas pelo CI e pelo limite de compatibilidade do frontend.
+5. **Vulnerabilidades do Dependabot** — zeradas; avaliar novas atualizações pelo CI e pelo limite de compatibilidade do item 4.
 6. **Campos de bug-report v5 não enviados** — `reproducibility`, `severity` e `gtaEdition` foram cogitados para o relato de bug (`BugReportWindow`) junto da telemetria v5, mas ficaram fora da integração: o Worker não tem schema/validação para eles em `bug_reports`, e a UI não os preenche hoje. Requer trabalho conjunto de UI + backend antes de existir.
 
 ## 6. Baseline de validação registrada
 
 Estes números são **referência do último estado validado**, não substituem testes da branch atual.
 
-- **24/08/2026 — release pública v1.5.0:** build Release sem warnings, **1.000 testes .NET**, `dotnet format --verify-no-changes`, verificação de segurança, contrato do instalador, smoke pós-ofuscação e instalação/upgrade/desinstalação aprovados. Worker (**199 testes**), dashboard (**49 testes**) e site (lint, typecheck, build e **3 testes**) também passaram sem vulnerabilidades. A CI remota e o workflow estável aprovaram SBOM, empacotamento endurecido, assinatura, proveniência, GitHub Release e publicação do feed estável assinado do updater.
+- **01/09/2026 — candidata integrada v1.6.0:** restore com auditoria NuGet, build Release sem warnings, **1.268 testes .NET**, `dotnet format --verify-no-changes`, `scripts/Verify-Safety.ps1`, validação de progressão SemVer e `git diff --check` aprovados. Worker (**238 testes**), dashboard (**51 testes**) e site (lint, typecheck, build e **3 testes**) passaram, com auditorias npm de produção sem vulnerabilidades; esses comandos web foram executados no host Node 26.8, enquanto o baseline suportado permanece Node 24.19 LTS.
 
-- **24/08/2026 — integração atual:** build Release sem warnings, **1.000 testes .NET**, `dotnet format --verify-no-changes`, `scripts/Verify-Safety.ps1`, `scripts/Verify-Installer.ps1 -ScriptOnly` e `git diff --check` aprovados; Worker com **199 testes** e `npm audit` sem vulnerabilidades; dashboard com **49 testes** e `npm audit` sem vulnerabilidades; site com typecheck, lint, build estático, **3 testes** e `npm audit` sem vulnerabilidades. O CI da branch de integração é a confirmação remota complementar deste baseline.
+- **24/08/2026 — release pública v1.5.0:** build Release sem warnings, **1.000 testes .NET**, `dotnet format --verify-no-changes`, verificação de segurança, contrato do instalador, smoke pós-ofuscação e instalação/upgrade/desinstalação aprovados. Worker (**199 testes**), dashboard (**49 testes**) e site (lint, typecheck, build e **3 testes**) também passaram sem vulnerabilidades. A CI remota e o workflow estável aprovaram SBOM, empacotamento endurecido, assinatura, proveniência, GitHub Release e publicação do feed estável assinado do updater.
 
 Ao alterar uma superfície, execute a validação aplicável novamente e use os resultados atuais no PR. Nunca use estes números para afirmar que código posterior foi testado.
 
@@ -144,10 +156,10 @@ Ao alterar uma superfície, execute a validação aplicável novamente e use os 
 Na raiz:
 
 ```powershell
-dotnet restore Vemryx.One.slnx
-dotnet build Vemryx.One.slnx --configuration Release --no-restore
-dotnet test Vemryx.One.slnx --configuration Release --no-build
-dotnet format Vemryx.One.slnx --verify-no-changes
+dotnet restore Ralven.slnx
+dotnet build Ralven.slnx --configuration Release --no-restore
+dotnet run --project tests/Ralven.Tests/Ralven.Tests.csproj --configuration Release --no-build -- --minimum-expected-tests 1
+dotnet format Ralven.slnx --verify-no-changes
 .\scripts\Verify-Safety.ps1
 git diff --check
 .\scripts\Start-DevelopmentApp.ps1

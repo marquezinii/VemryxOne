@@ -1,17 +1,18 @@
 <p align="center">
-  <img src="docs/assets/icon.png" alt="Ícone do Vemryx One" width="112">
+  <img src="docs/assets/icon.png" alt="Ícone do Ralven" width="112">
 </p>
 
-<h1 align="center">Vemryx One</h1>
+<h1 align="center">Ralven</h1>
 
 <p align="center">
-  Diagnóstico, manutenção e otimização transparente para <strong>FiveM sobre GTAV Legacy</strong> no Windows.
+  <strong>Mais desempenho. Menos complicação.</strong><br>
+  Gerenciamento, diagnóstico e otimização transparente do Windows, com uma área especializada para FiveM sobre GTAV Legacy.
 </p>
 
 <p align="center">
-  <a href="https://marquezinii.github.io/VemryxOne/"><strong>Baixar para Windows</strong></a>
+  <a href="https://vemryx.com/Ralven/"><strong>Baixar para Windows</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://github.com/marquezinii/VemryxOne/releases">Releases</a>
+  <a href="https://vemryx.com/Ralven/">Página oficial</a>
   &nbsp;·&nbsp;
   <a href="docs/safety.md">Segurança</a>
   &nbsp;·&nbsp;
@@ -19,24 +20,24 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/marquezinii/VemryxOne/actions/workflows/ci.yml"><img alt="Status da CI" src="https://img.shields.io/github/actions/workflow/status/marquezinii/VemryxOne/ci.yml?branch=main&style=flat-square&label=CI"></a>
-  <a href="https://github.com/marquezinii/VemryxOne/releases/latest"><img alt="Última release" src="https://img.shields.io/github/v/release/marquezinii/VemryxOne?style=flat-square&color=06b6d4"></a>
-  <img alt="Windows 10 e 11" src="https://img.shields.io/badge/Windows-10%20%7C%2011-2563eb?style=flat-square">
+  <a href="https://github.com/marquezinii/Ralven/actions/workflows/ci.yml"><img alt="Status da CI" src="https://img.shields.io/github/actions/workflow/status/marquezinii/Ralven/ci.yml?branch=main&style=flat-square&label=CI"></a>
+  <a href="https://vemryx.com/Ralven/"><img alt="Última release" src="https://img.shields.io/github/v/release/marquezinii/Ralven?style=flat-square&color=2D2E33"></a>
+  <img alt="Windows 10 e 11" src="https://img.shields.io/badge/Windows-10%20%7C%2011-2D2E33?style=flat-square">
   <img alt=".NET 10" src="https://img.shields.io/badge/.NET-10-512bd4?style=flat-square">
 </p>
 
-![Arte do Vemryx One](docs/assets/hero-vemryx-one.png)
+![Arte do Ralven](docs/assets/hero-ralven.png)
 
 > [!IMPORTANT]
-> O Vemryx One suporta somente **FiveM em GTAV Legacy**. GTAV Enhanced é identificado e bloqueado com segurança até existir um adaptador dedicado, pesquisado e testado.
+> O módulo FiveM do Ralven suporta somente **GTAV Legacy**. GTAV Enhanced é identificado e bloqueado com segurança até existir um adaptador dedicado, pesquisado e testado.
 
-## Uma forma mais clara de cuidar do seu FiveM
+## Seu PC em um lugar, FiveM com profundidade
 
-Nada de scripts opacos ou promessas irreais. O Vemryx One detecta o ambiente, monta um plano compreensível e mostra o que será alterado antes de executar. Cada ação declara escopo, pré-condições, risco, resultado e rollback quando aplicável.
+Otimizar analisa automaticamente o computador, recomenda Leve, Médio ou Agressivo conforme RAM, CPU, GPU/VRAM e espaço livre, e ajusta o Windows sem exigir FiveM ou GTA V. O plano geral reúne diagnósticos locais de hardware, armazenamento, drivers, tela, rede, memória e estabilidade com ações conservadoras já tipadas, como Modo de Jogo, captura em segundo plano, energia, responsividade visual e temporários antigos. Sistema mostra dentro do Ralven as informações locais do PC e a saúde agregada de antivírus, firewall e atualizações automáticas informada pela Central de Segurança do Windows. Aplicativos lista os programas desktop registrados e os itens de inicialização, com busca e estado parcial explícito; alterações continuam nas superfícies confiáveis do Windows. Jogos reúne os títulos compatíveis e hoje oferece FiveM sobre GTAV Legacy, preservando o fluxo especializado: detecta o ambiente, monta um plano próprio e mostra o que será alterado antes de executar. Cada ação declara em qual escopo pode entrar, suas pré-condições, risco, resultado e rollback quando aplicável.
 
 | Você vê | O que isso significa |
 | --- | --- |
-| Diagnóstico local | FiveM/GTA V, CPU, GPU, memória, armazenamento, rede, energia, drivers, processos e gargalos prováveis. |
+| Diagnóstico local | CPU, GPU, memória, armazenamento/TRIM, rede, energia, drivers, tela, inicialização, proteções do Windows, mouse, estabilidade e, no módulo especializado, FiveM/GTA V. |
 | Plano antes da execução | Perfil, ações, impacto, privilégios e condições de cada alteração ficam explícitos. |
 | Execução verificável | Snapshot, validação, journal local, progresso real e recuperação fazem parte do fluxo. |
 | Histórico útil | Resultado por ação, relatório técnico sanitizado e comparação local antes/depois. |
@@ -52,7 +53,7 @@ Nada de scripts opacos ou promessas irreais. O Vemryx One detecta o ambiente, mo
 Perfis são composições de ações conhecidas — não listas genéricas de "tweaks". Manutenção de dados é sempre opt-in; caches protegidos, entitlements, plugins e autenticação nunca são tratados como lixo.
 
 > [!WARNING]
-> Nenhum software pode prometer FPS, ping ou ausência de stutter em todo PC ou servidor. O Vemryx One não desativa Defender, Firewall, SmartScreen ou UAC; não injeta código; não modifica binários ou memória do jogo; e não usa prioridade Realtime, afinidade fixa ou debloat genérico.
+> Nenhum software pode prometer FPS, ping ou ausência de stutter em todo PC ou servidor. O Ralven não desativa Defender, Firewall, SmartScreen ou UAC; não injeta código; não modifica binários ou memória do jogo; e não usa prioridade Realtime, afinidade fixa ou debloat genérico.
 
 ## Segurança por projeto
 
@@ -66,8 +67,11 @@ Leia a [política de segurança](docs/safety.md) e as [evidências técnicas](do
 
 | Área | Disponível hoje |
 | --- | --- |
-| Otimizador | Prévia, perfis, progresso real, cancelamento seguro, resultado por ação e rollback. |
-| Conta | Cadastro, login, Google com OAuth 2.0 + PKCE, verificação de e-mail, recuperação, senha, troca de credenciais e exclusão. |
+| Otimizar | Plano geral do Windows independente de FiveM/GTA, com diagnóstico, prévia, confirmação, progresso real, resultado por ação e rollback. |
+| Sistema | Informações internas do PC, saúde agregada informada pelo Windows e leitura/ajuste confirmado do Modo de Jogo e da gravação histórica; atalhos nativos ficam como ações secundárias. |
+| Aplicativos | Inventário interno somente leitura de programas desktop e inicialização, com busca, contagens e acessos secundários às superfícies do Windows e da Microsoft Store. |
+| Jogos | Catálogo interno com FiveM sobre GTAV Legacy e seu plano especializado, sem reutilizar ações do jogo no escopo geral. |
+| Conta | Cadastro e login por e-mail, verificação, recuperação, senha, troca de credenciais e exclusão; Google usa OAuth 2.0 + PKCE quando a credencial desktop é fornecida ao build. |
 | Privacidade | ID token somente em memória, refresh token protegido por DPAPI e telemetria limitada por consentimento. |
 | Relatos de bug | Envio explícito com campos validados, e-mail e trecho de log opcionais — sem anexos automáticos. |
 | Atualizações | Feed assinado, validação de origem/tamanho/SHA-256, staging, ativação atômica, health-check e rollback. |
@@ -75,7 +79,7 @@ Leia a [política de segurança](docs/safety.md) e as [evidências técnicas](do
 
 ## Instalação e atualização
 
-Baixe apenas pelas [Releases oficiais](https://github.com/marquezinii/VemryxOne/releases). Cada release `win-x64` inclui instalador, SHA-256, manifestos e pacotes gerados pelo mesmo workflow.
+Baixe apenas pela [página oficial do Ralven](https://vemryx.com/Ralven/). Instalador, manifestos assinados e pacotes versionados são publicados pelo mesmo workflow no domínio da Vemryx.
 
 Após sua confirmação, a atualização verifica origem e integridade, preserva a versão anterior e só confirma a nova versão quando ela sinaliza saúde.
 
@@ -93,9 +97,9 @@ Veja [telemetria](docs/telemetry.md) e [relatos de bug](docs/bug-reports.md).
 Requisitos: Windows 10/11 x64, [.NET SDK 10.0.303](https://dotnet.microsoft.com/download/dotnet/10.0) e Node.js 24.19.0 LTS.
 
 ```powershell
-dotnet restore Vemryx.One.slnx
-dotnet build Vemryx.One.slnx --configuration Release --no-restore
-dotnet test Vemryx.One.slnx --configuration Release --no-build
+dotnet restore Ralven.slnx
+dotnet build Ralven.slnx --configuration Release --no-restore
+dotnet run --project tests/Ralven.Tests/Ralven.Tests.csproj --configuration Release --no-build -- --minimum-expected-tests 1
 .\scripts\Verify-Safety.ps1
 ```
 
@@ -120,8 +124,8 @@ Worker/Dashboard backend de conta, telemetria, bugs e operação privada
 Website         site público estático
 ```
 
-Consulte [docs/architecture.md](docs/architecture.md) para as fronteiras completas.
+Consulte [docs/architecture.md](docs/architecture.md) para as fronteiras completas e [`assets/brand`](assets/brand/) para a biblioteca oficial de identidade.
 
 ---
 
-Vemryx One é um projeto comunitário independente, sem afiliação, endosso ou patrocínio de Rockstar Games, Cfx.re ou FiveM. Aliases técnicos legados permanecem somente para manter instalações existentes atualizáveis durante a transição de marca.
+Ralven é um projeto comunitário independente, sem afiliação, endosso ou patrocínio de Rockstar Games, Cfx.re ou FiveM. Gerações anteriores estão sem suporte; apenas dados locais pessoais conhecidos podem ser importados de forma unidirecional na primeira abertura.

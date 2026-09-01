@@ -1,9 +1,9 @@
 # Instalador, atualização e publicação
 
-O instalador oficial do Vemryx One é um executável Inno Setup moderno para
+O instalador oficial do Ralven é um executável Inno Setup moderno para
 Windows 11 e, em compatibilidade legada, Windows 10 build 19041 ou mais recente,
 em sistemas compatíveis com binários x64. Windows 11 é o sistema recomendado.
-Em instalações novas, ele instala por usuário em `{autopf}\Vemryx One`; por padrão, isso corresponde
+Em instalações novas, ele instala por usuário em `{autopf}\Ralven`; por padrão, isso corresponde
 à pasta de programas local do usuário e não exige UAC.
 
 ## Dependências e funcionamento offline
@@ -24,7 +24,7 @@ Windows realmente for executada.
 - português do Brasil e inglês, escolhidos pela interface do Windows;
 - tema moderno que acompanha o modo claro/escuro do sistema, com arte lateral
   clara e escura gerada a partir do ícone oficial;
-- ícone e imagem oficiais do Vemryx One;
+- ícone e imagem oficiais do Ralven;
 - atalhos do menu Iniciar e desinstalação completa, com rótulos localizados;
 - atalho de Área de Trabalho habilitado por padrão; inicialização com o Windows
   desmarcada por padrão (ambas alteráveis na instalação e depois);
@@ -36,7 +36,7 @@ Windows realmente for executada.
 - logs padrões do Inno Setup para diagnóstico (pasta temporária quando ativos).
 
 Configurações, journals, logs, backups e downloads de atualização ficam fora da
-pasta de instalação, em `%LOCALAPPDATA%\FiveMCleaner` durante a ponte. Na desinstalação
+pasta de instalação, em `%LOCALAPPDATA%\Ralven` durante a ponte. Na desinstalação
 interativa, a pessoa escolhe se deseja preservar ou remover esses dados. A
 opção padrão é preservar; uma desinstalação silenciosa também preserva os dados
 para nunca apagar histórico ou backup sem confirmação visível.
@@ -46,10 +46,10 @@ para nunca apagar histórico ou backup sem confirmação visível.
 ```powershell
 .\scripts\Build-Installer.ps1 -Version 1.0.0
 
-$installer = Resolve-Path .\artifacts\installer\VemryxOne-Setup-1.0.0-win-x64.exe
+$installer = Resolve-Path .\artifacts\installer\Ralven-Setup-1.0.0-win-x64.exe
 .\scripts\Test-Installer.ps1 `
   -InstallerPath $installer `
-  -PublishDirectory .\artifacts\FiveMCleaner-win-x64 `
+  -PublishDirectory .\artifacts\Ralven-win-x64 `
   -ExpectedVersion 1.0.0
 ```
 
@@ -62,7 +62,7 @@ a assinatura Authenticode de `Pyrsys B.V.` antes de executar o compilador.
 O teste instala silenciosamente em uma pasta temporária sob `artifacts`, confere
 byte a byte todo o payload, valida o padrão desktop-on/startup-off, a task de
 inicialização quando pedida, o handoff `/AUTOUPDATE=yes`, a preservação de
-dados em `%LOCALAPPDATA%\FiveMCleaner` no uninstall silencioso, executa a
+dados em `%LOCALAPPDATA%\Ralven` no uninstall silencioso, executa a
 desinstalação e confirma a remoção. Ele se recusa a rodar se encontrar uma
 instalação real ou uma entrada de inicialização existente. Somente para uma
 validação local explicitamente autorizada, `-AllowExistingInstallation` libera
@@ -76,7 +76,7 @@ permitido; use `-AllowDirtySource` só se precisar forçar o mesmo em CI.
 ## Contrato de atualização
 
 O Inno Setup é somente o instalador inicial e a ponte para instalações legadas.
-Atalhos apontam para `FiveMCleaner.Launcher.exe`; cada versão do app fica
+Atalhos apontam para `Ralven.Launcher.exe`; cada versão do app fica
 imutável em `Runtime\versions\<versão>`. O aplicativo consulta somente o
 manifesto estável assinado do Worker e nunca atualiza sem confirmação.
 
@@ -84,8 +84,8 @@ Depois do clique do usuário, o atualizador:
 
 1. exibe a página oficial das alterações da release, quando disponível;
 2. valida contrato fechado, assinatura ECDSA P-256, chave pública incorporada,
-   SemVer, `minimumAllowedVersion`, URL GitHub allowlisted, tamanho e SHA-256;
-3. baixa somente `FiveMCleaner-Runtime-win-x64.zip` via TLS 1.2/1.3, valida
+   SemVer, `minimumAllowedVersion`, URL Vemryx allowlisted, tamanho e SHA-256;
+3. baixa somente `Ralven-Runtime-win-x64.zip` via TLS 1.2/1.3, valida
    revogação e cada redirecionamento, limita tamanho e grava com nome parcial;
 4. valida novamente o ZIP e o `SHA256SUMS.txt`; arquivos extras, ausentes,
    duplicados, alterados, caminhos externos e pacotes de extração excessiva são
@@ -96,25 +96,36 @@ Depois do clique do usuário, o atualizador:
    health receipt com nonce em até 45 segundos;
 7. sem receipt, o launcher restaura somente o predecessor registrado. Uma
    versão saudável avança o piso anti-downgrade protegido por DPAPI;
-8. nunca desativa SmartScreen, Defender, UAC ou antivírus de terceiros.
+8. depois da confirmação saudável, preserva somente a versão ativa e o seu
+   predecessor imediato; depois de rollback, remove a candidata que falhou.
+   Downloads de versões anteriores também são removidos ao baixar a próxima.
+   Se antivírus ou outro processo mantiver uma pasta em uso, o update continua
+   seguro e a limpeza é tentada novamente na atualização seguinte;
+9. nunca desativa SmartScreen, Defender, UAC ou antivírus de terceiros.
+
+Na primeira abertura após uma reinstalação manual sobre a instalação existente,
+o launcher aplica a mesma retenção depois de reconciliar o piso anti-downgrade.
 
 Falhas de manifesto, download, staging, ativação e saúde preservam a versão
-anterior. Logs detalhados ficam locais; eventos sanitizados chegam à área
-administrativa somente após consentimento explícito de telemetria.
+anterior. Logs detalhados ficam locais; eventos essenciais sanitizados chegam à
+área administrativa somente após a confirmação do aviso de privacidade vigente.
 
 ## Publicação no GitHub
 
-O workflow `.github/workflows/release.yml` só aceita disparo manual. Com
-`publish=false`, ele compila, testa e guarda os artefatos apenas dentro da
-execução. A criação pública exige uma tag exata (`vX.Y.Z` ou
-`vX.Y.Z-preview`), `publish=true` e o canal correspondente.
+O workflow `.github/workflows/release.yml` só aceita disparo manual. O job de
+build compila, testa e entrega um candidato **sem chaves de assinatura**. Um
+job separado, protegido pelo ambiente `release-signing`, recebe esse candidato,
+assina os manifestos de update e broker com chaves online distintas e devolve o
+artefato assinado. A criação pública exige uma tag exata (`vX.Y.Z` ou
+`vX.Y.Z-preview`), `publish=true`, o canal correspondente e aprovação manual
+do ambiente GitHub `production`.
 
 Antes de criar a release, o workflow repete build, testes, instalação e
-desinstalação; gera checksums; assina e verifica o manifesto do runtime; aplica
-o schema D1; implanta o Worker/feed; e produz uma atestação de proveniência do
-instalador. O binário permanece sem assinatura de código até existir um
-certificado Authenticode. SHA-256 e atestação aumentam a transparência, mas não
-substituem reputação ou uma assinatura pública.
+desinstalação; gera checksums; assina e verifica os manifestos do runtime e do
+broker; aplica o schema D1; implanta o Worker/feed; e produz uma atestação de
+proveniência do instalador. O binário permanece sem assinatura de código até
+existir um certificado Authenticode. SHA-256 e atestação aumentam a
+transparência, mas não substituem reputação ou uma assinatura pública.
 
 ### Sequência de versões públicas
 
@@ -141,14 +152,12 @@ Fontes oficiais usadas no desenho:
 3. Faça commit, envie `main`, crie a tag exata `vX.Y.Z` e envie a tag.
 4. Em **Actions → Build installer and publish release**, escolha a tag, canal
    `stable` e `publish=true`.
-5. Verifique no GitHub a release pública, o instalador, o runtime ZIP, os
-   checksums, o manifesto assinado e a atestação; confirme também o feed do
-   Worker antes de divulgar o link.
+5. Verifique a GitHub Release de notas e, em `vemryx.com/Ralven/`, o instalador,
+   runtime ZIP, checksums e os dois manifestos assinados antes de divulgar.
 
 O workflow nunca publica por `push`; a etapa de criação de release exige o
 disparo manual com `publish=true`. A página pública de download é
-`https://marquezinii.github.io/VemryxOne/`, gratuita e sem login para
-visitantes. O botão da página usa `VemryxOne-Setup-latest-win-x64.exe`; a mesma
-release também publica os aliases `FiveMCleaner-Setup-<versão>-win-x64.exe` e
-`FiveMCleaner-Setup-latest-win-x64.exe` para que instalações antigas encontrem
-o instalador idêntico esperado pelo atualizador legado.
+`https://vemryx.com/Ralven/`, gratuita e sem login para
+visitantes. O botão da página usa `Ralven-Setup-latest-win-x64.exe`; a mesma
+release também publica o instalador versionado e o alias
+`Ralven-Setup-latest-win-x64.exe` no bucket privado da Vemryx.

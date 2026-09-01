@@ -1,0 +1,29 @@
+{
+  "brand": "Ralven",
+  "assetVersion": "1.0.0",
+  "colors": {
+    "charcoal": "#0A0A0B",
+    "graphite": "#111214",
+    "darkGray": "#1D1E21",
+    "gray": "#2D2E33",
+    "lightGray": "#A6A7AC",
+    "white": "#FFFFFF"
+  },
+  "typography": {
+    "family": "Inter",
+    "version": "4.1",
+    "weights": {
+      "thin": 100,
+      "light": 300,
+      "regular": 400,
+      "medium": 500,
+      "semiBold": 600,
+      "bold": 700,
+      "extraBold": 800
+    }
+  },
+  "symbol": {
+    "minimumSizePx": 16,
+    "description": "R geometrico com elemento de velocidade e direcao"
+  }
+}

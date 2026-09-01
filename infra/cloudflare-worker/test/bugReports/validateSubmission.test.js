@@ -5,7 +5,8 @@ import { validateBugReport } from '../../src/bugReports/validateSubmission.js';
 function validSubmission(overrides = {}) {
   return {
     reportId: '11111111-1111-1111-1111-111111111111',
-    category: 'Falha na otimização',
+    category: 'optimization',
+    bugCode: 'APP_OPT_ACTION_EXECUTION',
     summary: 'O preset não terminou',
     description: 'Ao aplicar o perfil médio, a operação parou antes da conclusão.',
     appVersion: '1.0.4',
@@ -22,7 +23,8 @@ test('validateBugReport accepts a well-formed submission with no email/log', () 
   const result = validateBugReport(validSubmission());
 
   assert.ok(result);
-  assert.equal(result.category, 'Falha na otimização');
+  assert.equal(result.category, 'optimization');
+  assert.equal(result.bugCode, 'APP_OPT_ACTION_EXECUTION');
   assert.equal(result.email, null);
   assert.equal(result.logText, null);
 });
@@ -47,8 +49,14 @@ test('validateBugReport rejects a missing reportId', () => {
   assert.equal(validateBugReport(validSubmission({ reportId: undefined })), null);
 });
 
-test('validateBugReport rejects a category with a newline', () => {
-  assert.equal(validateBugReport(validSubmission({ category: 'a\nb' })), null);
+test('validateBugReport rejects a category outside the stable allowlist', () => {
+  assert.equal(validateBugReport(validSubmission({ category: 'Falha na otimização' })), null);
+});
+
+test('validateBugReport rejects a missing or unknown bug code', () => {
+  assert.equal(validateBugReport(validSubmission({ bugCode: undefined })), null);
+  assert.equal(validateBugReport(validSubmission({ bugCode: 'FREE_TEXT_REASON' })), null);
+  assert.equal(validateBugReport(validSubmission({ bugCode: 'x'.repeat(49) })), null);
 });
 
 test('validateBugReport rejects a summary that is too short or too long', () => {

@@ -4,6 +4,8 @@
 // Callers must treat only `uid` (JWT `sub`) as the permanent internal user id.
 // Never accept email as an identity claim for authorization.
 
+// Firebase project IDs are immutable external infrastructure identifiers.
+// This value is not displayed as product branding.
 export const FIREBASE_PROJECT_ID = 'fivemcleaner-app';
 export const FIREBASE_ID_TOKEN_ISSUER = `https://securetoken.google.com/${FIREBASE_PROJECT_ID}`;
 export const FIREBASE_JWKS_URL =

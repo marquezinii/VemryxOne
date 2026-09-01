@@ -1,12 +1,148 @@
 # Base de pesquisa
 
-Esta página registra as evidências usadas para definir o escopo e as políticas do Vemryx One. A revisão atual foi fechada em **18 de julho de 2026**; itens dependentes de versão precisam ser revalidados antes de cada release.
+Esta página registra as evidências usadas para definir o escopo e as políticas do Ralven. A revisão atual foi fechada em **30 de agosto de 2026**; itens dependentes de versão precisam ser revalidados antes de cada release.
 
 ## Como ler
 
 - **Fato**: comportamento documentado por fonte oficial, suporte do Cfx.re ou código-fonte oficial do FiveM Legacy.
 - **Inferência**: decisão prudente derivada desses fatos, ainda sujeita a benchmark e validação em hardware real.
 - **Fora de escopo**: comportamento que não deve ser automatizado pelo produto atual.
+
+## Windows geral
+
+Esta expansão distingue diagnóstico suportado de automação baseada em chaves
+privadas ou heurísticas de internet. O escopo geral usa somente capacidades já
+tipadas no Ralven e não exige FiveM/GTA instalado.
+
+### Energia
+
+**Fato.** O Windows expõe o esquema ativo pelas APIs
+`PowerGetActiveScheme`/`PowerSetActiveScheme` e documenta `powercfg /getactivescheme`,
+`/list` e `/setactive`. O controle pode ser recusado pela ACL de energia da
+máquina e não exige inventar um plano “Ultimate” com dezenas de índices ocultos.
+
+Fontes:
+
+- [Managing Power Schemes](https://learn.microsoft.com/en-us/windows/win32/power/managing-power-schemes)
+- [PowerGetActiveScheme](https://learn.microsoft.com/en-us/windows/win32/api/powersetting/nf-powersetting-powergetactivescheme)
+- [Opções do powercfg](https://learn.microsoft.com/en-us/windows-hardware/design/device-experiences/powercfg-command-line-options)
+
+**Decisão.** O Ralven pode ativar um esquema de desempenho somente após ler o
+GUID atual, verificar alimentação por tomada e guardar o estado anterior para
+rollback. Acesso negado pode acionar o broker tipado; esquema inexistente vira
+`Skipped`, não uma criação improvisada.
+
+**Fato sobre ASPM.** O Windows documenta a configuração PCI Express Link State
+Power Management pelo GUID `ee12f906-d277-404b-b6da-e5fa1a576df5`, com índices
+0 (Off), 1 (economia moderada) e 2 (economia máxima). As APIs
+`PowerReadACValueIndex` e `PowerReadDCValueIndex` leem separadamente os valores
+na tomada e na bateria; `powercfg /setacvalueindex`, `/setdcvalueindex` e
+`/setactive` são os mecanismos oficiais de gravação e ativação. A documentação
+prova o mecanismo de energia, não um ganho universal de FPS ou latência.
+
+Fontes:
+
+- [Link State Power Management](https://learn.microsoft.com/en-us/windows-hardware/customize/power-settings/pci-express-settings-link-state-power-management)
+- [PowerReadACValueIndex](https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreadacvalueindex)
+- [PowerReadDCValueIndex](https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreaddcvalueindex)
+- [Opções do powercfg](https://learn.microsoft.com/en-us/windows-hardware/design/device-experiences/powercfg-command-line-options)
+
+**Decisão sobre ASPM.** O Ralven só aplica Off quando ambos os índices podem ser
+lidos. Ele captura AC e DC separadamente, compensa qualquer falha parcial,
+reativa o plano, relê a pós-condição e recusa rollback sobre uma escolha mais
+nova. Hardware sem a configuração vira `Skipped`. O texto público descreve o
+efeito como condicional e explicita consumo/temperatura maiores.
+
+### Tela e taxa de atualização
+
+**Fato.** `EnumDisplaySettings` expõe o modo atual e os modos disponíveis por
+display. A própria documentação/suporte do Windows trata taxa dinâmica (DRR) e
+taxa fixa como escolhas contextuais, especialmente em notebooks.
+
+Fontes:
+
+- [EnumDisplaySettings](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumdisplaysettingsa)
+- [Alterar a taxa de atualização no Windows](https://support.microsoft.com/en-us/windows/hardware/display-graphics/change-the-refresh-rate-on-your-monitor-in-windows)
+
+**Decisão.** Comparar a taxa atual com a maior taxa da mesma resolução é um
+diagnóstico útil. O plano geral não troca modo, resolução ou frequência: uma
+alteração automática pode piorar bateria, selecionar combinação incompatível ou
+exigir reinício. A superfície nativa de Display Avançado continua sendo o local
+seguro para a escolha do usuário.
+
+### Inicialização, pagefile, memória e armazenamento
+
+**Fato.** `Run`/`RunOnce` e as pastas Startup são locais documentados de
+inicialização, mas o Windows não fornece uma API pública geral equivalente ao
+botão de desabilitar do Gerenciador de Tarefas para itens arbitrários.
+`Win32_PageFileSetting` descreve configuração persistente de pagefile, que exige
+privilégio e pode só entrar em vigor no próximo boot. `fsutil` documenta o estado
+de delete notification/TRIM, e `Optimize-Volume -ReTrim` é uma manutenção de
+volume, não uma forma universal de “acelerar SSD”.
+
+Fontes:
+
+- [Run e RunOnce](https://learn.microsoft.com/en-us/windows/win32/setupapi/run-and-runonce-registry-keys)
+- [Startup apps](https://learn.microsoft.com/en-us/windows/win32/w8cookbook/startup-apps)
+- [Win32_PageFileSetting](https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/win32-pagefilesetting)
+- [fsutil behavior](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior)
+- [Optimize-Volume](https://learn.microsoft.com/en-us/powershell/module/storage/optimize-volume?view=windowsserver2025-ps)
+
+**Decisão.** Nesta etapa, inicialização, pagefile e memória permanecem somente
+diagnóstico; o Ralven não escreve `StartupApproved`, não dimensiona pagefile por
+heurística de RAM e não implementa “RAM cleaner”. O plano pode consultar a
+política numérica de TRIM sem alteração; mudar a política ou executar ReTrim só
+poderá virar ação futura após existir detecção de filesystem/volume, privilégio
+tipado, verificação e uma apresentação explícita de que ReTrim não possui
+rollback.
+
+### Proteções do Windows e aceleração do ponteiro
+
+**Fato.** `WscGetSecurityProviderHealth` retorna a saúde agregada da categoria
+de proteção solicitada. `SystemParametersInfo` com `SPI_GETMOUSE` retorna os dois
+limiares e o nível de aceleração do ponteiro em um vetor de três inteiros.
+
+Fontes:
+
+- [WscGetSecurityProviderHealth](https://learn.microsoft.com/en-us/windows/win32/api/wscapi/nf-wscapi-wscgetsecurityproviderhealth)
+- [SystemParametersInfo e SPI_GETMOUSE](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfow)
+
+**Decisão.** O plano geral consulta as três categorias de proteção separadamente
+e não interpreta falha da Central de Segurança como estado saudável. A leitura
+do mouse é apenas diagnóstico da configuração do usuário: o Ralven não altera
+proteções, Windows Update, velocidade, limiares ou aceleração automaticamente e
+não deduz o caminho de entrada usado por um jogo a partir desse valor.
+
+### Responsividade da interface
+
+**Fato.** `SystemParametersInfo` expõe contratos públicos para consultar e
+alterar animações da interface e `SPI_GETMENUSHOWDELAY`/
+`SPI_SETMENUSHOWDELAY` representam, em milissegundos, o tempo que o Windows
+aguarda antes de abrir um menu em cascata.
+
+Fonte:
+
+- [SystemParametersInfo](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfow)
+
+**Decisão.** Os perfis Médio e Agressivo podem limitar o atraso dos menus a
+100 ms, sem aumentar um valor menor já escolhido pelo usuário. O perfil
+Agressivo também pode reduzir animações allowlisted. As duas ações releem suas
+pós-condições e guardam os valores anteriores para rollback; suavização de
+fontes e parâmetros de acessibilidade não relacionados permanecem intactos.
+
+### HAGS, VRR e perfis de fabricante
+
+**Fato.** A Microsoft documenta a superfície de Configurações e a capacidade
+DXGI `DXGI_FEATURE_PRESENT_ALLOW_TEARING`, mas essa capacidade não prova que
+VRR está ativo no monitor e não existe contrato público geral para editar HAGS
+ou perfis 3D NVIDIA/AMD de terceiros.
+
+Fonte: [Variable refresh rate displays](https://learn.microsoft.com/en-us/windows/win32/direct3ddxgi/variable-refresh-rate-displays).
+
+**Decisão.** O escopo geral pode relatar fatos comprováveis e abrir a superfície
+nativa, mas não promove HAGS, VRR, G-SYNC/FreeSync ou perfil de fabricante a
+ajuste automático. A existência de uma chave observada em builds atuais não a
+transforma em API suportada.
 
 ## Estado das edições
 
@@ -155,7 +291,7 @@ Como referência secundária de custo visual, o guia da NVIDIA para GTAV identif
 
 Fonte: [Grand Theft Auto V PC Graphics & Performance Guide](https://www.nvidia.com/en-us/geforce/news/grand-theft-auto-v-pc-graphics-and-performance-guide/).
 
-Esses resultados são antigos e dependentes de hardware. Por isso, os presets do Vemryx One são hipóteses conservadoras e devem ser medidos em hardware real antes de receber alegações quantitativas.
+Esses resultados são antigos e dependentes de hardware. Por isso, os presets do Ralven são hipóteses conservadoras e devem ser medidos em hardware real antes de receber alegações quantitativas.
 
 ## Antivírus e integridade
 
@@ -165,10 +301,10 @@ Esses resultados são antigos e dependentes de hardware. Por isso, os presets do
 - [KERNELBASE e conflito com antivírus](https://support.cfx.re/hc/en-us/articles/5299951678748-FiveM-crashing-with-KERNELBASE-dll-RaiseException-error)
 - [Game integrity check failed](https://support.cfx.re/hc/en-us/articles/12505932916508-Game-integrity-check-failed-error-in-FiveM)
 
-**Inferência.** Para reduzir falsos positivos, o Vemryx One não deve injetar DLL, alterar memória de processos, patchar executáveis, ofuscar payloads, baixar scripts executáveis ou desativar ferramentas de segurança. Não existe garantia honesta de detecção zero em todos os antivírus.
+**Inferência.** Para reduzir falsos positivos, o Ralven não deve injetar DLL, alterar memória de processos, patchar executáveis, ofuscar payloads, baixar scripts executáveis ou desativar ferramentas de segurança. Não existe garantia honesta de detecção zero em todos os antivírus.
 
 ## Marca e representação
 
-O acordo do Cfx.re proíbe representação que sugira endosso ou afiliação. A comunicação pública deve apresentar o Vemryx One como projeto independente “para FiveM”, incluir disclaimer claro e evitar o logo oficial como marca própria.
+O acordo do Cfx.re proíbe representação que sugira endosso ou afiliação. A comunicação pública deve apresentar o Ralven como projeto independente “para FiveM”, incluir disclaimer claro e evitar o logo oficial como marca própria.
 
 Fonte: [Cfx.re Platform Service Agreement](https://runtime.fivem.net/fivem-service-agreement-4.pdf), seção “Representation”.

@@ -58,4 +58,12 @@ test('recentBugReports selects email and log_text for the dashboard table', () =
 
   assert.match(sql, /\bemail\b/);
   assert.match(sql, /log_text/);
+  assert.match(sql, /bug_code/);
+});
+
+test('recentBugReports filters by app version', () => {
+  const { sql, params } = recentBugReports({ version: '1.0.4' });
+
+  assert.match(sql, /app_version = \?/);
+  assert.deepEqual(params, ['1.0.4', 50]);
 });
