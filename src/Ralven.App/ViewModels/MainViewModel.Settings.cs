@@ -275,7 +275,7 @@ public sealed partial class MainViewModel
             ? settings.Theme
             : AppThemePreference.System;
         minimizeToTrayOnClose = settings.MinimizeToTrayOnClose;
-        startMinimized = settings.StartMinimized ?? settings.MinimizeToTrayOnClose;
+        startMinimized = settings.StartMinimized ?? false;
         checkForUpdates = settings.CheckForUpdates;
         notifyWhenUpdateAvailable = settings.NotifyWhenUpdateAvailable;
         shareAnonymousTelemetry = settings.ShareAnonymousTelemetry;

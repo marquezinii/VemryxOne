@@ -6,21 +6,31 @@ namespace Ralven.Tests.App;
 
 public sealed class MainViewModelSettingsTests
 {
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task InitializeAsync_OldSettingsInheritPreviousStartupMinimizeBehavior(bool minimizeToTray)
+    [Fact]
+    public async Task InitializeAsync_OldSettingsDefaultToVisibleStartup()
     {
         var settings = new AppSettings
         {
-            MinimizeToTrayOnClose = minimizeToTray,
+            MinimizeToTrayOnClose = true,
             StartMinimized = null
         };
         var viewModel = CreateViewModel(settings);
 
         await viewModel.InitializeAsync();
 
-        Assert.Equal(minimizeToTray, viewModel.StartMinimized);
+        Assert.False(viewModel.StartMinimized);
+    }
+
+    [Fact]
+    public void NewSettings_UseRequestedGeneralDefaults()
+    {
+        var settings = new AppSettings();
+
+        Assert.True(settings.LaunchAtStartup);
+        Assert.True(settings.MinimizeToTrayOnClose);
+        Assert.False(settings.StartMinimized);
+        Assert.True(settings.CheckForUpdates);
+        Assert.True(settings.NotifyWhenUpdateAvailable);
     }
 
     [Fact]

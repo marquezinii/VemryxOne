@@ -225,16 +225,14 @@ public sealed record AppSettings
 
     public bool MinimizeToTrayOnClose { get; init; } = true;
 
-    public bool LaunchAtStartup { get; init; }
+    public bool LaunchAtStartup { get; init; } = true;
 
     /// <summary>
     /// Whether a launch requested by the Windows startup entry should remain
-    /// in the notification area. <see langword="null"/> identifies settings
-    /// written before this preference existed; those installations inherit
-    /// the previous <see cref="MinimizeToTrayOnClose"/> behavior once and are
-    /// normalized on the next save.
+    /// in the notification area. New and legacy settings default to a visible
+    /// window until the user explicitly enables this preference.
     /// </summary>
-    public bool? StartMinimized { get; init; }
+    public bool? StartMinimized { get; init; } = false;
 
     public bool CheckForUpdates { get; init; } = true;
 

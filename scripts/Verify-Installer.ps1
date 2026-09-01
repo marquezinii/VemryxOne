@@ -42,7 +42,7 @@ $requiredPatterns = [ordered]@{
     'no automatic reboot after run' = 'RestartIfNeededByRun=no'
     'concurrent setup guard'        = 'SetupMutex=Ralven\.Setup\.'
     'desktop shortcut enabled by default' = 'Name: "desktopicon"; Description: "\{cm:DesktopIcon\}"; GroupDescription:'
-    'startup disabled by default'   = 'Name: "startup"; Description: "\{cm:StartWithWindows\}"; GroupDescription: "\{cm:AdditionalShortcuts\}:"; Flags: unchecked'
+    'startup enabled by default'    = '(?m)^Name: "startup"; Description: "\{cm:StartWithWindows\}"; GroupDescription: "\{cm:AdditionalShortcuts\}:"\s*$'
     'startup ownership cleanup'     = 'ValueName: "Ralven"; Flags: deletevalue uninsdeletevalue; Tasks: not startup'
     'no launch in silent installs'  = 'Flags: nowait postinstall skipifsilent'
     'auto-update relaunch gated'    = 'Check: IsAutomaticUpdateRelaunch'
@@ -70,7 +70,7 @@ $forbiddenPatterns = [ordered]@{
     'shell execution helper'  = '(?im)\b(ShellExec|Exec|CreateProcess)\s*\('
     'broad install deletion'  = '(?im)^\s*Type\s*:\s*filesandordirs\b'
     'unchecked desktop shortcut' = 'Name: "desktopicon";.*Flags: unchecked'
-    'startup checked by default' = 'Name: "startup"; Description: "\{cm:StartWithWindows\}"; GroupDescription: "\{cm:AdditionalShortcuts\}:"\s*$'
+    'unchecked startup' = 'Name: "startup";.*Flags: unchecked'
 }
 
 foreach ($entry in $forbiddenPatterns.GetEnumerator()) {

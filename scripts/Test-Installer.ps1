@@ -129,9 +129,8 @@ if ($AllowExistingInstallation) {
 New-Item -ItemType Directory -Force -Path $smokeRoot | Out-Null
 
 try {
-    # Product defaults: desktop on, startup off (Flags: unchecked on startup).
-    # Always pass an explicit /TASKS list: with UsePreviousTasks=yes an older
-    # install (or -AllowExistingInstallation) would otherwise restore startup.
+    # Exercise the explicit opt-out path first. Product defaults enable both
+    # tasks, but /TASKS must remain able to deselect startup.
     $defaultTasksArguments = @(
         $commonSilentArguments
         '/CLOSEAPPLICATIONS',

@@ -266,7 +266,7 @@ public sealed class AppSettingsSerializationTests
         Assert.True(settings.ShareAnonymousTelemetry);
         Assert.True(settings.ShareCrashReports);
         Assert.Null(settings.PrivacyConsentVersion);
-        Assert.Null(settings.StartMinimized);
+        Assert.False(settings.StartMinimized);
         Assert.True(settings.NotifyWhenUpdateAvailable);
     }
 
@@ -334,6 +334,17 @@ public sealed class AppSettingsSerializationTests
         var settings = JsonSerializer.Deserialize<AppSettings>(json, Options)!;
 
         Assert.True(settings.MinimizeToTrayOnClose);
+    }
+
+    [Fact]
+    public void Deserialize_JsonWithoutGeneralPreferences_UsesFirstInstallDefaults()
+    {
+        var settings = JsonSerializer.Deserialize<AppSettings>("{}", Options)!;
+
+        Assert.True(settings.LaunchAtStartup);
+        Assert.False(settings.StartMinimized);
+        Assert.True(settings.CheckForUpdates);
+        Assert.True(settings.NotifyWhenUpdateAvailable);
     }
 
     [Fact]

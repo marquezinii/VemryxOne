@@ -17,6 +17,9 @@ public sealed class InstallerIdentityContractTests
         Assert.Contains("#define AppExeName \"Ralven.Launcher.exe\"", installer, StringComparison.Ordinal);
         Assert.Contains("#define StableAppId \"{{35FF816F-9EFD-42C8-A63B-CC5EA138805A}\"", installer, StringComparison.Ordinal);
         Assert.Contains("UsePreviousGroup=yes", installer, StringComparison.Ordinal);
+        Assert.Contains("Name: \"startup\"; Description: \"{cm:StartWithWindows}\"; GroupDescription: \"{cm:AdditionalShortcuts}:\"", installer, StringComparison.Ordinal);
+        Assert.DoesNotContain("Tasks: startup; Flags: unchecked", installer, StringComparison.Ordinal);
+        Assert.Equal(2, installer.Split("Check: not IsAutomaticUpdateRelaunch", StringSplitOptions.None).Length - 1);
 
         Assert.Contains("$baseName = \"Ralven-Setup-$Version-win-x64\"", build, StringComparison.Ordinal);
         Assert.DoesNotContain("legacyBaseName", build, StringComparison.OrdinalIgnoreCase);
