@@ -225,11 +225,10 @@ users to preserve; cleanup is a separate authorized deploy/migration task.
 
 ## Verified end-to-end
 
-Confirmed against the real, deployed Worker + dashboard: sent a test
-telemetry event via `curl`, logged in through the actual browser at
-`https://dashboard.vemryx.com`, and saw the event reflected in
-the tiles and charts (then deleted that test row from the real database —
-no test data was left behind).
+The ingestion-to-dashboard flow was verified against the real deployed Worker
+with a temporary telemetry event that was removed afterwards. The production
+dashboard now lives at `https://dashboard.vemryx.com`; authentication and live
+statistics were verified there after the custom domain became active.
 
 ## Deploying and rotating secrets
 
