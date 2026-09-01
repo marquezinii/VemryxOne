@@ -17,7 +17,7 @@ namespace Ralven.Tests.App;
 public sealed class MainViewModelPrivacyConsentTests
 {
     [Fact]
-    public async Task InitializeAsync_NewInstallation_RequestsFirstInstallationScreenWithCrashReportsDisabled()
+    public async Task InitializeAsync_NewInstallation_RequestsScreenWithOptionalReportsEnabledByDefault()
     {
         var service = new FakeAppOptimizationService(new AppSettings(), settingsFileExists: false);
         var telemetry = new RecordingTelemetryService();
@@ -30,8 +30,10 @@ public sealed class MainViewModelPrivacyConsentTests
         Assert.True(decision!.RequiresConsentScreen);
         Assert.Equal(PrivacyConsentScreenVariant.FirstInstallation, decision.Variant);
         Assert.True(viewModel.ShareAnonymousTelemetry);
-        Assert.False(viewModel.ShareCrashReports);
+        Assert.True(viewModel.ShareCrashReports);
+        Assert.True(viewModel.ShareOptionalReports);
         Assert.False(telemetry.IsEnabled);
+        Assert.False(telemetry.IncludesOptionalData);
         Assert.Equal(0, telemetry.TrackCallCount);
     }
 
@@ -60,6 +62,7 @@ public sealed class MainViewModelPrivacyConsentTests
         // is true.
         Assert.False(viewModel.ShareAnonymousTelemetry);
         Assert.True(viewModel.ShareCrashReports);
+        Assert.False(viewModel.ShareOptionalReports);
     }
 
     [Fact]
@@ -79,6 +82,7 @@ public sealed class MainViewModelPrivacyConsentTests
 
         Assert.False(viewModel.PrivacyConsentDecision!.RequiresConsentScreen);
         Assert.True(telemetry.IsEnabled);
+        Assert.False(telemetry.IncludesOptionalData);
     }
 
     [Fact]
@@ -101,14 +105,14 @@ public sealed class MainViewModelPrivacyConsentTests
     }
 
     [Fact]
-    public async Task ConfirmPrivacyConsentAsync_BothAccepted_PersistsBothTrueAndTheCurrentVersion()
+    public async Task ConfirmPrivacyConsentAsync_OptionalReportsAccepted_PersistsBothCompatibilityFields()
     {
         var service = new FakeAppOptimizationService(new AppSettings(), settingsFileExists: false);
         var telemetry = new RecordingTelemetryService();
         var viewModel = new MainViewModel(service, telemetry: telemetry);
         await viewModel.InitializeAsync();
 
-        await viewModel.ConfirmPrivacyConsentAsync(acceptAnonymousTelemetry: true, acceptCrashReports: true);
+        await viewModel.ConfirmPrivacyConsentAsync(acceptOptionalReports: true);
 
         Assert.NotNull(service.SavedSettings);
         Assert.True(service.SavedSettings!.ShareAnonymousTelemetry);
@@ -116,52 +120,46 @@ public sealed class MainViewModelPrivacyConsentTests
         Assert.Equal(PrivacyConsentPolicy.CurrentVersion, service.SavedSettings.PrivacyConsentVersion);
         Assert.True(viewModel.ShareAnonymousTelemetry);
         Assert.True(viewModel.ShareCrashReports);
+        Assert.True(viewModel.ShareOptionalReports);
         Assert.True(telemetry.IsEnabled);
-        Assert.True(viewModel.PrivacyConsentDecision!.IsCrashReportingAuthorized);
+        Assert.True(telemetry.IncludesOptionalData);
+        Assert.True(viewModel.PrivacyConsentDecision!.AreOptionalReportsAuthorized);
     }
 
     [Fact]
-    public async Task ConfirmPrivacyConsentAsync_BothDeclined_PersistsBothFalseButStillStampsTheVersion()
+    public async Task ConfirmPrivacyConsentAsync_OptionalReportsDeclined_KeepsEssentialDiagnosticsEnabled()
     {
         var service = new FakeAppOptimizationService(new AppSettings(), settingsFileExists: false);
         var telemetry = new RecordingTelemetryService();
         var viewModel = new MainViewModel(service, telemetry: telemetry);
         await viewModel.InitializeAsync();
 
-        await viewModel.ConfirmPrivacyConsentAsync(acceptAnonymousTelemetry: false, acceptCrashReports: false);
+        await viewModel.ConfirmPrivacyConsentAsync(acceptOptionalReports: false);
 
         Assert.False(service.SavedSettings!.ShareAnonymousTelemetry);
         Assert.False(service.SavedSettings.ShareCrashReports);
         Assert.Equal(PrivacyConsentPolicy.CurrentVersion, service.SavedSettings.PrivacyConsentVersion);
         Assert.False(viewModel.ShareAnonymousTelemetry);
         Assert.False(viewModel.ShareCrashReports);
-        Assert.False(telemetry.IsEnabled);
-        Assert.False(viewModel.PrivacyConsentDecision!.IsCrashReportingAuthorized);
+        Assert.False(viewModel.ShareOptionalReports);
+        Assert.True(telemetry.IsEnabled);
+        Assert.False(telemetry.IncludesOptionalData);
+        Assert.True(viewModel.PrivacyConsentDecision!.AreEssentialDiagnosticsAuthorized);
+        Assert.False(viewModel.PrivacyConsentDecision.AreOptionalReportsAuthorized);
     }
 
     [Fact]
-    public async Task ConfirmPrivacyConsentAsync_OnlyTelemetryAccepted_PersistsExactlyThatCombination()
+    public async Task ShareOptionalReports_UpdatesBothCompatibilityFieldsTogether()
     {
         var service = new FakeAppOptimizationService(new AppSettings(), settingsFileExists: false);
         var viewModel = new MainViewModel(service);
         await viewModel.InitializeAsync();
 
-        await viewModel.ConfirmPrivacyConsentAsync(acceptAnonymousTelemetry: true, acceptCrashReports: false);
+        await viewModel.ConfirmPrivacyConsentAsync(acceptOptionalReports: false);
+        viewModel.ShareOptionalReports = true;
+        await viewModel.RetrySaveSettingsAsync();
 
         Assert.True(service.SavedSettings!.ShareAnonymousTelemetry);
-        Assert.False(service.SavedSettings.ShareCrashReports);
-    }
-
-    [Fact]
-    public async Task ConfirmPrivacyConsentAsync_OnlyCrashReportsAccepted_PersistsExactlyThatCombination()
-    {
-        var service = new FakeAppOptimizationService(new AppSettings(), settingsFileExists: false);
-        var viewModel = new MainViewModel(service);
-        await viewModel.InitializeAsync();
-
-        await viewModel.ConfirmPrivacyConsentAsync(acceptAnonymousTelemetry: false, acceptCrashReports: true);
-
-        Assert.False(service.SavedSettings!.ShareAnonymousTelemetry);
         Assert.True(service.SavedSettings.ShareCrashReports);
     }
 
@@ -173,7 +171,7 @@ public sealed class MainViewModelPrivacyConsentTests
         var viewModel = new MainViewModel(service, telemetry: telemetry);
         await viewModel.InitializeAsync();
 
-        await viewModel.ConfirmPrivacyConsentAsync(acceptAnonymousTelemetry: true, acceptCrashReports: true);
+        await viewModel.ConfirmPrivacyConsentAsync(acceptOptionalReports: true);
 
         // Confirming consent only flips the local enabled/disabled switch;
         // it must never itself send a telemetry event or call any crash
@@ -199,7 +197,7 @@ public sealed class MainViewModelPrivacyConsentTests
         var viewModel = new MainViewModel(service);
         await viewModel.InitializeAsync();
 
-        await viewModel.ConfirmPrivacyConsentAsync(acceptAnonymousTelemetry: false, acceptCrashReports: false);
+        await viewModel.ConfirmPrivacyConsentAsync(acceptOptionalReports: false);
 
         Assert.Equal(AppLanguagePreference.English, service.SavedSettings!.Language);
         Assert.Equal(AppThemePreference.Dark, service.SavedSettings.Theme);

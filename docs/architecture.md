@@ -313,10 +313,13 @@ Progresso é calculado por passos concluídos e pesos declarados. Mensagens deve
 ## Diagnósticos essenciais e dados opcionais
 
 `IAnonymousTelemetryService` é uma fronteira da camada App, separada do
-serviço de otimização. A preferência persistida `AppSettings.ShareAnonymousTelemetry`
-nasce como `true` em instalações novas e controla o envio de toda a
-telemetria de uso; quando desativada, nenhum evento passa por esse serviço.
-Relatórios de falha sanitizados seguem o fluxo essencial separado. O
+serviço de otimização. Após a confirmação do aviso de privacidade vigente, o
+serviço permanece habilitado para diagnósticos essenciais allowlisted. As
+preferências persistidas `AppSettings.ShareAnonymousTelemetry` e
+`AppSettings.ShareCrashReports` são mantidas por compatibilidade e formam o
+controle único `ShareOptionalReports`: ambas nascem como `true`, mas qualquer
+opt-out legado falso prevalece. Quando o controle é desativado, campos
+opcionais também são retirados de eventos que já estavam na fila. O
 contrato `AnonymousTelemetryEvent` não aceita payload livre: contém o nome
 allowlisted do evento, duração, versão, categoria de erro allowlisted em
 falha e, desde a versão 2 do consentimento, um perfil de hardware (CPU/GPU/
@@ -336,7 +339,7 @@ privacidade: [telemetry.md](telemetry.md) e [bug-reports.md](bug-reports.md).
 `ICrashReportingService` (implementação `SentryCrashReportingService`) é
 outra fronteira da camada App, análoga à de telemetria e opcional; nunca é
 referenciada por `Core`/`Windows`/`Broker`. `MainWindow` a inicializa uma única
-vez somente quando `ShareCrashReports` e o consentimento vigente autorizam,
+vez somente quando `ShareOptionalReports` e o aviso vigente autorizam,
 usando
 `RemoteServicesOptionsLoader` para ler o DSN de um arquivo de configuração
 por ambiente (`Config/appsettings.{Development,Production}.json`, com

@@ -162,6 +162,8 @@ if (-not [string]::IsNullOrWhiteSpace($PublishDirectory)) {
         'Runtime\active.json',
         "$versionRoot\Ralven.exe",
         "$versionRoot\Ralven.runtimeconfig.json",
+        "$versionRoot\Sentry.dll",
+        "$versionRoot\Config\appsettings.Production.json",
         "$versionRoot\coreclr.dll",
         "$versionRoot\hostfxr.dll",
         "$versionRoot\broker\Ralven.Broker.exe",
@@ -177,6 +179,25 @@ if (-not [string]::IsNullOrWhiteSpace($PublishDirectory)) {
     if (-not $runtimeConfig.runtimeOptions.includedFrameworks -or
         @($runtimeConfig.runtimeOptions.includedFrameworks).Count -lt 2) {
         throw 'Runtime config does not prove a self-contained Windows Desktop publish.'
+    }
+
+    $productionConfig = Get-Content `
+        -LiteralPath (Join-Path $resolvedPublish "$versionRoot\Config\appsettings.Production.json") `
+        -Raw | ConvertFrom-Json
+    if ($productionConfig.environment -ne 'Production') {
+        throw 'Release payload diagnostics environment is not Production.'
+    }
+    if ($productionConfig.telemetryEndpoint -ne
+        'https://fivemcleaner-telemetry.felipemarquesini10.workers.dev/telemetry') {
+        throw 'Release payload telemetry endpoint is not the allowlisted production endpoint.'
+    }
+    $sentryDsn = $null
+    if (-not [Uri]::TryCreate($productionConfig.sentryDsn, [UriKind]::Absolute, [ref]$sentryDsn) -or
+        $sentryDsn.Scheme -ne [Uri]::UriSchemeHttps -or
+        -not $sentryDsn.Host.EndsWith('.sentry.io', [StringComparison]::OrdinalIgnoreCase) -or
+        [string]::IsNullOrWhiteSpace($sentryDsn.UserInfo) -or
+        -not ($sentryDsn.Segments[-1].Trim('/') -as [long])) {
+        throw 'Release payload Sentry DSN is invalid.'
     }
 
     $debugFiles = @(Get-ChildItem -LiteralPath $resolvedPublish -Recurse -File |

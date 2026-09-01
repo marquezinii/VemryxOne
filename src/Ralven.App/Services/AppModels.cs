@@ -241,24 +241,18 @@ public sealed record AppSettings
     public bool NotifyWhenUpdateAvailable { get; init; } = true;
 
     /// <summary>
-    /// Consentimento para telemetria técnica anonimizada. Vem habilitada por
-    /// padrão em instalações novas; o usuário pode desativá-la a qualquer
-    /// momento nas configurações. Continua transmitindo apenas categorias
-    /// allowlisted de erro, duração de uma otimização e versão do
-    /// aplicativo e sinais técnicos allowlisted descritos na política de
-    /// privacidade — nunca logs, arquivos, documentos, histórico, caminhos,
-    /// seriais de hardware ou dados pessoais.
+    /// Preferência persistida legada que, junto de
+    /// <see cref="ShareCrashReports"/>, representa a opção única de relatórios
+    /// técnicos opcionais. Os dois campos são mantidos para compatibilidade
+    /// com configurações existentes e nascem habilitados em instalações novas.
     /// </summary>
     public bool ShareAnonymousTelemetry { get; init; } = true;
 
     /// <summary>
-    /// Consentimento para relatórios automáticos de falhas (crash reports).
-    /// Vem desabilitado por padrão; o usuário pode habilitá-lo ao confirmar
-    /// ou a qualquer momento depois. Nenhum
-    /// envio ocorre antes da confirmação explícita da tela de consentimento — ver
-    /// <see cref="PrivacyConsentVersion"/> e <see cref="PrivacyConsentEvaluator"/>.
+    /// Segundo campo de compatibilidade da preferência única de relatórios
+    /// opcionais. Um valor legado falso prevalece para preservar opt-out.
     /// </summary>
-    public bool ShareCrashReports { get; init; }
+    public bool ShareCrashReports { get; init; } = true;
 
     /// <summary>
     /// Versão do consentimento de privacidade confirmada explicitamente pelo

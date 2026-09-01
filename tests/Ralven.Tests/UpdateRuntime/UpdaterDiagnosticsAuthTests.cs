@@ -46,7 +46,7 @@ public sealed class UpdaterDiagnosticsAuthTests : IDisposable
     }
 
     [Fact]
-    public void ValidJsonMissingTelemetryProperty_ReturnsFalse()
+    public void ValidJsonMissingPrivacyNoticeVersion_ReturnsFalse()
     {
         Directory.CreateDirectory(root);
         File.WriteAllText(SettingsPath, "{}");
@@ -54,12 +54,12 @@ public sealed class UpdaterDiagnosticsAuthTests : IDisposable
     }
 
     [Fact]
-    public void TelemetryDisabled_ReturnsFalse()
+    public void OptionalTelemetryDisabled_CurrentNoticeStillAuthorizesEssentialUpdaterDiagnostics()
     {
         Directory.CreateDirectory(root);
         File.WriteAllText(SettingsPath,
-            """{"shareAnonymousTelemetry":false,"privacyConsentVersion":3}""");
-        Assert.False(UpdaterDiagnostics.IsTelemetryAuthorized(root));
+            """{"shareAnonymousTelemetry":false,"privacyConsentVersion":8}""");
+        Assert.True(UpdaterDiagnostics.IsTelemetryAuthorized(root));
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public sealed class UpdaterDiagnosticsAuthTests : IDisposable
     {
         Directory.CreateDirectory(root);
         File.WriteAllText(SettingsPath,
-            """{"shareAnonymousTelemetry":true,"privacyConsentVersion":2}""");
+            """{"shareAnonymousTelemetry":true,"privacyConsentVersion":7}""");
         Assert.False(UpdaterDiagnostics.IsTelemetryAuthorized(root));
     }
 
@@ -94,7 +94,7 @@ public sealed class UpdaterDiagnosticsAuthTests : IDisposable
     {
         Directory.CreateDirectory(root);
         File.WriteAllText(SettingsPath,
-            """{"shareAnonymousTelemetry":true,"privacyConsentVersion":3}""");
+            """{"shareAnonymousTelemetry":true,"privacyConsentVersion":8}""");
         Assert.True(UpdaterDiagnostics.IsTelemetryAuthorized(root));
     }
 
@@ -112,7 +112,7 @@ public sealed class UpdaterDiagnosticsAuthTests : IDisposable
     {
         Directory.CreateDirectory(root);
         File.WriteAllText(SettingsPath,
-            """{"shareAnonymousTelemetry":true,"privacyConsentVersion":3}""");
+            """{"shareAnonymousTelemetry":true,"privacyConsentVersion":8}""");
         using (new FileStream(SettingsPath, FileMode.Open, FileAccess.Read, FileShare.None))
         {
             Assert.False(UpdaterDiagnostics.IsTelemetryAuthorized(root));
@@ -120,12 +120,12 @@ public sealed class UpdaterDiagnosticsAuthTests : IDisposable
     }
 
     [Fact]
-    public void TelemetryBooleanIsStringNotBool_ReturnsFalse()
+    public void LegacyTelemetryPropertyType_DoesNotAffectEssentialDiagnostics()
     {
         Directory.CreateDirectory(root);
         File.WriteAllText(SettingsPath,
-            """{"shareAnonymousTelemetry":"true","privacyConsentVersion":3}""");
-        Assert.False(UpdaterDiagnostics.IsTelemetryAuthorized(root));
+            """{"shareAnonymousTelemetry":"true","privacyConsentVersion":8}""");
+        Assert.True(UpdaterDiagnostics.IsTelemetryAuthorized(root));
     }
 
     [Fact]
@@ -133,7 +133,15 @@ public sealed class UpdaterDiagnosticsAuthTests : IDisposable
     {
         Directory.CreateDirectory(root);
         File.WriteAllText(SettingsPath,
-            """{"shareAnonymousTelemetry":true,"privacyConsentVersion":"3"}""");
+            """{"shareAnonymousTelemetry":true,"privacyConsentVersion":"8"}""");
         Assert.False(UpdaterDiagnostics.IsTelemetryAuthorized(root));
+    }
+
+    [Fact]
+    public void CurrentNoticeWithoutLegacyTelemetryProperty_ReturnsTrue()
+    {
+        Directory.CreateDirectory(root);
+        File.WriteAllText(SettingsPath, """{"privacyConsentVersion":8}""");
+        Assert.True(UpdaterDiagnostics.IsTelemetryAuthorized(root));
     }
 }

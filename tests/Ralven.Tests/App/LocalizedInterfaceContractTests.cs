@@ -723,8 +723,7 @@ public sealed partial class LocalizedInterfaceContractTests
                 "{Binding MinimizeToTrayOnClose}",
                 "{Binding CheckForUpdates}",
                 "{Binding NotifyWhenUpdateAvailable}",
-                "{Binding ShareAnonymousTelemetry}",
-                "{Binding ShareCrashReports}"
+                "{Binding ShareOptionalReports}"
             },
             checkBoxBindings);
 

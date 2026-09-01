@@ -36,5 +36,66 @@ public sealed class RuntimeActivationStore
         return active.Version;
     }
 
+    public void PruneVersionsExcept(params string[] preservedVersions)
+    {
+        ArgumentNullException.ThrowIfNull(preservedVersions);
+        if (preservedVersions.Length == 0
+            || preservedVersions.Any(version => !Version.TryParse(version, out _)))
+            throw new ArgumentException("Versões preservadas inválidas.", nameof(preservedVersions));
+
+        var preserved = new HashSet<string>(preservedVersions, StringComparer.OrdinalIgnoreCase);
+        try
+        {
+            preserved.Add(ReadActiveVersion());
+            foreach (var directory in Directory.EnumerateDirectories(VersionsRoot))
+            {
+                var version = Path.GetFileName(directory);
+                if (preserved.Contains(version) || !Version.TryParse(version, out _)) continue;
+                try { Directory.Delete(directory, recursive: true); }
+                catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+                {
+                    // A próxima atualização tenta novamente a pasta bloqueada.
+                }
+            }
+        }
+        catch (Exception exception) when (exception is DirectoryNotFoundException or IOException
+            or UnauthorizedAccessException or JsonException or InvalidDataException)
+        {
+            // Limpeza é manutenção de espaço, não parte da ativação. Um AV ou
+            // processo segurando a versão antiga não pode invalidar um update
+            // já confirmado; a próxima atualização tenta novamente.
+        }
+    }
+
+    public void PruneInactiveVersions()
+    {
+        try
+        {
+            var activeName = ReadActiveVersion();
+            var activeVersion = Version.Parse(activeName);
+            string? predecessorName = null;
+            Version? predecessorVersion = null;
+            foreach (var directory in Directory.EnumerateDirectories(VersionsRoot))
+            {
+                var name = Path.GetFileName(directory);
+                if (!Version.TryParse(name, out var version)
+                    || version >= activeVersion
+                    || predecessorVersion is not null && version <= predecessorVersion) continue;
+                predecessorName = name;
+                predecessorVersion = version;
+            }
+
+            if (predecessorName is null)
+                PruneVersionsExcept(activeName);
+            else
+                PruneVersionsExcept(activeName, predecessorName);
+        }
+        catch (Exception exception) when (exception is DirectoryNotFoundException or IOException
+            or UnauthorizedAccessException or JsonException or InvalidDataException)
+        {
+            // A próxima abertura tenta novamente sem impedir o aplicativo.
+        }
+    }
+
     private sealed record ActiveRuntime(string Version);
 }

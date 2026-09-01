@@ -39,8 +39,9 @@ public sealed class DisabledAnonymousTelemetryServiceTests
         var service = DisabledAnonymousTelemetryService.Instance;
 
         Assert.False(service.IsEnabled);
-        service.SetEnabled(true);
+        service.Configure(enabled: true, includeOptionalData: true);
         Assert.False(service.IsEnabled);
+        Assert.False(service.IncludesOptionalData);
     }
 
     [Fact]
@@ -49,5 +50,64 @@ public sealed class DisabledAnonymousTelemetryServiceTests
         var service = DisabledAnonymousTelemetryService.Instance;
 
         await service.TrackAsync(new AnonymousTelemetryEvent("optimization-completed", TimeSpan.Zero, "1.0.0"), cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
+    }
+}
+
+public sealed class AnonymousTelemetryEventPrivacyTests
+{
+    [Fact]
+    public void WithoutOptionalData_RemovesEveryOptionalFieldAndPreservesEssentialDiagnostics()
+    {
+        var original = new AnonymousTelemetryEvent(
+            "optimization-failed",
+            TimeSpan.FromSeconds(4),
+            "1.5.1",
+            ErrorCategory: "io",
+            OsVersion: "Windows 11",
+            SystemArchitecture: "x64",
+            CpuModel: "Test CPU",
+            GpuModel: "Test GPU",
+            RamBucketGiB: 16,
+            Profile: "Balanced",
+            ActionIds: ["windows.game-mode.enable"],
+            BugCode: Ralven.Contracts.BugCode.APP_OPT_ACTION_EXECUTION,
+            FiveMInstallDetected: true,
+            GtaEdition: "Legacy",
+            OptimizationTargetCount: 3,
+            WindowsBuild: 26100,
+            DiskType: "SSD",
+            FreeSpaceGiBBucket: 64,
+            RunTimestamp: DateTimeOffset.UtcNow,
+            DaysSinceLastRunBucket: 7,
+            BackupCreated: true,
+            BackupRestored: false,
+            ElevationUsed: true,
+            ProcessCountAtStart: 2);
+
+        var filtered = original.WithoutOptionalData();
+
+        Assert.Equal(original.EventId, filtered.EventId);
+        Assert.Equal(original.EventName, filtered.EventName);
+        Assert.Equal(original.ErrorCategory, filtered.ErrorCategory);
+        Assert.Equal(original.OsVersion, filtered.OsVersion);
+        Assert.Equal(original.SystemArchitecture, filtered.SystemArchitecture);
+        Assert.Equal(original.BugCode, filtered.BugCode);
+        Assert.Equal(original.FiveMInstallDetected, filtered.FiveMInstallDetected);
+        Assert.Equal(original.GtaEdition, filtered.GtaEdition);
+        Assert.Equal(original.OptimizationTargetCount, filtered.OptimizationTargetCount);
+        Assert.Null(filtered.CpuModel);
+        Assert.Null(filtered.GpuModel);
+        Assert.Null(filtered.RamBucketGiB);
+        Assert.Null(filtered.Profile);
+        Assert.Null(filtered.ActionIds);
+        Assert.Null(filtered.WindowsBuild);
+        Assert.Null(filtered.DiskType);
+        Assert.Null(filtered.FreeSpaceGiBBucket);
+        Assert.Null(filtered.RunTimestamp);
+        Assert.Null(filtered.DaysSinceLastRunBucket);
+        Assert.Null(filtered.BackupCreated);
+        Assert.Null(filtered.BackupRestored);
+        Assert.Null(filtered.ElevationUsed);
+        Assert.Null(filtered.ProcessCountAtStart);
     }
 }

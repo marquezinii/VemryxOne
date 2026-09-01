@@ -139,6 +139,7 @@ public sealed partial class MainViewModel
             if (SetProperty(ref shareAnonymousTelemetry, value))
             {
                 RefreshPrivacyAuthorization(settingsFileExistedBeforeLoad: true);
+                OnPropertyChanged(nameof(ShareOptionalReports));
                 SettingsChanged(refreshPlan: false);
             }
         }
@@ -165,6 +166,27 @@ public sealed partial class MainViewModel
             shareCrashReports = value;
             RefreshPrivacyAuthorization(settingsFileExistedBeforeLoad: true);
             OnPropertyChanged();
+            OnPropertyChanged(nameof(ShareOptionalReports));
+            SettingsChanged(refreshPlan: false);
+        }
+    }
+
+    public bool ShareOptionalReports
+    {
+        get => shareAnonymousTelemetry && shareCrashReports;
+        set
+        {
+            if (shareAnonymousTelemetry == value && shareCrashReports == value)
+            {
+                return;
+            }
+
+            shareAnonymousTelemetry = value;
+            shareCrashReports = value;
+            RefreshPrivacyAuthorization(settingsFileExistedBeforeLoad: true);
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(ShareAnonymousTelemetry));
+            OnPropertyChanged(nameof(ShareCrashReports));
             SettingsChanged(refreshPlan: false);
         }
     }
@@ -288,6 +310,7 @@ public sealed partial class MainViewModel
         OnPropertyChanged(nameof(NotifyWhenUpdateAvailable));
         OnPropertyChanged(nameof(ShareAnonymousTelemetry));
         OnPropertyChanged(nameof(ShareCrashReports));
+        OnPropertyChanged(nameof(ShareOptionalReports));
         ResetLocalizedPlaceholders(preserveDiagnostic: true);
     }
 
@@ -327,12 +350,11 @@ public sealed partial class MainViewModel
     /// (<see cref="IAppOptimizationService.SaveSettingsAsync"/>) — no second
     /// storage mechanism is introduced.
     /// </summary>
-    public async Task ConfirmPrivacyConsentAsync(bool acceptAnonymousTelemetry, bool acceptCrashReports)
+    public async Task ConfirmPrivacyConsentAsync(bool acceptOptionalReports)
     {
         var snapshot = PrivacyConsentOutcomeBuilder.BuildConfirmed(
             BuildSettingsSnapshot(),
-            acceptAnonymousTelemetry,
-            acceptCrashReports);
+            acceptOptionalReports);
 
         shareAnonymousTelemetry = snapshot.ShareAnonymousTelemetry;
         shareCrashReports = snapshot.ShareCrashReports;
@@ -340,6 +362,7 @@ public sealed partial class MainViewModel
         RefreshPrivacyAuthorization(settingsFileExistedBeforeLoad: true);
         OnPropertyChanged(nameof(ShareAnonymousTelemetry));
         OnPropertyChanged(nameof(ShareCrashReports));
+        OnPropertyChanged(nameof(ShareOptionalReports));
         var revision = Interlocked.Increment(ref settingsRevision);
         await SaveSettingsRevisionAsync(snapshot, revision).ConfigureAwait(false);
     }
@@ -407,7 +430,9 @@ public sealed partial class MainViewModel
         PrivacyConsentDecision = PrivacyConsentEvaluator.Evaluate(
             BuildSettingsSnapshot(),
             settingsFileExistedBeforeLoad);
-        telemetry.SetEnabled(PrivacyConsentDecision.IsAnonymousTelemetryAuthorized);
+        telemetry.Configure(
+            PrivacyConsentDecision.AreEssentialDiagnosticsAuthorized,
+            PrivacyConsentDecision.AreOptionalReportsAuthorized);
         OnPropertyChanged(nameof(PrivacyConsentDecision));
     }
 

@@ -14,10 +14,12 @@ produzidos pelo mesmo workflow:
 - `Ralven-Setup-X.Y.Z-win-x64.exe`;
 - `Ralven-Setup-X.Y.Z-win-x64.exe.sha256`;
 - `Ralven-release-manifest-X.Y.Z.json`;
-- `Ralven-Setup-X.Y.Z-win-x64.exe` e o alias estável legado quando
-  aplicável;
-- `Ralven-win-x64.zip` e `Ralven-win-x64.zip.sha256` para o
-  runtime compatível com instalações existentes.
+- `Ralven-Setup-latest-win-x64.exe`, como alias da release estável;
+- `Ralven-win-x64.zip` e `Ralven-win-x64.zip.sha256` para instalação
+  portátil;
+- `Ralven-Runtime-win-x64.zip` e `Ralven-Runtime-win-x64.zip.sha256` para o
+  atualizador transacional;
+- `Ralven-signed-update-manifest.json`, nas releases estáveis.
 
 Não use cópias hospedadas em encurtadores, mirrors, vídeos ou pacotes de
 "FPS boost". O código-fonte correspondente deve estar disponível no mesmo tag
@@ -43,6 +45,38 @@ O hash detecta corrupção e troca de arquivo. Como a release ainda não possui
 assinatura de código pública, o hash sozinho não substitui identidade do
 publicador: confira também o domínio `github.com`, o repositório, o tag e o
 código-fonte associado.
+
+## Atualização automática
+
+Uma instalação atual usa `Ralven.Launcher.exe` e o layout versionado
+`Runtime\versions\X.Y.Z`. Quando a opção de atualização automática está
+ativada (padrão), cada abertura consulta o feed estável. O aplicativo só mostra
+o aviso quando encontra uma versão semanticamente mais nova.
+
+O feed e o pacote do atualizador são verificados com assinatura ECDSA, versão
+mínima, tamanho e SHA-256. Depois do download, o ZIP também é validado por um
+manifesto de hashes interno antes de ser extraído. A ativação troca somente o
+ponteiro `Runtime\active.json`; a versão anterior permanece disponível. Se a
+nova versão não abrir e confirmar saúde em até 45 segundos, o launcher restaura
+automaticamente a versão anterior na próxima abertura.
+
+O runtime não acumula um histórico ilimitado de binários. Em condições normais,
+após uma atualização saudável ficam somente a versão ativa e seu predecessor
+imediato, necessário durante a transição segura. Após rollback, a candidata que
+falhou é removida. O cache de download mantém somente o pacote da atualização
+atual. Pastas bloqueadas pelo sistema são tentadas de novo no próximo update;
+pastas sem nome de versão reconhecido são ignoradas para evitar limpeza ampla.
+
+O workflow só encerra uma release estável depois de consultar o feed público e
+confirmar a versão, o hash do pacote e a assinatura recém-publicados. Se a
+publicação do feed falhar depois de o GitHub Release já existir, uma reexecução
+só prossegue quando o manifesto assinado e o ZIP runtime públicos forem
+idênticos ao candidato auditado; qualquer divergência bloqueia a retomada.
+
+Instalações antigas ou execuções portáteis fora desse layout continuam usando
+o atualizador legado baseado no instalador completo. O botão manual em
+Configurações força uma nova consulta e sempre informa se o app já está
+atualizado ou se a consulta falhou.
 
 ## Build ainda não assinado
 

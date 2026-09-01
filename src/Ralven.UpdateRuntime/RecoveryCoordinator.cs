@@ -22,6 +22,9 @@ public sealed class RecoveryCoordinator
         if (receipt.Confirms(transaction))
         {
             journal.Complete();
+            activation.PruneVersionsExcept(
+                transaction.CandidateVersion,
+                transaction.PreviousVersion);
             return RecoveryDecision.Healthy;
         }
         string activeVersion;
@@ -51,6 +54,7 @@ public sealed class RecoveryCoordinator
             || nowUtc - transaction.CandidateLaunchedAtUtc < healthTimeout) return RecoveryDecision.Pending;
         activation.Activate(transaction.PreviousVersion);
         journal.Complete();
+        activation.PruneVersionsExcept(transaction.PreviousVersion);
         return RecoveryDecision.RolledBack;
     }
 
@@ -71,8 +75,14 @@ public sealed class RecoveryCoordinator
     public void Abandon(UpdateTransaction transaction)
     {
         ArgumentNullException.ThrowIfNull(transaction);
-        if (activation.ReadActiveVersion() == transaction.CandidateVersion)
+        var activeVersion = activation.ReadActiveVersion();
+        if (activeVersion == transaction.CandidateVersion)
+        {
             activation.Activate(transaction.PreviousVersion);
+            activeVersion = transaction.PreviousVersion;
+        }
         journal.Complete();
+        if (activeVersion == transaction.PreviousVersion)
+            activation.PruneVersionsExcept(activeVersion);
     }
 }

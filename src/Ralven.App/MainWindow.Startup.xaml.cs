@@ -71,15 +71,12 @@ public partial class MainWindow
 
         var consentWindow = new PrivacyConsentWindow(
             decision.Variant,
-            viewModel.ShareAnonymousTelemetry,
-            initialShareCrashReports: false)
+            viewModel.ShareOptionalReports)
         {
             Owner = this
         };
         consentWindow.ShowDialog();
-        await viewModel.ConfirmPrivacyConsentAsync(
-            consentWindow.AcceptedAnonymousTelemetry,
-            consentWindow.AcceptedCrashReports);
+        await viewModel.ConfirmPrivacyConsentAsync(consentWindow.AcceptedOptionalReports);
     }
 
     /// <summary>
@@ -134,8 +131,7 @@ public partial class MainWindow
     {
         var current = CrashReporting.Current;
         var next = CrashReportingLifecycle.InitializeIfAuthorized(
-            viewModel.ShareCrashReports
-                && viewModel.PrivacyConsentDecision?.IsCrashReportingAuthorized == true,
+            viewModel.PrivacyConsentDecision?.AreOptionalReportsAuthorized == true,
             remoteServicesOptions,
             viewModel.AppVersion,
             static () => new SentryCrashReportingService());
@@ -151,7 +147,7 @@ public partial class MainWindow
     private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (crashReportingConfigured
-            && e.PropertyName == nameof(MainViewModel.ShareCrashReports))
+            && e.PropertyName == nameof(MainViewModel.ShareOptionalReports))
         {
             InitializeCrashReportingIfAuthorized();
         }

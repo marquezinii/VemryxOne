@@ -14,6 +14,7 @@ public sealed class RecoveryCoordinatorTests : IDisposable
         var runtime = new RuntimeActivationStore(root);
         Directory.CreateDirectory(Path.Combine(runtime.VersionsRoot, "1.0.0"));
         Directory.CreateDirectory(Path.Combine(runtime.VersionsRoot, "1.1.0"));
+        Directory.CreateDirectory(Path.Combine(runtime.VersionsRoot, "0.9.0"));
         runtime.Activate("1.0.0");
         var journal = new UpdateRecoveryJournal(root);
         var transaction = journal.Begin("1.0.0", "1.1.0");
@@ -25,6 +26,8 @@ public sealed class RecoveryCoordinatorTests : IDisposable
             RecoveryDecision.RolledBack,
             new RecoveryCoordinator(root).Reconcile(transaction.CandidateLaunchedAtUtc!.Value.AddMinutes(2), TimeSpan.FromMinutes(1)));
         Assert.Equal("1.0.0", runtime.ReadActiveVersion());
+        Assert.False(Directory.Exists(Path.Combine(runtime.VersionsRoot, "0.9.0")));
+        Assert.False(Directory.Exists(Path.Combine(runtime.VersionsRoot, "1.1.0")));
     }
 
     [Fact]
@@ -46,6 +49,7 @@ public sealed class RecoveryCoordinatorTests : IDisposable
         new RecoveryCoordinator(root).Abandon(transaction);
 
         Assert.Equal("1.0.0", runtime.ReadActiveVersion());
+        Assert.False(Directory.Exists(Path.Combine(runtime.VersionsRoot, "1.1.0")));
         Assert.False(journal.TryRead(out _));
     }
 

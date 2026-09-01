@@ -85,4 +85,68 @@ public sealed class RuntimeActivationStoreTests : IDisposable
             releaseThread.Join();
         }
     }
+
+    [Fact]
+    public void PruneVersionsExcept_RemovesOnlyRecognizedUnpreservedVersionsAndKeepsTheActiveVersion()
+    {
+        var store = new RuntimeActivationStore(root);
+        Directory.CreateDirectory(Path.Combine(store.VersionsRoot, "0.9.0"));
+        Directory.CreateDirectory(Path.Combine(store.VersionsRoot, "1.0.0"));
+        Directory.CreateDirectory(Path.Combine(store.VersionsRoot, "1.1.0"));
+        Directory.CreateDirectory(Path.Combine(store.VersionsRoot, "manual-recovery"));
+        store.Activate("1.1.0");
+
+        store.PruneVersionsExcept("1.0.0");
+
+        Assert.False(Directory.Exists(Path.Combine(store.VersionsRoot, "0.9.0")));
+        Assert.True(Directory.Exists(Path.Combine(store.VersionsRoot, "1.0.0")));
+        Assert.True(Directory.Exists(Path.Combine(store.VersionsRoot, "1.1.0")));
+        Assert.True(Directory.Exists(Path.Combine(store.VersionsRoot, "manual-recovery")));
+    }
+
+    [Fact]
+    public void PruneVersionsExcept_RejectsAnInvalidPreservationSetBeforeDeletingAnything()
+    {
+        var store = new RuntimeActivationStore(root);
+        var oldVersion = Path.Combine(store.VersionsRoot, "1.0.0");
+        Directory.CreateDirectory(oldVersion);
+
+        Assert.Throws<ArgumentException>(() => store.PruneVersionsExcept(".."));
+
+        Assert.True(Directory.Exists(oldVersion));
+    }
+
+    [Fact]
+    public void PruneVersionsExcept_DoesNotFailTheUpdateWhenAnOldVersionIsInUse()
+    {
+        var store = new RuntimeActivationStore(root);
+        var oldVersion = Path.Combine(store.VersionsRoot, "1.0.0");
+        Directory.CreateDirectory(oldVersion);
+        Directory.CreateDirectory(Path.Combine(store.VersionsRoot, "2.0.0"));
+        store.Activate("2.0.0");
+        var lockedFile = Path.Combine(oldVersion, "Ralven.dll");
+        File.WriteAllText(lockedFile, "old");
+
+        using (File.Open(lockedFile, FileMode.Open, FileAccess.Read, FileShare.None))
+            store.PruneVersionsExcept("2.0.0");
+
+        Assert.True(Directory.Exists(oldVersion));
+        Assert.True(Directory.Exists(Path.Combine(store.VersionsRoot, "2.0.0")));
+    }
+
+    [Fact]
+    public void PruneInactiveVersions_KeepsOnlyTheActiveVersionAndItsClosestPredecessor()
+    {
+        var store = new RuntimeActivationStore(root);
+        foreach (var version in new[] { "0.9.0", "1.0.0", "1.1.0", "2.0.0" })
+            Directory.CreateDirectory(Path.Combine(store.VersionsRoot, version));
+        store.Activate("1.1.0");
+
+        store.PruneInactiveVersions();
+
+        Assert.False(Directory.Exists(Path.Combine(store.VersionsRoot, "0.9.0")));
+        Assert.True(Directory.Exists(Path.Combine(store.VersionsRoot, "1.0.0")));
+        Assert.True(Directory.Exists(Path.Combine(store.VersionsRoot, "1.1.0")));
+        Assert.False(Directory.Exists(Path.Combine(store.VersionsRoot, "2.0.0")));
+    }
 }

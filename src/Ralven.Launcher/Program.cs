@@ -48,6 +48,8 @@ internal static class Program
                 activation.Activate(floor);
                 version = floor;
             }
+            if (!journal.TryRead(out _))
+                activation.PruneInactiveVersions();
             var executable = Path.Combine(activation.VersionsRoot, version, "Ralven.exe");
             if (!File.Exists(executable)) throw new FileNotFoundException("A versão ativa não contém o aplicativo.", executable);
 

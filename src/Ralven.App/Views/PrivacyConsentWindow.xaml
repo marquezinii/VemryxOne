@@ -5,7 +5,7 @@
         Title="{Binding [PrivacyConsent.WindowTitle], Source={StaticResource LocalizedStrings}}"
         Icon="/Ralven;component/Assets/Ralven.png"
         Width="540"
-        Height="650"
+        Height="560"
         MinWidth="460"
         MinHeight="480"
         WindowStartupLocation="CenterOwner"
@@ -49,42 +49,43 @@
                     <TextBlock Text="{Binding IntroText}"
                                Style="{StaticResource SecondaryText}"
                                Margin="0,8,0,20"
+                               TextWrapping="Wrap"
                                LineHeight="17" />
 
                     <Border Style="{StaticResource PanelSurface}" Padding="14" Margin="0,0,0,11">
-                        <StackPanel>
-                            <TextBlock Text="{Binding [PrivacyConsent.Essential.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyStrongText}" />
-                            <TextBlock Text="{Binding [PrivacyConsent.Essential.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource CaptionText}" Margin="0,3,0,0" />
-                        </StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Margin="0,0,18,0">
+                                <TextBlock Text="{Binding [PrivacyConsent.Essential.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyStrongText}" />
+                                <TextBlock Text="{Binding [PrivacyConsent.Essential.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource CaptionText}" Margin="0,3,0,0" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding [PrivacyConsent.Essential.Status], Source={StaticResource LocalizedStrings}}"
+                                       Style="{StaticResource OverlineText}"
+                                       Foreground="{DynamicResource SuccessBaseBrush}"
+                                       VerticalAlignment="Top" />
+                        </Grid>
                     </Border>
 
-                    <Border Style="{StaticResource PanelSurface}" Padding="14" Margin="0,0,0,18">
-                        <CheckBox x:Name="TelemetryCheckBox"
+                    <Border Style="{StaticResource PanelSurface}" Padding="14" Margin="0,0,0,14">
+                        <CheckBox x:Name="OptionalReportsCheckBox"
                                   Style="{StaticResource ToggleSwitchStyle}"
                                   AutomationProperties.Name="{Binding [PrivacyConsent.Telemetry.Title], Source={StaticResource LocalizedStrings}}">
                             <StackPanel>
                                 <TextBlock Text="{Binding [PrivacyConsent.Telemetry.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyStrongText}" />
-                                <TextBlock Text="{Binding [PrivacyConsent.Telemetry.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource CaptionText}" Margin="0,3,0,0" />
+                                <TextBlock Text="{Binding [PrivacyConsent.Telemetry.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource CaptionText}" Margin="0,3,0,0" TextWrapping="Wrap" />
                             </StackPanel>
                         </CheckBox>
                     </Border>
 
-                    <Border Style="{StaticResource PanelSurface}" Padding="14" Margin="0,0,0,18">
-                        <CheckBox x:Name="CrashReportsCheckBox"
-                                  Style="{StaticResource ToggleSwitchStyle}"
-                                  AutomationProperties.Name="{Binding [PrivacyConsent.CrashReports.Title], Source={StaticResource LocalizedStrings}}">
-                            <StackPanel>
-                                <TextBlock Text="{Binding [PrivacyConsent.CrashReports.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyStrongText}" />
-                                <TextBlock Text="{Binding [PrivacyConsent.CrashReports.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource CaptionText}" Margin="0,3,0,0" />
-                            </StackPanel>
-                        </CheckBox>
+                    <Border Style="{StaticResource AlertRowStyle}" Padding="13">
+                        <TextBlock Text="{Binding [PrivacyConsent.PrivacyNote], Source={StaticResource LocalizedStrings}}"
+                                   Style="{StaticResource CaptionText}"
+                                   TextWrapping="Wrap" />
                     </Border>
-
-                    <TextBlock Text="{Binding [Privacy.Collects.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource OverlineText}" Foreground="{DynamicResource SuccessBaseBrush}" />
-                    <TextBlock Text="{Binding [Privacy.Collects.Items], Source={StaticResource LocalizedStrings}}" Style="{StaticResource CaptionText}" Margin="0,5,0,14" LineHeight="16" />
-
-                    <TextBlock Text="{Binding [Privacy.DoesNotCollect.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource OverlineText}" Foreground="{DynamicResource DangerBaseBrush}" />
-                    <TextBlock Text="{Binding [Privacy.DoesNotCollect.Items], Source={StaticResource LocalizedStrings}}" Style="{StaticResource CaptionText}" Margin="0,5,0,0" LineHeight="16" />
                 </StackPanel>
             </ScrollViewer>
 

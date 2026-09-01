@@ -38,6 +38,34 @@ public sealed class SignedManifestUpdateServiceDownloadTests
             "*.part"));
     }
 
+    [Fact]
+    public async Task DownloadUpdateAsync_PrunesOnlyStaleVersionCaches()
+    {
+        var payload = "runtime"u8.ToArray();
+        var sha256 = Convert.ToHexString(SHA256.HashData(payload));
+        using var temporaryData = new TemporaryDirectory();
+        var updatesRoot = Path.Combine(temporaryData.Path, "Updates");
+        Directory.CreateDirectory(Path.Combine(updatesRoot, "1.0.0"));
+        Directory.CreateDirectory(Path.Combine(updatesRoot, "manual-recovery"));
+        File.WriteAllText(Path.Combine(updatesRoot, "1.0.0", "old.zip"), "old");
+        using var handler = new PayloadHandler(payload);
+        using var service = new SignedManifestUpdateService(handler, temporaryData.Path);
+        var update = new ReleaseUpdate(
+            StableSemanticVersion.Parse("2.0.0"),
+            "v2.0.0",
+            "Ralven-Runtime-2.0.0-win-x64.zip",
+            new Uri("https://github.com/marquezinii/Ralven/releases/download/v2.0.0/package.zip"),
+            payload.LongLength,
+            sha256,
+            new Uri("https://example.invalid/notes"));
+
+        await service.DownloadUpdateAsync(update, cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.False(Directory.Exists(Path.Combine(updatesRoot, "1.0.0")));
+        Assert.True(Directory.Exists(Path.Combine(updatesRoot, "manual-recovery")));
+        Assert.True(Directory.Exists(Path.Combine(updatesRoot, "2.0.0")));
+    }
+
     private sealed class PayloadHandler(byte[] payload) : HttpMessageHandler
     {
         protected override Task<HttpResponseMessage> SendAsync(

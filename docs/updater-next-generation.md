@@ -83,8 +83,10 @@ proibidas em uma atualização automática.
 O Recovery Agent mantém log local detalhado, rotacionado e sem dados pessoais.
 Para o Worker, envia apenas evento estruturado e limitado para `POST
 /updater-events`: versão anterior/candidata, fase, código de erro, resultado e
-ambiente. O servidor registra o horário de recebimento. O envio depende do mesmo consentimento de telemetria do
-app; texto livre, caminhos, dumps e logs completos nunca deixam o PC.
+ambiente. O servidor registra o horário de recebimento. Como diagnóstico
+essencial, o envio depende da confirmação do aviso de privacidade vigente do
+app, mas não do controle de relatórios opcionais; texto livre, caminhos, dumps
+e logs completos nunca deixam o PC.
 Eventos autorizados ficam em uma fila local limitada até o Worker responder
 com sucesso; IDs únicos e inserção idempotente tornam o reenvio seguro.
 

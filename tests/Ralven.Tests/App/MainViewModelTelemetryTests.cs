@@ -56,6 +56,7 @@ public sealed class MainViewModelTelemetryTests
             Task.FromResult(new AppSettings
             {
                 ShareAnonymousTelemetry = true,
+                ShareCrashReports = true,
                 PrivacyConsentVersion = PrivacyConsentPolicy.CurrentVersion
             });
 
@@ -120,7 +121,13 @@ public sealed class MainViewModelTelemetryTests
 
         public bool IsEnabled { get; private set; }
 
-        public void SetEnabled(bool enabled) => IsEnabled = enabled;
+        public bool IncludesOptionalData { get; private set; }
+
+        public void Configure(bool enabled, bool includeOptionalData)
+        {
+            IsEnabled = enabled;
+            IncludesOptionalData = includeOptionalData;
+        }
 
         public Task<AnonymousTelemetryEvent> WaitForEventAsync() => captured.Task;
 

@@ -43,6 +43,69 @@ public sealed class PublicExposureHardeningTests
     }
 
     [Fact]
+    public void StableRelease_PreparesAndProvesDiagnosticsBeforePublication()
+    {
+        var root = FindRepositoryRoot();
+        var workflow = File.ReadAllText(Path.Combine(root, ".github", "workflows", "release.yml"));
+
+        var prepare = workflow.IndexOf("- name: Prepare production diagnostics backend", StringComparison.Ordinal);
+        var migrate = workflow.IndexOf("wrangler d1 migrations apply", prepare, StringComparison.Ordinal);
+        var deploy = workflow.IndexOf("wrangler deploy", migrate, StringComparison.Ordinal);
+        var smoke = workflow.IndexOf("Test-ProductionDiagnostics.ps1", deploy, StringComparison.Ordinal);
+        var publish = workflow.IndexOf("- name: Create public release", smoke, StringComparison.Ordinal);
+        var feed = workflow.IndexOf("- name: Publish signed stable feed", publish, StringComparison.Ordinal);
+
+        Assert.True(prepare >= 0);
+        Assert.True(migrate > prepare);
+        Assert.True(deploy > migrate);
+        Assert.True(smoke > deploy);
+        Assert.True(publish > smoke);
+        Assert.True(feed > publish);
+    }
+
+    [Fact]
+    public void StableRelease_HardensAndSmokeTestsTheRuntimeBeforePublication()
+    {
+        var root = FindRepositoryRoot();
+        var workflow = File.ReadAllText(Path.Combine(root, ".github", "workflows", "release.yml"));
+
+        var hardenedBuild = workflow.IndexOf("Build-Installer.ps1 -Version $env:ASSET_VERSION -Harden", StringComparison.Ordinal);
+        var finalizeBroker = workflow.IndexOf("Finalize-BrokerIntegrity.ps1", hardenedBuild, StringComparison.Ordinal);
+        var runtimeSmoke = workflow.IndexOf("Test-HardenedRuntime.ps1", finalizeBroker, StringComparison.Ordinal);
+        var installerTest = workflow.IndexOf("Test-Installer.ps1", runtimeSmoke, StringComparison.Ordinal);
+        var publish = workflow.IndexOf("- name: Create public release", installerTest, StringComparison.Ordinal);
+
+        Assert.True(hardenedBuild >= 0);
+        Assert.True(finalizeBroker > hardenedBuild);
+        Assert.True(runtimeSmoke > finalizeBroker);
+        Assert.True(installerTest > runtimeSmoke);
+        Assert.True(publish > installerTest);
+        Assert.Contains("name: obfuscation-maps-", workflow, StringComparison.Ordinal);
+        Assert.Contains("retention-days: 90", workflow, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void StableRelease_CanSafelyResumeAndProvesThePublishedUpdateFeed()
+    {
+        var root = FindRepositoryRoot();
+        var workflow = File.ReadAllText(Path.Combine(root, ".github", "workflows", "release.yml"));
+
+        var existingRelease = workflow.IndexOf("Existing stable release matches the audited updater artifacts", StringComparison.Ordinal);
+        var compareManifest = workflow.LastIndexOf("Ralven-signed-update-manifest.json", existingRelease, StringComparison.Ordinal);
+        var compareRuntime = workflow.LastIndexOf("Ralven-Runtime-win-x64.zip", existingRelease, StringComparison.Ordinal);
+        var publishFeed = workflow.IndexOf("wrangler secret put RELEASE_MANIFEST_JSON", existingRelease, StringComparison.Ordinal);
+        var smokeFeed = workflow.IndexOf("/update/manifest", publishFeed, StringComparison.Ordinal);
+        var verifyExactManifest = workflow.IndexOf("$published -eq $expected", smokeFeed, StringComparison.Ordinal);
+
+        Assert.True(compareManifest >= 0);
+        Assert.True(compareRuntime >= 0);
+        Assert.True(existingRelease > compareManifest && existingRelease > compareRuntime);
+        Assert.True(publishFeed > existingRelease);
+        Assert.True(smokeFeed > publishFeed);
+        Assert.True(verifyExactManifest > smokeFeed);
+    }
+
+    [Fact]
     public void RuntimeTrustAnchors_AreSeparatedByPurpose()
     {
         var root = FindRepositoryRoot();

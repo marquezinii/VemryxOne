@@ -87,11 +87,11 @@ public sealed partial class MainViewModel
             errorCategory,
             OsVersion: diagnostic?.OsLabel,
             SystemArchitecture: diagnostic?.SystemArchitecture,
-            CpuModel: ShareAnonymousTelemetry ? diagnostic?.CpuName : null,
-            GpuModel: ShareAnonymousTelemetry ? diagnostic?.GpuName : null,
-            RamBucketGiB: ShareAnonymousTelemetry && diagnostic is not null ? RamBucketCalculator.ComputeBucketGiB(diagnostic.TotalMemoryGiB) : null,
-            Profile: ShareAnonymousTelemetry ? selectedProfile.ToString() : null,
-            ActionIds: ShareAnonymousTelemetry ? currentPlan?.Actions
+            CpuModel: ShareOptionalReports ? diagnostic?.CpuName : null,
+            GpuModel: ShareOptionalReports ? diagnostic?.GpuName : null,
+            RamBucketGiB: ShareOptionalReports && diagnostic is not null ? RamBucketCalculator.ComputeBucketGiB(diagnostic.TotalMemoryGiB) : null,
+            Profile: ShareOptionalReports ? selectedProfile.ToString() : null,
+            ActionIds: ShareOptionalReports ? currentPlan?.Actions
                 .Select(action => action.Metadata.Id)
                 .Take(TelemetryEventValidator.MaxActionIds)
                 .ToArray() : null,
@@ -101,15 +101,15 @@ public sealed partial class MainViewModel
             GtaEdition: diagnostic?.Edition.ToString(),
             OptimizationTargetCount: currentPlan?.Actions.Count,
             // v5: dados opcionais de contexto (só com consentimento)
-            WindowsBuild: ShareAnonymousTelemetry ? GetWindowsBuild() : null,
-            DiskType: ShareAnonymousTelemetry ? GetDiskType() : null,
-            FreeSpaceGiBBucket: ShareAnonymousTelemetry && diagnostic is not null ? BucketFreeSpaceGiB(diagnostic.FreeDiskGiB) : null,
-            RunTimestamp: ShareAnonymousTelemetry ? DateTimeOffset.UtcNow : null,
-            DaysSinceLastRunBucket: ShareAnonymousTelemetry ? GetDaysSinceLastRunBucket() : null,
+            WindowsBuild: ShareOptionalReports ? GetWindowsBuild() : null,
+            DiskType: ShareOptionalReports ? GetDiskType() : null,
+            FreeSpaceGiBBucket: ShareOptionalReports && diagnostic is not null ? BucketFreeSpaceGiB(diagnostic.FreeDiskGiB) : null,
+            RunTimestamp: ShareOptionalReports ? DateTimeOffset.UtcNow : null,
+            DaysSinceLastRunBucket: ShareOptionalReports ? GetDaysSinceLastRunBucket() : null,
             BackupCreated: null, // será preenchido pelo resultado da otimização quando disponível
             BackupRestored: null, // será preenchido pelo resultado da otimização quando disponível
             ElevationUsed: null, // será preenchido pelo resultado da otimização quando disponível
-            ProcessCountAtStart: ShareAnonymousTelemetry ? GetProcessCountBucket() : null);
+            ProcessCountAtStart: ShareOptionalReports ? GetProcessCountBucket() : null);
         _ = TrackOptimizationTelemetryAsync(telemetryEvent);
     }
 

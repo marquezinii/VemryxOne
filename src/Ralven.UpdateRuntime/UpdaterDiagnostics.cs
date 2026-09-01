@@ -15,6 +15,8 @@ public sealed record UpdaterEvent(
 
 public sealed class UpdaterDiagnostics
 {
+    private const int MinimumEssentialDiagnosticsNoticeVersion = 8;
+
     /// <summary>
     /// Host of the Cloudflare Worker that receives updater diagnostics events.
     /// The single source of truth for every caller that needs to build the
@@ -128,8 +130,8 @@ public sealed class UpdaterDiagnostics
         {
             using var document = JsonDocument.Parse(File.ReadAllText(Path.Combine(dataRoot, "settings.json")));
             var root = document.RootElement;
-            return root.TryGetProperty("shareAnonymousTelemetry", out var enabled) && enabled.GetBoolean()
-                && root.TryGetProperty("privacyConsentVersion", out var version) && version.GetInt32() >= 3;
+            return root.TryGetProperty("privacyConsentVersion", out var version)
+                && version.GetInt32() >= MinimumEssentialDiagnosticsNoticeVersion;
         }
         // UnauthorizedAccessException entra no filtro pelo mesmo motivo dos
         // demais: o app grava settings.json concorrentemente e um lock

@@ -96,11 +96,19 @@ Depois do clique do usuário, o atualizador:
    health receipt com nonce em até 45 segundos;
 7. sem receipt, o launcher restaura somente o predecessor registrado. Uma
    versão saudável avança o piso anti-downgrade protegido por DPAPI;
-8. nunca desativa SmartScreen, Defender, UAC ou antivírus de terceiros.
+8. depois da confirmação saudável, preserva somente a versão ativa e o seu
+   predecessor imediato; depois de rollback, remove a candidata que falhou.
+   Downloads de versões anteriores também são removidos ao baixar a próxima.
+   Se antivírus ou outro processo mantiver uma pasta em uso, o update continua
+   seguro e a limpeza é tentada novamente na atualização seguinte;
+9. nunca desativa SmartScreen, Defender, UAC ou antivírus de terceiros.
+
+Na primeira abertura após uma reinstalação manual sobre a instalação existente,
+o launcher aplica a mesma retenção depois de reconciliar o piso anti-downgrade.
 
 Falhas de manifesto, download, staging, ativação e saúde preservam a versão
-anterior. Logs detalhados ficam locais; eventos sanitizados chegam à área
-administrativa somente após consentimento explícito de telemetria.
+anterior. Logs detalhados ficam locais; eventos essenciais sanitizados chegam à
+área administrativa somente após a confirmação do aviso de privacidade vigente.
 
 ## Publicação no GitHub
 

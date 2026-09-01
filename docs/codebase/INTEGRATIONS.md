@@ -42,7 +42,7 @@
 
 ## 5) Observabilidade
 
-- Sentry recebe apenas exceção sanitizada e consentida; PII, sessões, tracing e captura HTTP automática estão desativados.
+- Sentry recebe apenas exceção sanitizada quando **Relatórios opcionais** está ativo; PII, sessões, tracing e captura HTTP automática estão desativados.
 - Telemetria usa evento allowlisted e idempotente; dashboard lê métricas e erros operacionais via Worker.
 - Broker/updater mantêm logs/journals locais com contexto de transação.
 - `[TODO]` não há SLO, tracing distribuído ou alerta automatizado do Worker/D1 documentado no código.
