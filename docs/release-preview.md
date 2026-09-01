@@ -73,6 +73,13 @@ publicação do feed falhar depois de a GitHub Release de notas já existir, uma
 reexecução republica os mesmos objetos versionados auditados antes de tornar os
 aliases estáveis visíveis.
 
+Para limitar armazenamento sem arriscar a versão pública, o workflow conserva
+somente as 7 pastas de release SemVer mais recentes no R2 depois que a nova
+publicação termina. Os aliases e manifestos em `stable/` são preservados. Não há
+expiração por idade para binários completos: o lifecycle automático de 1 dia
+serve apenas para abortar uploads multipart que não terminaram. A conta também
+possui alerta de orçamento em US$ 5; ele envia aviso, mas não interrompe cobrança.
+
 Instalações antigas ou execuções portáteis fora desse layout usam o manifesto
 assinado do instalador completo. O botão manual em
 Configurações força uma nova consulta e sempre informa se o app já está

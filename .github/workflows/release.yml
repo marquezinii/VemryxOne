@@ -519,3 +519,12 @@ jobs:
               throw "The public update feed '$($entry.Key)' does not match the signed candidate."
             }
           }
+
+      - name: Keep only the seven newest R2 releases
+        if: ${{ inputs.channel == 'stable' }}
+        shell: pwsh
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: node ./scripts/Prune-R2Releases.mjs

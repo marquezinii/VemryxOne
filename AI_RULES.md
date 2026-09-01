@@ -374,6 +374,21 @@ trabalho, diagnostique a causa e relate a limitação real.
 
 ## Publicação oficial
 
+### Retenção e custo do R2
+
+- O bucket `ralven-releases` mantém os objetos versionados das **7 releases
+  SemVer mais recentes**. A limpeza ocorre somente ao final de uma publicação
+  bem-sucedida e deve falhar de forma segura se a release corrente não estiver
+  entre as versões preservadas.
+- Os aliases e manifestos em `stable/` nunca participam da limpeza por versão.
+  Não crie expiração por idade para `releases/`: ela poderia remover a versão
+  pública atual durante um intervalo longo sem lançamento.
+- O lifecycle do bucket pode abortar uploads multipart incompletos após 1 dia;
+  ele não deve expirar artefatos completos.
+- Mantenha um alerta de orçamento da conta Cloudflare em **US$ 5**. O alerta é
+  informativo, não um limite rígido; preserve cache imutável, retenção e
+  monitoramento de uso.
+
 É disparada somente por frase como “publicar versão”, “lançar versão”, “criar
 release”, “publicar atualização” ou “fazer release oficial”. Ela sempre parte
 do estado já integrado e consistente de `dev/proxima-versao`; branches

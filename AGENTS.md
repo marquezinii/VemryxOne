@@ -296,6 +296,12 @@ incorreto. Não transforme falha de validação em warning silencioso.
 Release somente no fluxo explicitamente acionado pelo usuário e definido em
 `AI_RULES.md`.
 
+No R2, preserve somente as 7 releases SemVer mais recentes por meio da limpeza
+pós-publicação definida no workflow. Nunca inclua `stable/` nessa limpeza nem
+substitua a política por expiração etária de artefatos completos. O lifecycle de
+1 dia existe apenas para uploads multipart incompletos. Preserve também o alerta
+de orçamento Cloudflare de US$ 5, lembrando que ele notifica e não bloqueia gasto.
+
 Tarefa comum não:
 
 - incrementa versão;
