@@ -31,8 +31,7 @@ public enum PrivacyConsentScreenVariant
 /// <summary>
 /// Typed outcome of evaluating an <see cref="AppSettings"/> snapshot against
 /// <see cref="PrivacyConsentPolicy"/>. Carries both whether the consent
-/// screen must be shown and whether each kind of transmission is currently
-/// authorized to run.
+/// screen must be shown and which diagnostic tier is currently authorized.
 /// </summary>
 public sealed record PrivacyConsentDecision
 {
@@ -41,19 +40,17 @@ public sealed record PrivacyConsentDecision
     public required PrivacyConsentScreenVariant Variant { get; init; }
 
     /// <summary>
-    /// True only when <see cref="AppSettings.ShareAnonymousTelemetry"/> is
-    /// <see langword="true"/> AND the stored consent version is not older
-    /// than <see cref="PrivacyConsentPolicy.CurrentVersion"/>. Both
-    /// conditions must hold simultaneously — a checked toggle alone never
-    /// authorizes sending anything.
+    /// Essential, allowlisted diagnostics are authorized only after the
+    /// current privacy notice has been acknowledged.
     /// </summary>
-    public required bool IsAnonymousTelemetryAuthorized { get; init; }
+    public required bool AreEssentialDiagnosticsAuthorized { get; init; }
 
     /// <summary>
-    /// Same rule as <see cref="IsAnonymousTelemetryAuthorized"/>, applied to
-    /// <see cref="AppSettings.ShareCrashReports"/>.
+    /// Optional diagnostics and sanitized crash reports share one user-facing
+    /// preference. Both persisted compatibility flags must remain enabled so
+    /// an older explicit opt-out is never silently reversed.
     /// </summary>
-    public required bool IsCrashReportingAuthorized { get; init; }
+    public required bool AreOptionalReportsAuthorized { get; init; }
 }
 
 /// <summary>
@@ -97,8 +94,10 @@ public static class PrivacyConsentEvaluator
         {
             RequiresConsentScreen = requiresRenewal,
             Variant = variant,
-            IsAnonymousTelemetryAuthorized = settings.ShareAnonymousTelemetry && !requiresRenewal,
-            IsCrashReportingAuthorized = settings.ShareCrashReports && !requiresRenewal
+            AreEssentialDiagnosticsAuthorized = !requiresRenewal,
+            AreOptionalReportsAuthorized = settings.ShareAnonymousTelemetry
+                && settings.ShareCrashReports
+                && !requiresRenewal
         };
     }
 }

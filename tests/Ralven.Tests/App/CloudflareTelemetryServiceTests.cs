@@ -589,7 +589,7 @@ public sealed class QueuedCloudflareTelemetryServiceTests : IDisposable
         using var client = new HttpClient(handler);
         var queue = new LocalTelemetryQueue(tempDirectory);
         var service = new QueuedCloudflareTelemetryService(queue, new CloudflareTelemetryTransport(client, TestEndpoint));
-        service.SetEnabled(true);
+        service.Configure(enabled: true, includeOptionalData: true);
 
         await service.TrackAsync(SampleEvent(), cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
         await service.FlushPendingAsync(cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
@@ -607,7 +607,7 @@ public sealed class QueuedCloudflareTelemetryServiceTests : IDisposable
         using var client = new HttpClient(handler);
         var queue = new LocalTelemetryQueue(tempDirectory);
         var service = new QueuedCloudflareTelemetryService(queue, new CloudflareTelemetryTransport(client, TestEndpoint));
-        service.SetEnabled(true);
+        service.Configure(enabled: true, includeOptionalData: true);
 
         await queue.EnqueueAsync(SampleEvent(), cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
         await service.FlushPendingAsync(cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
@@ -622,7 +622,7 @@ public sealed class QueuedCloudflareTelemetryServiceTests : IDisposable
         using var client = new HttpClient(handler);
         var queue = new LocalTelemetryQueue(tempDirectory);
         var service = new QueuedCloudflareTelemetryService(queue, new CloudflareTelemetryTransport(client, TestEndpoint));
-        service.SetEnabled(true);
+        service.Configure(enabled: true, includeOptionalData: true);
         await queue.EnqueueAsync(SampleEvent(), cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
 
         await service.FlushPendingAsync(cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
@@ -641,7 +641,7 @@ public sealed class QueuedCloudflareTelemetryServiceTests : IDisposable
         var service = new QueuedCloudflareTelemetryService(
             new LocalTelemetryQueue(tempDirectory),
             new CloudflareTelemetryTransport(client, TestEndpoint));
-        service.SetEnabled(true);
+        service.Configure(enabled: true, includeOptionalData: true);
 
         await service.FlushPendingAsync(cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
 
@@ -687,7 +687,7 @@ public sealed class QueuedCloudflareTelemetryServiceTests : IDisposable
         using var client = new HttpClient(handler);
         var queue = new LocalTelemetryQueue(tempDirectory);
         var service = new QueuedCloudflareTelemetryService(queue, new CloudflareTelemetryTransport(client, TestEndpoint));
-        service.SetEnabled(true);
+        service.Configure(enabled: true, includeOptionalData: true);
 
         await Assert.ThrowsAsync<ArgumentException>(() => service.TrackAsync(SampleEvent() with { EventName = "not-allowed" }, cancellationToken: global::Xunit.TestContext.Current.CancellationToken));
 
@@ -701,7 +701,7 @@ public sealed class QueuedCloudflareTelemetryServiceTests : IDisposable
         using var client = new HttpClient(handler);
         var queue = new LocalTelemetryQueue(tempDirectory);
         var service = new QueuedCloudflareTelemetryService(queue, new CloudflareTelemetryTransport(client, TestEndpoint));
-        service.SetEnabled(true);
+        service.Configure(enabled: true, includeOptionalData: true);
         await queue.EnqueueAsync(SampleEvent(), cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
 
         var firstFlush = service.FlushPendingAsync(cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
@@ -711,6 +711,26 @@ public sealed class QueuedCloudflareTelemetryServiceTests : IDisposable
         await Task.WhenAll(firstFlush, secondFlush);
 
         Assert.Equal(1, handler.CallCount);
+        Assert.Empty(queue.ReadPending(10));
+    }
+
+    [Fact]
+    public async Task FlushPendingAsync_AfterOptionalReportsAreDisabled_StripsOptionalFieldsOnly()
+    {
+        var handler = new RecordingHandler();
+        using var client = new HttpClient(handler);
+        var queue = new LocalTelemetryQueue(tempDirectory);
+        var service = new QueuedCloudflareTelemetryService(queue, new CloudflareTelemetryTransport(client, TestEndpoint));
+        await queue.EnqueueAsync(
+            SampleEvent() with { OsVersion = "Windows 11", CpuModel = "Test CPU", Profile = "Balanced" },
+            cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
+        service.Configure(enabled: true, includeOptionalData: false);
+
+        await service.FlushPendingAsync(cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
+
+        Assert.Contains("Windows 11", handler.Body, StringComparison.Ordinal);
+        Assert.DoesNotContain("Test CPU", handler.Body, StringComparison.Ordinal);
+        Assert.DoesNotContain("Balanced", handler.Body, StringComparison.Ordinal);
         Assert.Empty(queue.ReadPending(10));
     }
 

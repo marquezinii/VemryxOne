@@ -54,13 +54,33 @@ public sealed record AnonymousTelemetryEvent(
     // This identifies a delivery attempt's logical event, never a device or user.
     // It is persisted with the queued payload so retries retain the same value.
     public Guid EventId { get; init; } = Guid.NewGuid();
+
+    public AnonymousTelemetryEvent WithoutOptionalData() => this with
+    {
+        CpuModel = null,
+        GpuModel = null,
+        RamBucketGiB = null,
+        Profile = null,
+        ActionIds = null,
+        WindowsBuild = null,
+        DiskType = null,
+        FreeSpaceGiBBucket = null,
+        RunTimestamp = null,
+        DaysSinceLastRunBucket = null,
+        BackupCreated = null,
+        BackupRestored = null,
+        ElevationUsed = null,
+        ProcessCountAtStart = null
+    };
 }
 
 public interface IAnonymousTelemetryService
 {
     bool IsEnabled { get; }
 
-    void SetEnabled(bool enabled);
+    bool IncludesOptionalData { get; }
+
+    void Configure(bool enabled, bool includeOptionalData);
 
     Task TrackAsync(AnonymousTelemetryEvent telemetryEvent, CancellationToken cancellationToken = default);
 
@@ -79,7 +99,9 @@ public sealed class DisabledAnonymousTelemetryService : IAnonymousTelemetryServi
 
     public bool IsEnabled => false;
 
-    public void SetEnabled(bool enabled)
+    public bool IncludesOptionalData => false;
+
+    public void Configure(bool enabled, bool includeOptionalData)
     {
     }
 

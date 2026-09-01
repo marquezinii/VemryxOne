@@ -506,10 +506,10 @@
                                         <Grid>
                                             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                                             <StackPanel Margin="0,0,24,0">
-                                                <TextBlock Text="{Binding [Settings.Telemetry.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyStrongText}" />
-                                                <TextBlock Text="{Binding [Settings.Telemetry.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,3,0,0" TextWrapping="Wrap" />
+                                                <TextBlock Text="{Binding [PrivacyConsent.Essential.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyStrongText}" />
+                                                <TextBlock Text="{Binding [PrivacyConsent.Essential.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,3,0,0" TextWrapping="Wrap" />
                                             </StackPanel>
-                                            <CheckBox Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding ShareAnonymousTelemetry}" AutomationProperties.Name="{Binding [Settings.Telemetry.Title], Source={StaticResource LocalizedStrings}}" AutomationProperties.HelpText="{Binding [Settings.Telemetry.Description], Source={StaticResource LocalizedStrings}}" />
+                                            <TextBlock Grid.Column="1" Text="{Binding [PrivacyConsent.Essential.Status], Source={StaticResource LocalizedStrings}}" Style="{StaticResource OverlineText}" Foreground="{DynamicResource SuccessBaseBrush}" VerticalAlignment="Top" />
                                         </Grid>
                                     </Border>
 
@@ -517,10 +517,10 @@
                                         <Grid>
                                             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                                             <StackPanel Margin="0,0,24,0">
-                                                <TextBlock Text="{Binding [Settings.CrashReports.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyStrongText}" />
-                                                <TextBlock Text="{Binding [Settings.CrashReports.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,3,0,0" TextWrapping="Wrap" />
+                                                <TextBlock Text="{Binding [Settings.Telemetry.Title], Source={StaticResource LocalizedStrings}}" Style="{StaticResource BodyStrongText}" />
+                                                <TextBlock Text="{Binding [Settings.Telemetry.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SecondaryText}" Margin="0,3,0,0" TextWrapping="Wrap" />
                                             </StackPanel>
-                                            <CheckBox Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding ShareCrashReports}" AutomationProperties.Name="{Binding [Settings.CrashReports.Title], Source={StaticResource LocalizedStrings}}" AutomationProperties.HelpText="{Binding [Settings.CrashReports.Description], Source={StaticResource LocalizedStrings}}" />
+                                            <CheckBox Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding ShareOptionalReports}" AutomationProperties.Name="{Binding [Settings.Telemetry.Title], Source={StaticResource LocalizedStrings}}" AutomationProperties.HelpText="{Binding [Settings.Telemetry.Description], Source={StaticResource LocalizedStrings}}" />
                                         </Grid>
                                     </Border>
 

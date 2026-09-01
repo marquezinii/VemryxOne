@@ -35,9 +35,7 @@ public sealed class MainViewModelSettingsTests
         viewModel.CheckForUpdates = false;
         viewModel.NotifyWhenUpdateAvailable = false;
 
-        await viewModel.ConfirmPrivacyConsentAsync(
-            viewModel.ShareAnonymousTelemetry,
-            viewModel.ShareCrashReports);
+        await viewModel.ConfirmPrivacyConsentAsync(viewModel.ShareOptionalReports);
 
         Assert.False(service.SavedSettings!.StartMinimized);
         Assert.False(service.SavedSettings.CheckForUpdates);

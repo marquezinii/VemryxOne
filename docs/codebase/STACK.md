@@ -16,7 +16,7 @@ O desktop é a aplicação principal; Worker, dashboard e site são superfícies
 | --- | --- | --- | --- |
 | WPF / Windows Desktop | .NET 10 | Shell nativo, XAML, bandeja e integração Windows | `src/Ralven.App/Ralven.App.csproj` |
 | WPF-UI | 4.3.0 | Controles e ícones WPF | `Directory.Packages.props`, `src/Ralven.App/Ralven.App.csproj` |
-| Sentry | 6.8.0 | Crash reporting condicionado a consentimento | `Directory.Packages.props`, `src/Ralven.App/Services/SentryCrashReportingService.cs` |
+| Sentry | 6.8.0 | Crash reporting condicionado ao controle de relatórios opcionais | `Directory.Packages.props`, `src/Ralven.App/Services/SentryCrashReportingService.cs` |
 | `System.Management` / `PerformanceCounter` | 10.0.11 | Descoberta de hardware e métricas Windows | `Directory.Packages.props`, `src/Ralven.Windows/Ralven.Windows.csproj` |
 | `ProtectedData` | 10.0.11 | DPAPI para sessão e estado sensível local | `Directory.Packages.props`, `src/Ralven.UpdateRuntime/Ralven.UpdateRuntime.csproj` |
 | Next.js / React | 16.3.0 / 19.2.8 | Site público estático | `website/package.json` |

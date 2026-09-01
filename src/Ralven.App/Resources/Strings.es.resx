@@ -431,27 +431,29 @@
   <data name="Notification.UpdateAvailable.Title" xml:space="preserve"><value>Actualización de Ralven disponible</value></data>
   <data name="Notification.UpdateAvailable.Message" xml:space="preserve"><value>La versión {0} está disponible. Haz clic para abrir Ralven.</value></data>
   <data name="Settings.CloseBehavior.Description" xml:space="preserve"><value>Al hacer clic en X, Ralven se minimizará a la bandeja del sistema en lugar de cerrarse.</value></data>
-  <data name="Settings.Telemetry.Title" xml:space="preserve"><value>Ayuda a mejorar Ralven</value></data>
-  <data name="Settings.Telemetry.Description" xml:space="preserve"><value>Envía telemetría técnica anonimizada solo si lo eliges.</value></data>
+  <data name="Settings.Telemetry.Title" xml:space="preserve"><value>Informes opcionales</value></data>
+  <data name="Settings.Telemetry.Description" xml:space="preserve"><value>Comparte contexto anónimo de uso y rendimiento, además de informes depurados de errores y fallos. Está activado por defecto y puedes desactivarlo cuando quieras.</value></data>
   <data name="Settings.Privacy.Title" xml:space="preserve"><value>Privacidad</value></data>
-  <data name="Settings.Privacy.Description" xml:space="preserve"><value>Elige qué datos técnicos opcionales pueden salir de este equipo.</value></data>
+  <data name="Settings.Privacy.Description" xml:space="preserve"><value>Consulta los diagnósticos esenciales usados para mantener Ralven confiable y controla todos los informes opcionales en un solo lugar.</value></data>
   <data name="Settings.CrashReports.Title" xml:space="preserve"><value>Enviar reportes de fallos automáticos</value></data>
   <data name="Settings.CrashReports.Description" xml:space="preserve"><value>Envía trazas de pila depuradas cuando Ralven falla o encuentra un error inesperado.</value></data>
   <data name="PrivacyConsent.WindowTitle" xml:space="preserve"><value>Privacidad y diagnósticos - Ralven</value></data>
   <data name="PrivacyConsent.Heading.FirstInstallation" xml:space="preserve"><value>Privacidad y diagnósticos</value></data>
-  <data name="PrivacyConsent.Heading.Upgrade" xml:space="preserve"><value>Nueva opción de privacidad disponible</value></data>
+  <data name="PrivacyConsent.Heading.Upgrade" xml:space="preserve"><value>Controles de privacidad más claros</value></data>
   <data name="PrivacyConsent.Heading.Renewal" xml:space="preserve"><value>Actualizamos nuestra política de privacidad</value></data>
-  <data name="PrivacyConsent.Intro.FirstInstallation" xml:space="preserve"><value>Estos datos nos ayudan a encontrar errores y mejorar Ralven. Puedes ajustar cada opción a continuación antes de continuar.</value></data>
-  <data name="PrivacyConsent.Intro.Upgrade" xml:space="preserve"><value>Tu instalación ya enviaba telemetría de uso. Ahora también puedes elegir enviar reportes de fallos automáticos. Revisa ambas opciones antes de continuar.</value></data>
-  <data name="PrivacyConsent.Intro.Renewal" xml:space="preserve"><value>Cambiamos lo que se recopila o adónde van los datos. Revisa las opciones a continuación y confirma de nuevo antes de continuar.</value></data>
+  <data name="PrivacyConsent.Intro.FirstInstallation" xml:space="preserve"><value>Los informes técnicos ayudan a encontrar errores y mejorar Ralven. Los diagnósticos esenciales y los informes opcionales están separados a continuación.</value></data>
+  <data name="PrivacyConsent.Intro.Upgrade" xml:space="preserve"><value>Agrupamos la telemetría anónima de uso y los informes depurados de fallos en un único control opcional. Revísalo antes de continuar.</value></data>
+  <data name="PrivacyConsent.Intro.Renewal" xml:space="preserve"><value>Simplificamos los controles de privacidad sin añadir datos nuevos. Revisa la única opción a continuación antes de continuar.</value></data>
   <data name="PrivacyConsent.Essential.Title" xml:space="preserve"><value>Diagnósticos esenciales</value></data>
   <data name="PrivacyConsent.Essential.Description" xml:space="preserve"><value>Recopilamos el mínimo necesario para actualizaciones, seguridad, estabilidad y diagnóstico: versión de la app y Windows, arquitectura, eventos del actualizador y resultados técnicos de optimización. No se puede desactivar.</value></data>
-  <data name="PrivacyConsent.Telemetry.Title" xml:space="preserve"><value>Ayudar a mejorar Ralven</value></data>
-  <data name="PrivacyConsent.Telemetry.Description" xml:space="preserve"><value>Comparte datos anónimos opcionales de hardware, perfil y uso de funciones para mejorar la aplicación. Puedes desactivarlo cuando quieras.</value></data>
+  <data name="PrivacyConsent.Essential.Status" xml:space="preserve"><value>SIEMPRE ACTIVO</value></data>
+  <data name="PrivacyConsent.Telemetry.Title" xml:space="preserve"><value>Informes opcionales</value></data>
+  <data name="PrivacyConsent.Telemetry.Description" xml:space="preserve"><value>Comparte contexto anónimo de hardware, perfil y funciones usadas, además de informes depurados de errores y fallos. Está activado por defecto y puedes desactivarlo cuando quieras.</value></data>
+  <data name="PrivacyConsent.PrivacyNote" xml:space="preserve"><value>Ralven no incluye contraseñas, datos de la cuenta, archivos personales, rutas locales completas ni un identificador único del equipo en estos informes.</value></data>
   <data name="PrivacyConsent.CrashReports.Title" xml:space="preserve"><value>Enviar reportes automáticos de errores y fallos</value></data>
   <data name="PrivacyConsent.CrashReports.Description" xml:space="preserve"><value>Trazas de pila depuradas y versión de la app cuando Ralven falla o encuentra un error inesperado.</value></data>
   <data name="PrivacyConsent.Continue" xml:space="preserve"><value>Continuar</value></data>
-  <data name="Privacy.Collects.Title" xml:space="preserve"><value>CON TUS OPCIONES, LA TELEMETRÍA PUEDE RECOPILAR</value></data>
+  <data name="Privacy.Collects.Title" xml:space="preserve"><value>LOS INFORMES TÉCNICOS PUEDEN INCLUIR</value></data>
   <data name="Privacy.Collects.Items" xml:space="preserve"><value>• Versión y entorno de Ralven
 • Versión, compilación y arquitectura de Windows
 • Duración, resultado, perfil y acciones de las optimizaciones
@@ -462,7 +464,7 @@
 • Rango de procesos FiveM/GTA en ejecución
 • Categoría de error depurada
 • Traza de pila depurada si permites reportes de fallos</value></data>
-  <data name="Privacy.DoesNotCollect.Title" xml:space="preserve"><value>ESTA TELEMETRÍA NO RECOPILA</value></data>
+  <data name="Privacy.DoesNotCollect.Title" xml:space="preserve"><value>ESTOS INFORMES NO INCLUYEN</value></data>
   <data name="Privacy.DoesNotCollect.Items" xml:space="preserve"><value>• Nombre de usuario, correo o ID de cuenta
 • Nombre de la computadora
 • Archivos personales

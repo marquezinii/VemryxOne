@@ -16,14 +16,13 @@ public static class PrivacyConsentOutcomeBuilder
     /// </summary>
     public static AppSettings BuildConfirmed(
         AppSettings current,
-        bool acceptAnonymousTelemetry,
-        bool acceptCrashReports)
+        bool acceptOptionalReports)
     {
         ArgumentNullException.ThrowIfNull(current);
         return current with
         {
-            ShareAnonymousTelemetry = acceptAnonymousTelemetry,
-            ShareCrashReports = acceptCrashReports,
+            ShareAnonymousTelemetry = acceptOptionalReports,
+            ShareCrashReports = acceptOptionalReports,
             PrivacyConsentVersion = PrivacyConsentPolicy.CurrentVersion
         };
     }

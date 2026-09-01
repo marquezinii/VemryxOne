@@ -99,8 +99,8 @@ Depois do clique do usuário, o atualizador:
 8. nunca desativa SmartScreen, Defender, UAC ou antivírus de terceiros.
 
 Falhas de manifesto, download, staging, ativação e saúde preservam a versão
-anterior. Logs detalhados ficam locais; eventos sanitizados chegam à área
-administrativa somente após consentimento explícito de telemetria.
+anterior. Logs detalhados ficam locais; eventos essenciais sanitizados chegam à
+área administrativa somente após a confirmação do aviso de privacidade vigente.
 
 ## Publicação no GitHub
 

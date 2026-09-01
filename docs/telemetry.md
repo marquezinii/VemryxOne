@@ -9,39 +9,44 @@ Quando uma versão altera a política, a tela de transparência volta a aparecer
 e só pode ser fechada por **Continuar**. Sem mudança na política, a escolha
 salva não é perguntada de novo.
 
-Relatórios de falha sanitizados, a telemetria de uso e os eventos técnicos de
-otimização dependem das opções abaixo. Nenhum deles inclui HWID, MAC, serial,
-nome do PC, usuário do Windows ou caminhos locais.
+Antes da confirmação da versão vigente do aviso, nenhum diagnóstico remoto ou
+relatório de falha é enviado. Depois da confirmação, os diagnósticos essenciais
+allowlisted permanecem ativos para estabilidade, atualizações e resultado
+técnico das operações.
 
-A opção **Ajudar a melhorar o Ralven** fica em **Configurações**, vem
-habilitada por padrão em instalações novas e pode ser desligada a qualquer
-momento. Ela controla o envio da telemetria de uso inteira, inclusive os
-campos técnicos abaixo.
+A opção única **Relatórios opcionais** fica em **Configurações**, vem habilitada
+por padrão em instalações novas e pode ser desligada a qualquer momento. Ela
+controla em conjunto a telemetria detalhada de uso e os relatórios sanitizados
+de erros e crashes enviados ao Sentry. Um opt-out já salvo por versão anterior
+é preservado. Nenhum desses fluxos inclui HWID, MAC, serial, nome do PC, usuário
+do Windows ou caminhos locais completos.
 
 ## Dados enviados, finalidade, retenção e destinatários
 
 Ao término, falha ou cancelamento de uma otimização, o aplicativo monta um
-evento técnico com estes campos (versão 7 do consentimento de privacidade —
+evento técnico com estes campos (versão 8 do aviso de privacidade —
 ver `PrivacyConsentPolicy`):
 
 | Campos | Finalidade | Obrigatório | Retenção | Destinatários |
 | --- | --- | --- | --- | --- |
-| ID do evento | Garantir entrega idempotente sem identificar máquina ou usuário. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
-| Tipo do evento, tempo de execução e versão do app | Distinguir conclusão, falha ou cancelamento; detectar operações anormalmente longas e correlacioná-las à versão. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, banco D1 e painel administrativo autenticado com métricas agregadas. |
-| Categoria de erro allowlisted (`cancelled`, `timeout`, `access-denied`, `io`, `invalid-data`, `unexpected`) | Classificar falhas sem enviar mensagem, stack trace, arquivo ou caminho. | Não. Só em falhas, com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
-| Código técnico de bug allowlisted (`BugCode`) | Agrupar a causa técnica da falha sem texto livre. | Não. Só quando a causa é conhecida e a telemetria de uso está ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
-| Versão e build do Windows; arquitetura | Compatibilidade agregada do sistema operacional. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
-| Modelo de CPU e GPU; faixa de RAM | Estatísticas agregadas do hardware mais comum. A RAM é arredondada para uma faixa fixa. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
-| Perfil escolhido e IDs allowlisted das ações aplicadas | Medir uso agregado de perfis e funcionalidades. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
-| FiveM detectado; edição do GTA V; contagem de alvos | Verificar instalação sem caminho, edição suportada e escopo da execução. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
-| Tipo de disco; faixa de espaço livre | Contextualizar I/O e falta de espaço sem enviar valor exato fora das faixas permitidas. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
-| Timestamp da execução; dias desde a última execução em faixa | Calcular padrões agregados de horário e frequência. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
-| Quantidade de processos FiveM/GTA em faixa | Avaliar se o jogo estava em execução. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
-| Ambiente (`Development` ou `Production`) | Separar dados de desenvolvimento dos dados da distribuição pública. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
+| ID do evento | Garantir entrega idempotente sem identificar máquina ou usuário. | Sim, diagnóstico essencial. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
+| Tipo do evento, tempo de execução e versão do app | Distinguir conclusão, falha ou cancelamento; detectar operações anormalmente longas e correlacioná-las à versão. | Sim, diagnóstico essencial. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, banco D1 e painel administrativo autenticado com métricas agregadas. |
+| Categoria de erro allowlisted (`cancelled`, `timeout`, `access-denied`, `io`, `invalid-data`, `unexpected`) | Classificar falhas sem enviar mensagem, stack trace, arquivo ou caminho. | Sim em falhas, diagnóstico essencial. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
+| Código técnico de bug allowlisted (`BugCode`) | Agrupar a causa técnica da falha sem texto livre. | Sim quando a causa é conhecida, diagnóstico essencial. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
+| Versão do Windows e arquitetura | Compatibilidade agregada do sistema operacional. | Sim, diagnóstico essencial. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
+| Build do Windows | Identificar incompatibilidades específicas de uma build. | Não. Só com **Relatórios opcionais** ativos. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
+| Modelo de CPU e GPU; faixa de RAM | Estatísticas agregadas do hardware mais comum. A RAM é arredondada para uma faixa fixa. | Não. Só com **Relatórios opcionais** ativos. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
+| Perfil escolhido e IDs allowlisted das ações aplicadas | Medir uso agregado de perfis e funcionalidades. | Não. Só com **Relatórios opcionais** ativos. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
+| FiveM detectado; edição do GTA V; contagem de alvos | Verificar instalação sem caminho, edição suportada e escopo da execução. | Sim, diagnóstico essencial. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
+| Tipo de disco; faixa de espaço livre | Contextualizar I/O e falta de espaço sem enviar valor exato fora das faixas permitidas. | Não. Só com **Relatórios opcionais** ativos. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
+| Timestamp da execução; dias desde a última execução em faixa | Calcular padrões agregados de horário e frequência. | Não. Só com **Relatórios opcionais** ativos. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
+| Quantidade de processos FiveM/GTA em faixa | Avaliar se o jogo estava em execução. | Não. Só com **Relatórios opcionais** ativos. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
+| Ambiente (`Development` ou `Production`) | Separar dados de desenvolvimento dos dados da distribuição pública. | Sim, diagnóstico essencial. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
 
-A telemetria de uso só é transmitida após o consentimento. A retenção no D1
-ainda não possui prazo automático implementado. Essa ausência é informada aqui
-para não sugerir um limite que o backend não aplica.
+Os campos essenciais são transmitidos após a confirmação do aviso vigente. Os
+demais campos da tabela só são incluídos com **Relatórios opcionais** ativos. A
+retenção no D1 ainda não possui prazo automático implementado. Essa ausência é
+informada aqui para não sugerir um limite que o backend não aplica.
 
 As únicas categorias de erro possíveis são `cancelled`, `timeout`,
 `access-denied`, `io`, `invalid-data` e `unexpected`. Mensagens de exceção,
@@ -63,7 +68,9 @@ código nem configuração que envie telemetria de uso para ele.
   tabela acima;
 - texto livre, mensagens de erro brutas, stack traces ou caminhos.
 
-A fila preserva o UUID aleatório de cada evento em todos os retries. O Worker
+A fila preserva o UUID aleatório de cada evento em todos os retries. Ao
+desativar **Relatórios opcionais**, campos opcionais também são removidos dos
+eventos que já estavam pendentes antes de qualquer novo envio. O Worker
 grava um lote em uma única transação D1; repetir o mesmo lote com UUID do
 cliente não cria eventos ou ações adicionais. Enquanto houver instalações
 anteriores sem UUID, o Worker gera um UUID apenas para compatibilidade, sem
@@ -93,10 +100,11 @@ separado e opt-in; suas regras estão em [Relatos de bug e privacidade](bug-repo
 
 ## Relatório de falhas (Sentry)
 
-Relatórios automáticos de crash começam desativados em instalações novas e podem
-ser ativados antes da confirmação ou a qualquer momento nas configurações.
-Só são enviados depois da confirmação da versão vigente do consentimento. Eles
-seguem a mesma sanitização e minimização descritas nesta página.
+Relatórios automáticos de crash fazem parte de **Relatórios opcionais**, que vem
+ativado em instalações novas e pode ser desativado a qualquer momento. O SDK do
+Sentry só é inicializado depois da confirmação da versão vigente do aviso e
+enquanto essa opção permanece ativa. Eles seguem a mesma sanitização e
+minimização descritas nesta página.
 
 ### Dados enviados com a opção ativada
 

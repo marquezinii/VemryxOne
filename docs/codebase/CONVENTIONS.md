@@ -43,7 +43,7 @@ npm run typecheck
 - Exceções esperadas são capturadas por tipo; falhas críticas continuam visíveis e falhas opcionais não mascaram a operação principal.
 - Broker e Worker devolvem códigos/mensagens genéricos; detalhes permanecem em journal/log local ou logs operacionais.
 - Telemetria, crash e relatórios passam por schemas fechados/sanitizadores; nunca registrar tokens, senhas, cookies ou paths pessoais completos.
-- Logging relevante: `BrokerDiagnosticsLog`, `UpdaterDiagnostics`, logs locais do app e Sentry somente após consentimento.
+- Logging relevante: `BrokerDiagnosticsLog`, `UpdaterDiagnostics`, logs locais do app e Sentry somente após confirmação do aviso e com **Relatórios opcionais** ativo.
 
 ## 5) UI, localização e testes
 

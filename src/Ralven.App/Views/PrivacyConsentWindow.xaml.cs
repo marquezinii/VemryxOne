@@ -9,7 +9,7 @@ namespace Ralven.App.Views;
 /// <c>MainWindow</c> right after settings finish loading and only when
 /// <see cref="PrivacyConsentEvaluator"/> says a decision is still pending —
 /// this window itself has no knowledge of <c>AppSettings</c> persistence; it
-/// only presents the two toggles and reports back the choices confirmed by
+/// only presents the optional-reports toggle and reports back the choice confirmed by
 /// the user with "Continue".
 /// </summary>
 public partial class PrivacyConsentWindow : Wpf.Ui.Controls.FluentWindow
@@ -19,32 +19,26 @@ public partial class PrivacyConsentWindow : Wpf.Ui.Controls.FluentWindow
 
     public PrivacyConsentWindow(
         PrivacyConsentScreenVariant variant,
-        bool initialShareAnonymousTelemetry,
-        bool initialShareCrashReports,
+        bool initialShareOptionalReports,
         ILocalizationService? localization = null)
     {
         this.localization = localization ?? LocalizationService.Current;
         Variant = variant;
         InitializeComponent();
         DataContext = this;
-        TelemetryCheckBox.IsChecked = initialShareAnonymousTelemetry;
-        CrashReportsCheckBox.IsChecked = initialShareCrashReports;
-        AcceptedAnonymousTelemetry = initialShareAnonymousTelemetry;
-        AcceptedCrashReports = initialShareCrashReports;
+        OptionalReportsCheckBox.IsChecked = initialShareOptionalReports;
+        AcceptedOptionalReports = initialShareOptionalReports;
         Closing += PrivacyConsentWindow_Closing;
-        Loaded += (_, _) => TelemetryCheckBox.Focus();
+        Loaded += (_, _) => OptionalReportsCheckBox.Focus();
     }
 
     public PrivacyConsentScreenVariant Variant { get; }
 
     /// <summary>
-    /// The user's final choice for anonymous telemetry, confirmed with
-    /// "Continue".
+    /// The user's final choice for optional telemetry and sanitized crash
+    /// reports, confirmed with "Continue".
     /// </summary>
-    public bool AcceptedAnonymousTelemetry { get; private set; }
-
-    /// <summary>The user's final choice for automatic crash reports.</summary>
-    public bool AcceptedCrashReports { get; private set; }
+    public bool AcceptedOptionalReports { get; private set; }
 
     public string HeadingText => Variant switch
     {
@@ -62,8 +56,7 @@ public partial class PrivacyConsentWindow : Wpf.Ui.Controls.FluentWindow
 
     private void Continue_Click(object sender, RoutedEventArgs e)
     {
-        AcceptedAnonymousTelemetry = TelemetryCheckBox.IsChecked == true;
-        AcceptedCrashReports = CrashReportsCheckBox.IsChecked == true;
+        AcceptedOptionalReports = OptionalReportsCheckBox.IsChecked == true;
         confirmedByUser = true;
         DialogResult = true;
     }

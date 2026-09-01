@@ -157,9 +157,15 @@ public sealed class RecordingTelemetryService : IAnonymousTelemetryService
 {
     public bool IsEnabled { get; private set; }
 
+    public bool IncludesOptionalData { get; private set; }
+
     public int TrackCallCount { get; private set; }
 
-    public void SetEnabled(bool enabled) => IsEnabled = enabled;
+    public void Configure(bool enabled, bool includeOptionalData)
+    {
+        IsEnabled = enabled;
+        IncludesOptionalData = includeOptionalData;
+    }
 
     public Task TrackAsync(AnonymousTelemetryEvent telemetryEvent, CancellationToken cancellationToken = default)
     {

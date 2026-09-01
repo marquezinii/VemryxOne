@@ -431,6 +431,7 @@ public sealed class QueuedCloudflareTelemetryService : IAnonymousTelemetryServic
     private readonly SemaphoreSlim flushLock = new(1, 1);
     private readonly string logDirectory;
     private volatile bool enabled;
+    private volatile bool includeOptionalData;
     private long successfulSends;
     private long failedSends;
 
@@ -443,7 +444,13 @@ public sealed class QueuedCloudflareTelemetryService : IAnonymousTelemetryServic
 
     public bool IsEnabled => enabled;
 
-    public void SetEnabled(bool value) => enabled = value;
+    public bool IncludesOptionalData => includeOptionalData;
+
+    public void Configure(bool enabled, bool includeOptionalData)
+    {
+        this.includeOptionalData = includeOptionalData;
+        this.enabled = enabled;
+    }
 
     public long SuccessfulSends => Interlocked.Read(ref successfulSends);
     public long FailedSends => Interlocked.Read(ref failedSends);
@@ -457,6 +464,7 @@ public sealed class QueuedCloudflareTelemetryService : IAnonymousTelemetryServic
             return;
         }
 
+        telemetryEvent = includeOptionalData ? telemetryEvent : telemetryEvent.WithoutOptionalData();
         TelemetryEventValidator.Validate(telemetryEvent);
         await queue.EnqueueAsync(telemetryEvent, cancellationToken).ConfigureAwait(false);
 
@@ -500,7 +508,9 @@ public sealed class QueuedCloudflareTelemetryService : IAnonymousTelemetryServic
             }
 
             var outcome = await transport
-                .SendBatchWithOutcomeAsync(pending.Select(item => item.Event).ToArray(), cancellationToken)
+                .SendBatchWithOutcomeAsync(
+                    pending.Select(item => includeOptionalData ? item.Event : item.Event.WithoutOptionalData()).ToArray(),
+                    cancellationToken)
                 .ConfigureAwait(false);
             if (outcome == TelemetrySendOutcome.Accepted)
             {

@@ -30,13 +30,13 @@ public sealed class PrivacyConsentPolicyTests
     {
         var entry = Assert.Single(PrivacyConsentPolicy.History, e => e.Version == PrivacyConsentPolicy.CurrentVersion);
         Assert.False(string.IsNullOrWhiteSpace(entry.Summary));
-        Assert.Contains("lista fechada", entry.Summary, StringComparison.Ordinal);
+        Assert.Contains("Consolida", entry.Summary, StringComparison.Ordinal);
     }
 
     [Fact]
-    public void CurrentVersion_Is7()
+    public void CurrentVersion_Is8()
     {
-        Assert.Equal(7, PrivacyConsentPolicy.CurrentVersion);
+        Assert.Equal(8, PrivacyConsentPolicy.CurrentVersion);
     }
 
     [Fact]
@@ -67,8 +67,8 @@ public sealed class PrivacyConsentEvaluatorTests
 
         Assert.True(decision.RequiresConsentScreen);
         Assert.Equal(PrivacyConsentScreenVariant.FirstInstallation, decision.Variant);
-        Assert.False(decision.IsAnonymousTelemetryAuthorized);
-        Assert.False(decision.IsCrashReportingAuthorized);
+        Assert.False(decision.AreEssentialDiagnosticsAuthorized);
+        Assert.False(decision.AreOptionalReportsAuthorized);
     }
 
     [Fact]
@@ -85,8 +85,8 @@ public sealed class PrivacyConsentEvaluatorTests
 
         Assert.True(decision.RequiresConsentScreen);
         Assert.Equal(PrivacyConsentScreenVariant.UpgradeFromOlderInstallation, decision.Variant);
-        Assert.False(decision.IsAnonymousTelemetryAuthorized);
-        Assert.False(decision.IsCrashReportingAuthorized);
+        Assert.False(decision.AreEssentialDiagnosticsAuthorized);
+        Assert.False(decision.AreOptionalReportsAuthorized);
     }
 
     [Fact]
@@ -103,8 +103,8 @@ public sealed class PrivacyConsentEvaluatorTests
 
         Assert.True(decision.RequiresConsentScreen);
         Assert.Equal(PrivacyConsentScreenVariant.UpgradeFromOlderInstallation, decision.Variant);
-        Assert.False(decision.IsAnonymousTelemetryAuthorized);
-        Assert.False(decision.IsCrashReportingAuthorized);
+        Assert.False(decision.AreEssentialDiagnosticsAuthorized);
+        Assert.False(decision.AreOptionalReportsAuthorized);
     }
 
     [Fact]
@@ -121,12 +121,12 @@ public sealed class PrivacyConsentEvaluatorTests
 
         Assert.False(decision.RequiresConsentScreen);
         Assert.Equal(PrivacyConsentScreenVariant.AlreadyValid, decision.Variant);
-        Assert.True(decision.IsAnonymousTelemetryAuthorized);
-        Assert.True(decision.IsCrashReportingAuthorized);
+        Assert.True(decision.AreEssentialDiagnosticsAuthorized);
+        Assert.True(decision.AreOptionalReportsAuthorized);
     }
 
     [Fact]
-    public void Evaluate_UserDeclinedBothAtCurrentVersion_IsAlreadyValidButAuthorizesNothing()
+    public void Evaluate_UserDeclinedOptionalReportsAtCurrentVersion_StillAuthorizesEssentialDiagnostics()
     {
         var settings = new AppSettings
         {
@@ -139,12 +139,12 @@ public sealed class PrivacyConsentEvaluatorTests
 
         Assert.False(decision.RequiresConsentScreen);
         Assert.Equal(PrivacyConsentScreenVariant.AlreadyValid, decision.Variant);
-        Assert.False(decision.IsAnonymousTelemetryAuthorized);
-        Assert.False(decision.IsCrashReportingAuthorized);
+        Assert.True(decision.AreEssentialDiagnosticsAuthorized);
+        Assert.False(decision.AreOptionalReportsAuthorized);
     }
 
     [Fact]
-    public void Evaluate_UserAcceptedOnlyTelemetryAtCurrentVersion_AuthorizesOnlyTelemetry()
+    public void Evaluate_LegacyMixedPreferencesAtCurrentVersion_PreservesTheOptOut()
     {
         var settings = new AppSettings
         {
@@ -156,12 +156,12 @@ public sealed class PrivacyConsentEvaluatorTests
         var decision = PrivacyConsentEvaluator.Evaluate(settings, settingsFileExistedBeforeLoad: true);
 
         Assert.False(decision.RequiresConsentScreen);
-        Assert.True(decision.IsAnonymousTelemetryAuthorized);
-        Assert.False(decision.IsCrashReportingAuthorized);
+        Assert.True(decision.AreEssentialDiagnosticsAuthorized);
+        Assert.False(decision.AreOptionalReportsAuthorized);
     }
 
     [Fact]
-    public void Evaluate_UserAcceptedOnlyCrashReportsAtCurrentVersion_AuthorizesOnlyCrashReports()
+    public void Evaluate_InverseLegacyMixedPreferencesAtCurrentVersion_PreservesTheOptOut()
     {
         var settings = new AppSettings
         {
@@ -173,8 +173,8 @@ public sealed class PrivacyConsentEvaluatorTests
         var decision = PrivacyConsentEvaluator.Evaluate(settings, settingsFileExistedBeforeLoad: true);
 
         Assert.False(decision.RequiresConsentScreen);
-        Assert.False(decision.IsAnonymousTelemetryAuthorized);
-        Assert.True(decision.IsCrashReportingAuthorized);
+        Assert.True(decision.AreEssentialDiagnosticsAuthorized);
+        Assert.False(decision.AreOptionalReportsAuthorized);
     }
 
     [Fact]
@@ -191,8 +191,8 @@ public sealed class PrivacyConsentEvaluatorTests
 
         Assert.True(decision.RequiresConsentScreen);
         Assert.Equal(PrivacyConsentScreenVariant.ConsentRenewalRequired, decision.Variant);
-        Assert.False(decision.IsAnonymousTelemetryAuthorized);
-        Assert.False(decision.IsCrashReportingAuthorized);
+        Assert.False(decision.AreEssentialDiagnosticsAuthorized);
+        Assert.False(decision.AreOptionalReportsAuthorized);
     }
 
     [Fact]
@@ -218,8 +218,8 @@ public sealed class PrivacyConsentEvaluatorTests
 
         var decision = PrivacyConsentEvaluator.Evaluate(settings, settingsFileExistedBeforeLoad: false);
 
-        Assert.False(decision.IsAnonymousTelemetryAuthorized);
-        Assert.False(decision.IsCrashReportingAuthorized);
+        Assert.False(decision.AreEssentialDiagnosticsAuthorized);
+        Assert.False(decision.AreOptionalReportsAuthorized);
     }
 
     [Fact]
@@ -234,8 +234,8 @@ public sealed class PrivacyConsentEvaluatorTests
 
         var decision = PrivacyConsentEvaluator.Evaluate(settings, settingsFileExistedBeforeLoad: true);
 
-        Assert.False(decision.IsAnonymousTelemetryAuthorized);
-        Assert.False(decision.IsCrashReportingAuthorized);
+        Assert.False(decision.AreEssentialDiagnosticsAuthorized);
+        Assert.False(decision.AreOptionalReportsAuthorized);
     }
 }
 
@@ -264,7 +264,7 @@ public sealed class AppSettingsSerializationTests
         var settings = JsonSerializer.Deserialize<AppSettings>(json, Options)!;
 
         Assert.True(settings.ShareAnonymousTelemetry);
-        Assert.False(settings.ShareCrashReports);
+        Assert.True(settings.ShareCrashReports);
         Assert.Null(settings.PrivacyConsentVersion);
         Assert.Null(settings.StartMinimized);
         Assert.True(settings.NotifyWhenUpdateAvailable);
@@ -283,7 +283,7 @@ public sealed class AppSettingsSerializationTests
         var settings = JsonSerializer.Deserialize<AppSettings>(json, Options)!;
 
         Assert.False(settings.ShareAnonymousTelemetry);
-        Assert.False(settings.ShareCrashReports);
+        Assert.True(settings.ShareCrashReports);
         Assert.Null(settings.PrivacyConsentVersion);
         Assert.True(settings.MinimizeToTrayOnClose);
     }
@@ -297,13 +297,13 @@ public sealed class AppSettingsSerializationTests
     }
 
     [Fact]
-    public void Deserialize_JsonWithoutShareCrashReports_DefaultsToFalse()
+    public void Deserialize_JsonWithoutShareCrashReports_DefaultsToTrue()
     {
         const string json = "{}";
 
         var settings = JsonSerializer.Deserialize<AppSettings>(json, Options)!;
 
-        Assert.False(settings.ShareCrashReports);
+        Assert.True(settings.ShareCrashReports);
     }
 
     [Fact]
@@ -398,12 +398,11 @@ public sealed class PrivacyConsentOutcomeBuilderTests
     };
 
     [Fact]
-    public void BuildConfirmed_BothAccepted_SetsBothTrueAndStampsCurrentVersion()
+    public void BuildConfirmed_OptionalReportsAccepted_SetsBothCompatibilityFieldsTrue()
     {
         var result = PrivacyConsentOutcomeBuilder.BuildConfirmed(
             SettingsWithDistinctPreferences(),
-            acceptAnonymousTelemetry: true,
-            acceptCrashReports: true);
+            acceptOptionalReports: true);
 
         Assert.True(result.ShareAnonymousTelemetry);
         Assert.True(result.ShareCrashReports);
@@ -411,40 +410,15 @@ public sealed class PrivacyConsentOutcomeBuilderTests
     }
 
     [Fact]
-    public void BuildConfirmed_BothDeclined_SetsBothFalseAndStampsCurrentVersion()
+    public void BuildConfirmed_OptionalReportsDeclined_SetsBothCompatibilityFieldsFalse()
     {
         var result = PrivacyConsentOutcomeBuilder.BuildConfirmed(
             SettingsWithDistinctPreferences(),
-            acceptAnonymousTelemetry: false,
-            acceptCrashReports: false);
+            acceptOptionalReports: false);
 
         Assert.False(result.ShareAnonymousTelemetry);
         Assert.False(result.ShareCrashReports);
         Assert.Equal(PrivacyConsentPolicy.CurrentVersion, result.PrivacyConsentVersion);
-    }
-
-    [Fact]
-    public void BuildConfirmed_OnlyTelemetryAccepted_KeepsCrashReportsFalse()
-    {
-        var result = PrivacyConsentOutcomeBuilder.BuildConfirmed(
-            SettingsWithDistinctPreferences(),
-            acceptAnonymousTelemetry: true,
-            acceptCrashReports: false);
-
-        Assert.True(result.ShareAnonymousTelemetry);
-        Assert.False(result.ShareCrashReports);
-    }
-
-    [Fact]
-    public void BuildConfirmed_OnlyCrashReportsAccepted_KeepsTelemetryFalse()
-    {
-        var result = PrivacyConsentOutcomeBuilder.BuildConfirmed(
-            SettingsWithDistinctPreferences(),
-            acceptAnonymousTelemetry: false,
-            acceptCrashReports: true);
-
-        Assert.False(result.ShareAnonymousTelemetry);
-        Assert.True(result.ShareCrashReports);
     }
 
     [Fact]
@@ -452,7 +426,7 @@ public sealed class PrivacyConsentOutcomeBuilderTests
     {
         var current = SettingsWithDistinctPreferences();
 
-        var result = PrivacyConsentOutcomeBuilder.BuildConfirmed(current, true, false);
+        var result = PrivacyConsentOutcomeBuilder.BuildConfirmed(current, true);
 
         Assert.Equal(current.Language, result.Language);
         Assert.Equal(current.Theme, result.Theme);

@@ -22,7 +22,7 @@ public static class PrivacyConsentPolicy
     /// including those who already accepted an older version, will be asked
     /// to confirm again.
     /// </summary>
-    public const int CurrentVersion = 7;
+    public const int CurrentVersion = 8;
 
     /// <summary>
     /// Full history of consent versions, oldest first, each with a short
@@ -68,7 +68,12 @@ public static class PrivacyConsentPolicy
         new PrivacyConsentVersionEntry(
             7,
             "Eventos de telemetria de falha passam a incluir um código técnico de causa vindo de uma lista fechada, " +
-            "para agrupar falhas sem enviar mensagem, caminho, stack trace ou texto livre.")
+            "para agrupar falhas sem enviar mensagem, caminho, stack trace ou texto livre."),
+        new PrivacyConsentVersionEntry(
+            8,
+            "Consolida telemetria detalhada e relatórios de falha sanitizados em uma única opção, habilitada por padrão " +
+            "em instalações novas e desativável a qualquer momento. Diagnósticos essenciais allowlisted continuam ativos " +
+            "após a confirmação deste aviso, sem ampliar os campos coletados.")
     ];
 
     /// <summary>
