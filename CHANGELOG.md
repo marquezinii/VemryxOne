@@ -5,6 +5,13 @@ segue [Semantic Versioning](https://semver.org/lang/pt-BR/): correções usam
 `patch`, melhorias compatíveis usam `minor` e mudanças incompatíveis usam
 `major`.
 
+## [1.6.1] - 2026-09-01
+
+### Alterações técnicas
+
+- Atualizados o Wrangler usado na publicação da infraestrutura Cloudflare e a
+  base de compatibilidade de navegadores do site, com validação completa na CI.
+
 ## [1.6.0] - 2026-09-01
 
 ### Adicionado

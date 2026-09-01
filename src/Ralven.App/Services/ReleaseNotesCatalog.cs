@@ -63,6 +63,10 @@ public static class ReleaseNotesCatalog
 {
     public static readonly IReadOnlyList<ReleaseNoteVersion> Versions = [
         new ReleaseNoteVersion(
+            "1.6.1",
+            new DateOnly(2026, 9, 1),
+            [ReleaseNoteCategory.Improved]),
+        new ReleaseNoteVersion(
             "1.6.0",
             new DateOnly(2026, 9, 1),
             [
