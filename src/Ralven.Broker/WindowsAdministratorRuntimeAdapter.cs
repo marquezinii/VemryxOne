@@ -14,9 +14,19 @@ internal sealed class WindowsAdministratorRuntimeAdapter
         this.runtime = runtime;
     }
 
-    public static WindowsAdministratorRuntimeAdapter CreateDefault()
+    public static WindowsAdministratorRuntimeAdapter CreateDefault(bool forRollback = false)
     {
-        return new WindowsAdministratorRuntimeAdapter(WindowsOptimizationRuntime.CreateDefault());
+        var environment = WindowsOptimizationEnvironment.DetectDefault();
+        var dependencies = WindowsOptimizationDependencies.CreateDefault(environment);
+        dependencies = dependencies with
+        {
+            JournalStore = new BrokerAdministratorJournalStore(
+                dependencies.JournalStore,
+                new RegistryAdministratorJournalReceiptStore(),
+                requireReceiptOnLoad: forRollback)
+        };
+        return new WindowsAdministratorRuntimeAdapter(
+            WindowsOptimizationRuntime.Create(environment, dependencies));
     }
 
     public Task<WindowsTransactionResult> ExecuteAsync(

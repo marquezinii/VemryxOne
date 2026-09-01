@@ -150,6 +150,47 @@ public sealed class AccountWindowTests
         RunOnUiThread(window => Assert.Equal(Visibility.Visible, Get<UIElement>(window, "ProviderPanel").Visibility));
     }
 
+    [Fact]
+    public void LogoutStorageFailure_StaysOpenAndShowsLocalizedStatus()
+    {
+        RunOnUiThread(
+            window =>
+            {
+                Get<Button>(window, "LogoutButton").RaiseEvent(new RoutedEventArgs(ButtonBase_ClickEvent));
+
+                Assert.Equal(Visibility.Visible, Get<UIElement>(window, "StatusPanel").Visibility);
+                Assert.Equal(LocalizationService.Current["Account.Session.ClearFailed"], Text(window, "StatusText"));
+            },
+            logoutFails: true);
+    }
+
+    [Fact]
+    public void ProfileUnavailable_ShowsRetryWithoutPretendingTheUserIsSignedOutOrIncomplete()
+    {
+        var accounts = new FakeAuthService(initial: new AuthenticationSnapshot(
+            AuthenticationState.ProfileUnavailable,
+            new FirebaseUser("uid-1", "person@example.com", true)));
+
+        RunOnUiThread(
+            window =>
+            {
+                Assert.Equal(LocalizationService.Current["Account.ProfileUnavailable.Title"], Text(window, "TitleText"));
+                Assert.Equal(LocalizationService.Current["Account.ProfileUnavailable.Description"], Text(window, "SubtitleText"));
+                Assert.Equal(Visibility.Collapsed, Get<UIElement>(window, "AuthenticationPanel").Visibility);
+                Assert.Equal(Visibility.Collapsed, Get<UIElement>(window, "ProfileFieldsPanel").Visibility);
+                Assert.Equal(Visibility.Collapsed, Get<UIElement>(window, "SwitchButton").Visibility);
+                Assert.Equal(Visibility.Visible, Get<UIElement>(window, "LogoutButton").Visibility);
+                Assert.Equal(LocalizationService.Current["Common.Retry"], Get<Button>(window, "SubmitButton").Content);
+
+                Invoke(window, "RetryAccountReadinessAsync");
+
+                Assert.Equal(1, accounts.ReadinessRefreshCount);
+                Assert.Equal(LocalizationService.Current["Account.ProfileUnavailable.Description"], Text(window, "StatusText"));
+                Assert.DoesNotContain("account-profile-unavailable", Text(window, "StatusText"), StringComparison.Ordinal);
+            },
+            accounts: accounts);
+    }
+
     /// <summary>
     /// Regression guard for the "campo de senha tem uma barrinha embaixo,
     /// os outros ficam flutuando" report: <c>RevealPasswordBox</c>'s
@@ -280,7 +321,11 @@ public sealed class AccountWindowTests
         ((Task)info!.Invoke(window, null)!).GetAwaiter().GetResult();
     }
 
-    private static void RunOnUiThread(Action<AccountWindow> assertions, bool googleConfigured = true)
+    private static void RunOnUiThread(
+        Action<AccountWindow> assertions,
+        bool googleConfigured = true,
+        bool logoutFails = false,
+        IFirebaseAuthService? accounts = null)
     {
         Exception? failure = null;
         var thread = new Thread(() =>
@@ -289,7 +334,7 @@ public sealed class AccountWindowTests
             {
                 EnsureApplicationResources();
                 var window = new AccountWindow(
-                    new FakeAuthService(),
+                    accounts ?? new FakeAuthService(logoutFails),
                     new FakeProfileService(),
                     new FakeGoogleOAuthClient(googleConfigured));
 
@@ -337,9 +382,12 @@ public sealed class AccountWindowTests
         }
     }
 
-    private sealed class FakeAuthService : IFirebaseAuthService
+    private sealed class FakeAuthService(
+        bool logoutFails = false,
+        AuthenticationSnapshot? initial = null) : IFirebaseAuthService
     {
-        public AuthenticationSnapshot Current { get; private set; } = new(AuthenticationState.SignedOut, null);
+        public AuthenticationSnapshot Current { get; private set; } = initial ?? new(AuthenticationState.SignedOut, null);
+        public int ReadinessRefreshCount { get; private set; }
         public event EventHandler<AuthenticationSnapshot>? StateChanged;
 
         public Task<FirebaseAuthResult> RestoreSessionAsync(CancellationToken cancellationToken = default) => Ok();
@@ -353,7 +401,15 @@ public sealed class AccountWindowTests
             Task.FromResult(new FederatedSignInResult(new FirebaseAuthResult(AuthenticationState.SignedOut, null, "indisponível")));
 
         public Task<FirebaseAuthResult> RefreshEmailVerificationAsync(CancellationToken cancellationToken = default) => Ok();
-        public Task<FirebaseAuthResult> RefreshAccountReadinessAsync(CancellationToken cancellationToken = default) => Ok();
+        public Task<FirebaseAuthResult> RefreshAccountReadinessAsync(CancellationToken cancellationToken = default)
+        {
+            ReadinessRefreshCount++;
+            StateChanged?.Invoke(this, Current);
+            return Task.FromResult(new FirebaseAuthResult(
+                Current.State,
+                Current.User,
+                Current.State == AuthenticationState.ProfileUnavailable ? FirebaseAuthService.ProfileUnavailableError : null));
+        }
         public Task<FirebaseAuthResult> ResendVerificationEmailAsync(CancellationToken cancellationToken = default) => Ok();
         public Task<FirebaseAuthResult> SendPasswordResetEmailAsync(string email, CancellationToken cancellationToken = default) => Ok();
         public Task<FirebaseAuthResult> ReauthenticateWithGoogleAsync(string googleIdToken, CancellationToken cancellationToken = default) => Ok();
@@ -362,7 +418,9 @@ public sealed class AccountWindowTests
         public Task<FirebaseAuthResult> ChangeEmailAsync(string currentPassword, string newEmail, CancellationToken cancellationToken = default) => Ok();
         public Task<FirebaseAuthResult> DeleteAccountAsync(string currentPassword, CancellationToken cancellationToken = default) => Ok();
         public Task<string?> GetIdTokenAsync(CancellationToken cancellationToken = default) => Task.FromResult<string?>(null);
-        public Task LogoutAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task LogoutAsync(CancellationToken cancellationToken = default) => logoutFails
+            ? Task.FromException(new IOException("session file is locked"))
+            : Task.CompletedTask;
         public void Dispose() { }
 
         private Task<FirebaseAuthResult> Ok()

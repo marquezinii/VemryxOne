@@ -140,8 +140,14 @@
   <data name="Applications.Inventory.Source.RegistryRun" xml:space="preserve"><value>Registro · Executar</value></data>
   <data name="Applications.Inventory.Source.RegistryRunOnce" xml:space="preserve"><value>Registro · Executar uma vez</value></data>
   <data name="Applications.Inventory.Source.StartupFolder" xml:space="preserve"><value>Pasta de inicialização</value></data>
-  <data name="Applications.Inventory.Empty.Installed" xml:space="preserve"><value>Nenhum aplicativo instalado visível corresponde à pesquisa.</value></data>
-  <data name="Applications.Inventory.Empty.Startup" xml:space="preserve"><value>Nenhuma entrada de inicialização corresponde à pesquisa.</value></data>
+  <data name="Applications.Inventory.Empty.Installed" xml:space="preserve"><value>Nenhum aplicativo instalado foi encontrado.</value></data>
+  <data name="Applications.Inventory.Empty.Startup" xml:space="preserve"><value>Nenhuma entrada de inicialização foi encontrada.</value></data>
+  <data name="Applications.Inventory.NoMatches.Installed" xml:space="preserve"><value>Nenhum aplicativo instalado visível corresponde à pesquisa.</value></data>
+  <data name="Applications.Inventory.NoMatches.Startup" xml:space="preserve"><value>Nenhuma entrada de inicialização corresponde à pesquisa.</value></data>
+  <data name="Applications.Inventory.Incomplete.Installed" xml:space="preserve"><value>Não foi possível listar todos os aplicativos instalados. Atualize para tentar novamente.</value></data>
+  <data name="Applications.Inventory.Incomplete.Startup" xml:space="preserve"><value>Não foi possível listar todas as entradas de inicialização. Atualize para tentar novamente.</value></data>
+  <data name="Applications.Inventory.Unavailable.Installed" xml:space="preserve"><value>Os aplicativos instalados estão indisponíveis agora. Atualize para tentar novamente.</value></data>
+  <data name="Applications.Inventory.Unavailable.Startup" xml:space="preserve"><value>As entradas de inicialização estão indisponíveis agora. Atualize para tentar novamente.</value></data>
   <data name="Applications.Platform.Title" xml:space="preserve"><value>Ações controladas pelo Windows</value></data>
   <data name="Applications.Platform.Description" xml:space="preserve"><value>Desinstalar, trocar aplicativos padrão e aceitar atualizações da Store continuam em superfícies confiáveis do Windows enquanto o gerenciamento interno do Ralven evolui.</value></data>
   <data name="Greeting.Morning.WithName" xml:space="preserve"><value>Bom dia, {0}. O que iremos fazer hoje?</value></data>
@@ -239,6 +245,8 @@
   <data name="History.Notes.Rollback" xml:space="preserve"><value>O rollback restaura apenas o que aquela execução mudou e preserva o que você alterou depois.</value></data>
   <data name="History.Notes.Local" xml:space="preserve"><value>Tudo permanece neste computador, na pasta local de dados do aplicativo.</value></data>
   <data name="Settings.Title" xml:space="preserve"><value>Configurações</value></data>
+  <data name="Settings.SaveFailed" xml:space="preserve"><value>Não foi possível salvar suas configurações. As escolhas mais recentes podem não persistir após reiniciar.</value></data>
+  <data name="Settings.SaveRetry" xml:space="preserve"><value>Tentar novamente</value></data>
   <data name="Settings.General.Title" xml:space="preserve"><value>Geral</value></data>
   <data name="Settings.General.Description" xml:space="preserve"><value>Escolha como o Ralven aparece, inicia e se mantém atualizado.</value></data>
   <data name="Settings.General.Interface" xml:space="preserve"><value>Interface</value></data>
@@ -278,7 +286,7 @@
   <data name="BugReport.FormLanguage" xml:space="preserve"><value>Formulário de relato</value></data>
   <data name="BugReport.Heading" xml:space="preserve"><value>Conte o que aconteceu</value></data>
   <data name="BugReport.Intro" xml:space="preserve"><value>Quanto mais claros os passos, mais rápido o problema poderá ser reproduzido e corrigido.</value></data>
-  <data name="BugReport.Privacy" xml:space="preserve"><value>Não pedimos nome nem e-mail. O serviço de entrega pode registrar IP e dados técnicos da conexão para segurança. Remova informações pessoais da imagem antes de enviar.</value></data>
+  <data name="BugReport.Privacy" xml:space="preserve"><value>Não pedimos nome. E-mail e trecho de log são opcionais e só são enviados quando informados. O serviço de entrega pode registrar IP e dados técnicos da conexão para segurança. Nenhuma imagem ou anexo é enviado.</value></data>
   <data name="BugReport.Category.Label" xml:space="preserve"><value>Tipo do problema *</value></data>
   <data name="BugReport.Category.Optimization" xml:space="preserve"><value>Otimização</value></data>
   <data name="BugReport.Category.Games" xml:space="preserve"><value>FiveM / GTA V</value></data>
@@ -509,8 +517,17 @@
   <data name="BugReport.Send.NotConfirmed" xml:space="preserve"><value>O serviço de entrega não confirmou o recebimento. Copie o relato e tente novamente depois.</value></data>
   <data name="BugReport.Send.UnexpectedResponse" xml:space="preserve"><value>O serviço respondeu em um formato inesperado. Copie o relato e tente novamente depois.</value></data>
   <data name="BugReport.Send.Accepted" xml:space="preserve"><value>O serviço de entrega recebeu o relato.</value></data>
-  <data name="BugReport.BugCode.Label" xml:space="preserve"><value>Código do bug *</value></data>
-  <data name="BugReport.BugCode.Tooltip" xml:space="preserve"><value>Selecione a categoria do bug que melhor corresponde ao problema</value></data>
+  <data name="BugReport.BugCode.Label" xml:space="preserve"><value>O que deu errado? *</value></data>
+  <data name="BugReport.BugCode.Tooltip" xml:space="preserve"><value>Selecione o motivo que mais combina com o problema</value></data>
+  <data name="BugReport.Reason.Optimization" xml:space="preserve"><value>A otimização não terminou</value></data>
+  <data name="BugReport.Reason.Rollback" xml:space="preserve"><value>A restauração ou reversão falhou</value></data>
+  <data name="BugReport.Reason.GameDetection" xml:space="preserve"><value>FiveM ou GTA V não foi detectado corretamente</value></data>
+  <data name="BugReport.Reason.Interface" xml:space="preserve"><value>Problema de interface, layout ou navegação</value></data>
+  <data name="BugReport.Reason.Account" xml:space="preserve"><value>Problema de login, cadastro ou conta</value></data>
+  <data name="BugReport.Reason.Settings" xml:space="preserve"><value>As configurações não foram salvas ou carregadas</value></data>
+  <data name="BugReport.Reason.Update" xml:space="preserve"><value>A atualização não baixou ou instalou</value></data>
+  <data name="BugReport.Reason.Windows" xml:space="preserve"><value>Problema de permissão do Windows ou UAC</value></data>
+  <data name="BugReport.Reason.Crash" xml:space="preserve"><value>O Ralven fechou ou parou inesperadamente</value></data>
   <data name="BugReport.Validation.BugCode" xml:space="preserve"><value>Selecione um código de bug.</value></data>
   <data name="BugReport.Clipboard.BugCode" xml:space="preserve"><value>Código do bug: {0}</value></data>
   <data name="Streaming.Readiness.Protected.Title" xml:space="preserve"><value>Proteção para transmissão ativa</value></data>
@@ -1002,6 +1019,7 @@
   <data name="History.State.RollbackFailed" xml:space="preserve"><value>Rollback com erro</value></data>
   <data name="History.State.FailedSafely" xml:space="preserve"><value>Falhou com segurança</value></data>
   <data name="History.State.Interrupted" xml:space="preserve"><value>Interrompido</value></data>
+  <data name="History.State.AdminReceiptMissing" xml:space="preserve"><value>Registro legado — o rollback administrativo não pode ser autenticado com segurança</value></data>
   <data name="BugReport.Service.RateLimited" xml:space="preserve"><value>O serviço recebeu muitos relatos agora. Aguarde alguns minutos e tente novamente.</value></data>
   <data name="BugReport.Service.HttpError" xml:space="preserve"><value>O serviço de entrega respondeu com HTTP {0}.</value></data>
   <data name="BugReport.Service.ActivationRequired" xml:space="preserve"><value>O canal de relatos aguarda a ativação do desenvolvedor. Use Copiar relato enquanto isso.</value></data>
@@ -1224,10 +1242,42 @@
   <data name="Account.Validation.TermsRequired" xml:space="preserve"><value>Aceite os Termos de Uso para criar sua conta.</value></data>
   <data name="Account.Validation.EmailRequiredForReset" xml:space="preserve"><value>Informe seu e-mail para receber as instruções de recuperação.</value></data>
   <data name="Account.Session.Expired" xml:space="preserve"><value>Sua sessão expirou. Entre novamente para concluir seu cadastro.</value></data>
+  <data name="Account.Session.ClearFailed" xml:space="preserve"><value>O Ralven não conseguiu remover a sessão salva deste PC. Feche outros processos do Ralven e tente novamente.</value></data>
   <data name="Account.Profile.SaveFailed" xml:space="preserve"><value>Não foi possível salvar seu perfil.</value></data>
   <data name="Account.Profile.DeleteFailed" xml:space="preserve"><value>Não foi possível remover o perfil da sua conta. Sua conta não foi excluída.</value></data>
   <data name="Account.Google.SigningIn" xml:space="preserve"><value>Concluindo o login na janela do seu navegador…</value></data>
   <data name="Account.Google.Failed" xml:space="preserve"><value>Não foi possível entrar com o Google.</value></data>
+  <data name="Account.ProfileUnavailable.Title" xml:space="preserve"><value>Não foi possível carregar sua conta</value></data>
+  <data name="Account.ProfileUnavailable.Description" xml:space="preserve"><value>Sua sessão continua ativa, mas o Ralven não conseguiu verificar seu perfil agora. Confira sua conexão e tente novamente.</value></data>
+  <data name="Account.Error.TooManyAttempts" xml:space="preserve"><value>Muitas tentativas. Aguarde alguns minutos antes de tentar novamente.</value></data>
+  <data name="Account.Error.SessionInvalid" xml:space="preserve"><value>Sua sessão não é mais válida. Entre novamente.</value></data>
+  <data name="Account.Error.ReauthenticationRequired" xml:space="preserve"><value>Confirme sua senha para concluir esta alteração.</value></data>
+  <data name="Account.Error.ReauthenticationDelete" xml:space="preserve"><value>Confirme sua senha para excluir a conta.</value></data>
+  <data name="Account.Error.EmailExists" xml:space="preserve"><value>Este e-mail já está em uso. Se a conta for sua, use "Esqueci minha senha" para recuperar o acesso.</value></data>
+  <data name="Account.Error.WeakPassword" xml:space="preserve"><value>A senha não atende à política de segurança.</value></data>
+  <data name="Account.Error.SensitiveFlow" xml:space="preserve"><value>Se os dados estiverem corretos, você receberá as instruções necessárias.</value></data>
+  <data name="Account.Error.Generic" xml:space="preserve"><value>Não foi possível concluir agora. Confira os dados e tente novamente.</value></data>
+  <data name="Account.Profile.ConnectionFailed" xml:space="preserve"><value>Não foi possível conectar para salvar seu perfil. Verifique sua conexão.</value></data>
+  <data name="Account.Profile.UsernameTaken" xml:space="preserve"><value>Este nome de usuário já está em uso. Escolha outro.</value></data>
+  <data name="Account.Profile.SaveHttpError" xml:space="preserve"><value>Não foi possível salvar seu perfil agora (erro {0}). Tente novamente.</value></data>
+  <data name="Account.Google.NotConfigured" xml:space="preserve"><value>O login com o Google não está configurado nesta versão.</value></data>
+  <data name="Account.Google.LoopbackUnavailable" xml:space="preserve"><value>Não foi possível abrir a porta local necessária para o login com o Google.</value></data>
+  <data name="Account.Google.BrowserOpenFailed" xml:space="preserve"><value>Não foi possível abrir seu navegador para concluir o login com o Google.</value></data>
+  <data name="Account.Google.InvalidResponse" xml:space="preserve"><value>A resposta do Google não pôde ser validada. Tente entrar novamente.</value></data>
+  <data name="Account.Google.Cancelled" xml:space="preserve"><value>Login com o Google cancelado.</value></data>
+  <data name="Account.Google.TimedOut" xml:space="preserve"><value>O login com o Google demorou demais e foi cancelado.</value></data>
+  <data name="Account.Google.LocalConnectionInterrupted" xml:space="preserve"><value>A conexão local do login com o Google foi interrompida.</value></data>
+  <data name="Account.Google.ProviderCancelled" xml:space="preserve"><value>Você cancelou o login com o Google.</value></data>
+  <data name="Account.Google.ProviderFailed" xml:space="preserve"><value>O Google não concluiu o login. Tente novamente.</value></data>
+  <data name="Account.Google.ExchangeRejected" xml:space="preserve"><value>O Google recusou a conclusão do login. Tente novamente.</value></data>
+  <data name="Account.Google.MissingAccountInfo" xml:space="preserve"><value>O Google não devolveu as informações da sua conta. Tente novamente.</value></data>
+  <data name="Account.Google.ExchangeTimedOut" xml:space="preserve"><value>A conexão com o Google demorou demais. Verifique sua internet.</value></data>
+  <data name="Account.Google.NetworkFailed" xml:space="preserve"><value>Não foi possível falar com o Google. Verifique sua conexão.</value></data>
+  <data name="Account.Google.Callback.NothingTitle" xml:space="preserve"><value>Nada aqui.</value></data>
+  <data name="Account.Google.Callback.SuccessTitle" xml:space="preserve"><value>Tudo certo!</value></data>
+  <data name="Account.Google.Callback.SuccessDetail" xml:space="preserve"><value>Você já pode voltar para o Ralven.</value></data>
+  <data name="Account.Google.Callback.FailureTitle" xml:space="preserve"><value>Login não concluído</value></data>
+  <data name="Account.Google.Callback.FailureDetail" xml:space="preserve"><value>Volte ao Ralven e tente novamente.</value></data>
   <data name="Account.PasswordReset.Sent" xml:space="preserve"><value>Se houver uma conta para este e-mail, enviamos as instruções de recuperação.</value></data>
   <data name="Account.Verification.ResentConfirmation" xml:space="preserve"><value>Reenviamos o e-mail de confirmação.</value></data>
   <data name="Account.Verification.PleaseConfirm" xml:space="preserve"><value>Confirme seu e-mail para continuar.</value></data>

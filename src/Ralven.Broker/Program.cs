@@ -186,7 +186,7 @@ internal static class Program
             "Iniciando reversão da transação elevada.",
             item => item.TransactionId = transactionId);
 
-        var runtime = WindowsAdministratorRuntimeAdapter.CreateDefault();
+        var runtime = WindowsAdministratorRuntimeAdapter.CreateDefault(forRollback: true);
         using var timeout = new CancellationTokenSource(ExecutionTimeout);
         WindowsTransactionResult result;
         try

@@ -153,6 +153,7 @@ export function toBugReportRow(row) {
   return [
     formatTimestamp(row.received_at),
     fallback(row.category),
+    fallback(row.bug_code),
     truncate(row.summary, 60),
     formatAppVersion(row.app_version),
     fallback(row.profile),

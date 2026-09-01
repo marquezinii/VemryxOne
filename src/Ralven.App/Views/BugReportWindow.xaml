@@ -57,16 +57,16 @@
 
                     <TextBlock Text="{Binding [BugReport.Category.Label], Source={StaticResource LocalizedStrings}}" Style="{StaticResource FieldLabelStyle}" Margin="0,0,0,8" />
                     <WrapPanel x:Name="CategoryPanel" Margin="0,0,0,9">
-                        <RadioButton GroupName="BugCategory" Style="{StaticResource SegmentedOptionStyle}" Tag="{Binding [BugReport.Category.Optimization], Source={StaticResource LocalizedStrings}}" Content="{Binding [BugReport.Category.Optimization], Source={StaticResource LocalizedStrings}}" Checked="Category_Checked" />
-                        <RadioButton GroupName="BugCategory" Style="{StaticResource SegmentedOptionStyle}" Tag="{Binding [BugReport.Category.Games], Source={StaticResource LocalizedStrings}}" Content="{Binding [BugReport.Category.Games], Source={StaticResource LocalizedStrings}}" Checked="Category_Checked" />
-                        <RadioButton GroupName="BugCategory" Style="{StaticResource SegmentedOptionStyle}" Tag="{Binding [BugReport.Category.Windows], Source={StaticResource LocalizedStrings}}" Content="{Binding [BugReport.Category.Windows], Source={StaticResource LocalizedStrings}}" Checked="Category_Checked" />
-                        <RadioButton GroupName="BugCategory" Style="{StaticResource SegmentedOptionStyle}" Tag="{Binding [BugReport.Category.Interface], Source={StaticResource LocalizedStrings}}" Content="{Binding [BugReport.Category.Interface], Source={StaticResource LocalizedStrings}}" Checked="Category_Checked" />
-                        <RadioButton GroupName="BugCategory" Style="{StaticResource SegmentedOptionStyle}" Tag="{Binding [BugReport.Category.Crash], Source={StaticResource LocalizedStrings}}" Content="{Binding [BugReport.Category.Crash], Source={StaticResource LocalizedStrings}}" Checked="Category_Checked" />
-                        <RadioButton GroupName="BugCategory" Style="{StaticResource SegmentedOptionStyle}" Tag="{Binding [BugReport.Category.Other], Source={StaticResource LocalizedStrings}}" Content="{Binding [BugReport.Category.Other], Source={StaticResource LocalizedStrings}}" Checked="Category_Checked" />
+                        <RadioButton GroupName="BugCategory" Style="{StaticResource SegmentedOptionStyle}" Tag="optimization" Content="{Binding [BugReport.Category.Optimization], Source={StaticResource LocalizedStrings}}" Checked="Category_Checked" />
+                        <RadioButton GroupName="BugCategory" Style="{StaticResource SegmentedOptionStyle}" Tag="games" Content="{Binding [BugReport.Category.Games], Source={StaticResource LocalizedStrings}}" Checked="Category_Checked" />
+                        <RadioButton GroupName="BugCategory" Style="{StaticResource SegmentedOptionStyle}" Tag="windows" Content="{Binding [BugReport.Category.Windows], Source={StaticResource LocalizedStrings}}" Checked="Category_Checked" />
+                        <RadioButton GroupName="BugCategory" Style="{StaticResource SegmentedOptionStyle}" Tag="interface" Content="{Binding [BugReport.Category.Interface], Source={StaticResource LocalizedStrings}}" Checked="Category_Checked" />
+                        <RadioButton GroupName="BugCategory" Style="{StaticResource SegmentedOptionStyle}" Tag="crash" Content="{Binding [BugReport.Category.Crash], Source={StaticResource LocalizedStrings}}" Checked="Category_Checked" />
+                        <RadioButton GroupName="BugCategory" Style="{StaticResource SegmentedOptionStyle}" Tag="other" Content="{Binding [BugReport.Category.Other], Source={StaticResource LocalizedStrings}}" Checked="Category_Checked" />
                     </WrapPanel>
 
                     <TextBlock Text="{Binding [BugReport.BugCode.Label], Source={StaticResource LocalizedStrings}}" Style="{StaticResource FieldLabelStyle}" Margin="0,0,0,8" />
-                    <ComboBox x:Name="BugCodeComboBox" Style="{StaticResource SettingsComboBoxStyle}" Margin="0,0,0,15" SelectionChanged="BugCode_SelectionChanged" />
+                    <ComboBox x:Name="BugCodeComboBox" Style="{StaticResource SettingsComboBoxStyle}" Margin="0,0,0,15" DisplayMemberPath="Label" SelectionChanged="BugCode_SelectionChanged" ToolTip="{Binding [BugReport.BugCode.Tooltip], Source={StaticResource LocalizedStrings}}" />
 
                     <TextBlock Text="{Binding [BugReport.Summary.Label], Source={StaticResource LocalizedStrings}}" Style="{StaticResource FieldLabelStyle}" />
                     <TextBox x:Name="SummaryTextBox" Style="{StaticResource FormTextBoxStyle}" MaxLength="120" ToolTip="{Binding [BugReport.Summary.Tooltip], Source={StaticResource LocalizedStrings}}" />

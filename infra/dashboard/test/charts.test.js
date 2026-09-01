@@ -229,6 +229,7 @@ test('toBugReportRow maps a row into the bug report table\'s column order', () =
   const row = {
     received_at: '2026-07-26T10:00:00.000Z',
     category: 'Falha na otimização',
+    bug_code: 'APP_OPT_ACTION_EXECUTION',
     summary: 'O preset não terminou',
     app_version: '1.0.4',
     profile: 'Médio',
@@ -245,6 +246,7 @@ test('toBugReportRow maps a row into the bug report table\'s column order', () =
   // Other cells should match exactly
   assert.deepEqual(cells.slice(1), [
     'Falha na otimização',
+    'APP_OPT_ACTION_EXECUTION',
     'O preset não terminou',
     '1.0.4',
     'Médio',
@@ -258,6 +260,7 @@ test('toBugReportRow shows a placeholder for missing email and "não" when there
   const row = {
     received_at: '2026-07-26T10:00:00.000Z',
     category: 'x',
+    bug_code: null,
     summary: 'x',
     app_version: '1.0.4',
     profile: 'Médio',
@@ -267,6 +270,6 @@ test('toBugReportRow shows a placeholder for missing email and "não" when there
   };
 
   const cells = toBugReportRow(row);
-  assert.equal(cells[6], '—');
+  assert.equal(cells[7], '—');
   assert.equal(cells.at(-1), 'não');
 });

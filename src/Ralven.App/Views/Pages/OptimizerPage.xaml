@@ -83,10 +83,10 @@
                     </Grid.RowDefinitions>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2*" MinWidth="170" />
-                            <ColumnDefinition Width="3*" MinWidth="200" />
-                            <ColumnDefinition Width="112" />
-                            <ColumnDefinition Width="164" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="72" />
+                            <ColumnDefinition Width="110" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="{Binding Name}" Style="{StaticResource BodyStrongText}" TextWrapping="Wrap" Margin="0,0,18,0" />
                         <TextBlock Grid.Column="1" Text="{Binding Description}" Style="{StaticResource SecondaryText}" TextWrapping="Wrap" Margin="0,1,18,0" />
@@ -287,25 +287,21 @@
 
         <!--
             ===================== Corpo: controle | plano | registro =====================
-            As três colunas somadas (controle 416 + plano no mínimo 420 +
-            registro 396 + dois respiros de 20) passam de 1270px de largura
-            própria — mais do que a janela no tamanho mínimo tem disponível
-            depois do rail de navegação e das margens da página. Em vez de
-            deixar o conteúdo simplesmente cortar sem aviso, o corpo rola na
-            horizontal quando não cabe.
-
-            O Grid interno vincula sua largura à do viewport do ScrollViewer
-            (para que a coluna "*" do plano continue esticando e preenchendo
-            o espaço disponível na janela maximizada, o caso comum) mas nunca
-            fica menor que 1272 — a soma real das três colunas no pior caso
-            (registro visível). Sem esse piso, numa janela estreita o Grid
-            encolheria para o viewport, o registro de 396 fixos estouraria a
-            largura declarada mesmo assim, e o ScrollViewer não saberia que
-            precisa rolar até lá — reproduzindo o corte original só que
-            deslocado.
+            Controle e plano precisam de 856px. O piso de 1272px só é
+            necessário quando o registro aparece; o ScrollViewer preserva o
+            acesso às três colunas numa janela estreita.
         -->
         <ScrollViewer x:Name="OptimizerBody" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-        <Grid Width="{Binding ActualWidth, ElementName=OptimizerBody}" MinWidth="1272">
+        <Grid Width="{Binding ActualWidth, ElementName=OptimizerBody}">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="MinWidth" Value="856" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsBusy}" Value="True"><Setter Property="MinWidth" Value="1272" /></DataTrigger>
+                        <DataTrigger Binding="{Binding IsReportAvailable}" Value="True"><Setter Property="MinWidth" Value="1272" /></DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="20" />
@@ -525,15 +521,15 @@
                         </Border.Style>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*" MinWidth="170" />
-                                <ColumnDefinition Width="3*" MinWidth="200" />
-                                <ColumnDefinition Width="112" />
-                                <ColumnDefinition Width="164" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="72" />
+                                <ColumnDefinition Width="110" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{Binding [Optimizer.Table.Action], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="0,0,18,0" />
-                            <TextBlock Grid.Column="1" Text="{Binding [Optimizer.Table.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="0,0,18,0" />
-                            <TextBlock Grid.Column="2" Text="{Binding [Optimizer.Table.Risk], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="0,0,12,0" />
-                            <TextBlock Grid.Column="3" Text="{Binding [Optimizer.Table.Privilege], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" />
+                            <TextBlock Grid.Column="0" Text="{Binding [Optimizer.Table.Action], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="0,0,18,0" TextWrapping="Wrap" />
+                            <TextBlock Grid.Column="1" Text="{Binding [Optimizer.Table.Description], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="0,0,18,0" TextWrapping="Wrap" />
+                            <TextBlock Grid.Column="2" Text="{Binding [Optimizer.Table.Risk], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="0,0,12,0" TextWrapping="Wrap" />
+                            <TextBlock Grid.Column="3" Text="{Binding [Optimizer.Table.Privilege], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" TextWrapping="Wrap" />
                         </Grid>
                     </Border>
 

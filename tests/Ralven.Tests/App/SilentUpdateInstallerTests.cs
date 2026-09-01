@@ -63,6 +63,19 @@ public sealed class SilentUpdateInstallerTests : IDisposable
     }
 
     [Fact]
+    public async Task StartAsync_KeepsVerifiedUpdaterLockedThroughLaunch()
+    {
+        var launcher = new ReplacementAttemptingLauncher();
+
+        var launch = await Create(launcher).StartAsync(
+            CreateVerifiedInstaller(),
+            cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
+
+        Assert.True(launch.Started);
+        Assert.True(launcher.ReplacementWasBlocked);
+    }
+
+    [Fact]
     public async Task StartAsync_RejectsAnInstallerOutsideTheVerifiedUpdatesRoot()
     {
         var outside = Path.Combine(root, "outside.exe");
@@ -99,6 +112,23 @@ public sealed class SilentUpdateInstallerTests : IDisposable
         {
             UpdaterPath = updaterPath;
             Arguments = arguments;
+        }
+    }
+
+    private sealed class ReplacementAttemptingLauncher : IUpdateProcessLauncher
+    {
+        public bool ReplacementWasBlocked { get; private set; }
+
+        public void Start(string updaterPath, IReadOnlyList<string> arguments)
+        {
+            try
+            {
+                File.WriteAllText(updaterPath, "replacement");
+            }
+            catch (IOException)
+            {
+                ReplacementWasBlocked = true;
+            }
         }
     }
 }

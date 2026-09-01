@@ -146,10 +146,19 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         viewModel.PropertyChanged += ViewModel_PropertyChanged;
         DataContext = viewModel;
         Loaded += MainWindow_Loaded;
+        SizeChanged += MainWindow_SizeChanged;
         SourceInitialized += MainWindow_SourceInitialized;
         Closing += MainWindow_Closing;
         Closed += MainWindow_Closed;
         System.Windows.Application.Current.SessionEnding += Application_SessionEnding;
+    }
+
+    private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (e.NewSize.Width < 1200)
+        {
+            RootNavigationView.IsPaneOpen = false;
+        }
     }
 
     private sealed record MainWindowCommandLine(

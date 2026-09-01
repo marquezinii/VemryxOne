@@ -140,8 +140,14 @@
   <data name="Applications.Inventory.Source.RegistryRun" xml:space="preserve"><value>Registry · Run</value></data>
   <data name="Applications.Inventory.Source.RegistryRunOnce" xml:space="preserve"><value>Registry · Run once</value></data>
   <data name="Applications.Inventory.Source.StartupFolder" xml:space="preserve"><value>Startup folder</value></data>
-  <data name="Applications.Inventory.Empty.Installed" xml:space="preserve"><value>No visible installed application matches this search.</value></data>
-  <data name="Applications.Inventory.Empty.Startup" xml:space="preserve"><value>No startup entry matches this search.</value></data>
+  <data name="Applications.Inventory.Empty.Installed" xml:space="preserve"><value>No installed applications were found.</value></data>
+  <data name="Applications.Inventory.Empty.Startup" xml:space="preserve"><value>No startup entries were found.</value></data>
+  <data name="Applications.Inventory.NoMatches.Installed" xml:space="preserve"><value>No visible installed application matches this search.</value></data>
+  <data name="Applications.Inventory.NoMatches.Startup" xml:space="preserve"><value>No startup entry matches this search.</value></data>
+  <data name="Applications.Inventory.Incomplete.Installed" xml:space="preserve"><value>Installed applications could not be listed completely. Refresh to try again.</value></data>
+  <data name="Applications.Inventory.Incomplete.Startup" xml:space="preserve"><value>Startup entries could not be listed completely. Refresh to try again.</value></data>
+  <data name="Applications.Inventory.Unavailable.Installed" xml:space="preserve"><value>Installed applications are unavailable right now. Refresh to try again.</value></data>
+  <data name="Applications.Inventory.Unavailable.Startup" xml:space="preserve"><value>Startup entries are unavailable right now. Refresh to try again.</value></data>
   <data name="Applications.Platform.Title" xml:space="preserve"><value>Windows-owned actions</value></data>
   <data name="Applications.Platform.Description" xml:space="preserve"><value>Uninstalling, changing defaults and accepting Store updates remain on trusted Windows surfaces while Ralven's internal management expands.</value></data>
   <data name="Greeting.Morning.WithName" xml:space="preserve"><value>Good morning, {0}. What shall we do today?</value></data>
@@ -239,6 +245,8 @@
   <data name="History.Notes.Rollback" xml:space="preserve"><value>Rollback restores only what this run changed and preserves anything you changed afterwards.</value></data>
   <data name="History.Notes.Local" xml:space="preserve"><value>Everything stays on this computer, in the app's local data folder.</value></data>
   <data name="Settings.Title" xml:space="preserve"><value>Settings</value></data>
+  <data name="Settings.SaveFailed" xml:space="preserve"><value>We couldn't save your settings. Your latest choices may not persist after restart.</value></data>
+  <data name="Settings.SaveRetry" xml:space="preserve"><value>Try again</value></data>
   <data name="Settings.General.Title" xml:space="preserve"><value>General</value></data>
   <data name="Settings.General.Description" xml:space="preserve"><value>Choose how Ralven looks, starts, and stays up to date.</value></data>
   <data name="Settings.General.Interface" xml:space="preserve"><value>Interface</value></data>
@@ -278,7 +286,7 @@
   <data name="BugReport.FormLanguage" xml:space="preserve"><value>Bug report form</value></data>
   <data name="BugReport.Heading" xml:space="preserve"><value>Tell us what happened</value></data>
   <data name="BugReport.Intro" xml:space="preserve"><value>Clear steps help us reproduce and fix the issue faster.</value></data>
-  <data name="BugReport.Privacy" xml:space="preserve"><value>We do not ask for a name or email. The delivery service may log the IP address and technical connection data for security. Remove personal information from the image before sending.</value></data>
+  <data name="BugReport.Privacy" xml:space="preserve"><value>Name is not requested. Email and a log excerpt are optional and are sent only when provided. The delivery service may log the IP address and technical connection data for security. No image or attachment is sent.</value></data>
   <data name="BugReport.Category.Label" xml:space="preserve"><value>Issue type *</value></data>
   <data name="BugReport.Category.Optimization" xml:space="preserve"><value>Optimization</value></data>
   <data name="BugReport.Category.Games" xml:space="preserve"><value>FiveM / GTA V</value></data>
@@ -509,8 +517,17 @@
   <data name="BugReport.Send.NotConfirmed" xml:space="preserve"><value>The delivery service did not confirm receipt. Copy the report and try again later.</value></data>
   <data name="BugReport.Send.UnexpectedResponse" xml:space="preserve"><value>The service returned an unexpected response. Copy the report and try again later.</value></data>
   <data name="BugReport.Send.Accepted" xml:space="preserve"><value>The delivery service received the report.</value></data>
-  <data name="BugReport.BugCode.Label" xml:space="preserve"><value>Bug code *</value></data>
-  <data name="BugReport.BugCode.Tooltip" xml:space="preserve"><value>Select the bug category that best matches the issue</value></data>
+  <data name="BugReport.BugCode.Label" xml:space="preserve"><value>What went wrong? *</value></data>
+  <data name="BugReport.BugCode.Tooltip" xml:space="preserve"><value>Select the reason that best matches the issue</value></data>
+  <data name="BugReport.Reason.Optimization" xml:space="preserve"><value>Optimization did not complete</value></data>
+  <data name="BugReport.Reason.Rollback" xml:space="preserve"><value>Restore or rollback failed</value></data>
+  <data name="BugReport.Reason.GameDetection" xml:space="preserve"><value>FiveM or GTA V was not detected correctly</value></data>
+  <data name="BugReport.Reason.Interface" xml:space="preserve"><value>Interface, layout or navigation problem</value></data>
+  <data name="BugReport.Reason.Account" xml:space="preserve"><value>Login, sign-up or account problem</value></data>
+  <data name="BugReport.Reason.Settings" xml:space="preserve"><value>Settings were not saved or loaded</value></data>
+  <data name="BugReport.Reason.Update" xml:space="preserve"><value>Update did not download or install</value></data>
+  <data name="BugReport.Reason.Windows" xml:space="preserve"><value>Windows permission or UAC problem</value></data>
+  <data name="BugReport.Reason.Crash" xml:space="preserve"><value>Ralven closed or stopped unexpectedly</value></data>
   <data name="BugReport.Validation.BugCode" xml:space="preserve"><value>Select a bug code.</value></data>
   <data name="BugReport.Clipboard.BugCode" xml:space="preserve"><value>Bug code: {0}</value></data>
   <data name="Streaming.Readiness.Protected.Title" xml:space="preserve"><value>Streaming protection is active</value></data>
@@ -1002,6 +1019,7 @@
   <data name="History.State.RollbackFailed" xml:space="preserve"><value>Rollback error</value></data>
   <data name="History.State.FailedSafely" xml:space="preserve"><value>Failed safely</value></data>
   <data name="History.State.Interrupted" xml:space="preserve"><value>Interrupted</value></data>
+  <data name="History.State.AdminReceiptMissing" xml:space="preserve"><value>Legacy record — administrative rollback cannot be authenticated safely</value></data>
   <data name="BugReport.Service.RateLimited" xml:space="preserve"><value>The service received too many reports. Wait a few minutes and try again.</value></data>
   <data name="BugReport.Service.HttpError" xml:space="preserve"><value>The delivery service returned HTTP {0}.</value></data>
   <data name="BugReport.Service.ActivationRequired" xml:space="preserve"><value>The report channel is awaiting developer activation. Copy the report in the meantime.</value></data>
@@ -1224,10 +1242,42 @@
   <data name="Account.Validation.TermsRequired" xml:space="preserve"><value>Accept the Terms of Use to create your account.</value></data>
   <data name="Account.Validation.EmailRequiredForReset" xml:space="preserve"><value>Enter your e-mail to receive the recovery instructions.</value></data>
   <data name="Account.Session.Expired" xml:space="preserve"><value>Your session has expired. Sign in again to finish your registration.</value></data>
+  <data name="Account.Session.ClearFailed" xml:space="preserve"><value>Ralven couldn't remove the saved session from this PC. Close other Ralven processes and try again.</value></data>
   <data name="Account.Profile.SaveFailed" xml:space="preserve"><value>We couldn't save your profile.</value></data>
   <data name="Account.Profile.DeleteFailed" xml:space="preserve"><value>We couldn't remove your account profile. Your account was not deleted.</value></data>
   <data name="Account.Google.SigningIn" xml:space="preserve"><value>Finishing sign-in in your browser window…</value></data>
   <data name="Account.Google.Failed" xml:space="preserve"><value>We couldn't sign in with Google.</value></data>
+  <data name="Account.ProfileUnavailable.Title" xml:space="preserve"><value>We couldn't load your account</value></data>
+  <data name="Account.ProfileUnavailable.Description" xml:space="preserve"><value>Your session is still active, but Ralven couldn't verify your profile right now. Check your connection and try again.</value></data>
+  <data name="Account.Error.TooManyAttempts" xml:space="preserve"><value>Too many attempts. Wait a few minutes before trying again.</value></data>
+  <data name="Account.Error.SessionInvalid" xml:space="preserve"><value>Your session is no longer valid. Sign in again.</value></data>
+  <data name="Account.Error.ReauthenticationRequired" xml:space="preserve"><value>Confirm your password to complete this change.</value></data>
+  <data name="Account.Error.ReauthenticationDelete" xml:space="preserve"><value>Confirm your password to delete the account.</value></data>
+  <data name="Account.Error.EmailExists" xml:space="preserve"><value>This e-mail is already in use. If the account is yours, use "Forgot my password" to recover access.</value></data>
+  <data name="Account.Error.WeakPassword" xml:space="preserve"><value>The password doesn't meet the security policy.</value></data>
+  <data name="Account.Error.SensitiveFlow" xml:space="preserve"><value>If the information is correct, you will receive the necessary instructions.</value></data>
+  <data name="Account.Error.Generic" xml:space="preserve"><value>We couldn't complete this right now. Check the information and try again.</value></data>
+  <data name="Account.Profile.ConnectionFailed" xml:space="preserve"><value>We couldn't connect to save your profile. Check your connection.</value></data>
+  <data name="Account.Profile.UsernameTaken" xml:space="preserve"><value>This username is already in use. Choose another one.</value></data>
+  <data name="Account.Profile.SaveHttpError" xml:space="preserve"><value>We couldn't save your profile right now (error {0}). Try again.</value></data>
+  <data name="Account.Google.NotConfigured" xml:space="preserve"><value>Google sign-in isn't configured in this build.</value></data>
+  <data name="Account.Google.LoopbackUnavailable" xml:space="preserve"><value>We couldn't open the local port required for Google sign-in.</value></data>
+  <data name="Account.Google.BrowserOpenFailed" xml:space="preserve"><value>We couldn't open your browser to complete Google sign-in.</value></data>
+  <data name="Account.Google.InvalidResponse" xml:space="preserve"><value>The response from Google couldn't be validated. Try signing in again.</value></data>
+  <data name="Account.Google.Cancelled" xml:space="preserve"><value>Google sign-in was cancelled.</value></data>
+  <data name="Account.Google.TimedOut" xml:space="preserve"><value>Google sign-in took too long and was cancelled.</value></data>
+  <data name="Account.Google.LocalConnectionInterrupted" xml:space="preserve"><value>The local Google sign-in connection was interrupted.</value></data>
+  <data name="Account.Google.ProviderCancelled" xml:space="preserve"><value>You cancelled Google sign-in.</value></data>
+  <data name="Account.Google.ProviderFailed" xml:space="preserve"><value>Google didn't complete the sign-in. Try again.</value></data>
+  <data name="Account.Google.ExchangeRejected" xml:space="preserve"><value>Google rejected the sign-in completion. Try again.</value></data>
+  <data name="Account.Google.MissingAccountInfo" xml:space="preserve"><value>Google didn't return your account information. Try again.</value></data>
+  <data name="Account.Google.ExchangeTimedOut" xml:space="preserve"><value>The connection to Google took too long. Check your internet connection.</value></data>
+  <data name="Account.Google.NetworkFailed" xml:space="preserve"><value>We couldn't contact Google. Check your connection.</value></data>
+  <data name="Account.Google.Callback.NothingTitle" xml:space="preserve"><value>Nothing here.</value></data>
+  <data name="Account.Google.Callback.SuccessTitle" xml:space="preserve"><value>All set!</value></data>
+  <data name="Account.Google.Callback.SuccessDetail" xml:space="preserve"><value>You can return to Ralven now.</value></data>
+  <data name="Account.Google.Callback.FailureTitle" xml:space="preserve"><value>Sign-in wasn't completed</value></data>
+  <data name="Account.Google.Callback.FailureDetail" xml:space="preserve"><value>Return to Ralven and try again.</value></data>
   <data name="Account.PasswordReset.Sent" xml:space="preserve"><value>If there's an account for this e-mail, we sent the recovery instructions.</value></data>
   <data name="Account.Verification.ResentConfirmation" xml:space="preserve"><value>We resent the confirmation e-mail.</value></data>
   <data name="Account.Verification.PleaseConfirm" xml:space="preserve"><value>Confirm your e-mail to continue.</value></data>

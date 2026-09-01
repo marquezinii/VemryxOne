@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Security;
 using System.Management;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -28,24 +29,27 @@ public sealed class AppOptimizationService : IAppOptimizationService
     private readonly ResourceComparisonCapture resourceComparison;
     private readonly bool demoMode;
     private readonly bool useSyntheticDiagnostic;
+    private readonly Func<Guid, bool> administratorReceiptExists;
     private string? detectedLegacyRoot;
 
     public AppOptimizationService(
         bool demoMode = false,
         bool useSyntheticDiagnostic = false,
         ILocalizationService? localization = null)
-        : this(demoMode, useSyntheticDiagnostic, localization, appDataDirectoryOverride: null)
+        : this(demoMode, useSyntheticDiagnostic, localization, appDataDirectoryOverride: null, null)
     {
     }
 
     internal AppOptimizationService(
         string appDataDirectory,
-        ILocalizationService? localization = null)
+        ILocalizationService? localization = null,
+        Func<Guid, bool>? administratorReceiptExists = null)
         : this(
             demoMode: false,
             useSyntheticDiagnostic: false,
             localization,
-            appDataDirectory)
+            appDataDirectory,
+            administratorReceiptExists)
     {
     }
 
@@ -53,11 +57,13 @@ public sealed class AppOptimizationService : IAppOptimizationService
         bool demoMode,
         bool useSyntheticDiagnostic,
         ILocalizationService? localization,
-        string? appDataDirectoryOverride)
+        string? appDataDirectoryOverride,
+        Func<Guid, bool>? administratorReceiptExists)
     {
         this.demoMode = demoMode;
         this.useSyntheticDiagnostic = useSyntheticDiagnostic;
         this.localization = localization ?? LocalizationService.Current;
+        this.administratorReceiptExists = administratorReceiptExists ?? HasAdministratorReceipt;
         appDataDirectory = appDataDirectoryOverride is null
             ? Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -359,6 +365,11 @@ public sealed class AppOptimizationService : IAppOptimizationService
                 var profile = journal.Profile ?? InferProfile(journal);
                 var changed = journal.Actions.Count(action => action.Changed);
                 var canRollback = journal.Actions.Any(CanOfferRollback);
+                var requiresAdministratorReceipt = journal.Actions.Any(action =>
+                    action.RequiredPrivilege == RequiredPrivilege.Administrator
+                    && CanOfferRollback(action));
+                var hasRequiredReceipt = !requiresAdministratorReceipt
+                    || administratorReceiptExists(journal.TransactionId);
                 records.Add(new AppHistoryRecord
                 {
                     TransactionId = journal.TransactionId,
@@ -367,9 +378,11 @@ public sealed class AppOptimizationService : IAppOptimizationService
                     Kind = IsWindowsGamingControlsTransaction(journal)
                         ? AppHistoryKind.WindowsGaming
                         : AppHistoryKind.Optimization,
-                    State = TranslateState(journal.State),
+                    State = hasRequiredReceipt
+                        ? TranslateState(journal.State)
+                        : localization.GetString("History.State.AdminReceiptMissing"),
                     ChangedActions = changed,
-                    CanRollback = canRollback && journal.State is
+                    CanRollback = canRollback && hasRequiredReceipt && journal.State is
                         TransactionState.Committed
                         or TransactionState.CommittedWithErrors
                         or TransactionState.AwaitingElevationRollback
@@ -378,13 +391,39 @@ public sealed class AppOptimizationService : IAppOptimizationService
                 });
             }
             catch (Exception exception) when (exception is JsonException
-                or NotSupportedException)
+                or NotSupportedException
+                or IOException
+                or UnauthorizedAccessException
+                or SecurityException)
             {
-                // Ignore a single corrupt or schema-incompatible historical journal; the active transaction is unaffected.
+                // Ignore one unreadable, corrupt, or incompatible historical journal; the active transaction is unaffected.
             }
         }
 
         return records;
+    }
+
+    private static bool HasAdministratorReceipt(Guid transactionId)
+    {
+        try
+        {
+            using var localMachine = RegistryKey.OpenBaseKey(
+                RegistryHive.LocalMachine,
+                RegistryView.Registry64);
+            using var key = localMachine.OpenSubKey(
+                ProductIdentity.AdministratorReceiptRegistryPath,
+                writable: false);
+            return key?.GetValue(
+                transactionId.ToString("N"),
+                null,
+                RegistryValueOptions.DoNotExpandEnvironmentNames) is byte[] { Length: > 0 };
+        }
+        catch (Exception exception) when (exception is IOException
+            or SecurityException
+            or UnauthorizedAccessException)
+        {
+            return false;
+        }
     }
 
     public Task<bool> RollbackAsync(

@@ -1,5 +1,6 @@
 using System.Net;
 using Ralven.App.Services;
+using Ralven.Contracts;
 using Xunit;
 
 namespace Ralven.Tests.App;
@@ -442,7 +443,8 @@ public sealed class CloudflareTelemetryTransportTests
         TimeSpan.FromSeconds(5),
         "1.0.4",
         OsVersion: "Windows 11",
-        CpuModel: "AMD Ryzen 5 5600X");
+        CpuModel: "AMD Ryzen 5 5600X",
+        BugCode: BugCode.APP_OPT_ACTION_EXECUTION);
 
     [Fact]
     public async Task SendBatchAsync_EmptyBatch_ReturnsTrueWithoutSendingARequest()
@@ -474,6 +476,7 @@ public sealed class CloudflareTelemetryTransportTests
         Assert.Contains("1.0.5", handler.Body, StringComparison.Ordinal);
         Assert.Contains("AMD Ryzen 5 5600X", handler.Body, StringComparison.Ordinal);
         Assert.Contains($"\"eventId\":\"{telemetryEvent.EventId:D}\"", handler.Body, StringComparison.Ordinal);
+        Assert.Contains("\"bugCode\":\"APP_OPT_ACTION_EXECUTION\"", handler.Body, StringComparison.Ordinal);
         Assert.Contains("\"environment\":\"Production\"", handler.Body, StringComparison.Ordinal);
     }
 
@@ -593,6 +596,8 @@ public sealed class QueuedCloudflareTelemetryServiceTests : IDisposable
 
         Assert.True(handler.CallCount >= 1);
         Assert.Empty(queue.ReadPending(10));
+        Assert.Equal(1, service.SuccessfulSends);
+        Assert.Equal(0, service.FailedSends);
     }
 
     [Fact]
@@ -623,6 +628,9 @@ public sealed class QueuedCloudflareTelemetryServiceTests : IDisposable
         await service.FlushPendingAsync(cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
 
         Assert.Empty(queue.ReadPending(10));
+        Assert.Equal(0, service.SuccessfulSends);
+        Assert.Equal(1, service.FailedSends);
+        Assert.False(service.IsHealthy);
     }
 
     [Fact]

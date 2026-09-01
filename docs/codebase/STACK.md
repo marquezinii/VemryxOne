@@ -32,7 +32,7 @@ O Worker e o dashboard não têm dependências npm de produção; usam APIs nati
 | coverlet.MTP | Cobertura .NET na CI | `Directory.Packages.props`, `.github/workflows/ci.yml` |
 | ESLint + TypeScript | Lint e verificação estática do site | `website/eslint.config.mjs`, `website/tsconfig.json` |
 | `node:test` | Testes do Worker, dashboard e HTML exportado | manifests em `infra/` e `website/package.json` |
-| Wrangler 4.125 | Desenvolvimento, migrations e deploy do Worker | `infra/cloudflare-worker/package.json` |
+| Wrangler 4.127 | Desenvolvimento, migrations e deploy do Worker | `infra/cloudflare-worker/package.json` |
 | Obfuscar / SBOM Tool | Hardening e SBOM dos artefatos | `.config/dotnet-tools.json`, `.github/workflows/ci.yml` |
 | PowerShell / Inno Setup | Build, verificações e instalador | `scripts/`, `installer/Ralven.iss` |
 

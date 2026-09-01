@@ -7,7 +7,7 @@
 
 - **Produto:** Ralven, aplicativo desktop Windows para otimização transparente, reversível e orientada por diagnóstico do FiveM para **GTAV Legacy**.
 - **Integração:** `dev/proxima-versao` é a branch de integração da próxima versão; `main` representa a linha pública/estável. O fluxo de branches, worktrees, Pull Requests, integração e release é definido em `AI_RULES.md`.
-- **Último estado consolidado neste documento-fonte:** 31/08/2026, após integrar o fortalecimento transacional e adaptativo do otimizador e a revisão de Configurações. Antes de qualquer trabalho, confirme o estado real com Git e os testes atuais.
+- **Último estado consolidado neste documento-fonte:** 01/09/2026, após a auditoria final integrada de interface, otimizações, histórico, inventário, autenticação, privacidade, telemetria e cadeia de atualização. Antes de qualquer trabalho, confirme o estado real com Git e os testes atuais.
 - **Release pública atual:** `v1.5.0`, publicada em 24/08/2026 a partir do commit integrado em `main`. O runtime assinado, instalador, hashes, manifesto e feed estável do updater foram publicados e validados.
 - **Próxima release pública:** a última release continua `v1.5.0`; Ralven ainda não foi publicado. A versão da nova geração só é definida no fluxo oficial de release, a partir das mudanças desde `v1.5.0`, sem aliases de execução, instalação ou atualização para gerações sem suporte.
 - **Atalho de desenvolvimento:** `Ralven - Desenvolvimento` usa `scripts\Start-DevelopmentApp.ps1`. Conforme `AI_RULES.md`, deve ser reconstruído com `scripts\Install-DevelopmentShortcut.ps1 -Build` quando aplicável. O script espelha a árvore para a pasta irmã fixa `Ralven-dev-shortcut`, sem ficar órfão após a remoção de um worktree.
@@ -72,11 +72,12 @@ Preferências, journals, solicitações efêmeras, filas e logs locais ficam sob
 - Visão geral apresenta diagnóstico/prontidão e monitoramento local de recursos; coleta pausa quando a superfície não está ativa.
 - Visão geral também monitora localmente início/fim de sessão do FiveM (`FiveMSessionStateTracker`/`FiveMSessionProbe`), por leitura passiva de processo/janela, sem hook, leitura de memória ou ação mutável automática; continua ativo com o app minimizado/na bandeja (decisão de produto), pois esse é o cenário normal de uso.
 - Aba **Sistema** reúne o diagnóstico local existente e a saúde agregada somente leitura de antivírus, firewall e atualizações automáticas da Central de Segurança do Windows; indisponibilidade da API é explícita e nunca vira afirmação de proteção. Também tem controles reais de jogos do Windows (Modo de Jogos, captura em segundo plano) sobre chaves HKCU allowlisted, com snapshot/journal/rollback via `WindowsTransactionEngine` e refresh ao voltar para a página.
-- Aba **Aplicativos** inventaria localmente programas desktop registrados e itens de inicialização, com busca, contagens e resultado parcial; não executa `UninstallString`, não altera `StartupApproved` nem escreve no Registro.
+- Aba **Aplicativos** inventaria localmente programas desktop registrados e entradas `Run`/`RunOnce`/pastas Startup, com busca, contagens e resultado parcial; não afirma cobrir tarefas agendadas/MSIX, não executa `UninstallString`, não altera `StartupApproved` nem escreve no Registro.
 - Aba **Jogos** é o catálogo de títulos compatíveis; hoje mostra FiveM sobre GTAV Legacy e encaminha para o fluxo especializado existente, sem habilitar outros jogos ou GTAV Enhanced.
 - Revisão do plano do Otimizador detalha por ação: como é detectada, o que a confirmação verifica, como é desfeita e riscos/limitações; texto cai no conteúdo do catálogo quando a chave de localização não existe.
 - Redesenho visual completo (20/08, direção "Câmara Âmbar"): tokens de tema (`Themes/Tokens/*.xaml`), `Controls.xaml`, `Surfaces.xaml`, `Typography.xaml` e as páginas Visão geral/Otimizador/Histórico foram redesenhadas; `ArcProgress`/`CoreVisual`/`CoreVisualPalette` (cena 3D antiga do Otimizador) foram removidos nesse redesenho.
 - Aba **Otimizador**: plano geral `GeneralWindows`, independente de FiveM/GTA, na trilha Preparar → Executar → Resultado; usa somente ações explicitamente permitidas para esse escopo e preserva a experiência especializada `FiveMLegacy` em Jogos.
+- Nos perfis padrão, cache/reparo permanece opt-in: Leve limita mutações a limpeza temporária segura e Modo de Jogo; Médio adiciona captura, energia e ajustes moderados reversíveis; Agressivo adiciona somente o conjunto conservador de aparência/responsividade. O perfil FiveM mantém ações próprias de GTAV Legacy e bloqueia com segurança processos/sessões incompatíveis.
 - Animações do Otimizador evitam `ScaleTransform` em elementos interativos, seguindo a regra já adotada para impedir deslocamento de listas no hover.
 - Smoke de captura aceita seleção de página via `--capture-page=Optimizer|History|Settings|Dashboard` e tema via `--capture-theme=light|dark` (só sob `--capture=`, não persiste).
 - Painel de **Notas da Versão** (`ReleaseNotesWindow`) é exibido automaticamente após um update bem-sucedido, controlado por `ReleaseNotesEvaluator`/`ReleaseNotesCatalog` e pelo campo `LastSeenReleaseNotesVersion` das configurações (mostra de novo só quando existem notas mais recentes que a última vista).
@@ -85,12 +86,12 @@ Preferências, journals, solicitações efêmeras, filas e logs locais ficam sob
 
 ### Motor de otimização e diagnóstico
 
-- `ActionCatalog.CurrentVersion` mais recente registrado: **18**.
+- `ActionCatalog.CurrentVersion` mais recente registrado: **20**.
 - Diagnósticos cobrem FiveM/GTA, CPU, GPU, RAM, armazenamento/TRIM, cache, processos, rede, pagefile/commit, drivers, taxa de atualização, aceleração do mouse, energia, WHEA, sinais de throttling e outros dados obtidos por APIs nativas/best-effort.
 - Existem diagnósticos somente leitura para gargalo provável, overlays/captura, logs do FiveM e orientação de medição pelas ferramentas oficiais do FiveM.
 - Relatório estruturado e relatório técnico sanitizado podem ser copiados/salvos explicitamente pelo usuário.
-- Relatos de bug são classificados automaticamente por `BugCodeClassifier`/`BugCode` (enum de códigos estáveis) antes do envio, para agrupar causas semelhantes no dashboard sem exigir triagem manual de texto livre.
-- Journal, snapshots e rollback preservam rastreabilidade das ações; a revalidação de planos compara integralmente os metadados de ações e usa a reconstrução canônica da requisição.
+- Falhas automáticas usam `BugCodeClassifier`; relatos manuais escolhem um motivo localizado mapeado para o mesmo `BugCode` allowlisted, permitindo agrupamento estável sem enviar classificação arbitrária.
+- Journal, snapshots e rollback preservam rastreabilidade das ações; ações administrativas exigem um receipt autoritativo protegido em HKLM/Registry64 antes de permitir rollback, e receipt ausente/corrompido falha fechado. A revalidação de planos compara integralmente os metadados de ações e usa a reconstrução canônica da requisição.
 - Ações XML de gráficos usam uma transação segura compartilhada; inspeção de processos e adaptadores de GPU têm primitivas de leitura separadas das mutações.
 - A recomendação de perfil considera o hardware detectado; ações persistentes mantêm resultado semântico, verificação e rollback estritos, com snapshots legados incompatíveis falhando fechados.
 - Diagnóstico de criadores reconhece OBS, Streamlabs Desktop e TikTok LIVE Studio sem fechar processos nem inferir que uma live está ativa.
@@ -98,7 +99,7 @@ Preferências, journals, solicitações efêmeras, filas e logs locais ficam sob
 ### Conta e autenticação
 
 - Autenticação do aplicativo usa **Firebase Authentication REST** para cadastro, login, verificação de e-mail, recuperação, reautenticação, alteração de e-mail/senha e exclusão de conta.
-- O ID Token fica em memória; refresh token opcional é persistido protegido por DPAPI. O **Firebase UID** é o identificador interno permanente, nunca o e-mail.
+- O ID Token fica em memória; refresh token opcional é persistido protegido por DPAPI somente quando a escolha explícita de manter sessão permanece ativa em refresh/reautenticação. Logout só conclui após remover e verificar o estado persistido. O **Firebase UID** é o identificador interno permanente, nunca o e-mail.
 - Perfil complementar (nome, sobrenome e username único) é armazenado no Worker/D1, indexado pelo UID autenticado.
 - Worker valida ID Token Firebase por RS256/JWKS, incluindo `aud`, `iss`, expiração e `sub`.
 - Login com Google usa OAuth2 + PKCE com redirect loopback; a confirmação local é estática, responsiva e usa o ícone oficial sem afetar a validação do fluxo.
@@ -113,12 +114,12 @@ Preferências, journals, solicitações efêmeras, filas e logs locais ficam sob
 - FormSubmit foi removido do código de desenvolvimento. O transporte atual usa Cloudflare Worker/D1.
 - Infraestrutura registrada como ativa: `/telemetry`, `POST /bugs`, `GET /api/bugs` e `GET /live-alert`/`POST /admin/live-alert` (aviso ao vivo do dashboard para o app, painel dedicado no dashboard); relatos de bug são texto, e-mail opcional e trecho de log opcional. **Não há anexo/R2**.
 - Telemetria e crash reporting obedecem consentimento e allowlists; falhas de envio nunca devem bloquear ou alterar o resultado da otimização. Novas instalações mantêm o compartilhamento de crash reports desativado até consentimento explícito.
-- Consentimento de privacidade na versão **6** (`PrivacyConsentPolicy`): diagnósticos essenciais agora incluem detecção do FiveM/GTA V, edição do GTA V e contagem de alvos; dados opcionais (sob consentimento) incluem build do Windows, tipo de disco, espaço livre, timestamp da execução, frequência de uso, backup e contagem de processos no início. Schema/migration/`INSERT` do Worker (`0004_telemetry_v5_fields.sql`) já ingerem todos os campos; cada evento também possui UUID para reenvio idempotente (`0006_telemetry_event_idempotency.sql`).
+- Consentimento de privacidade na versão **7** (`PrivacyConsentPolicy`): além dos campos técnicos já documentados, telemetria/relatos podem enviar um `BugCode` fechado para classificação; crash reporting continua desativado por padrão e todas as stacks passam por sanitização. A migration `0008_bug_report_code.sql` e o código consumidor estão preparados, mas ainda não foram implantados; devem ser aplicados juntos no próximo deploy do Worker.
 - Serviço de telemetria anônima expõe contadores de saúde (`SuccessfulSends`, `FailedSends`, `IsHealthy`) e grava falhas best-effort em `telemetry_failures.log` na pasta local da fila, sem nunca lançar para o chamador.
 - Sentry é usado para crash reporting somente após consentimento explícito, com sanitização/configuração centralizada e sem transformar o SDK em dependência das camadas Core/Windows/Broker.
 - Dashboard administrativo possui filtros, visão de telemetria e bugs e tratamento defensivo de falhas de rede/respostas inválidas.
 - Cookies administrativos cross-site usam `SameSite=None`; toda mutação `POST /admin/*` exige a origem exata do dashboard, e o dashboard publica CSP restritiva/anti-frame.
-- Fundação de cobrança (Mercado Pago) no Worker/D1: `billing_checkout_intents`, `billing_webhook_events` (idempotente por `provider_request_id`) e `billing_subscriptions` alimentam `account_entitlements`, o snapshot de acesso lido por `GET /account/entitlements`. O webhook verifica a assinatura HMAC do envelope assinado (request id + resource id) em tempo constante, nunca confia no corpo da requisição e busca o estado real no provedor antes de qualquer gravação; ver `docs/billing.md`.
+- Fundação de cobrança (Mercado Pago) no Worker/D1: `billing_checkout_intents`, `billing_webhook_events` (idempotente por `provider_request_id`) e `billing_subscriptions` já suportam reconciliação, enquanto `account_entitlements` é o snapshot fail-closed lido por `GET /account/entitlements`. Ainda não existe checkout público nem mutação automática de entitlement; isso pertence à próxima fase. O webhook verifica a assinatura HMAC do envelope assinado, nunca confia no corpo da requisição e busca o estado real no provedor antes de qualquer gravação; ver `docs/billing.md`.
 
 ### Atualização e distribuição
 
@@ -144,7 +145,7 @@ Somente itens ainda relevantes devem permanecer aqui. Quando resolvidos e integr
 
 Estes números são **referência do último estado validado**, não substituem testes da branch atual.
 
-- **31/08/2026 — integração do otimizador geral, seu fortalecimento transacional e atualização compatível do Worker:** build Release sem warnings e suíte .NET aprovados; `dotnet format --verify-no-changes`, `scripts/Verify-Safety.ps1` e `git diff --check` aprovados. Com Node 24.19 LTS, o Worker passou `npm test`, `npm run test:migrations` e `npm audit` sem vulnerabilidades; `wrangler` está em 4.127.0 com o postinstall de `workerd` allowlisted na versão transitiva exata.
+- **01/09/2026 — auditoria final integrada do aplicativo:** build Release sem warnings, **1.316 testes .NET**, `dotnet format --verify-no-changes`, `scripts/Verify-Safety.ps1`, auditoria NuGet completa e pacote portátil `win-x64` aprovados. Worker (**239 testes**), dashboard (**51 testes**) e site (lint, typecheck, build e **3 testes**) passaram, com auditorias npm sem vulnerabilidades; esses comandos web foram executados no host Node 26.8, enquanto o baseline suportado permanece Node 24.19 LTS. A matriz visual cobriu as 12 páginas/subpáginas em tema claro/escuro e viewports compacta/ampla (**48 capturas**).
 
 - **24/08/2026 — release pública v1.5.0:** build Release sem warnings, **1.000 testes .NET**, `dotnet format --verify-no-changes`, verificação de segurança, contrato do instalador, smoke pós-ofuscação e instalação/upgrade/desinstalação aprovados. Worker (**199 testes**), dashboard (**49 testes**) e site (lint, typecheck, build e **3 testes**) também passaram sem vulnerabilidades. A CI remota e o workflow estável aprovaram SBOM, empacotamento endurecido, assinatura, proveniência, GitHub Release e publicação do feed estável assinado do updater.
 

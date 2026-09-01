@@ -15,6 +15,7 @@ public enum AccountProfileOutcome
 {
     Created,
     UsernameTaken,
+    UidTaken,
     Failed,
 }
 

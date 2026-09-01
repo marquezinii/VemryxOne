@@ -480,6 +480,28 @@ public sealed class CrashReportSanitizerTests
         Assert.DoesNotContain("someuser", result.Message!.Message, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("%USERPROFILE%", result.Message!.Message, StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void Sanitize_ScrubsPathsFromEveryThreadStackTrace()
+    {
+        var firstFrame = new SentryStackFrame { FileName = @"C:\Users\first\one.cs" };
+        var secondFrame = new SentryStackFrame { AbsolutePath = @"C:\Users\second\two.cs" };
+        var sentryEvent = new SentryEvent
+        {
+            SentryThreads =
+            [
+                new SentryThread { Stacktrace = new SentryStackTrace { Frames = [firstFrame] } },
+                new SentryThread { Stacktrace = new SentryStackTrace { Frames = [secondFrame] } },
+            ],
+        };
+
+        CrashReportSanitizer.Sanitize(sentryEvent);
+
+        Assert.DoesNotContain("first", firstFrame.FileName, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("second", secondFrame.AbsolutePath, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("%USERPROFILE%", firstFrame.FileName, StringComparison.Ordinal);
+        Assert.Contains("%USERPROFILE%", secondFrame.AbsolutePath, StringComparison.Ordinal);
+    }
 }
 
 public sealed class CentralizedConfigurationGuardTests

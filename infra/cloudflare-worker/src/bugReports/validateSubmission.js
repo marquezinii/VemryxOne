@@ -5,8 +5,13 @@
 // No attachment/screenshot support: reports are text-only (D1 only, no R2).
 
 import { ALLOWED_ENVIRONMENTS } from '../environments.js';
+import { ALLOWED_BUG_CODES } from '../bugCodes.js';
 
 export const MAX_CATEGORY_LENGTH = 60;
+export const MAX_BUG_CODE_LENGTH = 48;
+export const ALLOWED_BUG_REPORT_CATEGORIES = new Set([
+  'optimization', 'games', 'windows', 'interface', 'crash', 'other',
+]);
 export const MAX_SUMMARY_LENGTH = 120;
 export const MIN_SUMMARY_LENGTH = 5;
 export const MAX_DESCRIPTION_LENGTH = 8000;
@@ -44,6 +49,7 @@ export function validateBugReport(payload) {
   const {
     reportId,
     category,
+    bugCode,
     summary,
     description,
     appVersion,
@@ -62,7 +68,16 @@ export function validateBugReport(payload) {
     typeof category !== 'string' ||
     category.length === 0 ||
     category.length > MAX_CATEGORY_LENGTH ||
-    /[\r\n]/.test(category)
+    !ALLOWED_BUG_REPORT_CATEGORIES.has(category)
+  ) {
+    return null;
+  }
+
+  if (
+    typeof bugCode !== 'string' ||
+    bugCode.length === 0 ||
+    bugCode.length > MAX_BUG_CODE_LENGTH ||
+    !ALLOWED_BUG_CODES.has(bugCode)
   ) {
     return null;
   }
@@ -124,6 +139,7 @@ export function validateBugReport(payload) {
   return {
     reportId,
     category,
+    bugCode,
     summary: summary.trim(),
     description: description.trim(),
     appVersion,

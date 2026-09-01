@@ -221,9 +221,10 @@ public sealed partial class MainViewModel : BindableBase, IDisposable
         && diagnostic is not null
         && !diagnosticFailed
         && currentPlan?.IsExecutable == true
-        && !diagnostic.IsFiveMRunning
-        && !diagnostic.GtaVIsRunning
-        && !IsFiveMSessionActive;
+        && (optimizationScope == OptimizationScope.GeneralWindows
+            || (!diagnostic.IsFiveMRunning
+                && !diagnostic.GtaVIsRunning
+                && !IsFiveMSessionActive));
 
     public bool CanCancel => IsBusy && operationCancellation is not null;
 
@@ -245,13 +246,12 @@ public sealed partial class MainViewModel : BindableBase, IDisposable
             await Task.WhenAll(settingsTask, diagnosticTask, historyTask);
 
             var loadedSettings = await settingsTask;
+            var settingsFileExistedBeforeLoad = service.SettingsFileExists();
             ApplySettings(loadedSettings);
-            PrivacyConsentDecision = PrivacyConsentEvaluator.Evaluate(
-                loadedSettings,
-                service.SettingsFileExists());
+            RefreshPrivacyAuthorization(settingsFileExistedBeforeLoad);
             PendingReleaseNotes = ReleaseNotesEvaluator.Evaluate(
                 loadedSettings,
-                service.SettingsFileExists(),
+                settingsFileExistedBeforeLoad,
                 AppVersion,
                 ReleaseNotesCatalog.Versions);
             ApplyDiagnostic(await diagnosticTask);

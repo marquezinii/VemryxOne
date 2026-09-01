@@ -82,14 +82,17 @@ public sealed class SilentUpdateInstaller : ISilentUpdateInstaller
         try
         {
             ResolveVerifiedInstallerPath(update);
-            var updaterPath = CopyUpdaterOutsideInstallDirectory();
-            using var currentProcess = Process.GetCurrentProcess();
-            launcher.Start(
-                updaterPath,
-                BuildHandoffArguments(
-                    update,
-                    currentProcess.Id,
-                    currentProcess.StartTime.ToUniversalTime().ToFileTimeUtc()));
+            var updaterPath = CopyUpdaterOutsideInstallDirectory(out var integrityLease);
+            using (integrityLease)
+            {
+                using var currentProcess = Process.GetCurrentProcess();
+                launcher.Start(
+                    updaterPath,
+                    BuildHandoffArguments(
+                        update,
+                        currentProcess.Id,
+                        currentProcess.StartTime.ToUniversalTime().ToFileTimeUtc()));
+            }
             return Task.FromResult(SilentUpdateLaunch.Running());
         }
         catch (Exception exception) when (exception is not (
@@ -143,7 +146,7 @@ public sealed class SilentUpdateInstaller : ISilentUpdateInstaller
         }
     }
 
-    private string CopyUpdaterOutsideInstallDirectory()
+    private string CopyUpdaterOutsideInstallDirectory(out FileStream integrityLease)
     {
         if (!File.Exists(updaterSourcePath)
             || !Path.GetFileName(updaterSourcePath).Equals(UpdaterFileName, StringComparison.OrdinalIgnoreCase))
@@ -165,14 +168,24 @@ public sealed class SilentUpdateInstaller : ISilentUpdateInstaller
                 throw new UpdateSecurityException("A cópia local do atualizador independente falhou na verificação de integridade.");
             }
             File.Move(temporary, destination, overwrite: true);
-            // Reverify again immediately before launch: closes the race window between
-            // the rename and Process.Start where another local process could have
-            // replaced the destination file at the same path.
-            if (!ComputeSha256(destination).Equals(sourceHash, StringComparison.OrdinalIgnoreCase))
+            var lease = new FileStream(
+                destination, FileMode.Open, FileAccess.Read, FileShare.Read);
+            try
             {
-                throw new UpdateSecurityException("O atualizador independente foi alterado após a cópia local.");
+                var destinationHash = Convert.ToHexString(SHA256.HashData(lease));
+                if (!destinationHash.Equals(sourceHash, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new UpdateSecurityException("O atualizador independente foi alterado após a cópia local.");
+                }
+
+                integrityLease = lease;
+                return destination;
             }
-            return destination;
+            catch
+            {
+                lease.Dispose();
+                throw;
+            }
         }
         finally
         {

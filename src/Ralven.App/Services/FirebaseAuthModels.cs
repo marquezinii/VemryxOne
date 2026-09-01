@@ -18,6 +18,7 @@ public enum AuthenticationState
     SigningIn,
     EmailVerificationRequired,
     ProfileCompletionRequired,
+    ProfileUnavailable,
     SignedIn,
     RefreshingSession,
     ReauthenticationRequired

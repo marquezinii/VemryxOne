@@ -21,7 +21,7 @@ campos técnicos abaixo.
 ## Dados enviados, finalidade, retenção e destinatários
 
 Ao término, falha ou cancelamento de uma otimização, o aplicativo monta um
-evento técnico com estes campos (versão 6 do consentimento de privacidade —
+evento técnico com estes campos (versão 7 do consentimento de privacidade —
 ver `PrivacyConsentPolicy`):
 
 | Campos | Finalidade | Obrigatório | Retenção | Destinatários |
@@ -29,6 +29,7 @@ ver `PrivacyConsentPolicy`):
 | ID do evento | Garantir entrega idempotente sem identificar máquina ou usuário. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
 | Tipo do evento, tempo de execução e versão do app | Distinguir conclusão, falha ou cancelamento; detectar operações anormalmente longas e correlacioná-las à versão. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, banco D1 e painel administrativo autenticado com métricas agregadas. |
 | Categoria de erro allowlisted (`cancelled`, `timeout`, `access-denied`, `io`, `invalid-data`, `unexpected`) | Classificar falhas sem enviar mensagem, stack trace, arquivo ou caminho. | Não. Só em falhas, com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
+| Código técnico de bug allowlisted (`BugCode`) | Agrupar a causa técnica da falha sem texto livre. | Não. Só quando a causa é conhecida e a telemetria de uso está ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
 | Versão e build do Windows; arquitetura | Compatibilidade agregada do sistema operacional. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
 | Modelo de CPU e GPU; faixa de RAM | Estatísticas agregadas do hardware mais comum. A RAM é arredondada para uma faixa fixa. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
 | Perfil escolhido e IDs allowlisted das ações aplicadas | Medir uso agregado de perfis e funcionalidades. | Não. Só é enviado com a telemetria de uso ativa. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
@@ -68,11 +69,14 @@ cliente não cria eventos ou ações adicionais. Enquanto houver instalações
 anteriores sem UUID, o Worker gera um UUID apenas para compatibilidade, sem
 promessa de idempotência para esse protocolo legado. O código limita os nomes
 de evento e categorias a uma allowlist e recusa campos fora desse esquema.
-Falhas de rede são ignoradas: não interrompem a otimização, não geram nova
-telemetria e não são reenviadas automaticamente.
-A fila local (`LocalTelemetryQueue`) persiste eventos pendentes por até 14
-dias antes de descartá-los, para sobreviver a reinícios e períodos offline
-sem crescer indefinidamente.
+Falhas de rede são isoladas: não interrompem a otimização nem geram nova
+telemetria. O evento permanece na fila e é reenviado oportunisticamente na
+próxima execução ou inicialização autorizada; não existe loop de retry nem
+polling em segundo plano. Rejeições permanentes do Worker são contabilizadas
+como falha e removidas para não bloquear a fila.
+A fila local (`LocalTelemetryQueue`) persiste eventos pendentes por até 14 dias
+antes de descartá-los, para sobreviver a reinícios e períodos offline sem
+crescer indefinidamente.
 
 ## Destino e metadados de transporte
 
@@ -84,7 +88,7 @@ infraestrutura de rede pode processar metadados de conexão, como endereço
 IP, conforme suas próprias políticas; isso não é controlado nem incluído
 como campo pelo aplicativo.
 
-Para relatar um problema com descrição ou imagem, use o formulário de bug
+Para relatar um problema com descrição e, opcionalmente, e-mail ou trecho de log, use o formulário de bug
 separado e opt-in; suas regras estão em [Relatos de bug e privacidade](bug-reports.md).
 
 ## Relatório de falhas (Sentry)
@@ -151,8 +155,8 @@ mostrar gráficos agregados — otimizações por dia, versões do Windows/app,
 funções mais usadas, hardware mais comum, tempo médio, taxa de sucesso e,
 para investigar bugs mais rápido, erros por categoria, ações mais
 associadas a falhas, um feed não agregado dos últimos erros e uma aba
-**"Bugs reportados"** com os relatos recebidos pela rota `/bugs` (categoria,
-resumo, versão, perfil, ambiente, e-mail opcional e se um trecho de log foi
+**"Bugs reportados"** com os relatos recebidos pela rota `/bugs` (categoria e
+código allowlisted, resumo, versão, perfil, ambiente, e-mail opcional e se um trecho de log foi
 enviado — sem captura de tela, esse formulário é só texto). Nenhum dado
 individual de usuário é exibido nem poderia ser, já que a telemetria nunca
 carrega um identificador de máquina; o painel deixa isso explícito em vez

@@ -13,6 +13,8 @@ namespace Ralven.App.ViewModels;
 
 public sealed partial class MainViewModel
 {
+    private string? settingsSaveErrorMessage;
+
     public AppThemePreference ThemePreference => themePreference;
 
     public AppLanguagePreference LanguagePreference => languagePreference;
@@ -136,7 +138,7 @@ public sealed partial class MainViewModel
         {
             if (SetProperty(ref shareAnonymousTelemetry, value))
             {
-                telemetry.SetEnabled(value);
+                RefreshPrivacyAuthorization(settingsFileExistedBeforeLoad: true);
                 SettingsChanged(refreshPlan: false);
             }
         }
@@ -161,9 +163,7 @@ public sealed partial class MainViewModel
             }
 
             shareCrashReports = value;
-            PrivacyConsentDecision = PrivacyConsentEvaluator.Evaluate(
-                BuildSettingsSnapshot(),
-                settingsFileExistedBeforeLoad: true);
+            RefreshPrivacyAuthorization(settingsFileExistedBeforeLoad: true);
             OnPropertyChanged();
             SettingsChanged(refreshPlan: false);
         }
@@ -179,6 +179,12 @@ public sealed partial class MainViewModel
     /// necessária para isso.
     /// </summary>
     public PrivacyConsentDecision? PrivacyConsentDecision { get; private set; }
+
+    public string? SettingsSaveErrorMessage
+    {
+        get => settingsSaveErrorMessage;
+        private set => SetProperty(ref settingsSaveErrorMessage, value);
+    }
 
     /// <summary>
     /// Decision computed by <see cref="ReleaseNotesEvaluator"/> from the
@@ -251,7 +257,6 @@ public sealed partial class MainViewModel
         checkForUpdates = settings.CheckForUpdates;
         notifyWhenUpdateAvailable = settings.NotifyWhenUpdateAvailable;
         shareAnonymousTelemetry = settings.ShareAnonymousTelemetry;
-        telemetry.SetEnabled(shareAnonymousTelemetry);
         shareCrashReports = settings.ShareCrashReports;
         privacyConsentVersion = settings.PrivacyConsentVersion;
         dismissedLiveAlertId = settings.DismissedLiveAlertId;
@@ -329,15 +334,20 @@ public sealed partial class MainViewModel
             acceptAnonymousTelemetry,
             acceptCrashReports);
 
-        PrivacyConsentDecision = PrivacyConsentEvaluator.Evaluate(snapshot, settingsFileExistedBeforeLoad: true);
         shareAnonymousTelemetry = snapshot.ShareAnonymousTelemetry;
-        telemetry.SetEnabled(snapshot.ShareAnonymousTelemetry);
         shareCrashReports = snapshot.ShareCrashReports;
         privacyConsentVersion = snapshot.PrivacyConsentVersion;
+        RefreshPrivacyAuthorization(settingsFileExistedBeforeLoad: true);
         OnPropertyChanged(nameof(ShareAnonymousTelemetry));
         OnPropertyChanged(nameof(ShareCrashReports));
         var revision = Interlocked.Increment(ref settingsRevision);
         await SaveSettingsRevisionAsync(snapshot, revision).ConfigureAwait(false);
+    }
+
+    public Task RetrySaveSettingsAsync()
+    {
+        var revision = Interlocked.Increment(ref settingsRevision);
+        return SaveSettingsRevisionAsync(BuildSettingsSnapshot(), revision);
     }
 
     /// <summary>
@@ -372,6 +382,10 @@ public sealed partial class MainViewModel
                 }
 
                 await service.SaveSettingsAsync(snapshot);
+                if (revision == Volatile.Read(ref settingsRevision))
+                {
+                    SettingsSaveErrorMessage = null;
+                }
             }
             finally
             {
@@ -381,12 +395,29 @@ public sealed partial class MainViewModel
         catch (Exception exception) when (exception is not (
             OutOfMemoryException or StackOverflowException or AccessViolationException))
         {
-            // Settings are best-effort; a later revision can still persist.
+            if (revision == Volatile.Read(ref settingsRevision))
+            {
+                SettingsSaveErrorMessage = localization.GetString("Settings.SaveFailed");
+            }
         }
+    }
+
+    private void RefreshPrivacyAuthorization(bool settingsFileExistedBeforeLoad)
+    {
+        PrivacyConsentDecision = PrivacyConsentEvaluator.Evaluate(
+            BuildSettingsSnapshot(),
+            settingsFileExistedBeforeLoad);
+        telemetry.SetEnabled(PrivacyConsentDecision.IsAnonymousTelemetryAuthorized);
+        OnPropertyChanged(nameof(PrivacyConsentDecision));
     }
 
     private void ResetLocalizedPlaceholders(bool preserveDiagnostic = false)
     {
+        if (SettingsSaveErrorMessage is not null)
+        {
+            SettingsSaveErrorMessage = localization.GetString("Settings.SaveFailed");
+        }
+
         if (!IsBusy)
         {
             ProgressHeadline = localization.GetString("Status.Ready.Headline");

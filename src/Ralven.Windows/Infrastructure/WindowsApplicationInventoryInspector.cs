@@ -351,6 +351,11 @@ public sealed class WindowsApplicationInventoryInspector : IWindowsApplicationIn
                 foreach (var file in Directory.EnumerateFiles(folder, "*", SearchOption.TopDirectoryOnly))
                 {
                     cancellationToken.ThrowIfCancellationRequested();
+                    if (Path.GetFileName(file).Equals("desktop.ini", StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
                     items.Add(new WindowsStartupInventoryEntry(
                         Path.GetFileNameWithoutExtension(file),
                         location,

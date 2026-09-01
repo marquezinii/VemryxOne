@@ -52,6 +52,12 @@ public static class TelemetryEventValidator
             throw new ArgumentException("Categoria de erro de telemetria não permitida.", nameof(telemetryEvent));
         }
 
+        if (telemetryEvent.BugCode is BugCode.Unknown
+            || telemetryEvent.BugCode is { } bugCode && !Enum.IsDefined(bugCode))
+        {
+            throw new ArgumentException("Código de bug de telemetria não permitido.", nameof(telemetryEvent));
+        }
+
         ValidateShortField(telemetryEvent.OsVersion, nameof(telemetryEvent.OsVersion));
         ValidateShortField(telemetryEvent.SystemArchitecture, nameof(telemetryEvent.SystemArchitecture));
         ValidateShortField(telemetryEvent.CpuModel, nameof(telemetryEvent.CpuModel));
@@ -368,6 +374,7 @@ public sealed class CloudflareTelemetryTransport
         executionTimeMs = (long)Math.Clamp(telemetryEvent.ExecutionTime.TotalMilliseconds, 0, 86_400_000),
         appVersion = telemetryEvent.AppVersion,
         errorCategory = telemetryEvent.ErrorCategory,
+        bugCode = telemetryEvent.BugCode?.ToString(),
         osVersion = telemetryEvent.OsVersion,
         systemArchitecture = telemetryEvent.SystemArchitecture,
         cpuModel = telemetryEvent.CpuModel,
@@ -495,13 +502,22 @@ public sealed class QueuedCloudflareTelemetryService : IAnonymousTelemetryServic
             var outcome = await transport
                 .SendBatchWithOutcomeAsync(pending.Select(item => item.Event).ToArray(), cancellationToken)
                 .ConfigureAwait(false);
-            if (outcome is TelemetrySendOutcome.Accepted or TelemetrySendOutcome.PermanentlyRejected)
+            if (outcome == TelemetrySendOutcome.Accepted)
             {
                 foreach (var item in pending)
                 {
                     queue.Remove(item.FilePath);
                 }
                 Interlocked.Add(ref successfulSends, pending.Count);
+            }
+            else if (outcome == TelemetrySendOutcome.PermanentlyRejected)
+            {
+                foreach (var item in pending)
+                {
+                    queue.Remove(item.FilePath);
+                }
+                Interlocked.Add(ref failedSends, pending.Count);
+                LogFailure($"Telemetry flush was permanently rejected. {pending.Count} invalid events removed from queue.");
             }
             else
             {

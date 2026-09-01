@@ -426,7 +426,7 @@ public sealed class PlanBuilderTests
         Assert.All(plan.Actions, action =>
             Assert.True(ActionCatalog.Current.GetRequired(action.Metadata.Id)
                 .Supports(OptimizationScope.GeneralWindows)));
-        Assert.Contains(OptimizationActionIds.VerifyFiveMIsStopped, Ids(plan));
+        Assert.DoesNotContain(OptimizationActionIds.VerifyFiveMIsStopped, Ids(plan));
         Assert.DoesNotContain(OptimizationActionIds.RepairLegacyServerCache, Ids(plan));
         Assert.DoesNotContain(OptimizationActionIds.ApplyAggressiveLegacyGraphics, Ids(plan));
         Assert.DoesNotContain(OptimizationActionIds.ApplyAggressiveGtaVGraphics, Ids(plan));
@@ -438,6 +438,33 @@ public sealed class PlanBuilderTests
             !notice.Message.Contains("FPS", StringComparison.OrdinalIgnoreCase));
         Assert.DoesNotContain(plan.Notices, notice =>
             notice.Code == "aggressive-prioritizes-performance");
+    }
+
+    [Theory]
+    [MemberData(nameof(GeneralWindowsProfiles))]
+    public void GeneralWindows_DefaultProfilesHaveExpectedMutationBoundaries(
+        OptimizationProfile profile,
+        ActionRisk maximumRisk,
+        bool requiresElevation,
+        string[] expectedMutationIds)
+    {
+        var plan = BuildPlan(new OptimizationPlanRequestDto
+        {
+            Scope = OptimizationScope.GeneralWindows,
+            Profile = profile,
+            Edition = FiveMEdition.Unknown
+        });
+
+        Assert.True(plan.IsExecutable);
+        Assert.Equal(maximumRisk, plan.MaximumRisk);
+        Assert.Equal(requiresElevation, plan.RequiresElevation);
+        Assert.True(plan.ContainsNonReversibleActions);
+        Assert.Equal(
+            expectedMutationIds,
+            plan.Actions
+                .Where(action => action.Metadata.Reversibility != ActionReversibility.ReadOnly)
+                .Select(action => action.Metadata.Id));
+        Assert.All(plan.Actions, action => Assert.False(action.Metadata.RequiresFiveMStopped));
     }
 
     [Fact]
@@ -595,4 +622,45 @@ public sealed class PlanBuilderTests
     {
         return plan.Actions.Select(action => action.Metadata.Id).ToArray();
     }
+
+    public static TheoryData<OptimizationProfile, ActionRisk, bool, string[]> GeneralWindowsProfiles =>
+        new()
+        {
+            {
+                OptimizationProfile.Light,
+                ActionRisk.Low,
+                false,
+                [
+                    OptimizationActionIds.CleanUserTemporaryFiles,
+                    OptimizationActionIds.EnableGameMode
+                ]
+            },
+            {
+                OptimizationProfile.Balanced,
+                ActionRisk.Moderate,
+                true,
+                [
+                    OptimizationActionIds.CleanUserTemporaryFiles,
+                    OptimizationActionIds.EnableGameMode,
+                    OptimizationActionIds.DisableBackgroundCapture,
+                    OptimizationActionIds.EnableSessionPerformancePowerPlan,
+                    OptimizationActionIds.AdjustPciExpressPowerManagement,
+                    OptimizationActionIds.ReduceMenuShowDelay
+                ]
+            },
+            {
+                OptimizationProfile.Aggressive,
+                ActionRisk.Moderate,
+                true,
+                [
+                    OptimizationActionIds.CleanUserTemporaryFiles,
+                    OptimizationActionIds.EnableGameMode,
+                    OptimizationActionIds.DisableBackgroundCapture,
+                    OptimizationActionIds.EnableSessionPerformancePowerPlan,
+                    OptimizationActionIds.AdjustPciExpressPowerManagement,
+                    OptimizationActionIds.ReduceMenuShowDelay,
+                    OptimizationActionIds.ReduceWindowsVisualEffects
+                ]
+            }
+        };
 }

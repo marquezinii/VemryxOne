@@ -17,7 +17,7 @@ public static class PrivacyConsentOutcomeBuilder
     public static AppSettings BuildConfirmed(
         AppSettings current,
         bool acceptAnonymousTelemetry,
-        bool acceptCrashReports = true)
+        bool acceptCrashReports)
     {
         ArgumentNullException.ThrowIfNull(current);
         return current with

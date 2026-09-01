@@ -30,12 +30,13 @@ public sealed class PrivacyConsentPolicyTests
     {
         var entry = Assert.Single(PrivacyConsentPolicy.History, e => e.Version == PrivacyConsentPolicy.CurrentVersion);
         Assert.False(string.IsNullOrWhiteSpace(entry.Summary));
+        Assert.Contains("lista fechada", entry.Summary, StringComparison.Ordinal);
     }
 
     [Fact]
-    public void CurrentVersion_Is6()
+    public void CurrentVersion_Is7()
     {
-        Assert.Equal(6, PrivacyConsentPolicy.CurrentVersion);
+        Assert.Equal(7, PrivacyConsentPolicy.CurrentVersion);
     }
 
     [Fact]

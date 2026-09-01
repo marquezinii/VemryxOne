@@ -19,13 +19,13 @@ public sealed class RuntimePackageStager
         CancellationToken cancellationToken = default)
     {
         if (!Version.TryParse(version, out _)) throw new ArgumentException("Versão inválida.", nameof(version));
-        if (new FileInfo(archivePath).Length != expectedSize) throw new InvalidDataException("Tamanho do pacote não confere.");
-        using (var stream = File.OpenRead(archivePath))
-        {
-            var actual = Convert.ToHexString(SHA256.HashData(stream));
-            if (!actual.Equals(expectedSha256, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("SHA-256 do pacote não confere.");
-        }
+        using var packageStream = new FileStream(
+            archivePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+        if (packageStream.Length != expectedSize) throw new InvalidDataException("Tamanho do pacote não confere.");
+        var actual = Convert.ToHexString(SHA256.HashData(packageStream));
+        if (!actual.Equals(expectedSha256, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidDataException("SHA-256 do pacote não confere.");
+        packageStream.Position = 0;
 
         Directory.CreateDirectory(activation.VersionsRoot);
         var destination = Path.Combine(activation.VersionsRoot, version);
@@ -51,7 +51,7 @@ public sealed class RuntimePackageStager
         Directory.CreateDirectory(staging);
         try
         {
-            using var archive = ZipFile.OpenRead(archivePath);
+            using var archive = new ZipArchive(packageStream, ZipArchiveMode.Read, leaveOpen: true);
             if (archive.Entries.Count > 10_000
                 || archive.Entries.Sum(entry => entry.Length) > 2_147_483_648L)
                 throw new InvalidDataException("Pacote excede os limites de extração.");

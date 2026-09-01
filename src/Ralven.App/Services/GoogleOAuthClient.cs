@@ -17,7 +17,7 @@ namespace Ralven.App.Services;
 /// <summary>
 /// Outcome of an interactive Google sign-in. Exactly one of
 /// <see cref="IdToken"/> and <see cref="Error"/> is set; <see cref="Error"/>
-/// is already a user-facing pt-BR sentence.
+/// is already localized for the current app language.
 /// </summary>
 public sealed record GoogleSignInTicket(string? IdToken, string? Error)
 {
@@ -79,17 +79,19 @@ public sealed class GoogleOAuthClient : IGoogleOAuthClient
     private readonly HttpClient client;
     private readonly string? clientId;
     private readonly string? clientSecret;
+    private readonly ILocalizationService localization;
 
-    public GoogleOAuthClient(string? clientId, string? clientSecret = null)
-        : this(new HttpClient { Timeout = TimeSpan.FromSeconds(20) }, clientId, clientSecret)
+    public GoogleOAuthClient(string? clientId, string? clientSecret = null, ILocalizationService? localization = null)
+        : this(new HttpClient { Timeout = TimeSpan.FromSeconds(20) }, clientId, clientSecret, localization)
     {
     }
 
-    internal GoogleOAuthClient(HttpClient client, string? clientId, string? clientSecret)
+    internal GoogleOAuthClient(HttpClient client, string? clientId, string? clientSecret, ILocalizationService? localization = null)
     {
         this.client = client;
         this.clientId = string.IsNullOrWhiteSpace(clientId) ? null : clientId.Trim();
         this.clientSecret = string.IsNullOrWhiteSpace(clientSecret) ? null : clientSecret.Trim();
+        this.localization = localization ?? LocalizationService.Current;
     }
 
     public bool IsConfigured => clientId is not null;
@@ -98,7 +100,7 @@ public sealed class GoogleOAuthClient : IGoogleOAuthClient
     {
         if (clientId is null)
         {
-            return GoogleSignInTicket.Fail("O login com o Google não está configurado nesta versão.");
+            return GoogleSignInTicket.Fail(T("Account.Google.NotConfigured"));
         }
 
         var verifier = CreateRandomToken();
@@ -111,7 +113,7 @@ public sealed class GoogleOAuthClient : IGoogleOAuthClient
         }
         catch (SocketException)
         {
-            return GoogleSignInTicket.Fail("Não foi possível abrir a porta local necessária para o login com o Google.");
+            return GoogleSignInTicket.Fail(T("Account.Google.LoopbackUnavailable"));
         }
 
         try
@@ -121,7 +123,7 @@ public sealed class GoogleOAuthClient : IGoogleOAuthClient
 
             if (!TryOpenBrowser(BuildAuthorizeUrl(redirectUri, verifier, state)))
             {
-                return GoogleSignInTicket.Fail("Não foi possível abrir seu navegador para concluir o login com o Google.");
+                return GoogleSignInTicket.Fail(T("Account.Google.BrowserOpenFailed"));
             }
 
             using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -137,7 +139,7 @@ public sealed class GoogleOAuthClient : IGoogleOAuthClient
                     Encoding.UTF8.GetBytes(callback.State ?? string.Empty),
                     Encoding.UTF8.GetBytes(state)))
             {
-                return GoogleSignInTicket.Fail("A resposta do Google não pôde ser validada. Tente entrar novamente.");
+                return GoogleSignInTicket.Fail(T("Account.Google.InvalidResponse"));
             }
 
             return await ExchangeCodeAsync(callback.Code!, verifier, redirectUri, cancellationToken).ConfigureAwait(false);
@@ -187,7 +189,7 @@ public sealed class GoogleOAuthClient : IGoogleOAuthClient
     /// response. Browsers routinely open extra connections to the same port
     /// (favicon, connection pre-warming), so a single accept is not enough.
     /// </summary>
-    private static async Task<CallbackResult> WaitForCallbackAsync(
+    private async Task<CallbackResult> WaitForCallbackAsync(
         TcpListener listener,
         CancellationToken timeoutToken,
         CancellationToken cancellationToken)
@@ -201,15 +203,15 @@ public sealed class GoogleOAuthClient : IGoogleOAuthClient
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
-                return CallbackResult.Failed("Login com o Google cancelado.");
+                return CallbackResult.Failed(T("Account.Google.Cancelled"));
             }
             catch (OperationCanceledException)
             {
-                return CallbackResult.Failed("O login com o Google demorou demais e foi cancelado.");
+                return CallbackResult.Failed(T("Account.Google.TimedOut"));
             }
             catch (SocketException)
             {
-                return CallbackResult.Failed("A conexão local do login com o Google foi interrompida.");
+                return CallbackResult.Failed(T("Account.Google.LocalConnectionInterrupted"));
             }
 
             using (connection)
@@ -234,7 +236,7 @@ public sealed class GoogleOAuthClient : IGoogleOAuthClient
                     await WriteResponseAsync(
                         connection,
                         "404 Not Found",
-                        "<section class=\"result result--neutral\"><h1>Nada aqui.</h1></section>",
+                        $"<section class=\"result result--neutral\"><h1>{H("Account.Google.Callback.NothingTitle")}</h1></section>",
                         timeoutToken).ConfigureAwait(false);
                     continue;
                 }
@@ -244,15 +246,15 @@ public sealed class GoogleOAuthClient : IGoogleOAuthClient
                     connection,
                     "200 OK",
                     succeeded
-                        ? "<section class=\"result result--success\"><span class=\"status-mark\" aria-hidden=\"true\"></span><h1>Tudo certo!</h1><p>Você já pode voltar para o Ralven.</p></section>"
-                        : "<section class=\"result result--error\"><span class=\"status-mark\" aria-hidden=\"true\"></span><h1>Login não concluído</h1><p>Volte ao Ralven e tente novamente.</p></section>",
+                        ? $"<section class=\"result result--success\"><span class=\"status-mark\" aria-hidden=\"true\"></span><h1>{H("Account.Google.Callback.SuccessTitle")}</h1><p>{H("Account.Google.Callback.SuccessDetail")}</p></section>"
+                        : $"<section class=\"result result--error\"><span class=\"status-mark\" aria-hidden=\"true\"></span><h1>{H("Account.Google.Callback.FailureTitle")}</h1><p>{H("Account.Google.Callback.FailureDetail")}</p></section>",
                     timeoutToken).ConfigureAwait(false);
 
                 return succeeded
                     ? new CallbackResult(code, query["state"], null)
                     : CallbackResult.Failed(error == "access_denied"
-                        ? "Você cancelou o login com o Google."
-                        : "O Google não concluiu o login. Tente novamente.");
+                        ? T("Account.Google.ProviderCancelled")
+                        : T("Account.Google.ProviderFailed"));
             }
         }
     }
@@ -275,14 +277,14 @@ public sealed class GoogleOAuthClient : IGoogleOAuthClient
         }
     }
 
-    private static async Task WriteResponseAsync(TcpClient connection, string status, string body, CancellationToken cancellationToken)
+    private async Task WriteResponseAsync(TcpClient connection, string status, string body, CancellationToken cancellationToken)
     {
         var iconMarkup = AppIconDataUri.Value is { } icon
             ? $"<img class=\"brand-mark\" src=\"{icon}\" alt=\"\">"
             : string.Empty;
         var html = $$"""
             <!doctype html>
-            <html lang="pt-BR">
+            <html lang="{{localization.CurrentCulture.Name}}">
             <head>
               <meta charset="utf-8">
               <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -500,7 +502,7 @@ public sealed class GoogleOAuthClient : IGoogleOAuthClient
 
             if (!response.IsSuccessStatusCode)
             {
-                return GoogleSignInTicket.Fail("O Google recusou a conclusão do login. Tente novamente.");
+                return GoogleSignInTicket.Fail(T("Account.Google.ExchangeRejected"));
             }
 
             var payload = await response.Content
@@ -508,12 +510,12 @@ public sealed class GoogleOAuthClient : IGoogleOAuthClient
                 .ConfigureAwait(false);
 
             return string.IsNullOrWhiteSpace(payload?.IdToken)
-                ? GoogleSignInTicket.Fail("O Google não devolveu as informações da sua conta. Tente novamente.")
+                ? GoogleSignInTicket.Fail(T("Account.Google.MissingAccountInfo"))
                 : new GoogleSignInTicket(payload!.IdToken, null);
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
-            return GoogleSignInTicket.Fail("A conexão com o Google demorou demais. Verifique sua internet.");
+            return GoogleSignInTicket.Fail(T("Account.Google.ExchangeTimedOut"));
         }
         catch (OperationCanceledException)
         {
@@ -521,7 +523,7 @@ public sealed class GoogleOAuthClient : IGoogleOAuthClient
         }
         catch (Exception exception) when (exception is HttpRequestException or JsonException or IOException)
         {
-            return GoogleSignInTicket.Fail("Não foi possível falar com o Google. Verifique sua conexão.");
+            return GoogleSignInTicket.Fail(T("Account.Google.NetworkFailed"));
         }
     }
 
@@ -529,6 +531,10 @@ public sealed class GoogleOAuthClient : IGoogleOAuthClient
 
     private static string Base64Url(byte[] value) =>
         Convert.ToBase64String(value).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+
+    private string T(string key) => localization.GetString(key);
+
+    private string H(string key) => WebUtility.HtmlEncode(T(key));
 
     private sealed record CallbackResult(string? Code, string? State, string? Error)
     {

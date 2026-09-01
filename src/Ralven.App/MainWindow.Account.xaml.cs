@@ -40,26 +40,33 @@ public partial class MainWindow
         if (accountService is null)
         {
             AccountSettingsUnavailablePanel.Visibility = Visibility.Visible;
+            AccountSettingsUnavailableText.Text = LocalizationService.Current.GetString("Settings.Account.Unavailable");
+            AccountSettingsUnavailableRetryButton.Visibility = Visibility.Collapsed;
             AccountSettingsSignedOutPanel.Visibility = Visibility.Collapsed;
             AccountSettingsSignedInPanel.Visibility = Visibility.Collapsed;
             ApplyAccountEntitlementPresentation();
             return;
         }
 
+        var profileUnavailable = accountService.Current.State == AuthenticationState.ProfileUnavailable;
+        var currentUser = accountService.Current.User;
         var user = accountService.Current.State == AuthenticationState.SignedIn
-            ? accountService.Current.User
+            ? currentUser
             : null;
-        AccountSettingsUnavailablePanel.Visibility = Visibility.Collapsed;
-        AccountSettingsSignedOutPanel.Visibility = user is null ? Visibility.Visible : Visibility.Collapsed;
+        AccountSettingsUnavailablePanel.Visibility = profileUnavailable ? Visibility.Visible : Visibility.Collapsed;
+        AccountSettingsUnavailableText.Text = LocalizationService.Current.GetString(
+            profileUnavailable ? "Account.ProfileUnavailable.Description" : "Settings.Account.Unavailable");
+        AccountSettingsUnavailableRetryButton.Visibility = profileUnavailable ? Visibility.Visible : Visibility.Collapsed;
+        AccountSettingsSignedOutPanel.Visibility = user is null && !profileUnavailable ? Visibility.Visible : Visibility.Collapsed;
         AccountSettingsSignedInPanel.Visibility = user is null ? Visibility.Collapsed : Visibility.Visible;
 
         // Signed in, the header button is just the avatar/initials -- the
         // "Entrar / Cadastre-se" prompt only makes sense while signed out.
-        AccountLabel.Visibility = user is null ? Visibility.Visible : Visibility.Collapsed;
+        AccountLabel.Visibility = currentUser is null ? Visibility.Visible : Visibility.Collapsed;
 
         if (user is null)
         {
-            ApplyAvatar(null, AccountAvatarEllipse, AccountFallbackIcon);
+            ApplyAvatar(currentUser is null ? null : avatarStore.TryLoad(currentUser.Uid), AccountAvatarEllipse, AccountFallbackIcon);
             ApplyAvatar(null, AccountSettingsAvatarEllipse, AccountSettingsFallbackIcon);
             ApplyAccountEntitlementPresentation();
             return;
@@ -89,6 +96,25 @@ public partial class MainWindow
         ApplyAvatar(avatar, AccountAvatarEllipse, AccountFallbackIcon);
         ApplyAvatar(avatar, AccountSettingsAvatarEllipse, AccountSettingsFallbackIcon);
         ApplyAccountEntitlementPresentation();
+    }
+
+    private async void RetryAccountReadinessFromSettings_Click(object sender, RoutedEventArgs e)
+    {
+        if (accountService?.Current.State != AuthenticationState.ProfileUnavailable)
+        {
+            return;
+        }
+
+        AccountSettingsUnavailableRetryButton.IsEnabled = false;
+        try
+        {
+            await accountService.RefreshAccountReadinessAsync();
+        }
+        finally
+        {
+            AccountSettingsUnavailableRetryButton.IsEnabled = true;
+            RefreshAccountSettingsCard();
+        }
     }
 
     private async void AccountEntitlementRefresh_Click(object sender, RoutedEventArgs e)
@@ -388,8 +414,22 @@ public partial class MainWindow
             return;
         }
 
-        await accountService.LogoutAsync();
-        AccountSettingsCurrentPasswordField.Clear();
+        SetAccountSettingsBusy(true);
+        try
+        {
+            await accountService.LogoutAsync();
+            AccountSettingsCurrentPasswordField.Clear();
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            AccountSettingsStatus(
+                LocalizationService.Current.GetString("Account.Session.ClearFailed"),
+                error: true);
+        }
+        finally
+        {
+            SetAccountSettingsBusy(false);
+        }
     }
 
     private async Task<FirebaseAuthResult> RunAccountSettingsActionAsync(
@@ -401,11 +441,25 @@ public partial class MainWindow
         try
         {
             var result = await action();
-            var error = result.Error == FirebaseAuthService.ProfileDeletionFailedError && errorKey is not null
-                ? LocalizationService.Current.GetString(errorKey)
-                : result.Error;
+            var error = result.Error switch
+            {
+                FirebaseAuthService.ProfileDeletionFailedError when errorKey is not null =>
+                    LocalizationService.Current.GetString(errorKey),
+                FirebaseAuthService.ProfileUnavailableError =>
+                    LocalizationService.Current.GetString("Account.ProfileUnavailable.Description"),
+                _ => result.Error,
+            };
             AccountSettingsStatus(error ?? success ?? string.Empty, error: error is not null);
             return result;
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            var error = LocalizationService.Current.GetString("Account.Session.ClearFailed");
+            AccountSettingsStatus(error, error: true);
+            return new FirebaseAuthResult(
+                accountService?.Current.State ?? AuthenticationState.SignedOut,
+                accountService?.Current.User,
+                error);
         }
         finally
         {

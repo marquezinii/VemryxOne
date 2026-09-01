@@ -131,6 +131,70 @@ public sealed class AppOptimizationServiceHistoryTests
             Assert.Single(history).State);
     }
 
+    [Fact]
+    public async Task LoadHistory_LegacyAdministratorJournalWithoutReceiptDisablesUnsafeRollback()
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+        var definition = ActionCatalog.Current.GetRequired(
+            OptimizationActionIds.EnableSessionPerformancePowerPlan);
+        await WriteJournalAsync(
+            temporaryDirectory.Path,
+            Journal(definition, TransactionState.Committed));
+        var localization = new LocalizationService(CultureInfo.GetCultureInfo("pt-BR"));
+
+        var history = await new AppOptimizationService(
+                temporaryDirectory.Path,
+                localization,
+                _ => false)
+            .LoadHistoryAsync(TestContext.Current.CancellationToken);
+
+        var record = Assert.Single(history);
+        Assert.False(record.CanRollback);
+        Assert.Equal(localization.GetString("History.State.AdminReceiptMissing"), record.State);
+    }
+
+    [Fact]
+    public async Task LoadHistory_AuthenticatedAdministratorJournalOffersRollback()
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+        var definition = ActionCatalog.Current.GetRequired(
+            OptimizationActionIds.EnableSessionPerformancePowerPlan);
+        await WriteJournalAsync(
+            temporaryDirectory.Path,
+            Journal(definition, TransactionState.Committed));
+
+        var history = await new AppOptimizationService(
+                temporaryDirectory.Path,
+                administratorReceiptExists: _ => true)
+            .LoadHistoryAsync(TestContext.Current.CancellationToken);
+
+        Assert.True(Assert.Single(history).CanRollback);
+    }
+
+    [Fact]
+    public async Task LoadHistory_LockedJournalDoesNotHideOtherRecords()
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+        var definition = ActionCatalog.Current.GetRequired(OptimizationActionIds.EnableGameMode);
+        await WriteJournalAsync(
+            temporaryDirectory.Path,
+            Journal(definition, TransactionState.Committed));
+        var lockedPath = Path.Combine(
+            temporaryDirectory.Path,
+            "Transactions",
+            $"{Guid.NewGuid():N}.json");
+        using var lockedJournal = new FileStream(
+            lockedPath,
+            FileMode.CreateNew,
+            FileAccess.ReadWrite,
+            FileShare.None);
+
+        var history = await new AppOptimizationService(temporaryDirectory.Path)
+            .LoadHistoryAsync(TestContext.Current.CancellationToken);
+
+        Assert.Single(history);
+    }
+
     [Theory]
     [InlineData("en-US")]
     [InlineData("pt-BR")]

@@ -42,6 +42,35 @@ public sealed class ApplicationsPageViewModelTests
         Assert.Equal("Beta", application.Name);
         Assert.Equal("1.5 GB", application.EstimatedSize);
         Assert.Empty(viewModel.StartupItems);
+        Assert.Equal(
+            localization.GetString("Applications.Inventory.NoMatches.Startup"),
+            viewModel.StartupEmptyMessage);
+    }
+
+    [Fact]
+    public async Task RefreshAsync_DistinguishesEmptyAndIncompleteSubinventories()
+    {
+        var localization = new LocalizationService(CultureInfo.GetCultureInfo("en-US"));
+        var snapshot = new WindowsApplicationInventorySnapshot(
+            [],
+            [],
+            DateTimeOffset.UtcNow,
+            InstalledApplicationsComplete: true,
+            StartupItemsComplete: false);
+        using var viewModel = new ApplicationsPageViewModel(
+            new StubInventoryInspector(_ => Task.FromResult(snapshot)),
+            localization);
+
+        await viewModel.RefreshAsync(TestContext.Current.CancellationToken);
+
+        Assert.True(viewModel.ShowInstalledEmptyState);
+        Assert.True(viewModel.ShowStartupEmptyState);
+        Assert.Equal(
+            localization.GetString("Applications.Inventory.Empty.Installed"),
+            viewModel.InstalledEmptyMessage);
+        Assert.Equal(
+            localization.GetString("Applications.Inventory.Incomplete.Startup"),
+            viewModel.StartupEmptyMessage);
     }
 
     [Fact]
@@ -60,7 +89,68 @@ public sealed class ApplicationsPageViewModelTests
             viewModel.InventoryStatusMessage);
         Assert.Empty(viewModel.InstalledApplications);
         Assert.Empty(viewModel.StartupItems);
+        Assert.True(viewModel.ShowInstalledEmptyState);
+        Assert.True(viewModel.ShowStartupEmptyState);
+        Assert.Equal(
+            localization.GetString("Applications.Inventory.Unavailable.Installed"),
+            viewModel.InstalledEmptyMessage);
+        Assert.Equal(
+            localization.GetString("Applications.Inventory.Unavailable.Startup"),
+            viewModel.StartupEmptyMessage);
         Assert.True(viewModel.CanRefreshInventory);
+
+        localization.SetLanguage(AppLanguage.English);
+        Assert.Equal(
+            localization.GetString("Applications.Inventory.Status.Unavailable"),
+            viewModel.InventoryStatusMessage);
+        Assert.Equal(
+            localization.GetString("Applications.Inventory.Unavailable.Installed"),
+            viewModel.InstalledEmptyMessage);
+    }
+
+    [Fact]
+    public async Task RefreshAsync_FailureAfterSuccess_NotifiesUnavailableState()
+    {
+        var localization = new LocalizationService(CultureInfo.GetCultureInfo("en-US"));
+        var attempts = 0;
+        var snapshot = new WindowsApplicationInventorySnapshot(
+            [],
+            [],
+            DateTimeOffset.UtcNow,
+            InstalledApplicationsComplete: true,
+            StartupItemsComplete: true);
+        using var viewModel = new ApplicationsPageViewModel(
+            new StubInventoryInspector(_ => ++attempts == 1
+                ? Task.FromResult(snapshot)
+                : Task.FromException<WindowsApplicationInventorySnapshot>(new IOException("refresh failed"))),
+            localization);
+
+        await viewModel.RefreshAsync(TestContext.Current.CancellationToken);
+        var changedProperties = new HashSet<string>();
+        viewModel.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName is not null)
+            {
+                changedProperties.Add(args.PropertyName);
+            }
+        };
+
+        await viewModel.RefreshAsync(TestContext.Current.CancellationToken);
+
+        Assert.Empty(viewModel.InstalledApplications);
+        Assert.Equal(
+            localization.GetString("Applications.Inventory.Status.Unavailable"),
+            viewModel.InventoryStatusMessage);
+        Assert.Equal(
+            localization.GetString("Applications.Inventory.Unavailable.Installed"),
+            viewModel.InstalledEmptyMessage);
+        Assert.Contains(nameof(ApplicationsPageViewModel.InstalledEmptyMessage), changedProperties);
+        Assert.Contains(nameof(ApplicationsPageViewModel.StartupEmptyMessage), changedProperties);
+
+        localization.SetLanguage(AppLanguage.PortugueseBrazil);
+        Assert.Equal(
+            localization.GetString("Applications.Inventory.Unavailable.Installed"),
+            viewModel.InstalledEmptyMessage);
     }
 
     private sealed class StubInventoryInspector(

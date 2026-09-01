@@ -27,6 +27,7 @@ internal sealed class ApplicationsPageViewModel : BindableBase, IDisposable
     private string inventoryStatusMessage;
     private string inventoryObservedAtLabel = string.Empty;
     private bool isInventoryLoading;
+    private bool inventoryUnavailable;
     private bool disposed;
 
     public ApplicationsPageViewModel(
@@ -56,11 +57,11 @@ internal sealed class ApplicationsPageViewModel : BindableBase, IDisposable
 
     public bool HasStartupItems => StartupItems.Count > 0;
 
-    public bool ShowInstalledEmptyState => snapshot is not null
+    public bool ShowInstalledEmptyState => (snapshot is not null || inventoryUnavailable)
         && !isInventoryLoading
         && !HasInstalledApplications;
 
-    public bool ShowStartupEmptyState => snapshot is not null
+    public bool ShowStartupEmptyState => (snapshot is not null || inventoryUnavailable)
         && !isInventoryLoading
         && !HasStartupItems;
 
@@ -76,11 +77,21 @@ internal sealed class ApplicationsPageViewModel : BindableBase, IDisposable
         private set => SetProperty(ref inventoryObservedAtLabel, value);
     }
 
-    public string InstalledEmptyMessage => localization.GetString(
-        "Applications.Inventory.Empty.Installed");
+    public string InstalledEmptyMessage => GetEmptyMessage(
+        snapshot?.InstalledApplicationsComplete,
+        installedApplications.Count > 0,
+        "Applications.Inventory.Empty.Installed",
+        "Applications.Inventory.NoMatches.Installed",
+        "Applications.Inventory.Incomplete.Installed",
+        "Applications.Inventory.Unavailable.Installed");
 
-    public string StartupEmptyMessage => localization.GetString(
-        "Applications.Inventory.Empty.Startup");
+    public string StartupEmptyMessage => GetEmptyMessage(
+        snapshot?.StartupItemsComplete,
+        startupItems.Count > 0,
+        "Applications.Inventory.Empty.Startup",
+        "Applications.Inventory.NoMatches.Startup",
+        "Applications.Inventory.Incomplete.Startup",
+        "Applications.Inventory.Unavailable.Startup");
 
     public string SearchText
     {
@@ -107,6 +118,7 @@ internal sealed class ApplicationsPageViewModel : BindableBase, IDisposable
         try
         {
             snapshot = await inspector.InspectAsync(cancellationToken);
+            inventoryUnavailable = false;
             installedApplications = snapshot.InstalledApplications;
             startupItems = snapshot.StartupItems;
             ApplySnapshotPresentation();
@@ -118,6 +130,7 @@ internal sealed class ApplicationsPageViewModel : BindableBase, IDisposable
         catch (Exception exception) when (exception is not (
             OutOfMemoryException or StackOverflowException or AccessViolationException))
         {
+            inventoryUnavailable = true;
             InventoryStatusMessage = localization.GetString(
                 "Applications.Inventory.Status.Unavailable");
             if (snapshot is null)
@@ -126,8 +139,9 @@ internal sealed class ApplicationsPageViewModel : BindableBase, IDisposable
                 startupItems = [];
                 ReplaceWith(InstalledApplications, []);
                 ReplaceWith(StartupItems, []);
-                NotifyInventoryCountsAndVisibility();
             }
+
+            NotifyInventoryCountsAndVisibility();
         }
         finally
         {
@@ -173,6 +187,29 @@ internal sealed class ApplicationsPageViewModel : BindableBase, IDisposable
         ReplaceWith(InstalledApplications, installed);
         ReplaceWith(StartupItems, startup);
         NotifyInventoryCountsAndVisibility();
+    }
+
+    private string GetEmptyMessage(
+        bool? inventoryComplete,
+        bool hasUnfilteredItems,
+        string emptyKey,
+        string noMatchesKey,
+        string incompleteKey,
+        string unavailableKey)
+    {
+        if (inventoryUnavailable)
+        {
+            return localization.GetString(unavailableKey);
+        }
+
+        var key = inventoryComplete switch
+        {
+            null => unavailableKey,
+            false => incompleteKey,
+            _ when hasUnfilteredItems => noMatchesKey,
+            _ => emptyKey
+        };
+        return localization.GetString(key);
     }
 
     private InstalledApplicationDisplayItem CreateDisplayItem(
@@ -271,6 +308,8 @@ internal sealed class ApplicationsPageViewModel : BindableBase, IDisposable
         OnPropertyChanged(nameof(CanRefreshInventory));
         OnPropertyChanged(nameof(ShowInstalledEmptyState));
         OnPropertyChanged(nameof(ShowStartupEmptyState));
+        OnPropertyChanged(nameof(InstalledEmptyMessage));
+        OnPropertyChanged(nameof(StartupEmptyMessage));
     }
 
     private void NotifyInventoryCountsAndVisibility()
@@ -281,20 +320,29 @@ internal sealed class ApplicationsPageViewModel : BindableBase, IDisposable
         OnPropertyChanged(nameof(HasStartupItems));
         OnPropertyChanged(nameof(ShowInstalledEmptyState));
         OnPropertyChanged(nameof(ShowStartupEmptyState));
+        OnPropertyChanged(nameof(InstalledEmptyMessage));
+        OnPropertyChanged(nameof(StartupEmptyMessage));
     }
 
     private void Localization_LanguageChanged(object? sender, AppLanguageChangedEventArgs e)
     {
         OnPropertyChanged(nameof(InstalledEmptyMessage));
         OnPropertyChanged(nameof(StartupEmptyMessage));
-        if (snapshot is not null)
+        if (inventoryUnavailable)
+        {
+            InventoryStatusMessage = localization.GetString(
+                "Applications.Inventory.Status.Unavailable");
+        }
+        else if (snapshot is not null)
         {
             ApplySnapshotPresentation();
         }
         else
         {
             InventoryStatusMessage = localization.GetString(
-                "Applications.Inventory.Status.Loading");
+                inventoryUnavailable
+                    ? "Applications.Inventory.Status.Unavailable"
+                    : "Applications.Inventory.Status.Loading");
         }
     }
 }

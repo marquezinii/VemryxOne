@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS telemetry_events (
     execution_time_ms INTEGER NOT NULL,
     app_version TEXT NOT NULL,
     error_category TEXT,
+    bug_code TEXT,
     os_version TEXT,
     system_architecture TEXT,
     cpu_model TEXT,
@@ -19,8 +20,8 @@ CREATE TABLE IF NOT EXISTS telemetry_events (
     profile TEXT,
     environment TEXT NOT NULL,
     received_at TEXT NOT NULL,
-    -- v5: expanded diagnostic fields, optional -- see migrations/0004_telemetry_v5_fields.sql
-    -- and PROJECT_STATE.md item 9. No client sends these yet.
+    -- v5: expanded optional diagnostic fields sent only with current consent;
+    -- see migrations/0004_telemetry_v5_fields.sql and docs/telemetry.md.
     five_m_install_detected INTEGER,
     gta_edition TEXT,
     optimization_target_count INTEGER,
@@ -92,6 +93,7 @@ CREATE TABLE IF NOT EXISTS bug_reports (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     report_id TEXT NOT NULL UNIQUE,
     category TEXT NOT NULL,
+    bug_code TEXT NOT NULL,
     summary TEXT NOT NULL,
     description TEXT NOT NULL,
     app_version TEXT NOT NULL,

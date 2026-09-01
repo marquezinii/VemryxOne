@@ -71,7 +71,7 @@ Leia a [política de segurança](docs/safety.md) e as [evidências técnicas](do
 | Sistema | Informações internas do PC, saúde agregada informada pelo Windows e leitura/ajuste confirmado do Modo de Jogo e da gravação histórica; atalhos nativos ficam como ações secundárias. |
 | Aplicativos | Inventário interno somente leitura de programas desktop e inicialização, com busca, contagens e acessos secundários às superfícies do Windows e da Microsoft Store. |
 | Jogos | Catálogo interno com FiveM sobre GTAV Legacy e seu plano especializado, sem reutilizar ações do jogo no escopo geral. |
-| Conta | Cadastro, login, Google com OAuth 2.0 + PKCE, verificação de e-mail, recuperação, senha, troca de credenciais e exclusão. |
+| Conta | Cadastro e login por e-mail, verificação, recuperação, senha, troca de credenciais e exclusão; Google usa OAuth 2.0 + PKCE quando a credencial desktop é fornecida ao build. |
 | Privacidade | ID token somente em memória, refresh token protegido por DPAPI e telemetria limitada por consentimento. |
 | Relatos de bug | Envio explícito com campos validados, e-mail e trecho de log opcionais — sem anexos automáticos. |
 | Atualizações | Feed assinado, validação de origem/tamanho/SHA-256, staging, ativação atômica, health-check e rollback. |

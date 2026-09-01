@@ -102,14 +102,20 @@ function adoptHistoricalBootstrap(config, stateDirectory) {
 
 const workerSchemaSmoke = `
   INSERT INTO telemetry_events
-    (event_name, execution_time_ms, app_version, environment, received_at,
+    (event_name, execution_time_ms, app_version, bug_code, environment, received_at,
      five_m_install_detected, gta_edition, optimization_target_count,
      windows_build, disk_type, free_space_gib_bucket, run_timestamp,
      days_since_last_run_bucket, backup_created, backup_restored,
      elevation_used, process_count_at_start)
   VALUES
-    ('OptimizationCompleted', 1, 'test', 'Production', '2026-01-01T00:00:00.000Z',
+    ('OptimizationCompleted', 1, 'test', 'APP_OPT_ACTION_EXECUTION', 'Production', '2026-01-01T00:00:00.000Z',
      1, 'Legacy', 1, 26100, 'SSD', 1, '2026-01-01T00:00:00.000Z', 1, 1, 0, 0, 1);
+  INSERT INTO bug_reports
+    (report_id, category, bug_code, summary, description, app_version, profile, environment, received_at)
+  VALUES
+    ('report-1', 'optimization', 'APP_OPT_ACTION_EXECUTION', 'Test report',
+     'A sufficiently detailed migration smoke report.', 'test', 'Balanced', 'Production',
+     '2026-01-01T00:00:00.000Z');
   INSERT INTO account_profiles
     (uid, username, username_normalized, first_name, last_name, terms_version, terms_accepted_at, created_at)
   VALUES ('test-user', 'TestUser', 'testuser', 'Test', 'User', 'v1', '2026-01-01T00:00:00.000Z', '2026-01-01T00:00:00.000Z');

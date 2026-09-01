@@ -17,6 +17,8 @@ public sealed class FakeAppOptimizationService : IAppOptimizationService
     private readonly bool settingsFileExists;
     private readonly IReadOnlyList<AppHistoryRecord> history;
     private readonly bool isFiveMRunning;
+    private readonly bool gtaVIsRunning;
+    private readonly string? fiveMRoot;
     private readonly FiveMEdition edition;
     private readonly OptimizationProfile recommendedProfile;
     private readonly Task<AppGtaVBenchmarkResult>? benchmarkResult;
@@ -25,28 +27,36 @@ public sealed class FakeAppOptimizationService : IAppOptimizationService
     public AppSettings? SavedSettings { get; private set; }
     public int SaveCallCount { get; private set; }
 
+    public Exception? SettingsSaveException { get; set; }
+
     public FakeAppOptimizationService(
         AppSettings initialSettings,
         bool settingsFileExists,
         Exception? diagnosticException = null,
         IReadOnlyList<AppHistoryRecord>? history = null,
         bool isFiveMRunning = false,
+        bool gtaVIsRunning = false,
+        string? fiveMRoot = null,
         FiveMEdition edition = FiveMEdition.Legacy,
         OptimizationProfile recommendedProfile = OptimizationProfile.Balanced,
         Task<AppGtaVBenchmarkResult>? benchmarkResult = null,
         bool? rollbackResult = null,
-        AppProgressUpdate? rollbackProgressUpdate = null)
+        AppProgressUpdate? rollbackProgressUpdate = null,
+        Exception? settingsSaveException = null)
     {
         InitialSettings = initialSettings;
         this.settingsFileExists = settingsFileExists;
         DiagnosticException = diagnosticException;
         this.history = history ?? [];
         this.isFiveMRunning = isFiveMRunning;
+        this.gtaVIsRunning = gtaVIsRunning;
+        this.fiveMRoot = fiveMRoot;
         this.edition = edition;
         this.recommendedProfile = recommendedProfile;
         this.benchmarkResult = benchmarkResult;
         this.rollbackResult = rollbackResult;
         this.rollbackProgressUpdate = rollbackProgressUpdate;
+        SettingsSaveException = settingsSaveException;
     }
 
     public AppSettings InitialSettings { get; }
@@ -62,14 +72,19 @@ public sealed class FakeAppOptimizationService : IAppOptimizationService
 
     public Task SaveSettingsAsync(AppSettings settings, CancellationToken cancellationToken = default)
     {
-        SavedSettings = settings;
         SaveCallCount++;
+        if (SettingsSaveException is not null)
+        {
+            return Task.FromException(SettingsSaveException);
+        }
+
+        SavedSettings = settings;
         return Task.CompletedTask;
     }
 
     public Task<AppDiagnostic> DiagnoseAsync(CancellationToken cancellationToken = default) =>
         DiagnosticException is null
-            ? Task.FromResult(CreateMinimalDiagnostic(isFiveMRunning, edition, recommendedProfile))
+            ? Task.FromResult(CreateMinimalDiagnostic(isFiveMRunning, gtaVIsRunning, fiveMRoot, edition, recommendedProfile))
             : Task.FromException<AppDiagnostic>(DiagnosticException);
 
     public Task<IReadOnlyList<AppHistoryRecord>> LoadHistoryAsync(CancellationToken cancellationToken = default) =>
@@ -107,13 +122,16 @@ public sealed class FakeAppOptimizationService : IAppOptimizationService
 
     private static AppDiagnostic CreateMinimalDiagnostic(
         bool isFiveMRunning,
+        bool gtaVIsRunning,
+        string? fiveMRoot,
         FiveMEdition edition,
         OptimizationProfile recommendedProfile) => new()
         {
             Edition = edition,
             IsFiveMRunning = isFiveMRunning,
-            GtaVDetected = false,
-            GtaVIsRunning = false,
+            FiveMRoot = fiveMRoot,
+            GtaVDetected = gtaVIsRunning,
+            GtaVIsRunning = gtaVIsRunning,
             GtaVGraphicsSettingsPath = string.Empty,
             CpuName = "Test CPU",
             GpuName = "Test GPU",

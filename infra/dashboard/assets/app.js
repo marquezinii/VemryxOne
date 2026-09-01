@@ -1,4 +1,4 @@
-import { buildStatsUrl, buildCsvUrl, buildBugsUrl, buildUpdaterEventsUrl, requestJson, resolveApiBase, getCsrfToken, getLiveAlert, setLiveAlert } from './api.js';
+import { buildStatsUrl, buildCsvUrl, buildBugsUrl, buildBugsCsvUrl, buildUpdaterEventsUrl, requestJson, resolveApiBase, getCsrfToken, getLiveAlert, setLiveAlert } from './api.js';
 import {
   toBarSeries,
   toCombinedBarSeries,
@@ -60,6 +60,7 @@ async function main() {
   const recentFailuresBody = document.getElementById('recent-failures-body');
   const recentFailuresCsvLink = document.getElementById('csv-recent-failures');
   const bugReportsBody = document.getElementById('bug-reports-body');
+  const bugReportsCsvLink = document.getElementById('csv-bug-reports');
   const updaterEventsBody = document.getElementById('updater-events-body');
   const refreshStatus = document.getElementById('refresh-status');
   const liveAlertForm = document.getElementById('live-alert-form');
@@ -240,7 +241,7 @@ async function main() {
   }
 
   function renderBugReports(rows) {
-    renderTableBody(bugReportsBody, rows, toBugReportRow, 8);
+    renderTableBody(bugReportsBody, rows, toBugReportRow, 9);
   }
 
   function renderUpdaterEvents(rows) {
@@ -290,6 +291,7 @@ async function main() {
     }
 
     renderBugReports(bugReports.unauthorized || bugReports.error ? [] : bugReports.data);
+    bugReportsCsvLink.href = buildBugsCsvUrl(API_BASE, filters);
     renderUpdaterEvents(updaterEvents.unauthorized || updaterEvents.error ? [] : updaterEvents.data);
 
     document.getElementById('tile-total-runs').textContent = sumBy(runsPerDay.data, 'runs');

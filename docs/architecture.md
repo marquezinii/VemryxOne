@@ -255,12 +255,14 @@ Perfil → Política de hardware → Ações propostas → Prévia do usuário �
 
 Isso permite:
 
-- desmarcar uma ação sem criar um quarto perfil;
 - testar cada ação isoladamente;
 - comparar versões de um perfil;
 - impedir que “Agressivo” se torne sinônimo de mudanças irreversíveis.
 
-Cache é um módulo de manutenção separado e não entra implicitamente nesses perfis.
+A prévia atual explica o plano imutável do perfil, mas não funciona como editor
+arbitrário de ações. Opções de manutenção que exigem consentimento próprio são
+controles separados, não itens pré-marcados na composição do perfil. Cache é um
+módulo de manutenção separado e não entra implicitamente nesses perfis.
 
 ## Adaptador FiveM Legacy
 
@@ -378,19 +380,14 @@ preservando intactas as ações já `Committed`; a transação se estabiliza em
 `CommittedWithErrors` e o resumo deixa explícito que as demais alterações
 foram mantidas.
 
-**Ações administrativas com `AttemptWithoutElevationFirst` tentam sem UAC
-primeiro.** `EnableSessionPerformancePowerPlan` e (desde 26/07/2026)
-`ToggleHags` usam esse sinalizador em `ActionMetadataDto`: o motor a inclui
-na fase de usuário padrão mesmo sem elevação; se o Windows genuinamente
-recusar (`UnauthorizedAccessException`, distinguido de outros tipos de
-"não deu certo" — por exemplo `PowerPlanActivationOutcome.AccessDenied`
-versus "este PC não tem esse plano" via código de saída/mensagem do
-`powercfg`), o motor devolve a ação para `DeferredPrivilege` em vez de
-marcá-la como falha — só então o broker elevado é acionado. Em muitas
-configurações do Windows um usuário comum já pode trocar o plano de
-energia, então nenhum UAC chega a aparecer; `ToggleHags` na prática quase
-sempre precisa de elevação (escreve em `HKLM`), mas usa o mesmo mecanismo
-por consistência.
+**Ações classificadas como administrativas sempre passam pelo broker.**
+`EnableSessionPerformancePowerPlan` e `ToggleHags` permanecem pendentes na
+fase de usuário padrão e só são aplicadas depois da validação elevada. Isso
+permite que o broker mantenha em `HKLM` a parte autoritativa do journal
+administrativo (identidade, estado, outcome e snapshot), selada antes da cópia
+local a cada transição. O carregamento reconcilia um journal local atrasado com
+esse recibo protegido; um arquivo gravável pelo usuário nunca é promovido a
+autoridade apenas por declarar uma ação como concluída.
 
 **Ações opt-in de perfil Agressivo, nunca automáticas** (também desde
 26/07/2026): `windows.gaming.gpu-preference-mismatch.diagnose` (👁,

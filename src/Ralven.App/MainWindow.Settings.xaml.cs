@@ -70,6 +70,8 @@ public partial class MainWindow
 
     private async void CheckForUpdatesManually_Click(object sender, RoutedEventArgs e) => await viewModel.CheckForUpdatesManuallyAsync();
 
+    private async void RetrySaveSettings_Click(object sender, RoutedEventArgs e) => await viewModel.RetrySaveSettingsAsync();
+
     private void ReportBug_Click(object sender, RoutedEventArgs e)
     {
         IBugReportService bugReportService = TryCreateHttpsEndpoint(remoteServicesOptions.BugReportEndpoint, out var bugReportEndpoint)

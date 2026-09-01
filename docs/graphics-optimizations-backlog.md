@@ -96,7 +96,8 @@ ações entraram no catálogo (versão 11):
   — **implementado**. `FullscreenOptimizationsRegistryAction`.
 - `windows.gaming.hags.toggle` (🧪, **Agressivo apenas**, opt-in via
   `OptimizationOptionsDto.ToggleHagsExperiment`, `RequiresRestart=true`,
-  `RequiredPrivilege.Administrator` com `AttemptWithoutElevationFirst`) —
+  `RequiredPrivilege.Administrator`; a implementação atual sempre delega ao
+  broker para preservar a proveniência verificável do rollback) —
   **implementado**. `HagsToggleAction`.
 
 **O que foi implementado, especificamente:** o mecanismo de aplicar/reverter

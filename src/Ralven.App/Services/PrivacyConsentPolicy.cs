@@ -22,7 +22,7 @@ public static class PrivacyConsentPolicy
     /// including those who already accepted an older version, will be asked
     /// to confirm again.
     /// </summary>
-    public const int CurrentVersion = 6;
+    public const int CurrentVersion = 7;
 
     /// <summary>
     /// Full history of consent versions, oldest first, each with a short
@@ -62,9 +62,13 @@ public static class PrivacyConsentPolicy
             "Continua sem identificador único de máquina, caminho ou texto livre."),
         new PrivacyConsentVersionEntry(
             6,
-            "Relatórios automáticos de falhas passam a exigir uma escolha separada e explícita, habilitada por padrão e " +
-            "que pode ser desativada. " +
-            "Nenhum relatório é enviado sem essa opção e o aceite vigente.")
+            "Relatórios automáticos de falhas passam a exigir uma escolha separada e explícita, desabilitada por padrão e " +
+            "que pode ser ativada. " +
+            "Nenhum relatório é enviado sem essa opção e o aceite vigente."),
+        new PrivacyConsentVersionEntry(
+            7,
+            "Eventos de telemetria de falha passam a incluir um código técnico de causa vindo de uma lista fechada, " +
+            "para agrupar falhas sem enviar mensagem, caminho, stack trace ou texto livre.")
     ];
 
     /// <summary>

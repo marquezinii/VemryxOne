@@ -4,6 +4,7 @@
 // on the .NET side -- the Worker never trusts client-side validation alone.
 
 import { ALLOWED_ENVIRONMENTS } from './environments.js';
+import { ALLOWED_BUG_CODES } from './bugCodes.js';
 
 export const ALLOWED_EVENT_NAMES = new Set([
   'optimization-completed',
@@ -91,6 +92,7 @@ export function validateEvent(event) {
     executionTimeMs,
     appVersion,
     errorCategory,
+    bugCode,
     environment: submittedEnvironment,
     osVersion,
     systemArchitecture,
@@ -148,6 +150,14 @@ export function validateEvent(event) {
     errorCategory !== undefined &&
     errorCategory !== null &&
     (typeof errorCategory !== 'string' || !ALLOWED_ERROR_CATEGORIES.has(errorCategory))
+  ) {
+    return null;
+  }
+
+  if (
+    bugCode !== undefined &&
+    bugCode !== null &&
+    (typeof bugCode !== 'string' || !ALLOWED_BUG_CODES.has(bugCode))
   ) {
     return null;
   }
@@ -265,6 +275,7 @@ export function validateEvent(event) {
     executionTimeMs: Math.trunc(executionTimeMs),
     appVersion,
     errorCategory: errorCategory ?? null,
+    bugCode: bugCode ?? null,
     environment,
     osVersion: osVersion ?? null,
     systemArchitecture: systemArchitecture ?? null,

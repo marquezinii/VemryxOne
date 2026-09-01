@@ -44,6 +44,31 @@ public sealed class MainViewModelSettingsTests
         Assert.False(service.SavedSettings.NotifyWhenUpdateAvailable);
     }
 
+    [Fact]
+    public async Task RetrySaveSettingsAsync_FailureIsVisibleAndSuccessfulRetryClearsIt()
+    {
+        var localization = new LocalizationService(System.Globalization.CultureInfo.GetCultureInfo("en-US"));
+        var service = new FakeAppOptimizationService(
+            new AppSettings { PrivacyConsentVersion = PrivacyConsentPolicy.CurrentVersion },
+            settingsFileExists: true,
+            settingsSaveException: new IOException("disk unavailable"));
+        var viewModel = new MainViewModel(
+            service,
+            localization,
+            startupRegistration: new SessionStartupRegistrationService());
+        await viewModel.InitializeAsync();
+
+        await viewModel.RetrySaveSettingsAsync();
+
+        Assert.Equal(localization.GetString("Settings.SaveFailed"), viewModel.SettingsSaveErrorMessage);
+
+        service.SettingsSaveException = null;
+        await viewModel.RetrySaveSettingsAsync();
+
+        Assert.Null(viewModel.SettingsSaveErrorMessage);
+        Assert.NotNull(service.SavedSettings);
+    }
+
     private static MainViewModel CreateViewModel(AppSettings settings) => new(
         new FakeAppOptimizationService(settings, settingsFileExists: true),
         startupRegistration: new SessionStartupRegistrationService());

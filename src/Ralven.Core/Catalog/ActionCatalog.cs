@@ -5,7 +5,7 @@ namespace Ralven.Core.Catalog;
 
 public sealed partial class ActionCatalog
 {
-    public const int CurrentVersion = 18;
+    public const int CurrentVersion = 20;
 
     private static readonly string[] NoPrerequisites = [];
     private static readonly string[] RequiresFiveMStoppedFirst = [OptimizationActionIds.VerifyFiveMIsStopped];
@@ -42,7 +42,6 @@ public sealed partial class ActionCatalog
 
     private static readonly IReadOnlySet<string> GeneralWindowsActionIds = new HashSet<string>(
     [
-        OptimizationActionIds.VerifyFiveMIsStopped,
         OptimizationActionIds.DiagnoseBottleneck,
         OptimizationActionIds.DetectOverlaysAndCaptureSoftware,
         OptimizationActionIds.DiagnoseNetworkHealth,

@@ -457,11 +457,7 @@ public sealed partial class MainViewModel
             },
             RemoveOldFiveMCrashDumps = optimizationScope == OptimizationScope.FiveMLegacy,
             DiagnosticRetentionDays = selectedProfile == OptimizationProfile.Aggressive ? 7 : 14,
-            ServerCacheRepair = optimizationScope == OptimizationScope.GeneralWindows
-                ? CacheRepairPolicy.Off
-                : selectedProfile == OptimizationProfile.Light
-                ? CacheRepairPolicy.Off
-                : CacheRepairPolicy.WhenOversized,
+            ServerCacheRepair = CacheRepairPolicy.Off,
             ServerCacheThresholdGiB = 8,
             EnableGameMode = true,
             PreferHighPerformanceGpu = optimizationScope == OptimizationScope.FiveMLegacy,

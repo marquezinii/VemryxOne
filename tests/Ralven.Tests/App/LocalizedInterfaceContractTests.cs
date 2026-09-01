@@ -183,6 +183,7 @@ public sealed partial class LocalizedInterfaceContractTests
 
         var keys = new[]
         {
+            "Account.Session.ClearFailed",
             "Settings.Account.Plan.Title",
             "Settings.Account.Plan.Free",
             "Settings.Account.Plan.FreeDetail",
@@ -505,6 +506,8 @@ public sealed partial class LocalizedInterfaceContractTests
         Assert.Contains("CpuValues=\"{Binding CpuUsageSeries}\"", dashboard, StringComparison.Ordinal);
         Assert.Contains("GpuValues=\"{Binding GpuUsageSeries}\"", dashboard, StringComparison.Ordinal);
         Assert.Contains("NetworkUsageLabel", dashboard, StringComparison.Ordinal);
+        Assert.Contains("IsLivePerformanceUnavailable", dashboard, StringComparison.Ordinal);
+        Assert.Contains("AutomationProperties.LiveSetting=\"Polite\"", dashboard, StringComparison.Ordinal);
         // Redesign "prancheta técnica": a geometria 3D (CoreVisual) e o anel
         // ArcProgress foram removidos do produto por decisão de design — a
         // profundidade passou a vir de camadas, traço e material. A prontidão
@@ -544,6 +547,33 @@ public sealed partial class LocalizedInterfaceContractTests
         Assert.Contains("> 25 => localization.GetString(\"Dashboard.Readiness.Average\")", viewModel, StringComparison.Ordinal);
         Assert.Contains("> 5 => localization.GetString(\"Dashboard.Readiness.Poor\")", viewModel, StringComparison.Ordinal);
         Assert.Contains("_ => localization.GetString(\"Dashboard.Readiness.VeryPoor\")", viewModel, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void OperationalPages_PreserveScrollingBusyStateAndNativeProfileSelection()
+    {
+        var root = TestHelpers.FindRepositoryRoot();
+        var appDirectory = Path.Combine(root, "src", "Ralven.App");
+        var pageDirectory = Path.Combine(appDirectory, "Views", "Pages");
+        var games = File.ReadAllText(Path.Combine(pageDirectory, "GamesPage.xaml"));
+        var history = File.ReadAllText(Path.Combine(pageDirectory, "HistoryPage.xaml"));
+        var selector = XDocument.Load(Path.Combine(appDirectory, "Controls", "SpectrumSelector.xaml"));
+        XNamespace presentation = "http://schemas.microsoft.com/winfx/2006/xaml/presentation";
+        XNamespace x = "http://schemas.microsoft.com/winfx/2006/xaml";
+
+        Assert.Contains("VerticalScrollBarVisibility=\"Auto\"", games, StringComparison.Ordinal);
+        Assert.Contains("TextWrapping=\"Wrap\"", games, StringComparison.Ordinal);
+        Assert.Contains("DataContext.IsBusy", history, StringComparison.Ordinal);
+        Assert.DoesNotContain("IsEnabled=\"{Binding CanRollback}\"", history, StringComparison.Ordinal);
+
+        var options = selector.Descendants(presentation + "RadioButton").ToArray();
+        Assert.Equal(3, options.Length);
+        Assert.All(options, option => Assert.Equal("SpectrumOptions", (string?)option.Attribute("GroupName")));
+        Assert.DoesNotContain(selector.Descendants(presentation + "Button"), element =>
+            ((string?)element.Attribute(x + "Name"))?.StartsWith("Option", StringComparison.Ordinal) == true);
+        var track = Assert.Single(selector.Descendants(presentation + "Grid"), element =>
+            (string?)element.Attribute(x + "Name") == "TrackHost");
+        Assert.Equal("False", (string?)track.Attribute("Focusable"));
     }
 
     [Fact]

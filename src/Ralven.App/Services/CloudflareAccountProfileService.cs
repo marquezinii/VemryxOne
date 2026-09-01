@@ -18,13 +18,14 @@ public sealed class CloudflareAccountProfileService : IAccountProfileService
     private static readonly HttpClient SharedClient = CreateClient();
     private readonly HttpClient httpClient;
     private readonly Uri endpoint;
+    private readonly ILocalizationService localization;
 
-    public CloudflareAccountProfileService(Uri endpoint)
-        : this(SharedClient, endpoint)
+    public CloudflareAccountProfileService(Uri endpoint, ILocalizationService? localization = null)
+        : this(SharedClient, endpoint, localization)
     {
     }
 
-    internal CloudflareAccountProfileService(HttpClient httpClient, Uri endpoint)
+    internal CloudflareAccountProfileService(HttpClient httpClient, Uri endpoint, ILocalizationService? localization = null)
     {
         this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         ArgumentNullException.ThrowIfNull(endpoint);
@@ -34,6 +35,7 @@ public sealed class CloudflareAccountProfileService : IAccountProfileService
         }
 
         this.endpoint = endpoint;
+        this.localization = localization ?? LocalizationService.Current;
     }
 
     public async Task<AccountProfileResult> CreateAsync(
@@ -68,23 +70,40 @@ public sealed class CloudflareAccountProfileService : IAccountProfileService
         {
             return new AccountProfileResult(
                 AccountProfileOutcome.Failed,
-                "Não foi possível conectar para salvar seu perfil. Verifique sua conexão.");
+                localization["Account.Profile.ConnectionFailed"]);
         }
 
         using (response)
         {
             if (response.StatusCode == HttpStatusCode.Conflict)
             {
-                return new AccountProfileResult(
-                    AccountProfileOutcome.UsernameTaken,
-                    "Este nome de usuário já está em uso. Escolha outro.");
+                AccountProfileErrorDto? body;
+                try
+                {
+                    body = await response.Content
+                        .ReadFromJsonAsync<AccountProfileErrorDto>(cancellationToken)
+                        .ConfigureAwait(false);
+                }
+                catch (System.Text.Json.JsonException)
+                {
+                    body = null;
+                }
+
+                return body?.Error switch
+                {
+                    "username-taken" => new AccountProfileResult(
+                        AccountProfileOutcome.UsernameTaken,
+                        localization["Account.Profile.UsernameTaken"]),
+                    "uid-taken" => new AccountProfileResult(AccountProfileOutcome.UidTaken, null),
+                    _ => new AccountProfileResult(AccountProfileOutcome.Failed, null),
+                };
             }
 
             if (!response.IsSuccessStatusCode)
             {
                 return new AccountProfileResult(
                     AccountProfileOutcome.Failed,
-                    $"Não foi possível salvar seu perfil agora (erro {(int)response.StatusCode}). Tente novamente.");
+                    localization.Format("Account.Profile.SaveHttpError", (int)response.StatusCode));
             }
 
             return new AccountProfileResult(AccountProfileOutcome.Created, null);
@@ -238,6 +257,9 @@ public sealed class CloudflareAccountProfileService : IAccountProfileService
 
     private sealed record UsernameAvailabilityDto(
         [property: JsonPropertyName("available")] bool? Available);
+
+    private sealed record AccountProfileErrorDto(
+        [property: JsonPropertyName("error")] string? Error);
 
     private sealed record AccountProfileResponseDto(
         [property: JsonPropertyName("username")] string? Username,

@@ -8,6 +8,17 @@ namespace Ralven.Tests.App;
 
 public sealed class FirebaseAuthServiceTests
 {
+    [Theory]
+    [InlineData("en-US", "Too many attempts. Wait a few minutes before trying again.")]
+    [InlineData("pt-BR", "Muitas tentativas. Aguarde alguns minutos antes de tentar novamente.")]
+    [InlineData("es", "Demasiados intentos. Espera unos minutos antes de intentarlo de nuevo.")]
+    public void ErrorMapper_UsesTheSelectedLanguage(string cultureName, string expected)
+    {
+        var localization = new LocalizationService(System.Globalization.CultureInfo.GetCultureInfo(cultureName));
+
+        Assert.Equal(expected, FirebaseAuthErrorMapper.Map("TOO_MANY_ATTEMPTS_TRY_LATER", localization));
+    }
+
     [Fact]
     public void PasswordPolicy_RequiresOnlyMinimumLength_NoCharacterClasses()
     {
@@ -72,7 +83,61 @@ public sealed class FirebaseAuthServiceTests
         Assert.True(result.Succeeded);
         Assert.Equal(AuthenticationState.SignedIn, service.Current.State);
         Assert.Equal("uid-1", service.Current.User!.Uid);
+        Assert.Equal("refresh-2", (await store.ReadAsync(global::Xunit.TestContext.Current.CancellationToken))?.RefreshToken);
         await service.LogoutAsync(cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
+        Assert.False(File.Exists(path));
+    }
+
+    [Fact]
+    public async Task GetIdTokenAsync_RefreshesTransientSessionWithoutPersistingIt()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"firebase-{Guid.NewGuid():N}.session");
+        var refreshRequests = 0;
+        using var client = new HttpClient(new StubHandler(request =>
+        {
+            if (request.RequestUri!.Host == "securetoken.googleapis.com")
+            {
+                refreshRequests++;
+                return Json("""{"user_id":"uid-1","id_token":"id-2","refresh_token":"refresh-2","expires_in":"3600"}""");
+            }
+
+            return request.RequestUri.AbsolutePath switch
+            {
+                "/v1/accounts:signInWithPassword" => Json("""{"localId":"uid-1","idToken":"id-1","refreshToken":"refresh-1","expiresIn":"0"}"""),
+                "/v1/accounts:lookup" => Json("""{"users":[{"localId":"uid-1","email":"person@example.com","emailVerified":true}]}"""),
+                _ => new HttpResponseMessage(HttpStatusCode.NotFound),
+            };
+        }));
+        using var service = new FirebaseAuthService(client, "test-firebase-api-key-1234567890", new SecureFirebaseSessionStore(path), new ReadyProfileService());
+
+        Assert.True((await service.SignInAsync("person@example.com", "0123456789ab", keepSignedIn: false, global::Xunit.TestContext.Current.CancellationToken)).Succeeded);
+        Assert.Equal("id-2", await service.GetIdTokenAsync(global::Xunit.TestContext.Current.CancellationToken));
+
+        Assert.Equal(1, refreshRequests);
+        Assert.False(File.Exists(path));
+    }
+
+    [Fact]
+    public async Task LogoutAsync_WhenPersistedTokenCannotBeDeleted_DoesNotReportSignedOut()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"firebase-{Guid.NewGuid():N}.session");
+        var store = new SecureFirebaseSessionStore(path);
+        await store.WriteAsync("refresh-1", CancellationToken.None);
+        using var client = new HttpClient(new StubHandler(request => request.RequestUri!.Host == "securetoken.googleapis.com"
+            ? Json("""{"user_id":"uid-1","id_token":"id-2","refresh_token":"refresh-2","expires_in":"3600"}""")
+            : Json("""{"users":[{"localId":"uid-1","email":"person@example.com","emailVerified":true}]}""")));
+        using var service = new FirebaseAuthService(client, "test-firebase-api-key-1234567890", store, new ReadyProfileService());
+        Assert.True((await service.RestoreSessionAsync(global::Xunit.TestContext.Current.CancellationToken)).Succeeded);
+
+        await using (var lockedSession = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+        {
+            await Assert.ThrowsAsync<IOException>(() => service.LogoutAsync(global::Xunit.TestContext.Current.CancellationToken));
+            Assert.Equal(AuthenticationState.SignedIn, service.Current.State);
+            Assert.True(File.Exists(path));
+        }
+
+        Assert.Equal("refresh-2", (await store.ReadAsync(global::Xunit.TestContext.Current.CancellationToken))?.RefreshToken);
+        await service.LogoutAsync(global::Xunit.TestContext.Current.CancellationToken);
         Assert.False(File.Exists(path));
     }
 
@@ -128,6 +193,34 @@ public sealed class FirebaseAuthServiceTests
         Assert.True(result.Succeeded);
         Assert.Equal(AuthenticationState.ProfileCompletionRequired, result.State);
         Assert.Equal(AuthenticationState.ProfileCompletionRequired, service.Current.State);
+    }
+
+    [Fact]
+    public async Task SignInAsync_ProfileLookupFailure_DoesNotSendExistingUserToProfileCreation()
+    {
+        using var client = new HttpClient(new StubHandler(request => request.RequestUri!.AbsolutePath switch
+        {
+            "/v1/accounts:signInWithPassword" => Json("""{"localId":"uid-1","idToken":"id-1","refreshToken":"refresh-1","expiresIn":"3600"}"""),
+            "/v1/accounts:lookup" => Json("""{"users":[{"localId":"uid-1","email":"person@example.com","emailVerified":true}]}"""),
+            _ => new HttpResponseMessage(HttpStatusCode.NotFound),
+        }));
+        using var service = new FirebaseAuthService(
+            client,
+            "test-firebase-api-key-1234567890",
+            new SecureFirebaseSessionStore(Path.Combine(Path.GetTempPath(), $"firebase-{Guid.NewGuid():N}.session")),
+            new FailingProfileService());
+
+        var result = await service.SignInAsync(
+            "person@example.com",
+            "0123456789ab",
+            keepSignedIn: false,
+            cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
+
+        Assert.False(result.Succeeded);
+        Assert.Equal(FirebaseAuthService.ProfileUnavailableError, result.Error);
+        Assert.Equal(AuthenticationState.ProfileUnavailable, result.State);
+        Assert.Equal(AuthenticationState.ProfileUnavailable, service.Current.State);
+        Assert.Equal("uid-1", service.Current.User?.Uid);
     }
 
     [Fact]
@@ -248,6 +341,7 @@ public sealed class FirebaseAuthServiceTests
     [Fact]
     public async Task CreatePasswordAsync_ReauthenticatesSameGoogleAccountAndLinksPasswordProvider()
     {
+        var path = Path.Combine(Path.GetTempPath(), $"firebase-{Guid.NewGuid():N}.session");
         var passwordCreated = false;
         string? requestBody = null;
         using var service = CreateService([], request =>
@@ -265,7 +359,7 @@ public sealed class FirebaseAuthServiceTests
                 "/v1/accounts:update" => SetPasswordCreated(),
                 _ => new HttpResponseMessage(HttpStatusCode.NotFound),
             };
-        });
+        }, path);
 
         HttpResponseMessage SetPasswordCreated()
         {
@@ -275,6 +369,7 @@ public sealed class FirebaseAuthServiceTests
 
         var signedIn = await service.SignInWithGoogleAsync("google-token", keepSignedIn: false, global::Xunit.TestContext.Current.CancellationToken);
         var reauthenticated = await service.ReauthenticateWithGoogleAsync("google-token", global::Xunit.TestContext.Current.CancellationToken);
+        Assert.False(File.Exists(path));
         var created = await service.CreatePasswordAsync("0123456789ab", global::Xunit.TestContext.Current.CancellationToken);
 
         Assert.True(signedIn.Result.Succeeded);
@@ -284,6 +379,7 @@ public sealed class FirebaseAuthServiceTests
         Assert.NotNull(requestBody);
         Assert.Contains("person@gmail.com", requestBody, StringComparison.Ordinal);
         Assert.Contains("0123456789ab", requestBody, StringComparison.Ordinal);
+        Assert.False(File.Exists(path));
     }
 
     [Fact]
@@ -337,9 +433,9 @@ public sealed class FirebaseAuthServiceTests
         Assert.DoesNotContain("/v1/accounts:update", requests);
     }
 
-    private static FirebaseAuthService CreateService(List<string> requests, Func<HttpRequestMessage, HttpResponseMessage> send)
+    private static FirebaseAuthService CreateService(List<string> requests, Func<HttpRequestMessage, HttpResponseMessage> send, string? sessionPath = null)
     {
-        var path = Path.Combine(Path.GetTempPath(), $"firebase-{Guid.NewGuid():N}.session");
+        var path = sessionPath ?? Path.Combine(Path.GetTempPath(), $"firebase-{Guid.NewGuid():N}.session");
         var client = new HttpClient(new StubHandler(request => { requests.Add(request.RequestUri!.AbsolutePath); return send(request); }));
         return new FirebaseAuthService(client, "test-firebase-api-key-1234567890", new SecureFirebaseSessionStore(path), new ReadyProfileService());
     }
@@ -365,6 +461,12 @@ public sealed class FirebaseAuthServiceTests
     {
         public override Task<AccountProfileFetchResult> FetchAsync(string idToken, CancellationToken cancellationToken = default) =>
             Task.FromResult(new AccountProfileFetchResult(AccountProfileFetchOutcome.NotFound));
+    }
+
+    private sealed class FailingProfileService : ReadyProfileService
+    {
+        public override Task<AccountProfileFetchResult> FetchAsync(string idToken, CancellationToken cancellationToken = default) =>
+            Task.FromResult(new AccountProfileFetchResult(AccountProfileFetchOutcome.Failed));
     }
 
     private sealed class FailingDeleteProfileService : ReadyProfileService

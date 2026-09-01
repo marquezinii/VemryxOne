@@ -4,6 +4,7 @@ import {
   buildStatsUrl,
   buildCsvUrl,
   buildBugsUrl,
+  buildBugsCsvUrl,
   buildUpdaterEventsUrl,
   requestJson,
   resolveApiBase,
@@ -45,6 +46,14 @@ test('buildCsvUrl appends .csv to the stat name and keeps the filters', () => {
 
   assert.equal(url.pathname, '/api/stats/runs-per-day.csv');
   assert.equal(url.searchParams.get('version'), '1.0.4');
+});
+
+test('buildBugsCsvUrl keeps bug report filters on the CSV endpoint', () => {
+  const url = new URL(buildBugsCsvUrl(BASE, { environment: 'Production', category: 'optimization' }));
+
+  assert.equal(url.pathname, '/api/bugs.csv');
+  assert.equal(url.searchParams.get('environment'), 'Production');
+  assert.equal(url.searchParams.get('category'), 'optimization');
 });
 
 test('requestJson returns unauthorized:true on a 401 without throwing', async () => {

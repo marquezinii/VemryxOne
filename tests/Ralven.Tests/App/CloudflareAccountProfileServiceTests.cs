@@ -35,14 +35,35 @@ public sealed class CloudflareAccountProfileServiceTests
     }
 
     [Fact]
-    public async Task CreateAsync_Conflict_ReturnsUsernameTakenWithAMessage()
+    public async Task CreateAsync_UsernameConflict_ReturnsUsernameTakenWithAMessage()
     {
-        var service = CreateService(_ => new HttpResponseMessage(HttpStatusCode.Conflict));
+        var service = CreateService(_ => Json(HttpStatusCode.Conflict, """{"error":"username-taken"}"""));
 
         var result = await service.CreateAsync("id-token-1", Submission, cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
 
         Assert.Equal(AccountProfileOutcome.UsernameTaken, result.Outcome);
         Assert.False(string.IsNullOrWhiteSpace(result.Message));
+    }
+
+    [Fact]
+    public async Task CreateAsync_UidConflict_DoesNotClaimTheUsernameIsTaken()
+    {
+        var service = CreateService(_ => Json(HttpStatusCode.Conflict, """{"error":"uid-taken"}"""));
+
+        var result = await service.CreateAsync("id-token-1", Submission, cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
+
+        Assert.Equal(AccountProfileOutcome.UidTaken, result.Outcome);
+        Assert.Null(result.Message);
+    }
+
+    [Fact]
+    public async Task CreateAsync_UnknownConflict_ReturnsFailed()
+    {
+        var service = CreateService(_ => Json(HttpStatusCode.Conflict, """{"error":"unknown"}"""));
+
+        var result = await service.CreateAsync("id-token-1", Submission, cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
+
+        Assert.Equal(AccountProfileOutcome.Failed, result.Outcome);
     }
 
     [Fact]
@@ -65,6 +86,25 @@ public sealed class CloudflareAccountProfileServiceTests
 
         Assert.Equal(AccountProfileOutcome.Failed, result.Outcome);
         Assert.False(string.IsNullOrWhiteSpace(result.Message));
+    }
+
+    [Theory]
+    [InlineData("en-US")]
+    [InlineData("pt-BR")]
+    [InlineData("es")]
+    public async Task CreateAsync_NetworkFailure_UsesTheSelectedLanguage(string cultureName)
+    {
+        var localization = new LocalizationService(System.Globalization.CultureInfo.GetCultureInfo(cultureName));
+        var client = new HttpClient(new StubHandler(_ => throw new HttpRequestException("network down")));
+        var service = new CloudflareAccountProfileService(
+            client,
+            new Uri("https://example.com/account/profile"),
+            localization);
+
+        var result = await service.CreateAsync("id-token-1", Submission, cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
+
+        Assert.Equal(localization["Account.Profile.ConnectionFailed"], result.Message);
+        Assert.NotEqual("Account.Profile.ConnectionFailed", result.Message);
     }
 
     [Fact]

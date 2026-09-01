@@ -49,7 +49,15 @@ export function buildCsvUrl(baseUrl, statName, filters = {}) {
 
 /** Builds the URL for listing recent bug reports, with optional filters. */
 export function buildBugsUrl(baseUrl, filters = {}) {
-  const url = new URL('/api/bugs', baseUrl);
+  return buildBugReportsUrl(baseUrl, '/api/bugs', filters);
+}
+
+export function buildBugsCsvUrl(baseUrl, filters = {}) {
+  return buildBugReportsUrl(baseUrl, '/api/bugs.csv', filters);
+}
+
+function buildBugReportsUrl(baseUrl, path, filters) {
+  const url = new URL(path, baseUrl);
   applyFilters(url, filters);
   if (filters.category) {
     url.searchParams.set('category', filters.category);

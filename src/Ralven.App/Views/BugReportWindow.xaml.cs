@@ -51,21 +51,26 @@ public partial class BugReportWindow : Wpf.Ui.Controls.FluentWindow
 
     private void PopulateBugCodeComboBox()
     {
-        var codes = Enum.GetValues<BugCode>()
-            .Where(c => c != BugCode.Unknown)
-            .OrderBy(c => c.ToString())
-            .ToList();
-
-        BugCodeComboBox.ItemsSource = codes;
-        BugCodeComboBox.DisplayMemberPath = nameof(BugCode.ToString);
+        BugCodeComboBox.ItemsSource = new[]
+        {
+            new BugCodeOption(BugCode.APP_OPT_ACTION_EXECUTION, T("BugReport.Reason.Optimization")),
+            new BugCodeOption(BugCode.APP_OPT_ACTION_ROLLBACK, T("BugReport.Reason.Rollback")),
+            new BugCodeOption(BugCode.APP_DIAG_FIVEM_DETECTION, T("BugReport.Reason.GameDetection")),
+            new BugCodeOption(BugCode.APP_UI_RENDER, T("BugReport.Reason.Interface")),
+            new BugCodeOption(BugCode.APP_AUTH_FLOW, T("BugReport.Reason.Account")),
+            new BugCodeOption(BugCode.APP_SETTINGS_PERSISTENCE, T("BugReport.Reason.Settings")),
+            new BugCodeOption(BugCode.UPD_INSTALLER_EXECUTION, T("BugReport.Reason.Update")),
+            new BugCodeOption(BugCode.WIN_PRIVILEGE, T("BugReport.Reason.Windows")),
+            new BugCodeOption(BugCode.APP_LIFECYCLE, T("BugReport.Reason.Crash"))
+        };
         BugCodeComboBox.SelectedIndex = 0;
     }
 
     private void BugCode_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (BugCodeComboBox.SelectedItem is BugCode code)
+        if (BugCodeComboBox.SelectedItem is BugCodeOption option)
         {
-            selectedBugCode = code;
+            selectedBugCode = option.Code;
         }
     }
 
@@ -207,6 +212,7 @@ public partial class BugReportWindow : Wpf.Ui.Controls.FluentWindow
         SummaryTextBox.IsEnabled = enabled;
         DescriptionTextBox.IsEnabled = enabled;
         CategoryPanel.IsEnabled = enabled;
+        BugCodeComboBox.IsEnabled = enabled;
         IncludeTechnicalInfoCheckBox.IsEnabled = enabled;
         LogTextBox.IsEnabled = enabled;
         EmailTextBox.IsEnabled = enabled;
@@ -234,27 +240,9 @@ public partial class BugReportWindow : Wpf.Ui.Controls.FluentWindow
 
     private string LocalizeSendResult(BugReportSendResult result)
     {
-        if (result.Accepted)
-        {
-            return T("BugReport.Send.Accepted");
-        }
-
-        if (result.Message.StartsWith("O serviço recebeu muitos", StringComparison.Ordinal))
-        {
-            return T("BugReport.Send.RateLimited");
-        }
-
-        if (result.Message.StartsWith("O canal de relatos aguarda", StringComparison.Ordinal))
-        {
-            return T("BugReport.Send.ActivationRequired");
-        }
-
-        if (result.Message.StartsWith("O serviço respondeu em um formato inesperado", StringComparison.Ordinal))
-        {
-            return T("BugReport.Send.UnexpectedResponse");
-        }
-
-        return T("BugReport.Send.NotConfirmed");
+        return string.IsNullOrWhiteSpace(result.Message)
+            ? T(result.Accepted ? "BugReport.Send.Accepted" : "BugReport.Send.NotConfirmed")
+            : result.Message;
     }
 
     private string FormatForClipboard(BugReportSubmission submission)
@@ -262,7 +250,7 @@ public partial class BugReportWindow : Wpf.Ui.Controls.FluentWindow
         var builder = new StringBuilder();
         builder.AppendLine(T("BugReport.Clipboard.Title"));
         builder.AppendLine(F("BugReport.Clipboard.Id", submission.ReportId.ToString("D")));
-        builder.AppendLine(F("BugReport.Clipboard.Category", submission.Category));
+        builder.AppendLine(F("BugReport.Clipboard.Category", LocalizeCategory(submission.Category)));
         builder.AppendLine(F("BugReport.Clipboard.BugCode", submission.BugCode.ToString()));
         builder.AppendLine(F("BugReport.Clipboard.Summary", submission.Summary.Trim()));
         builder.AppendLine(F("BugReport.Clipboard.Version", submission.AppVersion));
@@ -290,6 +278,18 @@ public partial class BugReportWindow : Wpf.Ui.Controls.FluentWindow
 
         return builder.ToString();
     }
+
+    private string LocalizeCategory(string categoryId) => categoryId switch
+    {
+        "optimization" => T("BugReport.Category.Optimization"),
+        "games" => T("BugReport.Category.Games"),
+        "windows" => T("BugReport.Category.Windows"),
+        "interface" => T("BugReport.Category.Interface"),
+        "crash" => T("BugReport.Category.Crash"),
+        _ => T("BugReport.Category.Other")
+    };
+
+    private sealed record BugCodeOption(BugCode Code, string Label);
 
     private void ConstrainToWorkArea()
     {

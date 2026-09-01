@@ -31,6 +31,7 @@ public sealed class MainViewModelPrivacyConsentTests
         Assert.Equal(PrivacyConsentScreenVariant.FirstInstallation, decision.Variant);
         Assert.True(viewModel.ShareAnonymousTelemetry);
         Assert.False(viewModel.ShareCrashReports);
+        Assert.False(telemetry.IsEnabled);
         Assert.Equal(0, telemetry.TrackCallCount);
     }
 
@@ -44,7 +45,8 @@ public sealed class MainViewModelPrivacyConsentTests
             PrivacyConsentVersion = null
         };
         var service = new FakeAppOptimizationService(oldSettings, settingsFileExists: true);
-        var viewModel = new MainViewModel(service);
+        var telemetry = new RecordingTelemetryService();
+        var viewModel = new MainViewModel(service, telemetry: telemetry);
 
         await viewModel.InitializeAsync();
 
@@ -70,11 +72,13 @@ public sealed class MainViewModelPrivacyConsentTests
             PrivacyConsentVersion = PrivacyConsentPolicy.CurrentVersion
         };
         var service = new FakeAppOptimizationService(settings, settingsFileExists: true);
-        var viewModel = new MainViewModel(service);
+        var telemetry = new RecordingTelemetryService();
+        var viewModel = new MainViewModel(service, telemetry: telemetry);
 
         await viewModel.InitializeAsync();
 
         Assert.False(viewModel.PrivacyConsentDecision!.RequiresConsentScreen);
+        Assert.True(telemetry.IsEnabled);
     }
 
     [Fact]
@@ -87,11 +91,13 @@ public sealed class MainViewModelPrivacyConsentTests
             PrivacyConsentVersion = PrivacyConsentPolicy.CurrentVersion - 1
         };
         var service = new FakeAppOptimizationService(settings, settingsFileExists: true);
-        var viewModel = new MainViewModel(service);
+        var telemetry = new RecordingTelemetryService();
+        var viewModel = new MainViewModel(service, telemetry: telemetry);
 
         await viewModel.InitializeAsync();
 
         Assert.Equal(PrivacyConsentScreenVariant.ConsentRenewalRequired, viewModel.PrivacyConsentDecision!.Variant);
+        Assert.False(telemetry.IsEnabled);
     }
 
     [Fact]

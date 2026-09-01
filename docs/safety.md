@@ -347,12 +347,15 @@ preserva as ações já `Committed` e conclui a transação como
 falha reverte só a própria ação" — é a correção de um caso em que ele não
 estava sendo respeitado entre as duas fases da mesma transação.
 
-Além disso, a única ação administrativa hoje (`EnableSessionPerformancePowerPlan`)
-tenta primeiro **sem elevação**: muitas configurações do Windows permitem
-que um usuário comum troque o plano de energia ativo, e só um resultado
-genuíno de acesso negado (distinguido de "este plano não existe neste PC")
-aciona o broker e o UAC. Isso reduz quantas vezes o UAC aparece sem abrir
-mão de elevar quando o Windows realmente exige.
+As ações administrativas (`EnableSessionPerformancePowerPlan` e o experimento
+opt-in `ToggleHags`) não são executadas na fase de usuário padrão. O broker
+elevado valida o plano e mantém em `HKLM` a cópia autoritativa dos campos do
+journal que controlam ações administrativas. Essa cópia protegida é atualizada
+antes do journal local a cada transição e restaura um arquivo local atrasado ou
+adulterado. Rollback elevado falha fechado quando o recibo não existe, está
+corrompido ou não corresponde à identidade das ações; recibos terminais são
+retidos para impedir replay. Registros legados sem recibo continuam visíveis no
+histórico, mas não oferecem rollback administrativo.
 
 Esse modelo atende ao requisito de "tratar erro sem interromper
 inutilmente todo o processo" sem abrir mão de nenhum dos invariantes de

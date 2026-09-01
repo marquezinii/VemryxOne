@@ -9,28 +9,32 @@ namespace Ralven.App.Services;
 public sealed class FirebaseAuthService : IFirebaseAuthService
 {
     public const string ProfileDeletionFailedError = "account-profile-deletion-failed";
+    public const string ProfileUnavailableError = "account-profile-unavailable";
     private const string IdentityBase = "https://identitytoolkit.googleapis.com/v1/";
     private const string SecureTokenBase = "https://securetoken.googleapis.com/v1/token";
     private readonly HttpClient client;
     private readonly string apiKey;
     private readonly SecureFirebaseSessionStore sessionStore;
     private readonly IAccountProfileService profiles;
+    private readonly ILocalizationService localization;
     private string? idToken;
     private string? refreshToken;
+    private bool persistSession;
     private DateTimeOffset tokenExpiresAt;
     private readonly SemaphoreSlim sessionLock = new(1, 1);
 
-    public FirebaseAuthService(string apiKey, IAccountProfileService profiles)
+    public FirebaseAuthService(string apiKey, IAccountProfileService profiles, ILocalizationService? localization = null)
         : this(new HttpClient { Timeout = TimeSpan.FromSeconds(20) }, apiKey,
-            new SecureFirebaseSessionStore(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), ProductIdentity.Name, "firebase.session")), profiles)
+            new SecureFirebaseSessionStore(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), ProductIdentity.Name, "firebase.session")), profiles, localization)
     { }
 
-    internal FirebaseAuthService(HttpClient client, string apiKey, SecureFirebaseSessionStore sessionStore, IAccountProfileService profiles)
+    internal FirebaseAuthService(HttpClient client, string apiKey, SecureFirebaseSessionStore sessionStore, IAccountProfileService profiles, ILocalizationService? localization = null)
     {
         this.client = client;
         this.apiKey = apiKey;
         this.sessionStore = sessionStore;
         this.profiles = profiles;
+        this.localization = localization ?? LocalizationService.Current;
     }
 
     public AuthenticationSnapshot Current { get; private set; } = new(AuthenticationState.SignedOut, null);
@@ -41,6 +45,7 @@ public sealed class FirebaseAuthService : IFirebaseAuthService
         var stored = await sessionStore.ReadAsync(cancellationToken).ConfigureAwait(false);
         if (stored is null || string.IsNullOrWhiteSpace(stored.RefreshToken)) return Result();
         refreshToken = stored.RefreshToken;
+        persistSession = true;
         return await RefreshAsync(cancellationToken).ConfigureAwait(false);
     }
 
@@ -95,7 +100,7 @@ public sealed class FirebaseAuthService : IFirebaseAuthService
                 FirebaseAuthErrorCodes.GoogleAccountMismatch);
         }
 
-        return await AcceptTokensAsync(response.Value!.ToTokens(), refreshToken is not null, cancellationToken).ConfigureAwait(false);
+        return await AcceptTokensAsync(response.Value!.ToTokens(), persistSession, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<FirebaseAuthResult> RefreshEmailVerificationAsync(CancellationToken cancellationToken = default)
@@ -122,7 +127,7 @@ public sealed class FirebaseAuthService : IFirebaseAuthService
     public async Task<FirebaseAuthResult> SendPasswordResetEmailAsync(string email, CancellationToken cancellationToken = default)
     {
         var response = await PostAsync<object>("accounts:sendOobCode", new { requestType = "PASSWORD_RESET", email }, cancellationToken).ConfigureAwait(false);
-        return response.Error is null ? Result() : new FirebaseAuthResult(Current.State, Current.User, FirebaseAuthErrorMapper.Map(response.Error, true));
+        return response.Error is null ? Result() : new FirebaseAuthResult(Current.State, Current.User, FirebaseAuthErrorMapper.Map(response.Error, localization, true));
     }
 
     public async Task<FirebaseAuthResult> CreatePasswordAsync(string newPassword, CancellationToken cancellationToken = default)
@@ -148,7 +153,7 @@ public sealed class FirebaseAuthService : IFirebaseAuthService
 
     public async Task<FirebaseAuthResult> ChangeEmailAsync(string currentPassword, string newEmail, CancellationToken cancellationToken = default)
     {
-        if (!await ReauthenticateAsync(currentPassword, cancellationToken).ConfigureAwait(false)) return new FirebaseAuthResult(AuthenticationState.ReauthenticationRequired, Current.User, "Confirme sua senha para concluir esta alteração.");
+        if (!await ReauthenticateAsync(currentPassword, cancellationToken).ConfigureAwait(false)) return new FirebaseAuthResult(AuthenticationState.ReauthenticationRequired, Current.User, localization["Account.Error.ReauthenticationRequired"]);
         var result = await UpdateAsync(null, newEmail, cancellationToken).ConfigureAwait(false);
         if (result.Succeeded) await ResendVerificationEmailAsync(cancellationToken).ConfigureAwait(false);
         return result;
@@ -156,7 +161,7 @@ public sealed class FirebaseAuthService : IFirebaseAuthService
 
     public async Task<FirebaseAuthResult> DeleteAccountAsync(string currentPassword, CancellationToken cancellationToken = default)
     {
-        if (!await ReauthenticateAsync(currentPassword, cancellationToken).ConfigureAwait(false)) return new FirebaseAuthResult(AuthenticationState.ReauthenticationRequired, Current.User, "Confirme sua senha para excluir a conta.");
+        if (!await ReauthenticateAsync(currentPassword, cancellationToken).ConfigureAwait(false)) return new FirebaseAuthResult(AuthenticationState.ReauthenticationRequired, Current.User, localization["Account.Error.ReauthenticationDelete"]);
         var token = await GetIdTokenAsync(cancellationToken).ConfigureAwait(false);
         if (token is null) return Result();
 
@@ -216,7 +221,8 @@ public sealed class FirebaseAuthService : IFirebaseAuthService
         await sessionLock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            await ClearSessionStateAsync().ConfigureAwait(false);
+            await sessionStore.ClearAsync().ConfigureAwait(false);
+            ClearInMemorySession();
         }
         finally
         {
@@ -225,11 +231,10 @@ public sealed class FirebaseAuthService : IFirebaseAuthService
         SetState(AuthenticationState.SignedOut);
     }
 
-    /// <summary>Clears the in-memory tokens and the persisted session. Caller must already hold <see cref="sessionLock"/>.</summary>
+    /// <summary>Invalidates in-memory tokens and best-effort removes an already rejected persisted session. Caller must hold <see cref="sessionLock"/>.</summary>
     private async Task ClearSessionStateAsync()
     {
-        idToken = refreshToken = null;
-        tokenExpiresAt = default;
+        ClearInMemorySession();
         try
         {
             await sessionStore.ClearAsync().ConfigureAwait(false);
@@ -237,6 +242,13 @@ public sealed class FirebaseAuthService : IFirebaseAuthService
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
         }
+    }
+
+    private void ClearInMemorySession()
+    {
+        idToken = refreshToken = null;
+        persistSession = false;
+        tokenExpiresAt = default;
     }
 
     private async Task<FirebaseAuthResult> RefreshAsync(CancellationToken cancellationToken)
@@ -263,7 +275,7 @@ public sealed class FirebaseAuthService : IFirebaseAuthService
             else
             {
                 idToken = payload.id_token; refreshToken = payload.refresh_token; tokenExpiresAt = Expiry(payload.expires_in);
-                await sessionStore.WriteAsync(refreshToken, cancellationToken).ConfigureAwait(false);
+                if (persistSession) await sessionStore.WriteAsync(refreshToken, cancellationToken).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested) { return Fail("NETWORK_REQUEST_FAILED"); }
@@ -276,7 +288,7 @@ public sealed class FirebaseAuthService : IFirebaseAuthService
         if (invalidated)
         {
             SetState(AuthenticationState.SignedOut);
-            return new FirebaseAuthResult(AuthenticationState.SignedOut, null, "Sua sessão não é mais válida. Entre novamente.");
+            return new FirebaseAuthResult(AuthenticationState.SignedOut, null, localization["Account.Error.SessionInvalid"]);
         }
 
         return await LoadUserAsync(idToken!, cancellationToken).ConfigureAwait(false);
@@ -287,7 +299,7 @@ public sealed class FirebaseAuthService : IFirebaseAuthService
         var token = await GetIdTokenAsync(cancellationToken).ConfigureAwait(false);
         if (token is null) return Result();
         var response = await PostAsync<FirebaseTokenResponse>("accounts:update", new { idToken = token, returnSecureToken = true, password, email }, cancellationToken).ConfigureAwait(false);
-        return response.Error is null ? await AcceptTokensAsync(response.Value!, refreshToken is not null, cancellationToken).ConfigureAwait(false) : Fail(response.Error);
+        return response.Error is null ? await AcceptTokensAsync(response.Value!, persistSession, cancellationToken).ConfigureAwait(false) : Fail(response.Error);
     }
 
     private async Task<bool> ReauthenticateAsync(string password, CancellationToken cancellationToken)
@@ -295,7 +307,7 @@ public sealed class FirebaseAuthService : IFirebaseAuthService
         if (Current.User is null) return false;
         var response = await PostAsync<FirebaseTokenResponse>("accounts:signInWithPassword", new { email = Current.User.Email, password, returnSecureToken = true }, cancellationToken).ConfigureAwait(false);
         if (response.Error is not null || !string.Equals(response.Value?.localId, Current.User.Uid, StringComparison.Ordinal)) return false;
-        return (await AcceptTokensAsync(response.Value!, refreshToken is not null, cancellationToken).ConfigureAwait(false)).Succeeded;
+        return (await AcceptTokensAsync(response.Value!, persistSession, cancellationToken).ConfigureAwait(false)).Succeeded;
     }
 
     private async Task<FirebaseAuthResult> AcceptTokensAsync(FirebaseTokenResponse tokens, bool persist, CancellationToken cancellationToken)
@@ -305,8 +317,14 @@ public sealed class FirebaseAuthService : IFirebaseAuthService
         await sessionLock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
+            if (!persist)
+            {
+                await sessionStore.ClearAsync().ConfigureAwait(false);
+            }
+
             idToken = tokens.idToken; refreshToken = tokens.refreshToken; tokenExpiresAt = Expiry(tokens.expiresIn);
-            if (persist) await sessionStore.WriteAsync(refreshToken, cancellationToken).ConfigureAwait(false); else await sessionStore.ClearAsync().ConfigureAwait(false);
+            if (persist) await sessionStore.WriteAsync(refreshToken, cancellationToken).ConfigureAwait(false);
+            persistSession = persist;
         }
         finally
         {
@@ -324,26 +342,34 @@ public sealed class FirebaseAuthService : IFirebaseAuthService
         var hasPassword = user.providerUserInfo?.Any(provider =>
             string.Equals(provider.providerId, "password", StringComparison.Ordinal)) == true;
         var firebaseUser = new FirebaseUser(user.localId, user.email, user.emailVerified, hasPassword);
-        var state = firebaseUser.EmailVerified
-            ? await ResolveReadinessAsync(token, cancellationToken).ConfigureAwait(false)
-            : AuthenticationState.EmailVerificationRequired;
-        SetState(state, firebaseUser);
-        return Result();
+        if (!firebaseUser.EmailVerified)
+        {
+            SetState(AuthenticationState.EmailVerificationRequired, firebaseUser);
+            return Result();
+        }
+
+        var readiness = await ResolveReadinessAsync(token, cancellationToken).ConfigureAwait(false);
+        SetState(readiness.State, firebaseUser);
+        return new FirebaseAuthResult(readiness.State, firebaseUser, readiness.Error);
     }
 
-    private async Task<AuthenticationState> ResolveReadinessAsync(string token, CancellationToken cancellationToken)
+    private async Task<(AuthenticationState State, string? Error)> ResolveReadinessAsync(string token, CancellationToken cancellationToken)
     {
         try
         {
             var profile = await profiles.FetchAsync(token, cancellationToken).ConfigureAwait(false);
-            return profile.Outcome == AccountProfileFetchOutcome.Found
-                && profile.TermsVersion == AccountTerms.CurrentVersion
-                ? AuthenticationState.SignedIn
-                : AuthenticationState.ProfileCompletionRequired;
+            return profile.Outcome switch
+            {
+                AccountProfileFetchOutcome.Found when profile.TermsVersion == AccountTerms.CurrentVersion =>
+                    (AuthenticationState.SignedIn, null),
+                AccountProfileFetchOutcome.Found or AccountProfileFetchOutcome.NotFound =>
+                    (AuthenticationState.ProfileCompletionRequired, null),
+                _ => (AuthenticationState.ProfileUnavailable, ProfileUnavailableError),
+            };
         }
         catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException)
         {
-            return AuthenticationState.ProfileCompletionRequired;
+            return (AuthenticationState.ProfileUnavailable, ProfileUnavailableError);
         }
     }
 
@@ -388,7 +414,7 @@ public sealed class FirebaseAuthService : IFirebaseAuthService
                 TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
                 TaskScheduler.Default);
         }
-        return new FirebaseAuthResult(Current.State, Current.User, FirebaseAuthErrorMapper.Map(error, sensitiveFlow));
+        return new FirebaseAuthResult(Current.State, Current.User, FirebaseAuthErrorMapper.Map(error, localization, sensitiveFlow));
     }
     private void SetState(AuthenticationState state, FirebaseUser? user = null)
     {

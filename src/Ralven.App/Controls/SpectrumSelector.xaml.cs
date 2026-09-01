@@ -4,10 +4,7 @@ using System.Windows.Media.Animation;
 using Ralven.App.Services;
 using UserControl = System.Windows.Controls.UserControl;
 using TextBlock = System.Windows.Controls.TextBlock;
-using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MouseButtonEventArgs = System.Windows.Input.MouseButtonEventArgs;
-using KeyboardFocusChangedEventArgs = System.Windows.Input.KeyboardFocusChangedEventArgs;
-using Key = System.Windows.Input.Key;
 
 namespace Ralven.App.Controls;
 
@@ -116,7 +113,7 @@ public partial class SpectrumSelector : UserControl
         control.UpdateLabelEmphasis();
     }
 
-    private void OnOptionClick(object sender, RoutedEventArgs e)
+    private void OnOptionChecked(object sender, RoutedEventArgs e)
     {
         if (ReferenceEquals(sender, Option0Button))
         {
@@ -149,7 +146,6 @@ public partial class SpectrumSelector : UserControl
         var target = (segment * SelectedIndex) + ((segment - indicatorWidth) / 2);
 
         SelectionIndicator.Width = indicatorWidth;
-        ThumbFocusRing.Width = indicatorWidth;
 
         if (animate && MotionPolicy.AnimationsEnabled)
         {
@@ -158,21 +154,17 @@ public partial class SpectrumSelector : UserControl
                 EasingFunction = (System.Windows.Media.Animation.IEasingFunction)FindResource("EaseControl")
             };
             IndicatorTransform.BeginAnimation(TranslateTransform.XProperty, animation);
-            ThumbFocusRingTransform.BeginAnimation(TranslateTransform.XProperty, animation);
         }
         else
         {
             IndicatorTransform.BeginAnimation(TranslateTransform.XProperty, null);
             IndicatorTransform.X = target;
-            ThumbFocusRingTransform.BeginAnimation(TranslateTransform.XProperty, null);
-            ThumbFocusRingTransform.X = target;
         }
     }
 
     /// <summary>Clicking anywhere on the track jumps to its nearest stop, not just the labels above it.</summary>
     private void OnTrackClick(object sender, MouseButtonEventArgs e)
     {
-        TrackHost.Focus();
         if (TrackHost.ActualWidth <= 0)
         {
             return;
@@ -181,25 +173,8 @@ public partial class SpectrumSelector : UserControl
         var x = e.GetPosition(TrackHost).X;
         var segment = TrackHost.ActualWidth / 3;
         SelectedIndex = Math.Clamp((int)(x / segment), 0, 2);
+        (SelectedIndex == 0 ? Option0Button : SelectedIndex == 1 ? Option1Button : Option2Button).Focus();
     }
-
-    private void OnTrackKeyDown(object sender, KeyEventArgs e)
-    {
-        if (e.Key == Key.Left)
-        {
-            SelectedIndex = Math.Max(0, SelectedIndex - 1);
-            e.Handled = true;
-        }
-        else if (e.Key == Key.Right)
-        {
-            SelectedIndex = Math.Min(2, SelectedIndex + 1);
-            e.Handled = true;
-        }
-    }
-
-    private void OnTrackGotFocus(object sender, KeyboardFocusChangedEventArgs e) => ThumbFocusRing.Opacity = 1;
-
-    private void OnTrackLostFocus(object sender, KeyboardFocusChangedEventArgs e) => ThumbFocusRing.Opacity = 0;
 
     private void UpdateRecommendedMark()
     {
@@ -210,6 +185,9 @@ public partial class SpectrumSelector : UserControl
 
     private void UpdateLabelEmphasis()
     {
+        Option0Button.IsChecked = SelectedIndex == 0;
+        Option1Button.IsChecked = SelectedIndex == 1;
+        Option2Button.IsChecked = SelectedIndex == 2;
         SetEmphasis(Option0Text, SelectedIndex == 0);
         SetEmphasis(Option1Text, SelectedIndex == 1);
         SetEmphasis(Option2Text, SelectedIndex == 2);

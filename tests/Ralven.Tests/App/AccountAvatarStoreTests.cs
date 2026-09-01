@@ -84,6 +84,22 @@ public sealed class AccountAvatarStoreTests : IDisposable
         Assert.False(store.TrySave("uid-4", notAnImage));
     });
 
+    [Theory]
+    [InlineData(0, 1)]
+    [InlineData(AccountAvatarStore.MaxSourceDimension + 1, 1)]
+    [InlineData(1, AccountAvatarStore.MaxSourceDimension + 1)]
+    [InlineData(10_000, 4_001)]
+    public void IsSourceSizeAllowed_DecompressionBombDimensionsAreRejected(int width, int height)
+    {
+        Assert.False(AccountAvatarStore.IsSourceSizeAllowed(width, height));
+    }
+
+    [Fact]
+    public void IsSourceSizeAllowed_MaximumAcceptedBoundsRemainUsable()
+    {
+        Assert.True(AccountAvatarStore.IsSourceSizeAllowed(8_000, 5_000));
+    }
+
     [Fact]
     public void TrySave_OverwritesAPreviousAvatarForTheSameUid() => RunOnSta(() =>
     {

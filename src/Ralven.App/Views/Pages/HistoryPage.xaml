@@ -33,10 +33,23 @@
                     <TextBlock Grid.Column="2" Text="{Binding Summary}" Style="{StaticResource SecondaryText}" VerticalAlignment="Center" Margin="0,0,18,0" TextWrapping="Wrap" />
                     <Button Grid.Column="3"
                             Content="{Binding [History.Undo], Source={StaticResource LocalizedStrings}}"
-                            Style="{StaticResource SecondaryButtonStyle}"
                             Height="34" Padding="16,0" VerticalAlignment="Center"
-                            Tag="{Binding}" Click="RollbackHistory_Click"
-                            IsEnabled="{Binding CanRollback}" />
+                            Tag="{Binding}" Click="RollbackHistory_Click">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource SecondaryButtonStyle}">
+                                <Setter Property="IsEnabled" Value="False" />
+                                <Style.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding CanRollback}" Value="True" />
+                                            <Condition Binding="{Binding DataContext.IsBusy, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" Value="False" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="IsEnabled" Value="True" />
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
                 </Grid>
             </Border>
         </DataTemplate>

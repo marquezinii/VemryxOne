@@ -1,6 +1,6 @@
 import { validateBatch } from './validateEvent.js';
 import { validateBugReport } from './bugReports/validateSubmission.js';
-import { recentBugReports } from './bugReports/queries.js';
+import { MAX_BUG_REPORT_LIMIT, recentBugReports } from './bugReports/queries.js';
 import { validateUpdaterEvent } from './updaterEvents/validateSubmission.js';
 import { recentUpdaterEvents } from './updaterEvents/queries.js';
 import { createPasswordAuthProvider } from './auth/passwordAuthProvider.js';
@@ -179,7 +179,7 @@ async function route(request, env, url) {
     return handleStatsRequest(request, env, url);
   }
 
-  if (request.method === 'GET' && url.pathname === '/api/bugs') {
+  if (request.method === 'GET' && (url.pathname === '/api/bugs' || url.pathname === '/api/bugs.csv')) {
     return handleBugReportsList(request, env, url);
   }
   if (request.method === 'GET' && url.pathname === '/api/updater-events') {
@@ -395,14 +395,14 @@ async function handleTelemetryIngest(request, env) {
       env.TELEMETRY_DB
         .prepare(
           `INSERT INTO telemetry_events
-             (event_id, event_name, execution_time_ms, app_version, error_category,
+             (event_id, event_name, execution_time_ms, app_version, error_category, bug_code,
               os_version, system_architecture, cpu_model, gpu_model,
               ram_bucket_gib, profile, environment, received_at,
               five_m_install_detected, gta_edition, optimization_target_count,
               windows_build, disk_type, free_space_gib_bucket, run_timestamp,
               days_since_last_run_bucket, backup_created, backup_restored,
               elevation_used, process_count_at_start)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
            ON CONFLICT(event_id) DO NOTHING`,
         )
         .bind(
@@ -411,6 +411,7 @@ async function handleTelemetryIngest(request, env) {
           event.executionTimeMs,
           event.appVersion,
           event.errorCategory,
+          event.bugCode,
           event.osVersion,
           event.systemArchitecture,
           event.cpuModel,
@@ -513,13 +514,14 @@ async function handleBugReportIngest(request, env) {
   await env.TELEMETRY_DB
     .prepare(
       `INSERT OR IGNORE INTO bug_reports
-         (report_id, category, summary, description, app_version, profile,
+         (report_id, category, bug_code, summary, description, app_version, profile,
           technical_summary, email, log_text, environment, received_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
     .bind(
       report.reportId,
       report.category,
+      report.bugCode,
       report.summary,
       report.description,
       report.appVersion,
@@ -543,15 +545,27 @@ async function handleBugReportsList(request, env, url) {
 
   const filters = {
     environment: url.searchParams.get('environment') || undefined,
+    version: url.searchParams.get('version') || undefined,
     category: url.searchParams.get('category') || undefined,
     from: url.searchParams.get('from') || undefined,
     to: url.searchParams.get('to') || undefined,
   };
-  const limit = Number(url.searchParams.get('limit')) || undefined;
+  const requestedLimit = Number(url.searchParams.get('limit')) || undefined;
+  const limit = url.pathname.endsWith('.csv') && requestedLimit === undefined
+    ? MAX_BUG_REPORT_LIMIT
+    : requestedLimit;
 
   const { sql, params } = recentBugReports(filters, limit);
   try {
     const { results } = await env.TELEMETRY_DB.prepare(sql).bind(...params).all();
+    if (url.pathname.endsWith('.csv')) {
+      return new Response(toCsv(results), {
+        headers: {
+          'Content-Type': 'text/csv; charset=utf-8',
+          'Content-Disposition': 'attachment; filename="bug_reports.csv"',
+        },
+      });
+    }
     return jsonResponse(results);
   } catch (err) {
     return jsonResponse({ error: 'Database query failed' }, 500);

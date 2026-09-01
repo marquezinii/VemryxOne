@@ -10,6 +10,7 @@ const CSRF_SECRET = 'csrf-secret-used-only-by-the-route-tests';
 
 function createLiveAlertDatabase(session) {
   let liveAlertWrites = 0;
+  let lastRead;
   return {
     prepare(sql) {
       return {
@@ -20,12 +21,19 @@ function createLiveAlertDatabase(session) {
               if (sql.includes('live_alert')) liveAlertWrites += 1;
               return {};
             },
+            all: async () => {
+              lastRead = { sql, parameters: _parameters };
+              return { results: [] };
+            },
           };
         },
       };
     },
     get liveAlertWrites() {
       return liveAlertWrites;
+    },
+    get lastRead() {
+      return lastRead;
     },
   };
 }
@@ -162,4 +170,15 @@ test('CSRF token route is session-protected and origin-locked', async () => {
     headers: { Origin: 'https://evil.example', Cookie: `${SESSION_COOKIE_NAME}=${sessionId}` },
   }), env);
   assert.equal(invalidOrigin.status, 403);
+});
+
+test('bug report CSV applies the version filter and the documented export limit', async () => {
+  const { sessionId, env, db } = await createAuthenticatedAlertEnvironment();
+  const response = await worker.fetch(new Request('https://worker.example/api/bugs.csv?version=1.0.4', {
+    headers: { Cookie: `${SESSION_COOKIE_NAME}=${sessionId}` },
+  }), env);
+
+  assert.equal(response.status, 200);
+  assert.match(db.lastRead.sql, /app_version = \?/);
+  assert.deepEqual(db.lastRead.parameters, ['1.0.4', 200]);
 });

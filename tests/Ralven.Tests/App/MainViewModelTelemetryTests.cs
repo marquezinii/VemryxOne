@@ -36,7 +36,9 @@ public sealed class MainViewModelTelemetryTests
 
         await viewModel.StartOptimizationAsync();
 
-        var sent = await telemetry.WaitForEventAsync();
+        var sent = await telemetry.WaitForEventAsync().WaitAsync(
+            TimeSpan.FromSeconds(5),
+            TestContext.Current.CancellationToken);
         Assert.Equal(TelemetryEventValidator.MaxActionIds, sent.ActionIds?.Count);
         TelemetryEventValidator.Validate(sent);
     }
@@ -51,7 +53,11 @@ public sealed class MainViewModelTelemetryTests
         public bool SettingsFileExists() => true;
 
         public Task<AppSettings> LoadSettingsAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(new AppSettings());
+            Task.FromResult(new AppSettings
+            {
+                ShareAnonymousTelemetry = true,
+                PrivacyConsentVersion = PrivacyConsentPolicy.CurrentVersion
+            });
 
         public Task SaveSettingsAsync(AppSettings settings, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;

@@ -4,6 +4,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="1400" d:DesignHeight="820">
+    <ScrollViewer x:Name="PageScrollViewer"
+                  VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled">
+    <Grid MinHeight="{Binding ViewportHeight, ElementName=PageScrollViewer}">
     <Grid Margin="28,24,28,28">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -53,7 +57,8 @@
                     </Border>
                     <TextBlock Text="{Binding [Games.FiveM.Description], Source={StaticResource LocalizedStrings}}"
                                Style="{StaticResource SecondaryText}"
-                               Margin="0,16,0,0" />
+                               Margin="0,16,0,0"
+                               TextWrapping="Wrap" />
                 </StackPanel>
                 <Button Grid.Row="2"
                         Content="{Binding [Games.FiveM.Action], Source={StaticResource LocalizedStrings}}"
@@ -65,4 +70,6 @@
             </Grid>
         </Border>
     </Grid>
+    </Grid>
+    </ScrollViewer>
 </UserControl>

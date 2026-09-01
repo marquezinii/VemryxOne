@@ -48,8 +48,12 @@ public sealed class SecureFirebaseSessionStore
 
     internal Task ClearAsync()
     {
-        try { if (File.Exists(path)) File.Delete(path); }
-        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException) { }
+        File.Delete(path);
+        if (File.Exists(path))
+        {
+            throw new IOException("The persisted Firebase session could not be removed.");
+        }
+
         return Task.CompletedTask;
     }
 }

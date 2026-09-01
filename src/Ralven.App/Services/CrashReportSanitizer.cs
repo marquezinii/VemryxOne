@@ -38,9 +38,10 @@ public static class CrashReportSanitizer
             SanitizeStackTrace(sentryException.Stacktrace);
         }
 
-        SanitizeStackTrace(sentryEvent.SentryThreads?
-            .Select(thread => thread.Stacktrace)
-            .FirstOrDefault(stackTrace => stackTrace is not null));
+        foreach (var sentryThread in sentryEvent.SentryThreads ?? [])
+        {
+            SanitizeStackTrace(sentryThread.Stacktrace);
+        }
 
         return sentryEvent;
     }

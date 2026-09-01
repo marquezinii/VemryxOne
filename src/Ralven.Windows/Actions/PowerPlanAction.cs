@@ -490,11 +490,8 @@ public sealed class SessionPerformancePowerPlanAction : WindowsOptimizationActio
 
         if (outcome == PowerPlanActivationOutcome.AccessDenied)
         {
-            // Muitas configurações do Windows permitem que um usuário comum
-            // troque o plano de energia; só chegamos aqui quando o Windows
-            // realmente recusou. Sem elevação, isso significa "precisa de
-            // UAC" (o mecanismo de tentativa-sem-admin-primeiro trata essa
-            // exceção de forma especial); já elevado, é um erro genuíno.
+            // O produto executa esta ação pelo broker. O ramo não elevado é
+            // mantido apenas como defesa para chamadores de baixo nível.
             throw new UnauthorizedAccessException(
                 context.IsElevated
                     ? "O Windows recusou a troca do plano de energia mesmo com privilégios administrativos."

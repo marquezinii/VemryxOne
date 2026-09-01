@@ -42,6 +42,22 @@ public sealed class GoogleOAuthClientTests
         Assert.False(called);
     }
 
+    [Theory]
+    [InlineData("en-US")]
+    [InlineData("pt-BR")]
+    [InlineData("es")]
+    public async Task AuthenticateAsync_Unconfigured_UsesTheSelectedLanguage(string cultureName)
+    {
+        var localization = new LocalizationService(System.Globalization.CultureInfo.GetCultureInfo(cultureName));
+        using var client = new HttpClient(new ThrowingHandler(() => { }));
+        var oauth = new GoogleOAuthClient(client, clientId: null, clientSecret: null, localization);
+
+        var ticket = await oauth.AuthenticateAsync(cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
+
+        Assert.Equal(localization["Account.Google.NotConfigured"], ticket.Error);
+        Assert.NotEqual("Account.Google.NotConfigured", ticket.Error);
+    }
+
     private sealed class ThrowingHandler(Action onSend) : HttpMessageHandler
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)

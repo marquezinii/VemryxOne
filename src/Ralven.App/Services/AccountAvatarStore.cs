@@ -25,6 +25,8 @@ public sealed class AccountAvatarStore
 {
     public const int MaxDimension = 512;
     public const long MaxSourceFileBytes = 8 * 1024 * 1024;
+    public const int MaxSourceDimension = 16_384;
+    public const long MaxSourcePixels = 40_000_000;
 
     private readonly string directory;
 
@@ -55,15 +57,12 @@ public sealed class AccountAvatarStore
 
         try
         {
-            var bitmap = new BitmapImage();
-            bitmap.BeginInit();
-            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-            bitmap.UriSource = new Uri(path, UriKind.Absolute);
-            bitmap.EndInit();
+            using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+            var bitmap = DecodeBounded(stream);
             bitmap.Freeze();
             return bitmap;
         }
-        catch (Exception exception) when (exception is IOException or NotSupportedException or UnauthorizedAccessException or ArgumentException)
+        catch (Exception exception) when (exception is IOException or FormatException or NotSupportedException or UnauthorizedAccessException or ArgumentException or NotImplementedException)
         {
             return null;
         }
@@ -74,23 +73,19 @@ public sealed class AccountAvatarStore
     /// square, downsizes it to <see cref="MaxDimension"/> px if larger, and
     /// saves it as <paramref name="uid"/>'s avatar. Returns false — without
     /// writing anything — for a file that does not exist, is not a readable
-    /// image, or exceeds <see cref="MaxSourceFileBytes"/>.
+    /// image, or exceeds the compressed-size or decoded-dimension limits.
     /// </summary>
     public bool TrySave(string uid, string sourcePath)
     {
         try
         {
-            var info = new FileInfo(sourcePath);
-            if (!info.Exists || info.Length > MaxSourceFileBytes)
+            using var stream = new FileStream(sourcePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            if (stream.Length > MaxSourceFileBytes)
             {
                 return false;
             }
 
-            var source = new BitmapImage();
-            source.BeginInit();
-            source.CacheOption = BitmapCacheOption.OnLoad;
-            source.UriSource = new Uri(info.FullName, UriKind.Absolute);
-            source.EndInit();
+            var source = DecodeBounded(stream);
 
             var side = Math.Min(source.PixelWidth, source.PixelHeight);
             if (side <= 0)
@@ -118,14 +113,14 @@ public sealed class AccountAvatarStore
             // previously good one.
             var destination = PathFor(uid);
             var temporary = destination + ".tmp";
-            using (var stream = File.Create(temporary))
+            using (var output = File.Create(temporary))
             {
-                encoder.Save(stream);
+                encoder.Save(output);
             }
             File.Move(temporary, destination, overwrite: true);
             return true;
         }
-        catch (Exception exception) when (exception is IOException or NotSupportedException or UnauthorizedAccessException or ArgumentException or NotImplementedException)
+        catch (Exception exception) when (exception is IOException or FormatException or NotSupportedException or UnauthorizedAccessException or ArgumentException or NotImplementedException)
         {
             return false;
         }
@@ -148,4 +143,48 @@ public sealed class AccountAvatarStore
     // string deserves the same defensive normalization regardless.
     private static string Sanitize(string uid) =>
         string.Concat(uid.Where(character => char.IsLetterOrDigit(character) || character is '-' or '_'));
+
+    internal static bool IsSourceSizeAllowed(int width, int height) =>
+        width is > 0 and <= MaxSourceDimension &&
+        height is > 0 and <= MaxSourceDimension &&
+        (long)width * height <= MaxSourcePixels;
+
+    private static BitmapImage DecodeBounded(FileStream stream)
+    {
+        if (stream.Length > MaxSourceFileBytes)
+        {
+            throw new InvalidDataException("Avatar image exceeds the encoded-size limit.");
+        }
+
+        // OnDemand reads the header without materializing the full pixel
+        // buffer. Both imports and cached files pass through this gate.
+        var decoder = BitmapDecoder.Create(
+            stream,
+            BitmapCreateOptions.PreservePixelFormat,
+            BitmapCacheOption.OnDemand);
+        if (decoder.Frames.Count == 0
+            || !IsSourceSizeAllowed(decoder.Frames[0].PixelWidth, decoder.Frames[0].PixelHeight))
+        {
+            throw new InvalidDataException("Avatar image dimensions exceed the decode limit.");
+        }
+
+        var sourceWidth = decoder.Frames[0].PixelWidth;
+        var sourceHeight = decoder.Frames[0].PixelHeight;
+        stream.Position = 0;
+
+        var bitmap = new BitmapImage();
+        bitmap.BeginInit();
+        bitmap.CacheOption = BitmapCacheOption.OnLoad;
+        bitmap.StreamSource = stream;
+        if (sourceWidth >= sourceHeight)
+        {
+            bitmap.DecodePixelHeight = Math.Min(sourceHeight, MaxDimension);
+        }
+        else
+        {
+            bitmap.DecodePixelWidth = Math.Min(sourceWidth, MaxDimension);
+        }
+        bitmap.EndInit();
+        return bitmap;
+    }
 }

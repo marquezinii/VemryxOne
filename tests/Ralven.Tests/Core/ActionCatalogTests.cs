@@ -11,7 +11,7 @@ public sealed class ActionCatalogTests
     {
         var catalog = ActionCatalog.Current;
 
-        Assert.Equal(18, ActionCatalog.CurrentVersion);
+        Assert.Equal(20, ActionCatalog.CurrentVersion);
         Assert.NotEmpty(catalog.Actions);
 
         Assert.All(catalog.Actions, action =>
@@ -51,7 +51,6 @@ public sealed class ActionCatalogTests
 
         var expected = new[]
         {
-            OptimizationActionIds.VerifyFiveMIsStopped,
             OptimizationActionIds.DiagnoseBottleneck,
             OptimizationActionIds.DetectOverlaysAndCaptureSoftware,
             OptimizationActionIds.DiagnoseNetworkHealth,
@@ -169,12 +168,23 @@ public sealed class ActionCatalogTests
         var powerAction = Assert.Single(elevated, action =>
             action.Id == OptimizationActionIds.EnableSessionPerformancePowerPlan);
         Assert.True(powerAction.RequiresAcPower);
-        Assert.True(powerAction.AttemptWithoutElevationFirst);
+        Assert.False(powerAction.AttemptWithoutElevationFirst);
 
         var hagsAction = Assert.Single(elevated, action =>
             action.Id == OptimizationActionIds.ToggleHags);
         Assert.True(hagsAction.RequiresRestart);
-        Assert.True(hagsAction.AttemptWithoutElevationFirst);
+        Assert.False(hagsAction.AttemptWithoutElevationFirst);
+    }
+
+    [Fact]
+    public void InformationalActions_AreReadOnly()
+    {
+        var informational = ActionCatalog.Current.Actions
+            .Where(action => action.Risk == ActionRisk.Informational);
+
+        Assert.NotEmpty(informational);
+        Assert.All(informational, action =>
+            Assert.Equal(ActionReversibility.ReadOnly, action.Reversibility));
     }
 
     [Fact]

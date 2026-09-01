@@ -9,6 +9,7 @@ function validEvent(overrides = {}) {
     executionTimeMs: 18342,
     appVersion: '1.0.4',
     errorCategory: null,
+    bugCode: 'APP_OPT_ACTION_EXECUTION',
     environment: 'Production',
     osVersion: 'Windows 11',
     systemArchitecture: 'x64',
@@ -29,6 +30,7 @@ test('validateEvent accepts a well-formed completed event with the full hardware
     executionTimeMs: 18342,
     appVersion: '1.0.4',
     errorCategory: null,
+    bugCode: 'APP_OPT_ACTION_EXECUTION',
     environment: 'Production',
     osVersion: 'Windows 11',
     systemArchitecture: 'x64',
@@ -95,6 +97,11 @@ test('validateEvent rejects an unknown error category', () => {
     validateEvent(validEvent({ eventName: 'optimization-failed', errorCategory: 'sql-injection' })),
     null,
   );
+});
+
+test('validateEvent accepts an allowlisted bug code and rejects arbitrary text', () => {
+  assert.equal(validateEvent(validEvent()).bugCode, 'APP_OPT_ACTION_EXECUTION');
+  assert.equal(validateEvent(validEvent({ bugCode: 'user supplied reason' })), null);
 });
 
 test('validateEvent rejects a negative execution time', () => {

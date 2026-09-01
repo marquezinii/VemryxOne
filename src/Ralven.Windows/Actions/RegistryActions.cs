@@ -722,12 +722,10 @@ public sealed class GpuPreferenceRegistryAction : AllowlistedRegistryAction
 /// graphics optimizations backlog (see docs/graphics-optimizations-backlog.md),
 /// never a one-directional "always enable". Writing
 /// <c>HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\HwSchMode</c>
-/// requires elevation on virtually every machine; the action still opts
-/// into <see cref="ActionMetadataDto.AttemptWithoutElevationFirst"/> for
-/// consistency with the rest of the codebase (harmless extra attempt, and
-/// correct for the rare relaxed-ACL case). Requires a Windows restart to
-/// take effect -- reported via <see cref="ActionMetadataDto.RequiresRestart"/>,
-/// never silently assumed to apply immediately.
+/// requires elevation on virtually every machine and therefore always runs
+/// through the typed broker. Requires a Windows restart to take effect --
+/// reported via <see cref="ActionMetadataDto.RequiresRestart"/>, never
+/// silently assumed to apply immediately.
 /// </summary>
 public sealed class HagsToggleAction : AllowlistedRegistryAction
 {

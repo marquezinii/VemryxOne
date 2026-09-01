@@ -290,38 +290,10 @@ public sealed class WindowsTransactionEngineTests
     }
 
     [Fact]
-    public async Task IsolatedExecution_AdministratorActionThatDoesNotNeedElevation_CommitsWithoutAwaitingUac()
+    public async Task IsolatedExecution_AdministratorActionAlwaysDefersToTheElevatedBroker()
     {
         var standard = new TestGameModeAction();
-        var administrator = new TestPowerAction { RequiresElevationOnThisMachine = false };
-        var journals = new InMemoryJournalStore();
-        var engine = new WindowsTransactionEngine(
-            new WindowsActionCatalog([standard, administrator]),
-            journals);
-        var transactionId = Guid.NewGuid();
-
-        var result = await engine.ExecuteAsync(
-            [standard, administrator],
-            Context(transactionId, elevated: false),
-            new WindowsTransactionOptions
-            {
-                IncludeStandardUserActions = true,
-                IncludeAdministratorActions = false,
-                IsolateFailures = true
-            }, cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
-
-        Assert.Equal(TransactionState.Committed, result.State);
-        Assert.Empty(result.DeferredAdministratorActionIds);
-        Assert.Equal(1, administrator.ApplyCount);
-        Assert.All(journals.Get(transactionId).Actions, entry =>
-            Assert.Equal(ActionJournalState.Committed, entry.State));
-    }
-
-    [Fact]
-    public async Task IsolatedExecution_AdministratorActionThatNeedsElevation_DefersInsteadOfFailingTheRun()
-    {
-        var standard = new TestGameModeAction();
-        var administrator = new TestPowerAction { RequiresElevationOnThisMachine = true };
+        var administrator = new TestPowerAction();
         var journals = new InMemoryJournalStore();
         var engine = new WindowsTransactionEngine(
             new WindowsActionCatalog([standard, administrator]),
@@ -708,21 +680,6 @@ public sealed class WindowsTransactionEngineTests
     {
         public override ActionMetadataDto Metadata { get; } = WindowsActionMetadata.For(
             OptimizationActionIds.EnableSessionPerformancePowerPlan);
-
-        /// <summary>When true, mimics a computer that genuinely requires elevation (like the real action's AccessDenied outcome).</summary>
-        public bool RequiresElevationOnThisMachine { get; set; } = true;
-
-        public override Task<WindowsActionApplyResult> ApplyAsync(
-            WindowsActionContext context,
-            CancellationToken cancellationToken)
-        {
-            if (RequiresElevationOnThisMachine && !context.IsElevated)
-            {
-                throw new UnauthorizedAccessException("simulated: this machine requires elevation for this action");
-            }
-
-            return base.ApplyAsync(context, cancellationToken);
-        }
     }
 
     private sealed class TestHagsAction : TestAction

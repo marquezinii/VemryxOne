@@ -37,6 +37,7 @@ public sealed class CloudflareBugReportServiceTests
         var root = body.RootElement;
         Assert.Equal(submission.ReportId.ToString("D"), root.GetProperty("reportId").GetString());
         Assert.Equal(submission.Category, root.GetProperty("category").GetString());
+        Assert.Equal("APP_OPT_ACTION_EXECUTION", root.GetProperty("bugCode").GetString());
         Assert.Equal(submission.Summary, root.GetProperty("summary").GetString());
         Assert.Equal(submission.Description, root.GetProperty("description").GetString());
         Assert.Equal("Production", root.GetProperty("environment").GetString());
@@ -55,6 +56,21 @@ public sealed class CloudflareBugReportServiceTests
         var invalid = ValidSubmission() with { Email = "not-an-email" };
 
         await Assert.ThrowsAsync<ArgumentException>(() => service.SendAsync(invalid, CancellationToken.None));
+
+        Assert.Equal(0, handler.CallCount);
+    }
+
+    [Fact]
+    public async Task SendAsync_RejectsAnUnknownBugCodeAndLocalizedCategoryBeforeTransport()
+    {
+        var handler = new RecordingHandler();
+        using var httpClient = new HttpClient(handler);
+        var service = CreateService(httpClient);
+
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            service.SendAsync(ValidSubmission() with { BugCode = BugCode.Unknown }, CancellationToken.None));
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            service.SendAsync(ValidSubmission() with { Category = "Falha na otimização" }, CancellationToken.None));
 
         Assert.Equal(0, handler.CallCount);
     }
@@ -137,7 +153,7 @@ public sealed class CloudflareBugReportServiceTests
     private static BugReportSubmission ValidSubmission() => new()
     {
         ReportId = Guid.NewGuid(),
-        Category = "Falha na otimização",
+        Category = "optimization",
         BugCode = BugCode.APP_OPT_ACTION_EXECUTION,
         Summary = "O preset não terminou",
         Description = "Ao aplicar o perfil médio, a operação parou antes da conclusão.",

@@ -1,3 +1,4 @@
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -71,6 +72,12 @@ public partial class AccountWindow : Wpf.Ui.Controls.FluentWindow
         {
             requiresProfileSetup = false;
         }
+        else if (state.State == AuthenticationState.ProfileUnavailable)
+        {
+            // A backend/readiness outage is neither a signed-out state nor a
+            // missing profile. Keep the authenticated account and offer retry.
+            requiresProfileSetup = false;
+        }
 
         Render(state);
     }
@@ -128,9 +135,10 @@ public partial class AccountWindow : Wpf.Ui.Controls.FluentWindow
         }
 
         var verification = state.State == AuthenticationState.EmailVerificationRequired;
+        var profileUnavailable = state.State == AuthenticationState.ProfileUnavailable;
         var hasUser = state.User is not null;
         var showRegistrationExtras = registering && !requiresProfileSetup;
-        var collectingCredentials = !hasUser || requiresProfileSetup;
+        var collectingCredentials = !profileUnavailable && (!hasUser || requiresProfileSetup);
 
         AuthenticationPanel.Visibility = Show(collectingCredentials);
         ProfileFieldsPanel.Visibility = Show(registering || requiresProfileSetup);
@@ -146,12 +154,22 @@ public partial class AccountWindow : Wpf.Ui.Controls.FluentWindow
 
         VerificationPanel.Visibility = Show(verification && !requiresProfileSetup);
         LogoutButton.Visibility = Show(hasUser);
-        SubmitButton.Visibility = Show(collectingCredentials);
+        SubmitButton.Visibility = Show(collectingCredentials || profileUnavailable);
         SwitchButton.Visibility = Show(!hasUser && !requiresProfileSetup);
 
-        SubmitButton.Content = requiresProfileSetup ? T("Account.Actions.FinishRegistration") : registering ? T("Account.Actions.CreateAccount") : T("Account.Actions.SignIn");
+        SubmitButton.Content = profileUnavailable
+            ? T("Common.Retry")
+            : requiresProfileSetup
+                ? T("Account.Actions.FinishRegistration")
+                : registering ? T("Account.Actions.CreateAccount") : T("Account.Actions.SignIn");
 
-        if (requiresProfileSetup)
+        if (profileUnavailable)
+        {
+            TitleText.Text = T("Account.ProfileUnavailable.Title");
+            SubtitleText.Text = T("Account.ProfileUnavailable.Description");
+            ResetPasswordButton.Visibility = Visibility.Collapsed;
+        }
+        else if (requiresProfileSetup)
         {
             TitleText.Text = T("Account.ProfileSetup.Title");
             SubtitleText.Text = T("Account.ProfileSetup.Subtitle");
@@ -229,9 +247,28 @@ public partial class AccountWindow : Wpf.Ui.Controls.FluentWindow
 
     private async void Submit_Click(object sender, RoutedEventArgs e)
     {
+        if (accounts.Current.State == AuthenticationState.ProfileUnavailable) { await RetryAccountReadinessAsync(); return; }
         if (requiresProfileSetup) { await SubmitProfileAsync(); return; }
         if (registering) { await SubmitRegistrationAsync(); return; }
         await SubmitSignInAsync();
+    }
+
+    private async Task RetryAccountReadinessAsync()
+    {
+        ClearStatus();
+        SetBusy(true);
+        try
+        {
+            var result = await accounts.RefreshAccountReadinessAsync();
+            if (result.State == AuthenticationState.ProfileUnavailable)
+            {
+                Status(T("Account.ProfileUnavailable.Description"), error: true);
+            }
+        }
+        finally
+        {
+            SetBusy(false);
+        }
     }
 
     private async Task SubmitSignInAsync()
@@ -271,7 +308,7 @@ public partial class AccountWindow : Wpf.Ui.Controls.FluentWindow
         try
         {
             var result = await accounts.RegisterAsync(EmailBox.Text.Trim(), PasswordField.Password, KeepSignedInBox.IsChecked == true);
-            if (result.Error is not null) { Status(result.Error, true); return; }
+            if (FriendlyAccountError(result.Error) is { } error) { Status(error, true); return; }
             Render(accounts.Current);
         }
         finally { SetBusy(false); }
@@ -380,7 +417,7 @@ public partial class AccountWindow : Wpf.Ui.Controls.FluentWindow
             var federated = await accounts.SignInWithGoogleAsync(ticket.IdToken, KeepSignedInBox.IsChecked == true);
             if (!federated.Result.Succeeded)
             {
-                Status(federated.Result.Error ?? T("Account.Google.Failed"), true);
+                Status(FriendlyAccountError(federated.Result.Error) ?? T("Account.Google.Failed"), true);
                 return;
             }
 
@@ -558,7 +595,7 @@ public partial class AccountWindow : Wpf.Ui.Controls.FluentWindow
         {
             var result = await accounts.SendPasswordResetEmailAsync(EmailBox.Text.Trim());
             Status(
-                result.Error ?? T("Account.PasswordReset.Sent"),
+                FriendlyAccountError(result.Error) ?? T("Account.PasswordReset.Sent"),
                 result.Error is not null);
         }
         finally { SetBusy(false); }
@@ -572,8 +609,20 @@ public partial class AccountWindow : Wpf.Ui.Controls.FluentWindow
 
     private async void Logout_Click(object sender, RoutedEventArgs e)
     {
-        await accounts.LogoutAsync();
-        CloseAfterSignIn();
+        SetBusy(true);
+        try
+        {
+            await accounts.LogoutAsync();
+            CloseAfterSignIn();
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            Status(T("Account.Session.ClearFailed"), error: true);
+        }
+        finally
+        {
+            SetBusy(false);
+        }
     }
 
     private async Task<FirebaseAuthResult> RunAsync(Func<Task<FirebaseAuthResult>> action, string? success = null)
@@ -582,19 +631,26 @@ public partial class AccountWindow : Wpf.Ui.Controls.FluentWindow
         try
         {
             var result = await action();
+            var error = FriendlyAccountError(result.Error);
             Status(
-                result.Error
+                error
                     ?? success
                     ?? (result.State == AuthenticationState.EmailVerificationRequired ? T("Account.Verification.PleaseConfirm") : string.Empty),
-                result.Error is not null);
+                error is not null);
             return result;
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            var error = T("Account.Session.ClearFailed");
+            Status(error, error: true);
+            return new FirebaseAuthResult(accounts.Current.State, accounts.Current.User, error);
         }
         finally { SetBusy(false); }
     }
 
     private void SetBusy(bool busy)
     {
-        SubmitButton.IsEnabled = SwitchButton.IsEnabled = GoogleButton.IsEnabled = !busy;
+        SubmitButton.IsEnabled = SwitchButton.IsEnabled = GoogleButton.IsEnabled = LogoutButton.IsEnabled = !busy;
         ResendVerificationButton.IsEnabled = !busy;
         RefreshVerificationButton.IsEnabled = !busy;
         Cursor = busy ? System.Windows.Input.Cursors.Wait : null;
@@ -605,6 +661,12 @@ public partial class AccountWindow : Wpf.Ui.Controls.FluentWindow
     private string T(string key) => localization.GetString(key);
 
     private string F(string key, params object?[] arguments) => localization.Format(key, arguments);
+
+    private string? FriendlyAccountError(string? error) => error switch
+    {
+        FirebaseAuthService.ProfileUnavailableError => T("Account.ProfileUnavailable.Description"),
+        _ => error,
+    };
 
     private void ClearStatus() => StatusPanel.Visibility = Visibility.Collapsed;
 

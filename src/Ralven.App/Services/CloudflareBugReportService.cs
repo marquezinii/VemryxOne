@@ -18,6 +18,10 @@ public sealed class CloudflareBugReportService : IBugReportService
     private const int MaxEmailLength = 254;
 
     private static readonly HttpClient SharedClient = CreateClient();
+    private static readonly HashSet<string> AllowedCategories = new(StringComparer.Ordinal)
+    {
+        "optimization", "games", "windows", "interface", "crash", "other"
+    };
     private readonly HttpClient httpClient;
     private readonly Uri endpoint;
     private readonly string environment;
@@ -110,7 +114,7 @@ public sealed class CloudflareBugReportService : IBugReportService
 
         if (string.IsNullOrWhiteSpace(submission.Category)
             || submission.Category.Length > MaxCategoryLength
-            || submission.Category.IndexOfAny(['\r', '\n']) >= 0)
+            || !AllowedCategories.Contains(submission.Category))
         {
             throw new ArgumentException("Escolha um tipo de problema válido.", nameof(submission));
         }
@@ -140,7 +144,7 @@ public sealed class CloudflareBugReportService : IBugReportService
             throw new ArgumentException("O perfil do relato é inválido.", nameof(submission));
         }
 
-        if (!Enum.IsDefined(typeof(BugCode), submission.BugCode))
+        if (submission.BugCode == BugCode.Unknown || !Enum.IsDefined(submission.BugCode))
         {
             throw new ArgumentException("O código do bug é inválido.", nameof(submission));
         }
