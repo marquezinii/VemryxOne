@@ -490,6 +490,13 @@
   <data name="ReleaseNotes.1_5_0.Fixed" xml:space="preserve"><value>• Corrigidos bindings de textos localizados que podiam exibir conteúdo incorreto em partes da interface.</value></data>
   <data name="ReleaseNotes.1_5_0.Security" xml:space="preserve"><value>• A sessão agora exige e-mail verificado, perfil válido e termos aceitos; mudanças administrativas remotas validam a origem do dashboard.</value></data>
   <data name="ReleaseNotes.1_5_1.Fixed" xml:space="preserve"><value>• Atualizados os links públicos de download e atualização para o endereço oficial do Ralven.</value></data>
+  <data name="ReleaseNotes.1_6_0.Added" xml:space="preserve"><value>• Adicionadas Visão geral do Windows, inventário de aplicativos, biblioteca de jogos e cartão do FiveM para contextualizar o plano antes de qualquer alteração.
+• Adicionados monitoramento local da sessão FiveM e controles opt-in de jogos do Windows, com verificação e reversão.</value></data>
+  <data name="ReleaseNotes.1_6_0.Improved" xml:space="preserve"><value>• A revisão do plano ficou mais clara, com detalhes das ações, pré-condições, efeitos esperados e limitações.
+• Novas instalações ativam por padrão a inicialização, a bandeja, a busca automática e os avisos de atualização; todas as preferências continuam sob seu controle.</value></data>
+  <data name="ReleaseNotes.1_6_0.Fixed" xml:space="preserve"><value>• Preservadas as escolhas de inicialização durante atualizações do instalador e mantido o opt-out explícito.
+• Downloads e atualizações automáticas passaram a usar o endereço oficial da Vemryx.</value></data>
+  <data name="ReleaseNotes.1_6_0.Security" xml:space="preserve"><value>• Reforçados o consentimento de relatórios opcionais, a idempotência da telemetria, a proteção de requisições administrativas e o isolamento da assinatura de release.</value></data>
   <data name="ReleaseNotes.Category.Removed" xml:space="preserve"><value>Removido</value></data>
   <data name="ReleaseNotes.Category.Security" xml:space="preserve"><value>Segurança</value></data>
   <data name="ReleaseNotes.Close" xml:space="preserve"><value>Fechar</value></data>

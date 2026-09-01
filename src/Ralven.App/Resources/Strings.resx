@@ -490,6 +490,13 @@
   <data name="ReleaseNotes.1_5_0.Fixed" xml:space="preserve"><value>• Fixed localized-text bindings that could display incorrect content in parts of the interface.</value></data>
   <data name="ReleaseNotes.1_5_0.Security" xml:space="preserve"><value>• Sessions now require a verified email, valid profile, and accepted terms; administrative remote changes validate the dashboard origin.</value></data>
   <data name="ReleaseNotes.1_5_1.Fixed" xml:space="preserve"><value>• Updated public download and update links to the official Ralven address.</value></data>
+  <data name="ReleaseNotes.1_6_0.Added" xml:space="preserve"><value>• Added a Windows overview, installed-app inventory, games library, and FiveM card to contextualize the plan before any change.
+• Added local FiveM session monitoring and opt-in Windows gaming controls with verification and rollback.</value></data>
+  <data name="ReleaseNotes.1_6_0.Improved" xml:space="preserve"><value>• Made plan review clearer with action details, prerequisites, expected effects, and limitations.
+• New installations now enable startup, tray minimization, automatic update checks, and update notifications by default; every preference remains under your control.</value></data>
+  <data name="ReleaseNotes.1_6_0.Fixed" xml:space="preserve"><value>• Preserved startup choices across installer updates and kept the explicit opt-out path.
+• Moved downloads and automatic updates to the official Vemryx address.</value></data>
+  <data name="ReleaseNotes.1_6_0.Security" xml:space="preserve"><value>• Strengthened optional-report consent, telemetry idempotency, administrative request protection, and release-signing isolation.</value></data>
   <data name="ReleaseNotes.Category.Removed" xml:space="preserve"><value>Removed</value></data>
   <data name="ReleaseNotes.Category.Security" xml:space="preserve"><value>Security</value></data>
   <data name="ReleaseNotes.Close" xml:space="preserve"><value>Close</value></data>

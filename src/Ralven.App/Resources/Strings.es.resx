@@ -490,6 +490,13 @@
   <data name="ReleaseNotes.1_5_0.Fixed" xml:space="preserve"><value>• Se corrigieron bindings de textos localizados que podían mostrar contenido incorrecto en partes de la interfaz.</value></data>
   <data name="ReleaseNotes.1_5_0.Security" xml:space="preserve"><value>• La sesión ahora exige correo verificado, perfil válido y términos aceptados; los cambios administrativos remotos validan el origen del dashboard.</value></data>
   <data name="ReleaseNotes.1_5_1.Fixed" xml:space="preserve"><value>• Se actualizaron los enlaces públicos de descarga y actualización a la dirección oficial de Ralven.</value></data>
+  <data name="ReleaseNotes.1_6_0.Added" xml:space="preserve"><value>• Se añadieron Vista general de Windows, inventario de aplicaciones, biblioteca de juegos y tarjeta de FiveM para contextualizar el plan antes de cualquier cambio.
+• Se añadieron monitoreo local de la sesión FiveM y controles opt-in de juegos de Windows, con verificación y reversión.</value></data>
+  <data name="ReleaseNotes.1_6_0.Improved" xml:space="preserve"><value>• La revisión del plan es más clara, con detalles de acciones, requisitos previos, efectos esperados y limitaciones.
+• Las nuevas instalaciones activan por defecto el inicio, la bandeja, la búsqueda automática y los avisos de actualización; todas las preferencias siguen bajo tu control.</value></data>
+  <data name="ReleaseNotes.1_6_0.Fixed" xml:space="preserve"><value>• Se conservaron las elecciones de inicio durante las actualizaciones del instalador y se mantuvo el opt-out explícito.
+• Las descargas y actualizaciones automáticas ahora usan la dirección oficial de Vemryx.</value></data>
+  <data name="ReleaseNotes.1_6_0.Security" xml:space="preserve"><value>• Se reforzaron el consentimiento de informes opcionales, la idempotencia de telemetría, la protección de solicitudes administrativas y el aislamiento de la firma de la release.</value></data>
   <data name="ReleaseNotes.Category.Removed" xml:space="preserve"><value>Eliminado</value></data>
   <data name="ReleaseNotes.Category.Security" xml:space="preserve"><value>Seguridad</value></data>
   <data name="ReleaseNotes.Close" xml:space="preserve"><value>Cerrar</value></data>
