@@ -259,19 +259,18 @@ public sealed class FileSafetyAndCleanupTests
 
         var action = new UserTemporaryFilesCleanupAction(tempRoot, TimeSpan.FromDays(7));
         using var cancellation = new CancellationTokenSource();
-        var observeFirstMove = Task.Run(() =>
-        {
-            Assert.True(SpinWait.SpinUntil(
-                () => files.Any(file => !File.Exists(file)),
-                TimeSpan.FromSeconds(10)));
-            cancellation.Cancel();
-        }, TestContext.Current.CancellationToken);
+        var apply = Task.Factory.StartNew(
+            () => action.ApplyAsync(Context(), cancellation.Token).GetAwaiter().GetResult(),
+            TestContext.Current.CancellationToken,
+            TaskCreationOptions.LongRunning,
+            TaskScheduler.Default);
 
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
-            Task.Run(
-                () => action.ApplyAsync(Context(), cancellation.Token),
-                TestContext.Current.CancellationToken));
-        await observeFirstMove;
+        Assert.True(SpinWait.SpinUntil(
+            () => files.Any(file => !File.Exists(file)),
+            TimeSpan.FromSeconds(10)));
+        cancellation.Cancel();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => apply);
 
         Assert.All(files, file => Assert.True(File.Exists(file)));
     }
