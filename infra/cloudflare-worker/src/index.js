@@ -56,8 +56,8 @@ const MAX_LIVE_ALERT_BODY_BYTES = 4 * 1024;
 //
 // The dashboard is served from a different origin than this Worker (a
 // Cloudflare Pages domain, or a different localhost port while testing
-// locally), so every response carries CORS headers scoped to exactly the
-// single origin configured in the DASHBOARD_ORIGIN var -- see cors.js.
+// locally), so every response carries CORS headers scoped to the origins
+// configured in the DASHBOARD_ORIGIN var -- see cors.js.
 
 const STATS_BUILDERS = {
   'runs-per-day': queries.optimizationRunsPerDay,

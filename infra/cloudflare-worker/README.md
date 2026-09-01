@@ -108,8 +108,8 @@ URL), authentication is a small, self-contained system:
   domains — a stricter policy silently never sends the cookie back on a
   cross-site `fetch`, which is exactly what made the first deployment's
   login appear to succeed but leave the dashboard stuck on the login screen.
-- **CSRF e limites de entrada**: a publicação do alerta exige o `Origin`
-  exato de `DASHBOARD_ORIGIN`, o cabeçalho `X-Ralven-Csrf-Token` e
+- **CSRF e limites de entrada**: a publicação do alerta exige um dos origins
+  exatos de `DASHBOARD_ORIGIN`, o cabeçalho `X-Ralven-Csrf-Token` e
   `Content-Type: application/json` exato. O token é derivado no Worker da
   sessão e de `ADMIN_CSRF_SECRET`, fica somente em memória no dashboard e é
   recuperado em `GET /admin/csrf` após um recarregamento. Todos os JSON
@@ -227,7 +227,7 @@ users to preserve; cleanup is a separate authorized deploy/migration task.
 
 Confirmed against the real, deployed Worker + dashboard: sent a test
 telemetry event via `curl`, logged in through the actual browser at
-`https://fivemcleaner-dashboard.pages.dev`, and saw the event reflected in
+`https://dashboard.vemryx.com`, and saw the event reflected in
 the tiles and charts (then deleted that test row from the real database —
 no test data was left behind).
 

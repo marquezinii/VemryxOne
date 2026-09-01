@@ -79,5 +79,6 @@ base (no custom domain connects the two, so `location.origin` would point
 at the dashboard's own, wrong origin) — update that constant first if the
 Worker is ever redeployed under a different URL. The Pages project name and
 Worker hostname are retained external infrastructure identifiers, not public
-brand names. No custom domain has been configured; ask before adding one,
-because that requires DNS changes to a real zone.
+brand names. The public dashboard address is `https://dashboard.vemryx.com`;
+the old `*.pages.dev` address remains in the Worker CORS allowlist for
+compatibility with existing bookmarks.
