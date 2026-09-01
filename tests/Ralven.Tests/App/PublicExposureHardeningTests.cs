@@ -43,6 +43,27 @@ public sealed class PublicExposureHardeningTests
     }
 
     [Fact]
+    public void StableRelease_PreparesAndProvesDiagnosticsBeforePublication()
+    {
+        var root = FindRepositoryRoot();
+        var workflow = File.ReadAllText(Path.Combine(root, ".github", "workflows", "release.yml"));
+
+        var prepare = workflow.IndexOf("- name: Prepare production diagnostics backend", StringComparison.Ordinal);
+        var migrate = workflow.IndexOf("wrangler d1 migrations apply", prepare, StringComparison.Ordinal);
+        var deploy = workflow.IndexOf("wrangler deploy", migrate, StringComparison.Ordinal);
+        var smoke = workflow.IndexOf("Test-ProductionDiagnostics.ps1", deploy, StringComparison.Ordinal);
+        var publish = workflow.IndexOf("- name: Create public release", smoke, StringComparison.Ordinal);
+        var feed = workflow.IndexOf("- name: Publish signed stable feed", publish, StringComparison.Ordinal);
+
+        Assert.True(prepare >= 0);
+        Assert.True(migrate > prepare);
+        Assert.True(deploy > migrate);
+        Assert.True(smoke > deploy);
+        Assert.True(publish > smoke);
+        Assert.True(feed > publish);
+    }
+
+    [Fact]
     public void RuntimeTrustAnchors_AreSeparatedByPurpose()
     {
         var root = FindRepositoryRoot();

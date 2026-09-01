@@ -25,29 +25,33 @@ public sealed class SentryCrashReportingService : ICrashReportingService
             return;
         }
 
-        sdkHandle = SentrySdk.Init(sentryOptions =>
-        {
-            sentryOptions.Dsn = options.SentryDsn;
-            sentryOptions.Environment = options.Environment;
-            sentryOptions.Release = $"ralven@{appVersion}";
+        sdkHandle = SentrySdk.Init(sentryOptions => Configure(sentryOptions, options, appVersion));
+    }
 
-            // Never send IP, machine name, or any other automatically
-            // collected personal/technical identifier beyond the sanitized
-            // exception itself.
-            sentryOptions.SendDefaultPii = false;
-            sentryOptions.IsEnvironmentUser = false;
-            sentryOptions.AttachStacktrace = true;
+    internal static void Configure(SentryOptions sentryOptions, RemoteServicesOptions options, string appVersion)
+    {
+        sentryOptions.Dsn = options.SentryDsn;
+        sentryOptions.Environment = options.Environment;
+        sentryOptions.Release = $"ralven@{appVersion}";
+        sentryOptions.ShutdownTimeout = TimeSpan.FromSeconds(5);
+        sentryOptions.FlushTimeout = TimeSpan.FromSeconds(5);
 
-            // No session pings, no HTTP breadcrumbs/failed-request capture,
-            // no performance tracing — only the sanitized error event itself
-            // is ever transmitted, matching the closed allowlist already
-            // documented for anonymous telemetry.
-            sentryOptions.AutoSessionTracking = false;
-            sentryOptions.CaptureFailedRequests = false;
-            sentryOptions.TracesSampleRate = 0.0;
+        // Never send IP, machine name, or any other automatically
+        // collected personal/technical identifier beyond the sanitized
+        // exception itself.
+        sentryOptions.SendDefaultPii = false;
+        sentryOptions.IsEnvironmentUser = false;
+        sentryOptions.AttachStacktrace = true;
 
-            sentryOptions.SetBeforeSend(CrashReportSanitizer.Sanitize);
-        });
+        // No session pings, no HTTP breadcrumbs/failed-request capture,
+        // no performance tracing — only the sanitized error event itself
+        // is ever transmitted, matching the closed allowlist already
+        // documented for anonymous telemetry.
+        sentryOptions.AutoSessionTracking = false;
+        sentryOptions.CaptureFailedRequests = false;
+        sentryOptions.TracesSampleRate = 0.0;
+
+        sentryOptions.SetBeforeSend(CrashReportSanitizer.Sanitize);
     }
 
     public void CaptureException(Exception exception)

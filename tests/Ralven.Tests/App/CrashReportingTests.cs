@@ -276,6 +276,31 @@ public sealed class FirebaseAuthConfigurationTests
 public sealed class CrashReportingHolderTests
 {
     [Fact]
+    public void SentryConfiguration_IsPrivateAndFlushesOnShutdown()
+    {
+        var sentryOptions = new SentryOptions();
+
+        SentryCrashReportingService.Configure(
+            sentryOptions,
+            new RemoteServicesOptions
+            {
+                SentryDsn = "https://key@example.ingest.sentry.io/1",
+                Environment = "Production",
+            },
+            "2.0.0");
+
+        Assert.Equal("Production", sentryOptions.Environment);
+        Assert.Equal("ralven@2.0.0", sentryOptions.Release);
+        Assert.Equal(TimeSpan.FromSeconds(5), sentryOptions.ShutdownTimeout);
+        Assert.Equal(TimeSpan.FromSeconds(5), sentryOptions.FlushTimeout);
+        Assert.False(sentryOptions.SendDefaultPii);
+        Assert.False(sentryOptions.IsEnvironmentUser);
+        Assert.False(sentryOptions.AutoSessionTracking);
+        Assert.False(sentryOptions.CaptureFailedRequests);
+        Assert.Equal(0.0, sentryOptions.TracesSampleRate);
+    }
+
+    [Fact]
     public void NoOpCrashReportingService_NeverInitializesAndNeverThrows()
     {
         var service = NoOpCrashReportingService.Instance;
@@ -514,6 +539,27 @@ public sealed class CentralizedConfigurationGuardTests
 
     private static readonly string D1DatabaseIdFragment =
         "fe276121-a71a-4ba4-ab62-" + "81cccdf601c6";
+
+    [Fact]
+    public void ProductionDiagnosticsConfiguration_IsReleaseReady()
+    {
+        var root = TestHelpers.FindRepositoryRoot();
+        var options = RemoteServicesOptionsLoader.Load(
+            AppRuntimeEnvironment.Production,
+            Path.Combine(root, "src", "Ralven.App"));
+
+        Assert.Equal("Production", options.Environment);
+        Assert.True(TelemetryEndpointPolicy.TryCreate(
+            options.TelemetryEndpoint,
+            AppRuntimeEnvironment.Production,
+            out _,
+            out _));
+        Assert.True(Uri.TryCreate(options.SentryDsn, UriKind.Absolute, out var sentryDsn));
+        Assert.Equal(Uri.UriSchemeHttps, sentryDsn.Scheme);
+        Assert.EndsWith(".sentry.io", sentryDsn.Host, StringComparison.OrdinalIgnoreCase);
+        Assert.False(string.IsNullOrWhiteSpace(sentryDsn.UserInfo));
+        Assert.True(long.TryParse(sentryDsn.Segments[^1].Trim('/'), out _));
+    }
 
     [Fact]
     public void SentryDsn_OnlyAppearsInsideTheConfigJsonFiles_NeverInSourceCode()
