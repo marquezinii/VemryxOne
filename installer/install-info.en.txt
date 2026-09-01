@@ -19,9 +19,9 @@ Later updates are offered inside the app after you confirm them. You usually do
 not need to download this installer again.
 
 Download the installer only from:
-https://marquezinii.github.io/Ralven/
+https://vemryx.com/Ralven/
 or the official release page:
-https://github.com/marquezinii/Ralven/releases
+https://vemryx.com/Ralven/
 
 Before running it, verify the published .sha256 sidecar:
   (Get-FileHash .\Ralven-Setup-*-win-x64.exe -Algorithm SHA256).Hash

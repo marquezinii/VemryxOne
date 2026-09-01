@@ -84,7 +84,7 @@ Depois do clique do usuário, o atualizador:
 
 1. exibe a página oficial das alterações da release, quando disponível;
 2. valida contrato fechado, assinatura ECDSA P-256, chave pública incorporada,
-   SemVer, `minimumAllowedVersion`, URL GitHub allowlisted, tamanho e SHA-256;
+   SemVer, `minimumAllowedVersion`, URL Vemryx allowlisted, tamanho e SHA-256;
 3. baixa somente `Ralven-Runtime-win-x64.zip` via TLS 1.2/1.3, valida
    revogação e cada redirecionamento, limita tamanho e grava com nome parcial;
 4. valida novamente o ZIP e o `SHA256SUMS.txt`; arquivos extras, ausentes,
@@ -152,14 +152,12 @@ Fontes oficiais usadas no desenho:
 3. Faça commit, envie `main`, crie a tag exata `vX.Y.Z` e envie a tag.
 4. Em **Actions → Build installer and publish release**, escolha a tag, canal
    `stable` e `publish=true`.
-5. Verifique no GitHub a release pública, o instalador, o runtime ZIP, os
-   checksums, o manifesto assinado e a atestação; confirme também o feed do
-   Worker antes de divulgar o link.
+5. Verifique a GitHub Release de notas e, em `vemryx.com/Ralven/`, o instalador,
+   runtime ZIP, checksums e os dois manifestos assinados antes de divulgar.
 
 O workflow nunca publica por `push`; a etapa de criação de release exige o
 disparo manual com `publish=true`. A página pública de download é
-`https://marquezinii.github.io/Ralven/`, gratuita e sem login para
+`https://vemryx.com/Ralven/`, gratuita e sem login para
 visitantes. O botão da página usa `Ralven-Setup-latest-win-x64.exe`; a mesma
-release também publica os aliases `Ralven-Setup-<versão>-win-x64.exe` e
-`Ralven-Setup-latest-win-x64.exe` para que instalações antigas encontrem
-o instalador idêntico esperado pelo atualizador legado.
+release também publica o instalador versionado e o alias
+`Ralven-Setup-latest-win-x64.exe` no bucket privado da Vemryx.

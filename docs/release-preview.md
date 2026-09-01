@@ -6,10 +6,10 @@ release correspondente; nenhuma delas é garantia de ganho de desempenho.
 
 ## Origem oficial
 
-Baixe binários somente pela página
-[GitHub Releases](https://github.com/marquezinii/Ralven/releases). Para
-cada release `win-x64`, a publicação deve conter os seguintes arquivos
-produzidos pelo mesmo workflow:
+Baixe binários somente pela
+[página oficial do Ralven](https://vemryx.com/Ralven/). Para cada release
+`win-x64`, o bucket privado da Vemryx recebe os seguintes arquivos produzidos
+pelo mesmo workflow:
 
 - `Ralven-Setup-X.Y.Z-win-x64.exe`;
 - `Ralven-Setup-X.Y.Z-win-x64.exe.sha256`;
@@ -19,7 +19,7 @@ produzidos pelo mesmo workflow:
   portátil;
 - `Ralven-Runtime-win-x64.zip` e `Ralven-Runtime-win-x64.zip.sha256` para o
   atualizador transacional;
-- `Ralven-signed-update-manifest.json`, nas releases estáveis.
+- manifestos assinados separados para o instalador e o runtime, nas releases estáveis.
 
 Não use cópias hospedadas em encurtadores, mirrors, vídeos ou pacotes de
 "FPS boost". O código-fonte correspondente deve estar disponível no mesmo tag
@@ -43,8 +43,8 @@ if ($actual -ne $expected) {
 
 O hash detecta corrupção e troca de arquivo. Como a release ainda não possui
 assinatura de código pública, o hash sozinho não substitui identidade do
-publicador: confira também o domínio `github.com`, o repositório, o tag e o
-código-fonte associado.
+publicador: confira também o domínio `vemryx.com`, a versão e o código-fonte
+associado.
 
 ## Atualização automática
 
@@ -69,12 +69,12 @@ pastas sem nome de versão reconhecido são ignoradas para evitar limpeza ampla.
 
 O workflow só encerra uma release estável depois de consultar o feed público e
 confirmar a versão, o hash do pacote e a assinatura recém-publicados. Se a
-publicação do feed falhar depois de o GitHub Release já existir, uma reexecução
-só prossegue quando o manifesto assinado e o ZIP runtime públicos forem
-idênticos ao candidato auditado; qualquer divergência bloqueia a retomada.
+publicação do feed falhar depois de a GitHub Release de notas já existir, uma
+reexecução republica os mesmos objetos versionados auditados antes de tornar os
+aliases estáveis visíveis.
 
-Instalações antigas ou execuções portáteis fora desse layout continuam usando
-o atualizador legado baseado no instalador completo. O botão manual em
+Instalações antigas ou execuções portáteis fora desse layout usam o manifesto
+assinado do instalador completo. O botão manual em
 Configurações força uma nova consulta e sempre informa se o app já está
 atualizado ou se a consulta falhou.
 

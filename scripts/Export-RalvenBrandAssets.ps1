@@ -12,8 +12,6 @@ $sourceBackground = Join-Path $receivedRoot 'ralven-atmosphere-background-origin
 $iconExportRoot = Join-Path $brandRoot 'export\app-icon'
 $backgroundExportRoot = Join-Path $brandRoot 'export\background'
 $appAssetRoot = Join-Path $repositoryRoot 'src\Ralven.App\Assets'
-$websitePublicRoot = Join-Path $repositoryRoot 'website\public'
-$websiteFontRoot = Join-Path $websitePublicRoot 'fonts'
 $docsAssetRoot = Join-Path $repositoryRoot 'docs\assets'
 $dashboardAssetRoot = Join-Path $repositoryRoot 'infra\dashboard\assets\img'
 
@@ -41,7 +39,7 @@ foreach ($entry in $immutableSourceHashes.GetEnumerator()) {
 }
 
 New-Item -ItemType Directory -Path `
-    $iconExportRoot, $backgroundExportRoot, $appAssetRoot, $websiteFontRoot, $docsAssetRoot, $dashboardAssetRoot `
+    $iconExportRoot, $backgroundExportRoot, $appAssetRoot, $docsAssetRoot, $dashboardAssetRoot `
     -Force | Out-Null
 
 Add-Type -AssemblyName System.Drawing.Common
@@ -268,20 +266,12 @@ Copy-IfChanged -Source $sourceBackground -Destination $exportBackground
 Copy-IfChanged -Source (Join-Path $iconExportRoot 'ralven-app-icon-1024.png') -Destination (Join-Path $appAssetRoot 'Ralven.png')
 Copy-IfChanged -Source $exportIco -Destination (Join-Path $appAssetRoot 'Ralven.ico')
 foreach ($destination in @(
-    (Join-Path $websitePublicRoot 'icon.png'),
     (Join-Path $docsAssetRoot 'icon.png'),
     (Join-Path $dashboardAssetRoot 'logo.png')
 )) {
     Copy-IfChanged -Source (Join-Path $iconExportRoot 'ralven-app-icon-512.png') -Destination $destination
 }
-Copy-IfChanged -Source $exportBackground -Destination (Join-Path $websitePublicRoot 'og.png')
 Copy-IfChanged -Source $exportBackground -Destination (Join-Path $docsAssetRoot 'hero-ralven.png')
-Copy-IfChanged `
-    -Source (Join-Path $brandRoot 'fonts\inter-4.1\web\InterVariable.woff2') `
-    -Destination (Join-Path $websiteFontRoot 'InterVariable.woff2')
-Copy-IfChanged `
-    -Source (Join-Path $brandRoot 'fonts\inter-4.1\web\InterVariable-Italic.woff2') `
-    -Destination (Join-Path $websiteFontRoot 'InterVariable-Italic.woff2')
 
 $checksumPath = Join-Path $brandRoot 'CHECKSUMS.sha256'
 $checksumLines = Get-ChildItem -LiteralPath $brandRoot -Recurse -File |

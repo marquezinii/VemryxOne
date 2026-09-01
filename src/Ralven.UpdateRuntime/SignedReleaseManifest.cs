@@ -40,8 +40,8 @@ public static class ReleaseTrustPolicy
             || !string.IsNullOrEmpty(url.UserInfo)
             || !string.IsNullOrEmpty(url.Query)
             || !string.IsNullOrEmpty(url.Fragment)
-            || !url.Host.Equals("github.com", StringComparison.OrdinalIgnoreCase)
-            || !url.AbsolutePath.StartsWith("/marquezinii/Ralven/releases/download/", StringComparison.Ordinal)
+            || !url.Host.Equals("vemryx.com", StringComparison.OrdinalIgnoreCase)
+            || !url.AbsolutePath.StartsWith("/Ralven/releases/v", StringComparison.Ordinal)
             || manifest.PackageSizeBytes is <= 0 or > 1_073_741_824
             || manifest.PackageSha256.Length != 64 || !manifest.PackageSha256.All(char.IsAsciiHexDigit)
             || manifest.SignatureBase64.Length is < 80 or > 256)

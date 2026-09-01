@@ -249,9 +249,8 @@ jobs:
           Copy-Item -LiteralPath ./artifacts/Ralven-Runtime-win-x64.zip -Destination ./artifacts/release
           Copy-Item -LiteralPath ./artifacts/Ralven-Runtime-win-x64.zip.sha256 -Destination ./artifacts/release
 
-          # A landing page precisa de um endereço estável para iniciar o download
-          # sem uma etapa intermediária. O updater usa exclusivamente o runtime ZIP
-          # versionado autorizado pelo manifesto assinado abaixo.
+          # O site usa um alias estável; os dois modos do updater usam somente
+          # artefatos versionados autorizados por manifestos assinados.
           if ($env:RELEASE_CHANNEL -eq 'stable') {
             if ([string]::IsNullOrWhiteSpace($env:RELEASE_SIGNING_PRIVATE_KEY) -or
                 [string]::IsNullOrWhiteSpace($env:RALVEN_SIGNING_PASSWORD)) {
@@ -264,17 +263,26 @@ jobs:
                 $env:RELEASE_SIGNING_PRIVATE_KEY,
                 [Text.UTF8Encoding]::new($false))
               $minimum = (Get-Content -LiteralPath ./installer/minimum-update-version.txt -Raw).Trim()
-              $packageUrl = "https://github.com/marquezinii/Ralven/releases/download/$env:RELEASE_TAG/Ralven-Runtime-win-x64.zip"
-              $signedManifest = './artifacts/release/Ralven-signed-update-manifest.json'
+              $runtimeUrl = "https://vemryx.com/Ralven/releases/$env:RELEASE_TAG/Ralven-Runtime-$env:ASSET_VERSION-win-x64.zip"
+              $installerUrl = "https://vemryx.com/Ralven/releases/$env:RELEASE_TAG/Ralven-Setup-$env:ASSET_VERSION-win-x64.exe"
+              $runtimeManifest = './artifacts/release/Ralven-runtime-update-manifest.json'
+              $installerManifest = './artifacts/release/Ralven-installer-update-manifest.json'
               dotnet run --project ./src/Ralven.ReleaseTool/Ralven.ReleaseTool.csproj `
                 --configuration Release --no-build -- `
                 sign ./artifacts/Ralven-Runtime-win-x64.zip stable $env:ASSET_VERSION `
-                $minimum $packageUrl $privateKey $signedManifest
+                $minimum $runtimeUrl $privateKey $runtimeManifest
               if ($LASTEXITCODE -ne 0) { throw 'Signing the runtime manifest failed.' }
               dotnet run --project ./src/Ralven.ReleaseTool/Ralven.ReleaseTool.csproj `
                 --configuration Release --no-build -- `
-                verify $signedManifest ./src/Ralven.App/Assets/update-manifest-public-key.pem $minimum
-              if ($LASTEXITCODE -ne 0) { throw 'The signed manifest does not match the embedded public key.' }
+                sign "./artifacts/installer/Ralven-Setup-$env:ASSET_VERSION-win-x64.exe" stable $env:ASSET_VERSION `
+                $minimum $installerUrl $privateKey $installerManifest
+              if ($LASTEXITCODE -ne 0) { throw 'Signing the installer manifest failed.' }
+              foreach ($manifest in @($runtimeManifest, $installerManifest)) {
+                dotnet run --project ./src/Ralven.ReleaseTool/Ralven.ReleaseTool.csproj `
+                  --configuration Release --no-build -- `
+                  verify $manifest ./src/Ralven.App/Assets/update-manifest-public-key.pem $minimum
+                if ($LASTEXITCODE -ne 0) { throw "Signed manifest '$manifest' does not match the embedded public key." }
+              }
             }
             finally {
               if (Test-Path -LiteralPath $privateKey) { Remove-Item -LiteralPath $privateKey -Force }
@@ -313,7 +321,7 @@ jobs:
           retention-days: 14
 
   publish:
-    name: Publish GitHub release
+    name: Publish release
     if: ${{ inputs.publish }}
     needs: [build_audit, sign_release]
     runs-on: windows-latest
@@ -410,6 +418,38 @@ jobs:
           finally { Pop-Location }
           ./scripts/Test-ProductionDiagnostics.ps1 -AppVersion $env:ASSET_VERSION
 
+      - name: Publish versioned release artifacts to Vemryx
+        shell: pwsh
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+          ASSET_VERSION: ${{ needs.build_audit.outputs.asset_version }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:CLOUDFLARE_API_TOKEN) -or
+              [string]::IsNullOrWhiteSpace($env:CLOUDFLARE_ACCOUNT_ID)) {
+            throw 'Cloudflare credentials are required to publish release artifacts.'
+          }
+          Push-Location ./infra/cloudflare-worker
+          try {
+            npm ci
+            $uploads = @{
+              "Ralven-Setup-$env:ASSET_VERSION-win-x64.exe" = "Ralven-Setup-$env:ASSET_VERSION-win-x64.exe"
+              "Ralven-Setup-$env:ASSET_VERSION-win-x64.exe.sha256" = "Ralven-Setup-$env:ASSET_VERSION-win-x64.exe.sha256"
+              "Ralven-release-manifest-$env:ASSET_VERSION.json" = "Ralven-release-manifest-$env:ASSET_VERSION.json"
+              'Ralven-win-x64.zip' = 'Ralven-win-x64.zip'
+              'Ralven-win-x64.zip.sha256' = 'Ralven-win-x64.zip.sha256'
+              'Ralven-Runtime-win-x64.zip' = "Ralven-Runtime-$env:ASSET_VERSION-win-x64.zip"
+              'Ralven-Runtime-win-x64.zip.sha256' = "Ralven-Runtime-$env:ASSET_VERSION-win-x64.zip.sha256"
+            }
+            foreach ($entry in $uploads.GetEnumerator()) {
+              npx.cmd wrangler r2 object put "ralven-releases/releases/$env:RELEASE_TAG/$($entry.Value)" `
+                --file "../../release/$($entry.Key)" --remote
+              if ($LASTEXITCODE -ne 0) { throw "Publishing '$($entry.Key)' to R2 failed." }
+            }
+          }
+          finally { Pop-Location }
+
       - name: Create public release
         shell: pwsh
         env:
@@ -423,50 +463,13 @@ jobs:
               throw "Release '$env:RELEASE_TAG' already exists; refusing to overwrite it."
             }
 
-            # A rerun after the release was created but before the stable feed
-            # was published must be recoverable. Continue only when the two
-            # updater trust artifacts already public are byte-identical to
-            # this audited candidate; otherwise fail closed without changing
-            # the existing release or feed.
-            $verificationRoot = Join-Path $env:RUNNER_TEMP ("ralven-existing-release-" + [Guid]::NewGuid().ToString('N'))
-            New-Item -ItemType Directory -Force -Path $verificationRoot | Out-Null
-            try {
-              gh release download $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY `
-                --pattern Ralven-signed-update-manifest.json `
-                --pattern Ralven-Runtime-win-x64.zip `
-                --dir $verificationRoot
-              if ($LASTEXITCODE -ne 0) { throw 'Could not download updater artifacts from the existing release.' }
-              foreach ($asset in @('Ralven-signed-update-manifest.json', 'Ralven-Runtime-win-x64.zip')) {
-                $local = Join-Path (Resolve-Path ./release) $asset
-                $published = Join-Path $verificationRoot $asset
-                if (-not (Test-Path -LiteralPath $published -PathType Leaf) -or
-                    (Get-FileHash -LiteralPath $local -Algorithm SHA256).Hash -ne
-                    (Get-FileHash -LiteralPath $published -Algorithm SHA256).Hash) {
-                  throw "Existing release updater asset '$asset' does not match this audited candidate."
-                }
-              }
-              Write-Host "Existing stable release matches the audited updater artifacts; resuming feed publication."
-              exit 0
-            }
-            finally { Remove-Item -LiteralPath $verificationRoot -Recurse -Force }
+            Write-Host "Existing stable release found; resuming Vemryx feed publication."
+            exit 0
           }
 
-          $assets = @(
-            (Resolve-Path "./release/Ralven-Setup-$env:ASSET_VERSION-win-x64.exe").Path,
-            (Resolve-Path "./release/Ralven-Setup-$env:ASSET_VERSION-win-x64.exe.sha256").Path,
-            (Resolve-Path "./release/Ralven-release-manifest-$env:ASSET_VERSION.json").Path,
-            (Resolve-Path ./release/Ralven-win-x64.zip).Path,
-            (Resolve-Path ./release/Ralven-win-x64.zip.sha256).Path,
-            (Resolve-Path ./release/Ralven-Runtime-win-x64.zip).Path,
-            (Resolve-Path ./release/Ralven-Runtime-win-x64.zip.sha256).Path
-          )
-          if ($env:RELEASE_CHANNEL -eq 'stable') {
-            $assets += (Resolve-Path ./release/Ralven-Setup-latest-win-x64.exe).Path
-            $assets += (Resolve-Path ./release/Ralven-signed-update-manifest.json).Path
-          }
           $arguments = @(
             'release', 'create', $env:RELEASE_TAG
-          ) + $assets + @(
+          ) + @(
             '--repo', $env:GITHUB_REPOSITORY,
             '--verify-tag',
             '--title', "Ralven $env:RELEASE_TAG",
@@ -480,7 +483,7 @@ jobs:
 
           gh @arguments
 
-      - name: Publish signed stable feed
+      - name: Publish signed stable feed to Vemryx
         if: ${{ inputs.channel == 'stable' }}
         shell: pwsh
         env:
@@ -493,25 +496,26 @@ jobs:
           }
           Push-Location ./infra/cloudflare-worker
           try {
-            Get-Content -LiteralPath ../../release/Ralven-signed-update-manifest.json -Raw |
-              npx.cmd wrangler secret put RELEASE_MANIFEST_JSON
-            if ($LASTEXITCODE -ne 0) { throw 'Publishing the signed update feed failed.' }
+            npx.cmd wrangler r2 object put ralven-releases/stable/Ralven-Setup-latest-win-x64.exe `
+              --file ../../release/Ralven-Setup-latest-win-x64.exe --remote
+            if ($LASTEXITCODE -ne 0) { throw 'Publishing the stable installer alias failed.' }
+            npx.cmd wrangler r2 object put ralven-releases/stable/runtime-manifest.json `
+              --file ../../release/Ralven-runtime-update-manifest.json --remote
+            if ($LASTEXITCODE -ne 0) { throw 'Publishing the runtime update feed failed.' }
+            npx.cmd wrangler r2 object put ralven-releases/stable/installer-manifest.json `
+              --file ../../release/Ralven-installer-update-manifest.json --remote
+            if ($LASTEXITCODE -ne 0) { throw 'Publishing the installer update feed failed.' }
           }
           finally { Pop-Location }
 
-          $expected = (Get-Content -LiteralPath ./release/Ralven-signed-update-manifest.json -Raw).Trim()
-          $feedUri = 'https://fivemcleaner-telemetry.felipemarquesini10.workers.dev/update/manifest'
-          $published = $null
-          foreach ($attempt in 1..6) {
-            try {
-              $published = (Invoke-WebRequest -Uri $feedUri -Method Get -Headers @{ 'Cache-Control' = 'no-cache' }).Content.Trim()
-              if ($published -eq $expected) { break }
-            }
-            catch {
-              if ($attempt -eq 6) { throw }
-            }
-            if ($attempt -lt 6) { Start-Sleep -Seconds 5 }
+          $feeds = @{
+            'https://vemryx.com/Ralven/releases/runtime-manifest.json' = './release/Ralven-runtime-update-manifest.json'
+            'https://vemryx.com/Ralven/releases/installer-manifest.json' = './release/Ralven-installer-update-manifest.json'
           }
-          if ($published -ne $expected) {
-            throw 'The public update feed did not expose the signed release that was just published.'
+          foreach ($entry in $feeds.GetEnumerator()) {
+            $expected = (Get-Content -LiteralPath $entry.Value -Raw).Trim()
+            $published = (Invoke-WebRequest -Uri $entry.Key -Headers @{ 'Cache-Control' = 'no-cache' }).Content.Trim()
+            if ($published -ne $expected) {
+              throw "The public update feed '$($entry.Key)' does not match the signed candidate."
+            }
           }

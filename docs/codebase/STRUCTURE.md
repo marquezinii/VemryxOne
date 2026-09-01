@@ -8,7 +8,6 @@
 | `tests/Ralven.Tests/` | Testes .NET por área (`App`, `Core`, `Windows`, `UpdateRuntime`) | `tests/Ralven.Tests/Ralven.Tests.csproj` |
 | `infra/cloudflare-worker/` | API Cloudflare Worker, D1, migrations e testes | `infra/cloudflare-worker/wrangler.toml` |
 | `infra/dashboard/` | Painel administrativo estático e testes | `infra/dashboard/index.html`, `infra/dashboard/assets/app.js` |
-| `website/` | Site Next.js exportado como HTML estático | `website/app/page.tsx`, `website/next.config.ts` |
 | `installer/` | Instalador Inno Setup e textos localizados | `installer/Ralven.iss` |
 | `scripts/` | Build, verificação de segurança, instalador e atalho de desenvolvimento | `scripts/Verify-Safety.ps1`, `scripts/Build-Installer.ps1` |
 | `assets/brand/` | Fonte oficial de marca, exports, Inter, tokens e checksums | `assets/brand/guidelines/BRAND_GUIDELINES.md` |
@@ -25,7 +24,6 @@
 - Launcher, updater e ferramenta de release: `src/Ralven.Launcher/Program.cs`, `src/Ralven.Updater/Program.cs`, `src/Ralven.ReleaseTool/Program.cs`.
 - Worker: export default de `infra/cloudflare-worker/src/index.js`.
 - Dashboard: `infra/dashboard/index.html` carrega `assets/app.js`.
-- Site: `website/app/page.tsx`; `next.config.ts` seleciona export estático.
 - Instalador: `installer/Ralven.iss`.
 
 `Ralven.slnx` seleciona os projetos .NET; os `package.json` selecionam scripts Node; os workflows em `.github/workflows/` coordenam CI e publicação.
@@ -58,4 +56,3 @@
 - `src/Ralven.App/App.xaml.cs`
 - `src/Ralven.Windows/WindowsOptimizationRuntime.cs`
 - `infra/cloudflare-worker/src/index.js`
-- `website/next.config.ts`

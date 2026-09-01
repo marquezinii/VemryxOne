@@ -11,7 +11,14 @@ public sealed class ReleaseTrustPolicyTests
     {
         using var signer = ECDsa.Create(ECCurve.NamedCurves.nistP256);
         var publicKey = signer.ExportSubjectPublicKeyInfo();
-        var unsigned = new SignedReleaseManifest("stable", "2.0.0", "1.5.0", "https://github.com/marquezinii/Ralven/releases/download/v2.0.0/app.zip", new string('a', 64), 1024, "");
+        var unsigned = new SignedReleaseManifest(
+            "stable",
+            "2.0.0",
+            "1.5.0",
+            "https://vemryx.com/Ralven/releases/v2.0.0/app.zip",
+            new string('a', 64),
+            1024,
+            "");
         var signature = signer.SignData(unsigned.CanonicalPayload(), HashAlgorithmName.SHA256);
         var valid = unsigned with { SignatureBase64 = Convert.ToBase64String(signature) };
 

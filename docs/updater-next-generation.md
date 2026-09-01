@@ -11,7 +11,7 @@ requisito de custo zero.
 Substituir gradualmente Inno e o updater atual por uma distribuição própria
 versionada, composta por um **Launcher/Recovery Agent** e diretórios de app
 imutáveis. Ambos são self-contained .NET, sem serviço, driver, elevação,
-dependência comercial ou instalação de certificado. GitHub Releases hospeda
+dependência comercial ou instalação de certificado. A infraestrutura Vemryx hospeda
 os pacotes e o Worker/Pages existente hospeda o feed e a observabilidade nos
 planos gratuitos, sujeitos aos limites documentados desses provedores.
 

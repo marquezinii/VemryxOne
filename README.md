@@ -10,9 +10,9 @@
 </p>
 
 <p align="center">
-  <a href="https://marquezinii.github.io/Ralven/"><strong>Baixar para Windows</strong></a>
+  <a href="https://vemryx.com/Ralven/"><strong>Baixar para Windows</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://github.com/marquezinii/Ralven/releases">Releases</a>
+  <a href="https://vemryx.com/Ralven/">Página oficial</a>
   &nbsp;·&nbsp;
   <a href="docs/safety.md">Segurança</a>
   &nbsp;·&nbsp;
@@ -21,7 +21,7 @@
 
 <p align="center">
   <a href="https://github.com/marquezinii/Ralven/actions/workflows/ci.yml"><img alt="Status da CI" src="https://img.shields.io/github/actions/workflow/status/marquezinii/Ralven/ci.yml?branch=main&style=flat-square&label=CI"></a>
-  <a href="https://github.com/marquezinii/Ralven/releases/latest"><img alt="Última release" src="https://img.shields.io/github/v/release/marquezinii/Ralven?style=flat-square&color=2D2E33"></a>
+  <a href="https://vemryx.com/Ralven/"><img alt="Última release" src="https://img.shields.io/github/v/release/marquezinii/Ralven?style=flat-square&color=2D2E33"></a>
   <img alt="Windows 10 e 11" src="https://img.shields.io/badge/Windows-10%20%7C%2011-2D2E33?style=flat-square">
   <img alt=".NET 10" src="https://img.shields.io/badge/.NET-10-512bd4?style=flat-square">
 </p>
@@ -79,7 +79,7 @@ Leia a [política de segurança](docs/safety.md) e as [evidências técnicas](do
 
 ## Instalação e atualização
 
-Baixe apenas pelas [Releases oficiais](https://github.com/marquezinii/Ralven/releases). Cada release `win-x64` inclui instalador, SHA-256, manifestos e pacotes gerados pelo mesmo workflow.
+Baixe apenas pela [página oficial do Ralven](https://vemryx.com/Ralven/). Instalador, manifestos assinados e pacotes versionados são publicados pelo mesmo workflow no domínio da Vemryx.
 
 Após sua confirmação, a atualização verifica origem e integridade, preserva a versão anterior e só confirma a nova versão quando ela sinaliza saúde.
 

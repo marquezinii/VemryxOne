@@ -36,7 +36,6 @@ zero testes nesta combinação WPF/MTP.
 - .NET: um projeto em `tests/Ralven.Tests`, subdividido em `App/`, `Core/`, `Windows/` e `UpdateRuntime/`; arquivos `*Tests.cs`.
 - Worker: `infra/cloudflare-worker/test/**/*.test.js`, espelhando domínios de `src/`.
 - Dashboard: `infra/dashboard/test/*.test.js`.
-- Site: `website/tests/*.test.mjs`, consumindo o diretório gerado `website/out/`.
 - Setup compartilhado .NET: `GlobalUsings.cs`, `SharedTestDoubles.cs` e doubles locais por área.
 
 ## 3) Matriz de escopo
@@ -52,7 +51,7 @@ zero testes nesta combinação WPF/MTP.
 
 - C#: interfaces em `Ralven.Windows` e serviços App recebem fakes/doubles; filesystem usa diretórios temporários e journals in-memory quando possível.
 - Worker: `Request`, `fetch` injetado, bindings e D1 simulados em JavaScript puro.
-- Dashboard/site: helpers sem DOM são testados diretamente; HTML é validado após export estático.
+- Dashboard: helpers sem DOM são testados diretamente.
 - Testes unitários não devem depender da instalação real do FiveM, estado da máquina, elevação ou rede externa.
 
 Falha comum a evitar: alterar contrato persistido, resource key ou metadata de ação sem atualizar o teste de contrato correspondente.
@@ -69,8 +68,7 @@ Falha comum a evitar: alterar contrato persistido, resource key ou metadata de a
 
 - `tests/Ralven.Tests/Ralven.Tests.csproj`
 - `tests/Ralven.Tests/Windows/WindowsTransactionEngineTests.cs`
-- `tests/Ralven.Tests/App/GitHubReleaseUpdateServiceTests.cs`
+- `tests/Ralven.Tests/App/SignedManifestUpdateServiceDownloadTests.cs`
 - `infra/cloudflare-worker/test/telemetryIngest.test.js`
 - `infra/dashboard/test/api.test.js`
-- `website/tests/rendered-html.test.mjs`
 - `.github/workflows/ci.yml`

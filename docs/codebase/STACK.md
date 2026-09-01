@@ -6,7 +6,6 @@
 | --- | --- | --- | --- |
 | Aplicativo Windows | C# 14, .NET SDK 10.0.303, `net10.0-windows10.0.19041.0` | NuGet com versões centralizadas; MSBuild/Solution XML | `global.json`, `Directory.Build.props`, `Directory.Packages.props`, `Ralven.slnx` |
 | Worker e dashboard | JavaScript ES modules, Node.js 24.19.0 | npm com lockfiles; runtime Cloudflare Workers/Pages | `.node-version`, `infra/cloudflare-worker/package.json`, `infra/dashboard/package.json` |
-| Site público | TypeScript 6 em modo `strict`, React 19 e Node.js 24.19.0 | npm; Next.js com export estático | `website/package.json`, `website/tsconfig.json`, `website/next.config.ts` |
 
 O desktop é a aplicação principal; Worker, dashboard e site são superfícies implantáveis separadamente.
 
@@ -19,7 +18,6 @@ O desktop é a aplicação principal; Worker, dashboard e site são superfícies
 | Sentry | 6.8.0 | Crash reporting condicionado ao controle de relatórios opcionais | `Directory.Packages.props`, `src/Ralven.App/Services/SentryCrashReportingService.cs` |
 | `System.Management` / `PerformanceCounter` | 10.0.11 | Descoberta de hardware e métricas Windows | `Directory.Packages.props`, `src/Ralven.Windows/Ralven.Windows.csproj` |
 | `ProtectedData` | 10.0.11 | DPAPI para sessão e estado sensível local | `Directory.Packages.props`, `src/Ralven.UpdateRuntime/Ralven.UpdateRuntime.csproj` |
-| Next.js / React | 16.3.0 / 19.2.8 | Site público estático | `website/package.json` |
 | Cloudflare Workers + D1 | plataforma | API, autenticação administrativa, telemetria, bugs e manifestos | `infra/cloudflare-worker/wrangler.toml`, `infra/cloudflare-worker/src/index.js` |
 
 O Worker e o dashboard não têm dependências npm de produção; usam APIs nativas da plataforma e do navegador.
@@ -30,8 +28,7 @@ O Worker e o dashboard não têm dependências npm de produção; usam APIs nati
 | --- | --- | --- |
 | Microsoft.Testing.Platform + xUnit v3 | Suíte .NET | `global.json`, `tests/Ralven.Tests/Ralven.Tests.csproj` |
 | coverlet.MTP | Cobertura .NET na CI | `Directory.Packages.props`, `.github/workflows/ci.yml` |
-| ESLint + TypeScript | Lint e verificação estática do site | `website/eslint.config.mjs`, `website/tsconfig.json` |
-| `node:test` | Testes do Worker, dashboard e HTML exportado | manifests em `infra/` e `website/package.json` |
+| `node:test` | Testes do Worker e dashboard | manifests em `infra/` |
 | Wrangler 4.127 | Desenvolvimento, migrations e deploy do Worker | `infra/cloudflare-worker/package.json` |
 | Obfuscar / SBOM Tool | Hardening e SBOM dos artefatos | `.config/dotnet-tools.json`, `.github/workflows/ci.yml` |
 | PowerShell / Inno Setup | Build, verificações e instalador | `scripts/`, `installer/Ralven.iss` |
@@ -43,14 +40,6 @@ dotnet restore Ralven.slnx
 dotnet build Ralven.slnx --configuration Release --no-restore
 dotnet run --project tests/Ralven.Tests/Ralven.Tests.csproj --configuration Release --no-build -- --minimum-expected-tests 1
 ./scripts/Verify-Safety.ps1
-```
-
-```powershell
-Set-Location website
-npm ci
-npm run lint
-npm run typecheck
-npm test
 ```
 
 ```powershell
@@ -70,7 +59,6 @@ npm test
 - Configuração do app: `src/Ralven.App/Config/appsettings*.json`, com overlay local ignorado `appsettings.<Environment>.local.json`.
 - Ambiente do app: `RALVEN_ENVIRONMENT`, argumentos de demonstração e configuração `Development`/`Production` em `src/Ralven.App/Services/AppEnvironment.cs`.
 - Worker: bindings `TELEMETRY_DB` e rate limiters no `wrangler.toml`; secrets administrativos são injetados pelo Wrangler e não ficam no Git.
-- Site: `NEXT_PUBLIC_BASE_PATH` é opcional; o build usa `output: "export"`.
 - Restrições: desktop Windows 10/11 x64; Node 24.19.0; não há configuração de container.
 
 ## 6) Evidências
@@ -81,4 +69,3 @@ npm test
 - `Ralven.slnx`
 - `.github/workflows/ci.yml`
 - `infra/cloudflare-worker/package.json`
-- `website/package.json`

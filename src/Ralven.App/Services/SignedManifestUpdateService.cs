@@ -17,16 +17,16 @@ namespace Ralven.App.Services;
 
 public sealed class SignedManifestUpdateService : IReleaseUpdateService, IDisposable
 {
-    private static readonly Uri ManifestUri =
-        new("https://fivemcleaner-telemetry.felipemarquesini10.workers.dev/update/manifest");
     private readonly HttpClient client;
     private readonly byte[] publicKey;
     private readonly string updatesRoot;
     private readonly VersionFloorStore versionFloor;
     private readonly UpdaterDiagnostics diagnostics;
     private readonly string dataRoot;
+    private readonly ReleasePackageKind packageKind;
+    private readonly Uri manifestUri;
 
-    public SignedManifestUpdateService()
+    public SignedManifestUpdateService(ReleasePackageKind packageKind = ReleasePackageKind.Runtime)
         : this(
             new SocketsHttpHandler
             {
@@ -40,13 +40,22 @@ public sealed class SignedManifestUpdateService : IReleaseUpdateService, IDispos
             },
             Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "Ralven"))
+                "Ralven"),
+            packageKind)
     {
     }
 
-    internal SignedManifestUpdateService(HttpMessageHandler handler, string dataRoot)
+    internal SignedManifestUpdateService(
+        HttpMessageHandler handler,
+        string dataRoot,
+        ReleasePackageKind packageKind = ReleasePackageKind.Runtime)
     {
         this.dataRoot = dataRoot;
+        this.packageKind = packageKind;
+        manifestUri = new Uri(
+            packageKind == ReleasePackageKind.Runtime
+                ? "https://vemryx.com/Ralven/releases/runtime-manifest.json"
+                : "https://vemryx.com/Ralven/releases/installer-manifest.json");
         client = new HttpClient(handler) { Timeout = TimeSpan.FromMinutes(15) };
         client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Ralven-Updater", "2.0"));
         updatesRoot = Path.Combine(dataRoot, "Updates");
@@ -78,13 +87,13 @@ public sealed class SignedManifestUpdateService : IReleaseUpdateService, IDispos
         StableSemanticVersion currentVersion,
         CancellationToken cancellationToken)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Get, ManifestUri);
+        using var request = new HttpRequestMessage(HttpMethod.Get, manifestUri);
         request.Headers.CacheControl = new CacheControlHeaderValue { NoCache = true };
         using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         if (response.StatusCode == HttpStatusCode.ServiceUnavailable) return null;
         if (response.StatusCode != HttpStatusCode.OK
             || response.RequestMessage?.RequestUri is not { } effectiveUri
-            || !effectiveUri.Equals(ManifestUri))
+            || !effectiveUri.Equals(manifestUri))
             throw new UpdateSecurityException($"A fonte assinada respondeu com HTTP {(int)response.StatusCode}.");
         if (response.Content.Headers.ContentLength is > 65_536)
             throw new UpdateSecurityException("O manifesto assinado excede 64 KiB.");
@@ -128,14 +137,18 @@ public sealed class SignedManifestUpdateService : IReleaseUpdateService, IDispos
         var version = StableSemanticVersion.Parse(manifest.Version);
         if (version.CompareTo(currentVersion) <= 0) return null;
         var uri = new Uri(manifest.PackageUrl);
+        ValidateDownloadUri(uri, version);
+        var assetName = packageKind == ReleasePackageKind.Runtime
+            ? $"Ralven-Runtime-{version.CoreVersion}-win-x64.zip"
+            : $"Ralven-Setup-{version.CoreVersion}-win-x64.exe";
         return new ReleaseUpdate(
             version,
             $"v{version.CoreVersion}",
-            $"Ralven-Runtime-{version.CoreVersion}-win-x64.zip",
+            assetName,
             uri,
             manifest.PackageSizeBytes,
             manifest.PackageSha256,
-            new Uri($"https://github.com/marquezinii/Ralven/releases/tag/v{version.CoreVersion}"));
+            new Uri("https://vemryx.com/Ralven/"));
     }
 
     public async Task<DownloadedUpdate> DownloadUpdateAsync(
@@ -168,7 +181,10 @@ public sealed class SignedManifestUpdateService : IReleaseUpdateService, IDispos
         var temporary = finalPath + $".{Guid.NewGuid():N}.part";
         try
         {
-            using var response = await SendDownloadAsync(update.DownloadUri, cancellationToken);
+            using var response = await SendDownloadAsync(
+                update.DownloadUri,
+                update.Version,
+                cancellationToken);
             if (response.StatusCode != HttpStatusCode.OK)
                 throw new HttpRequestException($"O download respondeu com HTTP {(int)response.StatusCode}.");
             if (response.Content.Headers.ContentLength is long length && length != update.SizeBytes)
@@ -231,12 +247,15 @@ public sealed class SignedManifestUpdateService : IReleaseUpdateService, IDispos
         _ => "unexpected",
     };
 
-    private async Task<HttpResponseMessage> SendDownloadAsync(Uri initial, CancellationToken token)
+    private async Task<HttpResponseMessage> SendDownloadAsync(
+        Uri initial,
+        StableSemanticVersion version,
+        CancellationToken token)
     {
         var current = initial;
         for (var redirects = 0; redirects <= 5; redirects++)
         {
-            ValidateDownloadUri(current);
+            ValidateDownloadUri(current, version);
             using var request = new HttpRequestMessage(HttpMethod.Get, current);
             request.Headers.AcceptEncoding.Add(new StringWithQualityHeaderValue("identity"));
             var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
@@ -251,12 +270,17 @@ public sealed class SignedManifestUpdateService : IReleaseUpdateService, IDispos
         throw new UpdateSecurityException("Redirecionamentos demais.");
     }
 
-    private static void ValidateDownloadUri(Uri uri)
+    private void ValidateDownloadUri(Uri uri, StableSemanticVersion version)
     {
+        var expectedPath = packageKind == ReleasePackageKind.Runtime
+            ? $"/Ralven/releases/v{version.CoreVersion}/Ralven-Runtime-{version.CoreVersion}-win-x64.zip"
+            : $"/Ralven/releases/v{version.CoreVersion}/Ralven-Setup-{version.CoreVersion}-win-x64.exe";
         if (uri.Scheme != Uri.UriSchemeHttps || !uri.IsDefaultPort || !string.IsNullOrEmpty(uri.UserInfo)
-            || !(uri.Host.Equals("github.com", StringComparison.OrdinalIgnoreCase)
-                || uri.Host.Equals("release-assets.githubusercontent.com", StringComparison.OrdinalIgnoreCase)))
-            throw new UpdateSecurityException("O download saiu dos hosts oficiais permitidos.");
+            || !uri.Host.Equals("vemryx.com", StringComparison.OrdinalIgnoreCase)
+            || !uri.AbsolutePath.Equals(expectedPath, StringComparison.Ordinal)
+            || !string.IsNullOrEmpty(uri.Query)
+            || !string.IsNullOrEmpty(uri.Fragment))
+            throw new UpdateSecurityException("O download saiu da rota oficial permitida.");
     }
 
     private static async Task<bool> MatchesAsync(string path, ReleaseUpdate update, CancellationToken token)
@@ -288,4 +312,10 @@ public sealed class SignedManifestUpdateService : IReleaseUpdateService, IDispos
             // Cache velho nunca pode impedir o download verificado atual.
         }
     }
+}
+
+public enum ReleasePackageKind
+{
+    Runtime,
+    Installer,
 }

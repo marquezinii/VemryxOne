@@ -33,7 +33,7 @@ WPF/ViewModel -> AppOptimizationService -> PlanBuilder/Core -> Windows runtime
 | Broker | Fronteira elevada allowlisted | Comando arbitrário, rede ou navegação | `src/Ralven.Broker/Program.cs`, `PlanValidator.cs` |
 | Update runtime | Integridade, staging, ativação e recuperação | Ignorar assinatura/hash/origem | `src/Ralven.UpdateRuntime/` |
 | Worker | Auth, validação, rate limiting, D1 e respostas | Confiar no cliente para identidade | `infra/cloudflare-worker/src/index.js` |
-| Dashboard/site | Operação privada / comunicação pública | Lógica de mutação local | `infra/dashboard/`, `website/` |
+| Dashboard/site | Operação privada / comunicação pública | Lógica de mutação local | `infra/dashboard/`, site institucional Vemryx |
 
 ## 4) Padrões reutilizados
 

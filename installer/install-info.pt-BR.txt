@@ -19,9 +19,9 @@ Atualizações futuras são oferecidas dentro do aplicativo, com a sua confirma�
 Em geral não é necessário baixar este instalador de novo.
 
 Baixe o instalador somente em:
-https://marquezinii.github.io/Ralven/
+https://vemryx.com/Ralven/
 ou na release oficial:
-https://github.com/marquezinii/Ralven/releases
+https://vemryx.com/Ralven/
 
 Antes de executar, confira o arquivo .sha256 publicado junto do instalador:
   (Get-FileHash .\Ralven-Setup-*-win-x64.exe -Algorithm SHA256).Hash

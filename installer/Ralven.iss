@@ -1,8 +1,8 @@
 #define AppName "Ralven"
 #define AppPublisher "Ralven"
-#define AppPublisherUrl "https://github.com/marquezinii/Ralven"
-#define AppUrl "https://github.com/marquezinii/Ralven"
-#define AppWebsite "https://marquezinii.github.io/Ralven/"
+#define AppPublisherUrl "https://vemryx.com/"
+#define AppUrl "https://vemryx.com/Ralven/"
+#define AppWebsite "https://vemryx.com/Ralven/"
 #define AppExeName "Ralven.Launcher.exe"
 #define StableAppId "{{35FF816F-9EFD-42C8-A63B-CC5EA138805A}"
 

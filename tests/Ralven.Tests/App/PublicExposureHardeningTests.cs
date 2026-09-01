@@ -85,24 +85,26 @@ public sealed class PublicExposureHardeningTests
     }
 
     [Fact]
-    public void StableRelease_CanSafelyResumeAndProvesThePublishedUpdateFeed()
+    public void StableRelease_PublishesVersionedArtifactsBeforeSignedVemryxFeeds()
     {
         var root = FindRepositoryRoot();
         var workflow = File.ReadAllText(Path.Combine(root, ".github", "workflows", "release.yml"));
 
-        var existingRelease = workflow.IndexOf("Existing stable release matches the audited updater artifacts", StringComparison.Ordinal);
-        var compareManifest = workflow.LastIndexOf("Ralven-signed-update-manifest.json", existingRelease, StringComparison.Ordinal);
-        var compareRuntime = workflow.LastIndexOf("Ralven-Runtime-win-x64.zip", existingRelease, StringComparison.Ordinal);
-        var publishFeed = workflow.IndexOf("wrangler secret put RELEASE_MANIFEST_JSON", existingRelease, StringComparison.Ordinal);
-        var smokeFeed = workflow.IndexOf("/update/manifest", publishFeed, StringComparison.Ordinal);
-        var verifyExactManifest = workflow.IndexOf("$published -eq $expected", smokeFeed, StringComparison.Ordinal);
+        var versioned = workflow.IndexOf("- name: Publish versioned release artifacts to Vemryx", StringComparison.Ordinal);
+        var createRelease = workflow.IndexOf("- name: Create public release", versioned, StringComparison.Ordinal);
+        var stableFeed = workflow.IndexOf("- name: Publish signed stable feed to Vemryx", createRelease, StringComparison.Ordinal);
+        var runtimeFeed = workflow.IndexOf("https://vemryx.com/Ralven/releases/runtime-manifest.json", stableFeed, StringComparison.Ordinal);
+        var installerFeed = workflow.IndexOf("https://vemryx.com/Ralven/releases/installer-manifest.json", stableFeed, StringComparison.Ordinal);
+        var verifyExactManifest = workflow.IndexOf("$published -ne $expected", installerFeed, StringComparison.Ordinal);
 
-        Assert.True(compareManifest >= 0);
-        Assert.True(compareRuntime >= 0);
-        Assert.True(existingRelease > compareManifest && existingRelease > compareRuntime);
-        Assert.True(publishFeed > existingRelease);
-        Assert.True(smokeFeed > publishFeed);
-        Assert.True(verifyExactManifest > smokeFeed);
+        Assert.True(versioned >= 0);
+        Assert.True(createRelease > versioned);
+        Assert.True(stableFeed > createRelease);
+        Assert.True(runtimeFeed > stableFeed);
+        Assert.True(installerFeed > stableFeed);
+        Assert.True(verifyExactManifest > installerFeed);
+        Assert.Contains("ralven-releases/releases/$env:RELEASE_TAG", workflow, StringComparison.Ordinal);
+        Assert.DoesNotContain("release-assets.githubusercontent.com", workflow, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -125,6 +127,19 @@ public sealed class PublicExposureHardeningTests
         using var brokerVerifier = ECDsa.Create();
         brokerVerifier.ImportFromPem(brokerKey);
         Assert.Equal(32, brokerVerifier.ExportParameters(includePrivateParameters: false).Q.X!.Length);
+    }
+
+    [Fact]
+    public void PublicDistribution_UsesOnlyTheVemryxSiteAndSignedFeeds()
+    {
+        var root = FindRepositoryRoot();
+        var updater = File.ReadAllText(Path.Combine(root, "src", "Ralven.App", "Services", "SignedManifestUpdateService.cs"));
+        var mainWindow = File.ReadAllText(Path.Combine(root, "src", "Ralven.App", "MainWindow.xaml.cs"));
+
+        Assert.Contains("https://vemryx.com/Ralven/", updater, StringComparison.Ordinal);
+        Assert.DoesNotContain("api.github.com", updater, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("GitHubReleaseUpdateService", mainWindow, StringComparison.Ordinal);
+        Assert.False(File.Exists(Path.Combine(root, ".github", "workflows", "pages.yml")));
     }
 
     [Fact]

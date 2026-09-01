@@ -96,7 +96,7 @@ public sealed class RuntimePackageStager
             using var stream = File.OpenRead(file);
             var actualHash = SHA256.HashData(stream);
             // Constant-time compare, igual ao restante do pipeline de update
-            // (GitHubReleaseUpdateService, BrokerIntegrityVerifier) -- este
+            // (SignedManifestUpdateService, BrokerIntegrityVerifier) -- este
             // era o único verificador de manifesto ainda usando Equals.
             if (!CryptographicOperations.FixedTimeEquals(actualHash, Convert.FromHexString(expected)))
                 throw new InvalidDataException("Integridade de arquivo extraído falhou.");

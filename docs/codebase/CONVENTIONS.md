@@ -8,7 +8,6 @@
 | Métodos/propriedades C# | PascalCase; async termina em `Async` | `ExecuteAsync`, `LoadSettingsAsync` | `AppOptimizationService.cs` |
 | Locais/campos privados C# | camelCase, sem prefixo `_` | `journalDirectory`, `brokerClient` | `AppOptimizationService.cs` |
 | Constantes C# | PascalCase | `ProductionHost`, `TelemetryPath` | `RemoteServicesOptions.cs` |
-| Componentes React | PascalCase | `HeroSection.tsx` | `website/app/components/` |
 | Módulos/funções JavaScript | arquivos e funções em camelCase | `firebaseIdToken.js`, `readBoundedJson` | `infra/cloudflare-worker/src/` |
 | Bindings/env vars | `SCREAMING_SNAKE_CASE` | `TELEMETRY_DB`, `ADMIN_CSRF_SECRET` | `wrangler.toml`, `src/index.js` |
 | Testes | `*Tests.cs` e `*.test.js`/`*.test.mjs` | `PlanBuilderTests.cs`, `rateLimit.test.js` | `tests/`, `infra/cloudflare-worker/test/` |
@@ -17,7 +16,6 @@
 
 - `.editorconfig`: UTF-8, CRLF, newline final e trim; quatro espaços para C#/XAML/MSBuild e dois para Markdown/JSON/YAML.
 - C#: nullable e implicit usings habilitados; linguagem 14; `dotnet format Ralven.slnx --no-restore` é o formatador compatível.
-- Site: ESLint 9 com `eslint-config-next/core-web-vitals` e regras TypeScript; `tsconfig.json` usa `strict`, `noEmit` e `isolatedModules`.
 - Worker/dashboard: sem linter dedicado configurado; o estilo observado usa dois espaços, aspas simples e ES modules.
 
 Comandos relevantes:
@@ -25,16 +23,12 @@ Comandos relevantes:
 ```powershell
 dotnet format Ralven.slnx --no-restore
 dotnet build Ralven.slnx --configuration Release --no-restore
-Set-Location website
-npm run lint
-npm run typecheck
 ```
 
 ## 3) Imports e módulos
 
 - C# usa namespaces alinhados aos projetos e referências explícitas nos `.csproj`; `Contracts` e `Core` não importam WPF.
 - `using` fica no topo; implicit usings reduz imports da BCL.
-- TypeScript configura `@/*` para a raiz de `website`, mas imports relativos são aceitos e usados.
 - Não há política de barrels confirmada; módulos públicos são consumidos diretamente pelo arquivo.
 
 ## 4) Erros e logging
@@ -62,8 +56,6 @@ npm run typecheck
 
 - `.editorconfig`
 - `Directory.Build.props`
-- `website/eslint.config.mjs`
-- `website/tsconfig.json`
 - `AGENTS.md`
 - `AI_RULES.md`
 - `src/Ralven.App/Resources/Strings.resx`

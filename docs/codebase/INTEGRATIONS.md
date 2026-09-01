@@ -9,9 +9,9 @@
 | Cloudflare D1 | banco SQL | Eventos, ações, perfis, bugs, sessões e alerta | binding `TELEMETRY_DB` | alta | `wrangler.toml`, `migrations/` |
 | Firebase Authentication | REST/JWT/JWKS | Conta, e-mail/senha e identidade do perfil | API key pública no cliente; ID token RS256 validado no Worker | alta | `FirebaseAuthService.cs`, `firebaseIdToken.js` |
 | Google OAuth 2.0 | OAuth + OIDC | Login Google com Authorization Code + PKCE | client ID/credencial desktop em overlay local | média | `src/Ralven.App/Services/GoogleOAuthClient.cs` |
-| GitHub Releases | API/download | Consulta, download e página oficial de versões | público; publicação usa GitHub Actions | alta | `GitHubReleaseUpdateService.cs`, `.github/workflows/release.yml` |
+| Vemryx / Cloudflare R2 | manifestos/download | Consulta assinada, download e página oficial de versões | público via `vemryx.com/Ralven/`; publicação usa GitHub Actions | alta | `SignedManifestUpdateService.cs`, `.github/workflows/release.yml` |
 | Sentry | observabilidade | Crash reporting sanitizado e opt-in | DSN de projeto na configuração | média | `SentryCrashReportingService.cs` |
-| Cloudflare Pages / GitHub Pages | hosting estático | Dashboard privado / site público | deploy operacional / GitHub Actions | média | `infra/dashboard/README.md`, `.github/workflows/pages.yml` |
+| Cloudflare Pages / Workers | hosting | Dashboard privado / site institucional Vemryx | deploy operacional | média | `infra/dashboard/README.md` |
 | Discord | webhook de release | Aviso pós-release | secret do GitHub Actions | baixa | `.github/workflows/discord-release.yml` |
 
 ## 2) Armazenamento
@@ -25,7 +25,7 @@
 
 ## 3) Secrets e credenciais
 
-- Worker: `ADMIN_PASSWORD_HASH`, `IP_HASH_SECRET`, `ADMIN_CSRF_SECRET` e `RELEASE_MANIFEST_JSON` são secrets do Wrangler; não são commitados.
+- Worker: `ADMIN_PASSWORD_HASH`, `IP_HASH_SECRET` e `ADMIN_CSRF_SECRET` são secrets do Wrangler; não são commitados.
 - App: endpoints, Firebase API key pública e DSN ficam em `appsettings.<Environment>.json`; valores locais sensíveis/opcionais usam `appsettings.<Environment>.local.json`, ignorado pelo Git.
 - Sessão: senha e ID token não são persistidos; somente refresh token protegido por DPAPI CurrentUser.
 - CI/release: chaves de assinatura e webhooks entram como GitHub Secrets; workflows não devem imprimi-los.

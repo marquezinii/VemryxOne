@@ -174,9 +174,7 @@ public sealed class ReleaseUpdate
     public string Sha256Hex { get; }
 
     /// <summary>
-    /// The official GitHub page for the exact release. It is optional for
-    /// compatibility with locally constructed values, but API-sourced updates
-    /// validate it before exposing it to the interface.
+    /// The official page for release information.
     /// </summary>
     public Uri? ReleaseNotesUri { get; }
 }
@@ -193,30 +191,6 @@ public readonly record struct UpdateDownloadProgress(long BytesReceived, long To
     public double Percentage => TotalBytes <= 0
         ? 0
         : Math.Clamp(BytesReceived * 100d / TotalBytes, 0, 100);
-}
-
-public sealed class GitHubReleaseUpdateOptions
-{
-    /// <summary>
-    /// Exact installer-name template. The {version} token is replaced with the
-    /// stable core version from a vX.Y.Z release tag.
-    /// </summary>
-    public string InstallerAssetNameTemplate { get; init; } =
-        "Ralven-Setup-{version}-win-x64.exe";
-
-    public string? UpdatesRootDirectory { get; init; }
-
-    public long MinimumInstallerSizeBytes { get; init; } = 64 * 1024;
-
-    public long MaximumInstallerSizeBytes { get; init; } = 512L * 1024 * 1024;
-
-    public int MaximumManifestSizeBytes { get; init; } = 1024 * 1024;
-
-    public int MaximumRedirects { get; init; } = 5;
-
-    public TimeSpan ManifestTimeout { get; init; } = TimeSpan.FromSeconds(30);
-
-    public TimeSpan DownloadTimeout { get; init; } = TimeSpan.FromMinutes(15);
 }
 
 public sealed class UpdateSecurityException : Exception

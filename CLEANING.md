@@ -60,7 +60,7 @@ O projeto já recebeu rodadas anteriores de:
 - tech-debt e deduplicação pontual;
 - auditoria de falhas silenciosas/startup;
 - modernização de dependências/toolchain;
-- decomposição de funções grandes em áreas como `WindowsTransactionEngine`, `AppOptimizationService`, `MainViewModel`, `GitHubReleaseUpdateService`, `PlanBuilder`, `ActionCatalog`, `WindowsOptimizationRuntime` e `MainWindow`.
+- decomposição de funções grandes em áreas como `WindowsTransactionEngine`, `AppOptimizationService`, `MainViewModel`, `SignedManifestUpdateService`, `PlanBuilder`, `ActionCatalog`, `WindowsOptimizationRuntime` e `MainWindow`.
 
 Portanto, o objetivo agora não é repetir `Extract Method` ou deletar novamente itens já removidos. O foco deve ser **responsabilidade, dependências, invariantes, duplicação semântica, dead code restante e simplificação estrutural real**.
 

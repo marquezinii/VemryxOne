@@ -202,7 +202,8 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
     {
         return demoMode
             ? null
-            : runtimeRoot is null ? new GitHubReleaseUpdateService() : new SignedManifestUpdateService();
+            : new SignedManifestUpdateService(
+                runtimeRoot is null ? ReleasePackageKind.Installer : ReleasePackageKind.Runtime);
     }
 
     private ISilentUpdateInstaller? CreateSilentUpdateInstaller(

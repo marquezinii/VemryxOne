@@ -51,10 +51,10 @@ A toolchain integrada usa .NET 10 LTS com SDK 10.0.303, C# 14 fixo e NuGet Centr
 
 - `infra/cloudflare-worker/` — backend Cloudflare Worker + D1 para telemetria, relatos de bug e perfil de conta.
 - `infra/dashboard/` — painel administrativo privado da telemetria/bugs.
-- `website/` — fonte única do site/landing page, gerada como export estático nativo do Next.js para GitHub Pages.
+- `https://vemryx.com/Ralven/` — página pública e origem dos downloads; manifestos assinados e artefatos versionados são servidos pelo Worker do site a partir de R2 privado.
 - `installer/` — Inno Setup 7 em arquitetura x64.
 - `scripts/` — build, validação, release, smoke tests e launcher de desenvolvimento.
-- `.github/workflows/` — CI de .NET/site/Worker/dashboard, Pages, SBOM e release. Dependabot cobre NuGet, npm e Actions; o CodeQL usa o default setup do GitHub para C#, JavaScript/TypeScript e Actions.
+- `.github/workflows/` — CI de .NET/Worker/dashboard, SBOM e release. O site público vive no repositório Vemryx; Dependabot cobre NuGet, npm da infraestrutura e Actions.
 
 Node 24.19 LTS é o baseline versionado para site, Worker e dashboard.
 

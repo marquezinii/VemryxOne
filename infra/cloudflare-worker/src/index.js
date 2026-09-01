@@ -19,7 +19,6 @@ import { toCsv } from './stats/csv.js';
 import { buildCorsHeaders, isAllowedDashboardOrigin, withCorsHeaders } from './cors.js';
 import { hasExactJsonContentType, readBoundedJson } from './requestSecurity.js';
 import { createCsrfToken, isValidCsrfToken } from './auth/crypto.js';
-import { parseReleaseManifest } from './releaseManifest.js';
 import { validateLiveAlertUpdate } from './liveAlert/validateSubmission.js';
 import { buildLiveAlertUpsert, toLiveAlertResponse } from './liveAlert/store.js';
 import { fetchAccountEntitlements } from './billing/entitlements.js';
@@ -135,9 +134,6 @@ async function route(request, env, url) {
   if (request.method === 'POST' && url.pathname === '/updater-events') {
     return handleUpdaterEventIngest(request, env);
   }
-  if (request.method === 'GET' && url.pathname === '/update/manifest') {
-    return handleSignedReleaseManifest(env);
-  }
   if (request.method === 'POST' && url.pathname === '/account/profile') {
     return handleAccountProfileCreate(request, env);
   }
@@ -187,22 +183,6 @@ async function route(request, env, url) {
   }
 
   return new Response('Not found', { status: 404 });
-}
-
-function handleSignedReleaseManifest(env) {
-  const manifest = env.RELEASE_MANIFEST_JSON;
-  if (typeof manifest !== 'string' || manifest.length === 0) {
-    return new Response('Release manifest unavailable', { status: 503 });
-  }
-  if (parseReleaseManifest(manifest) === null) {
-    return new Response('Release manifest invalid', { status: 500 });
-  }
-  // No explicit Cache-Control here -- withCorsHeaders already defaults every
-  // response (including this signed manifest) to 'no-store'.
-  return new Response(manifest, {
-    status: 200,
-    headers: { 'Content-Type': 'application/json; charset=utf-8' },
-  });
 }
 
 async function handleUpdaterEventIngest(request, env) {

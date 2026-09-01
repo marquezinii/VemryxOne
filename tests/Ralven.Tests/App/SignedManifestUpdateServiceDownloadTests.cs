@@ -23,7 +23,7 @@ public sealed class SignedManifestUpdateServiceDownloadTests
             StableSemanticVersion.Parse("9.9.9"),
             "v9.9.9",
             "Ralven-Runtime-9.9.9-win-x64.zip",
-            new Uri("https://github.com/marquezinii/Ralven/releases/download/v9.9.9/package.zip"),
+            new Uri("https://vemryx.com/Ralven/releases/v9.9.9/Ralven-Runtime-9.9.9-win-x64.zip"),
             payload.LongLength,
             sha256,
             new Uri("https://example.invalid/notes"));
@@ -54,7 +54,7 @@ public sealed class SignedManifestUpdateServiceDownloadTests
             StableSemanticVersion.Parse("2.0.0"),
             "v2.0.0",
             "Ralven-Runtime-2.0.0-win-x64.zip",
-            new Uri("https://github.com/marquezinii/Ralven/releases/download/v2.0.0/package.zip"),
+            new Uri("https://vemryx.com/Ralven/releases/v2.0.0/Ralven-Runtime-2.0.0-win-x64.zip"),
             payload.LongLength,
             sha256,
             new Uri("https://example.invalid/notes"));
@@ -64,6 +64,28 @@ public sealed class SignedManifestUpdateServiceDownloadTests
         Assert.False(Directory.Exists(Path.Combine(updatesRoot, "1.0.0")));
         Assert.True(Directory.Exists(Path.Combine(updatesRoot, "manual-recovery")));
         Assert.True(Directory.Exists(Path.Combine(updatesRoot, "2.0.0")));
+    }
+
+    [Fact]
+    public async Task DownloadUpdateAsync_RejectsAPathOutsideTheSignedPackageRoute()
+    {
+        var payload = "installer"u8.ToArray();
+        using var temporaryData = new TemporaryDirectory();
+        using var handler = new PayloadHandler(payload);
+        using var service = new SignedManifestUpdateService(
+            handler,
+            temporaryData.Path,
+            ReleasePackageKind.Installer);
+        var update = new ReleaseUpdate(
+            StableSemanticVersion.Parse("2.0.0"),
+            "v2.0.0",
+            "Ralven-Setup-2.0.0-win-x64.exe",
+            new Uri("https://vemryx.com/Ralven/download/"),
+            payload.LongLength,
+            Convert.ToHexString(SHA256.HashData(payload)));
+
+        await Assert.ThrowsAsync<UpdateSecurityException>(() =>
+            service.DownloadUpdateAsync(update, cancellationToken: TestContext.Current.CancellationToken));
     }
 
     private sealed class PayloadHandler(byte[] payload) : HttpMessageHandler
