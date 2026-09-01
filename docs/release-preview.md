@@ -60,6 +60,13 @@ ponteiro `Runtime\active.json`; a versão anterior permanece disponível. Se a
 nova versão não abrir e confirmar saúde em até 45 segundos, o launcher restaura
 automaticamente a versão anterior na próxima abertura.
 
+O runtime não acumula um histórico ilimitado de binários. Em condições normais,
+após uma atualização saudável ficam somente a versão ativa e seu predecessor
+imediato, necessário durante a transição segura. Após rollback, a candidata que
+falhou é removida. O cache de download mantém somente o pacote da atualização
+atual. Pastas bloqueadas pelo sistema são tentadas de novo no próximo update;
+pastas sem nome de versão reconhecido são ignoradas para evitar limpeza ampla.
+
 O workflow só encerra uma release estável depois de consultar o feed público e
 confirmar a versão, o hash do pacote e a assinatura recém-publicados. Se a
 publicação do feed falhar depois de o GitHub Release já existir, uma reexecução

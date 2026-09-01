@@ -158,6 +158,7 @@ public sealed class SignedManifestUpdateService : IReleaseUpdateService, IDispos
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(update);
+        PruneStaleDownloads(update.Version.CoreVersion);
         var directory = Path.Combine(updatesRoot, update.Version.CoreVersion);
         Directory.CreateDirectory(directory);
         var finalPath = Path.Combine(directory, update.AssetName);
@@ -264,5 +265,27 @@ public sealed class SignedManifestUpdateService : IReleaseUpdateService, IDispos
         await using var stream = File.OpenRead(path);
         return Convert.ToHexString(await SHA256.HashDataAsync(stream, token))
             .Equals(update.Sha256Hex, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void PruneStaleDownloads(string currentVersion)
+    {
+        try
+        {
+            foreach (var directory in Directory.EnumerateDirectories(updatesRoot))
+            {
+                var version = Path.GetFileName(directory);
+                if (version.Equals(currentVersion, StringComparison.OrdinalIgnoreCase)
+                    || !Version.TryParse(version, out _)) continue;
+                try { Directory.Delete(directory, recursive: true); }
+                catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+                {
+                    // A próxima atualização tenta novamente a pasta bloqueada.
+                }
+            }
+        }
+        catch (Exception exception) when (exception is DirectoryNotFoundException or IOException or UnauthorizedAccessException)
+        {
+            // Cache velho nunca pode impedir o download verificado atual.
+        }
     }
 }

@@ -27,12 +27,17 @@ public sealed class UpdateLifecycleIntegrationTests : IDisposable
         Assert.Equal(RecoveryDecision.Healthy, new RecoveryCoordinator(runtimeRoot).Reconcile(
             DateTimeOffset.UtcNow, TimeSpan.FromSeconds(45)));
         Assert.Equal("2.0.0", activation.ReadActiveVersion());
+        Assert.True(Directory.Exists(Path.Combine(activation.VersionsRoot, "1.0.0")));
+        Assert.True(Directory.Exists(Path.Combine(activation.VersionsRoot, "2.0.0")));
         Assert.False(new UpdateRecoveryJournal(runtimeRoot).TryRead(out _));
 
         var unhealthy = StageActivateAndLaunch(runtimeRoot, "2.0.0", "3.0.0", confirmHealth: false);
         Assert.Equal(RecoveryDecision.RolledBack, new RecoveryCoordinator(runtimeRoot).Reconcile(
             unhealthy.CandidateLaunchedAtUtc!.Value.AddSeconds(46), TimeSpan.FromSeconds(45)));
         Assert.Equal("2.0.0", activation.ReadActiveVersion());
+        Assert.False(Directory.Exists(Path.Combine(activation.VersionsRoot, "1.0.0")));
+        Assert.False(Directory.Exists(Path.Combine(activation.VersionsRoot, "3.0.0")));
+        Assert.True(Directory.Exists(Path.Combine(activation.VersionsRoot, "2.0.0")));
         Assert.False(new UpdateRecoveryJournal(runtimeRoot).TryRead(out _));
     }
 
