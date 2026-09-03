@@ -1134,6 +1134,7 @@ public sealed class WindowsTransactionEngine
             item.Entry.Error = exception.ToString();
             item.Entry.State = ActionJournalState.Failed;
             item.Entry.Outcome = ActionExecutionOutcome.Failed;
+            item.Entry.OutcomeReason = exception.Message;
             item.Entry.CompletedAtUtc = DateTimeOffset.UtcNow;
             var recoveryErrors = new List<Exception>();
             try
