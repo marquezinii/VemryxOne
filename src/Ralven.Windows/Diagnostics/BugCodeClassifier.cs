@@ -50,6 +50,8 @@ public static class BugCodeClassifier
             _ => context switch
             {
                 "optimization" => BugCode.APP_OPT_ACTION_EXECUTION,
+                "app-inventory" => BugCode.APP_INV_SCAN,
+                "security-health" => BugCode.SEC_HEALTH_QUERY,
                 _ => BugCode.Unknown
             }
         };
@@ -200,6 +202,7 @@ public static class BugCodeClassifier
             "registry" => BugCode.WIN_REGISTRY,
             "service" => BugCode.WIN_SERVICE,
             "power" => BugCode.WIN_POWER_PLAN,
+            "app-inventory" => BugCode.APP_INV_SCAN,
             _ => BugCode.WIN_PRIVILEGE
         };
     }
