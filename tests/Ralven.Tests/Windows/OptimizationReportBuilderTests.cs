@@ -54,6 +54,28 @@ public sealed class OptimizationReportBuilderTests
         Assert.Equal(1, report.RollbackFailedCount);
     }
 
+    [Fact]
+    public void Build_PropagatesBugCodeFromJournalEntryToReportLine()
+    {
+        var entry = Entry(1, OptimizationActionIds.DisableBackgroundCapture, ActionExecutionOutcome.Failed);
+        entry.BugCode = BugCode.WIN_GAMING_MODE;
+        var journal = Journal(entry);
+
+        var report = OptimizationReportBuilder.Build(journal, OptimizationProfile.Balanced);
+
+        Assert.Equal(BugCode.WIN_GAMING_MODE, report.Lines[0].BugCode);
+    }
+
+    [Fact]
+    public void Build_LineWithoutBugCode_ReportsNullNotAFakeDefault()
+    {
+        var journal = Journal(Entry(1, OptimizationActionIds.EnableGameMode, ActionExecutionOutcome.Applied));
+
+        var report = OptimizationReportBuilder.Build(journal, OptimizationProfile.Light);
+
+        Assert.Null(report.Lines[0].BugCode);
+    }
+
     private static WindowsTransactionJournal Journal(params WindowsActionJournalEntry[] entries)
     {
         return new WindowsTransactionJournal
