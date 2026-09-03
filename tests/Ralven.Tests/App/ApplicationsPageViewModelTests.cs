@@ -85,7 +85,8 @@ public sealed class ApplicationsPageViewModelTests
         await viewModel.RefreshAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(
-            localization.GetString("Applications.Inventory.Status.Unavailable"),
+            $"{localization.GetString("Applications.Inventory.Status.Unavailable")} — "
+                + localization.Format("Report.ErrorCodeSuffix", "SYS_FILESYSTEM"),
             viewModel.InventoryStatusMessage);
         Assert.Empty(viewModel.InstalledApplications);
         Assert.Empty(viewModel.StartupItems);
@@ -139,7 +140,8 @@ public sealed class ApplicationsPageViewModelTests
 
         Assert.Empty(viewModel.InstalledApplications);
         Assert.Equal(
-            localization.GetString("Applications.Inventory.Status.Unavailable"),
+            $"{localization.GetString("Applications.Inventory.Status.Unavailable")} — "
+                + localization.Format("Report.ErrorCodeSuffix", "SYS_FILESYSTEM"),
             viewModel.InventoryStatusMessage);
         Assert.Equal(
             localization.GetString("Applications.Inventory.Unavailable.Installed"),
