@@ -225,14 +225,14 @@ test('setLiveAlert posts message and active to /admin/live-alert', async () => {
   assert.deepEqual(JSON.parse(capturedOptions.body), { message: 'oi', active: true });
 });
 
-test('setLiveAlert omits message from the body when deactivating without resending text', async () => {
+test('setLiveAlert sends an empty message when deactivating to clear stale content', async () => {
   let capturedOptions;
   const fakeFetch = async (_url, options) => {
     capturedOptions = options;
     return new Response(JSON.stringify({ success: true }), { status: 200 });
   };
 
-  await setLiveAlert(BASE, { active: false }, 'csrf-token', fakeFetch);
+  await setLiveAlert(BASE, { message: '', active: false }, 'csrf-token', fakeFetch);
 
-  assert.deepEqual(JSON.parse(capturedOptions.body), { active: false });
+  assert.deepEqual(JSON.parse(capturedOptions.body), { message: '', active: false });
 });

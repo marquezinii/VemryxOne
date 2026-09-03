@@ -179,7 +179,7 @@ async function main() {
     }
 
     const { message, active, id } = result.data;
-    liveAlertMessage.value = message || '';
+    liveAlertMessage.value = active ? message || '' : '';
     updateLiveAlertCounter();
     liveAlertStatus.textContent = formatLiveAlertStatus(active, id);
     liveAlertStatus.classList.toggle('live-alert-status-active', active);
@@ -205,7 +205,7 @@ async function main() {
 
   liveAlertDeactivate.addEventListener('click', async () => {
     liveAlertError.textContent = '';
-    const result = await setLiveAlert(API_BASE, { active: false }, csrfToken);
+    const result = await setLiveAlert(API_BASE, { message: '', active: false }, csrfToken);
     if (result.error || result.unauthorized) {
       liveAlertError.textContent = 'Erro ao desativar o aviso.';
       return;

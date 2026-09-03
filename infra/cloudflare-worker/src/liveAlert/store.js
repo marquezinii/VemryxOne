@@ -25,5 +25,6 @@ export function toLiveAlertResponse(row) {
     return { id: null, message: '', active: false };
   }
 
-  return { id: row.updated_at, message: row.message, active: !!row.active };
+  const active = !!row.active;
+  return { id: row.updated_at, message: active ? row.message : '', active };
 }
