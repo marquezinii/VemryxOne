@@ -251,7 +251,12 @@ public partial class BugReportWindow : Wpf.Ui.Controls.FluentWindow
         builder.AppendLine(T("BugReport.Clipboard.Title"));
         builder.AppendLine(F("BugReport.Clipboard.Id", submission.ReportId.ToString("D")));
         builder.AppendLine(F("BugReport.Clipboard.Category", LocalizeCategory(submission.Category)));
-        builder.AppendLine(F("BugReport.Clipboard.BugCode", submission.BugCode.ToString()));
+        var categoryResourceKey = BugCodeCatalog.GetCategoryResourceKey(submission.BugCode)
+            ?? "BugCode.Category.Unknown";
+        builder.AppendLine(F(
+            "BugReport.Clipboard.BugCode",
+            submission.BugCode.ToString(),
+            T(categoryResourceKey)));
         builder.AppendLine(F("BugReport.Clipboard.Summary", submission.Summary.Trim()));
         builder.AppendLine(F("BugReport.Clipboard.Version", submission.AppVersion));
         builder.AppendLine(F("BugReport.Clipboard.Profile", submission.Profile));

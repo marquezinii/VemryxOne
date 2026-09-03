@@ -538,7 +538,7 @@
   <data name="BugReport.Reason.Windows" xml:space="preserve"><value>Windows permission or UAC problem</value></data>
   <data name="BugReport.Reason.Crash" xml:space="preserve"><value>Ralven closed or stopped unexpectedly</value></data>
   <data name="BugReport.Validation.BugCode" xml:space="preserve"><value>Select a bug code.</value></data>
-  <data name="BugReport.Clipboard.BugCode" xml:space="preserve"><value>Bug code: {0}</value></data>
+  <data name="BugReport.Clipboard.BugCode" xml:space="preserve"><value>Bug code: {0} ({1})</value></data>
   <data name="Streaming.Readiness.Protected.Title" xml:space="preserve"><value>Streaming protection is active</value></data>
   <data name="Streaming.Readiness.Protected.Detail" xml:space="preserve"><value>A streaming app is open. Ralven preserves it; confirm your broadcast state before optimizing.</value></data>
   <data name="Streaming.Readiness.Attention.Title" xml:space="preserve"><value>Run a test before going live</value></data>

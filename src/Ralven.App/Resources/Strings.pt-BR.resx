@@ -538,7 +538,7 @@
   <data name="BugReport.Reason.Windows" xml:space="preserve"><value>Problema de permissão do Windows ou UAC</value></data>
   <data name="BugReport.Reason.Crash" xml:space="preserve"><value>O Ralven fechou ou parou inesperadamente</value></data>
   <data name="BugReport.Validation.BugCode" xml:space="preserve"><value>Selecione um código de bug.</value></data>
-  <data name="BugReport.Clipboard.BugCode" xml:space="preserve"><value>Código do bug: {0}</value></data>
+  <data name="BugReport.Clipboard.BugCode" xml:space="preserve"><value>Código do bug: {0} ({1})</value></data>
   <data name="Streaming.Readiness.Protected.Title" xml:space="preserve"><value>Proteção para transmissão ativa</value></data>
   <data name="Streaming.Readiness.Protected.Detail" xml:space="preserve"><value>Um aplicativo de transmissão está aberto. O Ralven o preserva; confirme o estado da sua live antes de otimizar.</value></data>
   <data name="Streaming.Readiness.Attention.Title" xml:space="preserve"><value>Faça um teste antes de entrar ao vivo</value></data>
