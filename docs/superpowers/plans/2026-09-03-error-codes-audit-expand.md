@@ -592,11 +592,13 @@ specific action's root cause is identifiable without guessing."
 ### Task 5: Show the code in the Optimizer Result screen; drop the synthetic-exception hack
 
 **Files:**
+- Create: `src/Ralven.App/ViewModels/OptimizationFailureMessageFormatter.cs`
 - Modify: `src/Ralven.App/ViewModels/MainViewModel.Report.cs`
 - Modify: `src/Ralven.App/ViewModels/MainViewModel.Optimization.cs`
-- Modify: `src/Ralven.App/ViewModels/DisplayModels.cs`
 - Modify: `src/Ralven.App/Resources/Strings.resx`, `Strings.pt-BR.resx`, `Strings.es.resx`
 - Test: `tests/Ralven.Tests/App/OptimizationFailureMessageFormatterTests.cs` (new)
+
+Note: `DisplayModels.cs`'s `ReportLineDisplayItem` shape is unchanged — the composed text still flows through its existing `Reason` property, so this task does not touch that file.
 
 **Interfaces:**
 - Consumes: `OptimizationReportLineDto.BugCode`, `OptimizationReportDto.Lines` (Task 4).
