@@ -1076,6 +1076,7 @@
   <data name="BugCode.Category.System" xml:space="preserve"><value>Sistema</value></data>
   <data name="BugCode.Category.Security" xml:space="preserve"><value>Segurança</value></data>
   <data name="BugCode.Category.Unknown" xml:space="preserve"><value>Não classificado</value></data>
+  <data name="Report.ErrorCodeSuffix" xml:space="preserve"><value>Código do erro: {0}</value></data>
   <data name="Report.CopyButton" xml:space="preserve"><value>Copiar relatório técnico</value></data>
   <data name="Comparison.Reason.NewThermalSignal" xml:space="preserve"><value>Um novo sinal de temperatura elevada apareceu, que não existia antes.</value></data>
   <data name="Comparison.Reason.MemoryDropped" xml:space="preserve"><value>A memória disponível caiu bastante em relação a antes.</value></data>
