@@ -67,6 +67,7 @@ const STATS_BUILDERS = {
   'success-rate': queries.successRate,
   'errors-by-version': queries.errorsByVersion,
   'error-categories': queries.errorCategoryBreakdown,
+  'bug-codes': queries.bugCodeBreakdown,
   'recent-failures': queries.recentFailures,
   'top-cpu': queries.topCpuModels,
   'top-gpu': queries.topGpuModels,

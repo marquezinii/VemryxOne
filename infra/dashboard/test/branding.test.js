@@ -3,11 +3,13 @@ import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 
 test("keeps the dashboard on the Ralven public brand", async () => {
-  const [html, brandStyles, headers, app] = await Promise.all([
+  const [html, brandStyles, headers, app, readme, diagnostics] = await Promise.all([
     readFile(new URL("../index.html", import.meta.url), "utf8"),
     readFile(new URL("../assets/brand.css", import.meta.url), "utf8"),
     readFile(new URL("../_headers", import.meta.url), "utf8"),
     readFile(new URL("../assets/app.js", import.meta.url), "utf8"),
+    readFile(new URL("../README.md", import.meta.url), "utf8"),
+    readFile(new URL("../../../scripts/Test-ProductionDiagnostics.ps1", import.meta.url), "utf8"),
   ]);
 
   assert.match(html, /Ralven/);
@@ -19,5 +21,9 @@ test("keeps the dashboard on the Ralven public brand", async () => {
   assert.match(brandStyles, /fonts\/InterVariable\.woff2/);
   assert.match(headers, /connect-src 'self' https:\/\/fivemcleaner-telemetry\.felipemarquesini10\.workers\.dev/);
   assert.match(app, /DEFAULT_API_BASE = 'https:\/\/fivemcleaner-telemetry\.felipemarquesini10\.workers\.dev'/);
+  assert.match(readme, /--project-name=ralven-dashboard/);
+  assert.match(readme, /https:\/\/ralven-dashboard\.pages\.dev/);
+  assert.match(diagnostics, /DashboardUrl = 'https:\/\/ralven-dashboard\.pages\.dev'/);
+  assert.match(html, /<option value="Production">Produção<\/option>/);
   await access(new URL("../assets/fonts/InterVariable.woff2", import.meta.url));
 });
