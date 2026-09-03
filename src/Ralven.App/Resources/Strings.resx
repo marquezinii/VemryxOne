@@ -1065,6 +1065,17 @@
   <data name="Report.SummaryFormat" xml:space="preserve"><value>Verified {0} · Changed {1} · Skipped {2} · Warnings {3} · Failed {4}</value></data>
   <data name="Report.RestartNeeded" xml:space="preserve"><value>Restarting Windows is recommended to fully apply the changes.</value></data>
   <data name="Report.RestartNotNeeded" xml:space="preserve"><value>No restart is required.</value></data>
+  <data name="BugCode.Category.App" xml:space="preserve"><value>Application</value></data>
+  <data name="BugCode.Category.Updater" xml:space="preserve"><value>Update</value></data>
+  <data name="BugCode.Category.Broker" xml:space="preserve"><value>Administrative privileges</value></data>
+  <data name="BugCode.Category.Network" xml:space="preserve"><value>Network</value></data>
+  <data name="BugCode.Category.FiveM" xml:space="preserve"><value>FiveM</value></data>
+  <data name="BugCode.Category.GtaV" xml:space="preserve"><value>GTA V</value></data>
+  <data name="BugCode.Category.Windows" xml:space="preserve"><value>Windows</value></data>
+  <data name="BugCode.Category.Config" xml:space="preserve"><value>Configuration</value></data>
+  <data name="BugCode.Category.System" xml:space="preserve"><value>System</value></data>
+  <data name="BugCode.Category.Security" xml:space="preserve"><value>Security</value></data>
+  <data name="BugCode.Category.Unknown" xml:space="preserve"><value>Unclassified</value></data>
   <data name="Report.CopyButton" xml:space="preserve"><value>Copy technical report</value></data>
   <data name="Comparison.Reason.NewThermalSignal" xml:space="preserve"><value>A new elevated temperature signal appeared that was not present before.</value></data>
   <data name="Comparison.Reason.MemoryDropped" xml:space="preserve"><value>Available memory dropped sharply compared to before.</value></data>
