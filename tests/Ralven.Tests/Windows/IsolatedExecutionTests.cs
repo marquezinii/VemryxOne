@@ -29,6 +29,9 @@ public sealed class IsolatedExecutionTests
         Assert.NotNull(result.Error);
         var journal = journals.Get(id);
         Assert.Equal(ActionExecutionOutcome.Failed, OutcomeOf(journal, failing));
+        Assert.Equal(
+            "simulated apply failure",
+            OptimizationReportBuilder.Build(journal, OptimizationProfile.Light).Lines[0].Reason);
         Assert.Equal(ActionExecutionOutcome.Applied, OutcomeOf(journal, succeeding));
         Assert.Equal(1, succeeding.CommitCount);
     }
