@@ -2,7 +2,7 @@ using System.IO;
 using System.Net.Http;
 using Ralven.Contracts;
 
-namespace Ralven.App.Services;
+namespace Ralven.Windows.Diagnostics;
 
 /// <summary>
 /// Maps exceptions and failure contexts to stable <see cref="BugCode"/> values.
@@ -43,8 +43,15 @@ public static class BugCodeClassifier
             // Memory
             OutOfMemoryException => BugCode.SYS_MEMORY,
 
-            // Generic fallthrough
-            _ => BugCode.APP_OPT_ACTION_EXECUTION
+            // Generic fallthrough: only assume "optimization" when nothing
+            // more specific matched and the caller actually said so; an
+            // unrecognized context must not silently look like an
+            // optimization failure.
+            _ => context switch
+            {
+                "optimization" => BugCode.APP_OPT_ACTION_EXECUTION,
+                _ => BugCode.Unknown
+            }
         };
     }
 

@@ -1,9 +1,9 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Security.Cryptography;
-using Ralven.App.Services;
 using Ralven.Contracts;
 using Ralven.UpdateRuntime;
+using Ralven.Windows.Diagnostics;
 
 namespace Ralven.Launcher;
 

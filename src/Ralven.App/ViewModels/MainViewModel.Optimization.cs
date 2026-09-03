@@ -8,6 +8,7 @@ using Ralven.App.Services;
 using Ralven.Contracts;
 using Ralven.Core.Catalog;
 using Ralven.Core.Planning;
+using Ralven.Windows.Diagnostics;
 
 namespace Ralven.App.ViewModels;
 
