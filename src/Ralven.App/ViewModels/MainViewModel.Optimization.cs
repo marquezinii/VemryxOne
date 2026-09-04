@@ -8,6 +8,7 @@ using Ralven.App.Services;
 using Ralven.Contracts;
 using Ralven.Core.Catalog;
 using Ralven.Core.Planning;
+using Ralven.Windows.Diagnostics;
 
 namespace Ralven.App.ViewModels;
 
@@ -218,17 +219,13 @@ public sealed partial class MainViewModel
             var result = await service.ExecuteAsync(currentPlan!, progress, operationCancellation.Token);
             completedSuccessfully = result.Succeeded;
             telemetryEventName = result.Succeeded ? "optimization-completed" : "optimization-failed";
-            if (!result.Succeeded && result.Report is not null)
+            if (!result.Succeeded)
             {
-                // Use the first failed action's ID for bug classification
-                var failedActionId = result.Report.Lines
+                telemetryBugCode = result.Report?.Lines
                     .Where(l => l.Outcome is ActionExecutionOutcome.Failed or ActionExecutionOutcome.RollbackFailed)
-                    .Select(l => l.ActionId)
-                    .FirstOrDefault();
-                if (!string.IsNullOrWhiteSpace(failedActionId))
-                {
-                    telemetryBugCode = BugCodeClassifier.ClassifyOptimizationException(new InvalidOperationException(), failedActionId);
-                }
+                    .Select(l => l.BugCode)
+                    .FirstOrDefault(code => code is not null and not BugCode.Unknown)
+                    ?? result.BugCode;
             }
             await HandleOptimizationResultAsync(result);
         }
@@ -283,7 +280,17 @@ public sealed partial class MainViewModel
         ProgressPercent = result.Succeeded ? 100 : ProgressPercent;
         FinalizeHeadline(result.Succeeded
             ? localization.GetString("Status.OptimizationCompleted")
-            : result.Summary);
+            // AppendCode's signature is string? to also serve callers with an
+            // optional message, but result.Summary is a required non-null
+            // string, so the result here can never actually be null.
+            : OptimizationFailureMessageFormatter.AppendCode(
+                result.Summary,
+                result.Report?.Lines
+                    .Where(l => l.Outcome is ActionExecutionOutcome.Failed or ActionExecutionOutcome.RollbackFailed)
+                    .Select(l => l.BugCode)
+                    .FirstOrDefault(code => code is not null and not BugCode.Unknown)
+                    ?? result.BugCode,
+                code => localization.Format("Report.ErrorCodeSuffix", code))!);
         ApplyReport(result.Report);
         lastTransactionId = result.TransactionId;
         ApplyComparison(result.Comparison);

@@ -244,7 +244,7 @@ test('toBugReportRow maps a row into the bug report table\'s column order', () =
   assert.ok(cells[0] !== '2026-07-26 10:00');
   // Other cells should match exactly
   assert.deepEqual(cells.slice(1), [
-    'APP_OPT_ACTION_EXECUTION',
+    'APP_OPT_ACTION_EXECUTION — Aplicativo',
     'O preset não terminou',
     'Falha na otimização',
     '1.0.4',

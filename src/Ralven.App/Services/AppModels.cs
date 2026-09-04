@@ -125,6 +125,13 @@ public sealed record AppOptimizationResult
 
     /// <summary>Before/after resource comparison, when one could be captured.</summary>
     public OptimizationComparisonResult? Comparison { get; init; }
+
+    /// <summary>
+    /// Classification of a broker/elevation-phase failure that happened
+    /// before any action reached the journal (so no report line can carry
+    /// it). Null on success or when the failure has a per-action code instead.
+    /// </summary>
+    public BugCode? BugCode { get; init; }
 }
 
 /// <summary>

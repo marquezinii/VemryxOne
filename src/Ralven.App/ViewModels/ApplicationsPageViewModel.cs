@@ -1,5 +1,7 @@
 using System.Collections.ObjectModel;
 using Ralven.App.Services;
+using Ralven.Contracts;
+using Ralven.Windows.Diagnostics;
 using Ralven.Windows.Infrastructure;
 
 namespace Ralven.App.ViewModels;
@@ -28,6 +30,7 @@ internal sealed class ApplicationsPageViewModel : BindableBase, IDisposable
     private string inventoryObservedAtLabel = string.Empty;
     private bool isInventoryLoading;
     private bool inventoryUnavailable;
+    private BugCode? inventoryBugCode;
     private bool disposed;
 
     public ApplicationsPageViewModel(
@@ -119,6 +122,7 @@ internal sealed class ApplicationsPageViewModel : BindableBase, IDisposable
         {
             snapshot = await inspector.InspectAsync(cancellationToken);
             inventoryUnavailable = false;
+            inventoryBugCode = null;
             installedApplications = snapshot.InstalledApplications;
             startupItems = snapshot.StartupItems;
             ApplySnapshotPresentation();
@@ -131,8 +135,11 @@ internal sealed class ApplicationsPageViewModel : BindableBase, IDisposable
             OutOfMemoryException or StackOverflowException or AccessViolationException))
         {
             inventoryUnavailable = true;
-            InventoryStatusMessage = localization.GetString(
-                "Applications.Inventory.Status.Unavailable");
+            inventoryBugCode = BugCodeClassifier.ClassifyException(exception, "app-inventory");
+            InventoryStatusMessage = OptimizationFailureMessageFormatter.AppendCode(
+                localization.GetString("Applications.Inventory.Status.Unavailable"),
+                inventoryBugCode,
+                code => localization.Format("Report.ErrorCodeSuffix", code))!;
             if (snapshot is null)
             {
                 installedApplications = [];
