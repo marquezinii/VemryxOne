@@ -219,12 +219,13 @@ public sealed partial class MainViewModel
             var result = await service.ExecuteAsync(currentPlan!, progress, operationCancellation.Token);
             completedSuccessfully = result.Succeeded;
             telemetryEventName = result.Succeeded ? "optimization-completed" : "optimization-failed";
-            if (!result.Succeeded && result.Report is not null)
+            if (!result.Succeeded)
             {
-                telemetryBugCode = result.Report.Lines
+                telemetryBugCode = result.Report?.Lines
                     .Where(l => l.Outcome is ActionExecutionOutcome.Failed or ActionExecutionOutcome.RollbackFailed)
                     .Select(l => l.BugCode)
-                    .FirstOrDefault(code => code is not null and not BugCode.Unknown);
+                    .FirstOrDefault(code => code is not null and not BugCode.Unknown)
+                    ?? result.BugCode;
             }
             await HandleOptimizationResultAsync(result);
         }
@@ -287,7 +288,8 @@ public sealed partial class MainViewModel
                 result.Report?.Lines
                     .Where(l => l.Outcome is ActionExecutionOutcome.Failed or ActionExecutionOutcome.RollbackFailed)
                     .Select(l => l.BugCode)
-                    .FirstOrDefault(code => code is not null and not BugCode.Unknown),
+                    .FirstOrDefault(code => code is not null and not BugCode.Unknown)
+                    ?? result.BugCode,
                 code => localization.Format("Report.ErrorCodeSuffix", code))!);
         ApplyReport(result.Report);
         lastTransactionId = result.TransactionId;
