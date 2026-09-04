@@ -8,12 +8,14 @@ using Ralven.App.Services;
 using Ralven.Contracts;
 using Ralven.Core.Catalog;
 using Ralven.Core.Planning;
+using Ralven.Windows.Diagnostics;
 
 namespace Ralven.App.ViewModels;
 
 public sealed partial class MainViewModel
 {
     private string? settingsSaveErrorMessage;
+    private BugCode? settingsSaveBugCode;
 
     public AppThemePreference ThemePreference => themePreference;
 
@@ -408,6 +410,7 @@ public sealed partial class MainViewModel
                 if (revision == Volatile.Read(ref settingsRevision))
                 {
                     SettingsSaveErrorMessage = null;
+                    settingsSaveBugCode = null;
                 }
             }
             finally
@@ -420,7 +423,11 @@ public sealed partial class MainViewModel
         {
             if (revision == Volatile.Read(ref settingsRevision))
             {
-                SettingsSaveErrorMessage = localization.GetString("Settings.SaveFailed");
+                settingsSaveBugCode = BugCodeClassifier.ClassifyException(exception, "settings");
+                SettingsSaveErrorMessage = OptimizationFailureMessageFormatter.AppendCode(
+                    localization.GetString("Settings.SaveFailed"),
+                    settingsSaveBugCode,
+                    code => localization.Format("Report.ErrorCodeSuffix", code));
             }
         }
     }
@@ -440,7 +447,10 @@ public sealed partial class MainViewModel
     {
         if (SettingsSaveErrorMessage is not null)
         {
-            SettingsSaveErrorMessage = localization.GetString("Settings.SaveFailed");
+            SettingsSaveErrorMessage = OptimizationFailureMessageFormatter.AppendCode(
+                localization.GetString("Settings.SaveFailed"),
+                settingsSaveBugCode,
+                code => localization.Format("Report.ErrorCodeSuffix", code));
         }
 
         if (!IsBusy)

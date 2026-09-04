@@ -47,4 +47,20 @@ public sealed class BugCodeClassifierTests
         Assert.Equal(BugCode.APP_OPT_ACTION_EXECUTION, result);
         Assert.NotEqual(BugCode.Unknown, result);
     }
+
+    [Fact]
+    public void ClassifyException_SettingsContext_ReturnsSettingsPersistenceRatherThanUnknown()
+    {
+        var result = BugCodeClassifier.ClassifyException(new ArgumentException("boom"), "settings");
+
+        Assert.Equal(BugCode.APP_SETTINGS_PERSISTENCE, result);
+    }
+
+    [Fact]
+    public void ClassifyException_UnauthorizedAccessWithSettingsContext_ReturnsSettingsPersistence()
+    {
+        var result = BugCodeClassifier.ClassifyException(new UnauthorizedAccessException(), "settings");
+
+        Assert.Equal(BugCode.APP_SETTINGS_PERSISTENCE, result);
+    }
 }

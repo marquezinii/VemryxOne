@@ -55,6 +55,7 @@ public static class BugCodeClassifier
                 "windows-action" => BugCode.APP_OPT_ACTION_EXECUTION,
                 "app-inventory" => BugCode.APP_INV_SCAN,
                 "security-health" => BugCode.SEC_HEALTH_QUERY,
+                "settings" => BugCode.APP_SETTINGS_PERSISTENCE,
                 _ => BugCode.Unknown
             }
         };
@@ -206,6 +207,7 @@ public static class BugCodeClassifier
             "service" => BugCode.WIN_SERVICE,
             "power" => BugCode.WIN_POWER_PLAN,
             "app-inventory" => BugCode.APP_INV_SCAN,
+            "settings" => BugCode.APP_SETTINGS_PERSISTENCE,
             _ => BugCode.WIN_PRIVILEGE
         };
     }
