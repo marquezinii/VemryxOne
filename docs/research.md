@@ -96,6 +96,27 @@ poderá virar ação futura após existir detecção de filesystem/volume, privi
 tipado, verificação e uma apresentação explícita de que ReTrim não possui
 rollback.
 
+## Atualizações de aplicativos pelo WinGet
+
+**Fato.** O Windows Package Manager oferece os comandos `list` e `upgrade` no
+Windows 10 e 11. `list --upgrade-available` limita o resultado aos aplicativos
+com atualização aplicável, e `upgrade --id ... --exact --source winget` limita a
+execução a uma identidade e fonte específicas. O WinGet mantém verificações de
+hash e não reinicia o computador sem `--allow-reboot`.
+
+Fontes:
+
+- [Comando list do WinGet](https://learn.microsoft.com/windows/package-manager/winget/list)
+- [Comando upgrade do WinGet](https://learn.microsoft.com/windows/package-manager/winget/upgrade)
+- [Códigos de retorno do WinGet](https://github.com/microsoft/winget-cli/blob/master/doc/windows/package-manager/winget/returnCodes.md)
+
+**Decisão.** A primeira integração consulta somente a fonte comunitária
+`winget`, atualiza um aplicativo por confirmação e não inclui atualização
+automática, Store, drivers, Windows Update, outros gerenciadores ou argumentos
+livres. O Ralven não tenta reconstruir rollback de um instalador de terceiros;
+ele informa essa limitação antes da execução e reporta o código de retorno sem
+mascarar falhas.
+
 ### Proteções do Windows e aceleração do ponteiro
 
 **Fato.** `WscGetSecurityProviderHealth` retorna a saúde agregada da categoria

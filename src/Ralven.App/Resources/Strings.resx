@@ -103,7 +103,7 @@
   <data name="System.Gaming.RestoreConfirm.Title" xml:space="preserve"><value>Restore previous settings?</value></data>
   <data name="System.Gaming.RestoreConfirm.Message" xml:space="preserve"><value>Ralven will attempt to restore only the values changed by this operation. A value modified afterward by another program will not be overwritten.</value></data>
   <data name="Applications.Title" xml:space="preserve"><value>Applications</value></data>
-  <data name="Applications.Subtitle" xml:space="preserve"><value>Inspect installed and startup applications directly in Ralven. Windows-owned changes remain one click away when the platform requires them.</value></data>
+  <data name="Applications.Subtitle" xml:space="preserve"><value>Inspect installed and startup applications, and update supported software through WinGet. Windows-owned changes remain one click away when the platform requires them.</value></data>
   <data name="Applications.Installed.Title" xml:space="preserve"><value>Installed applications</value></data>
   <data name="Applications.Installed.Description" xml:space="preserve"><value>Review installed applications, their disk usage and the uninstall options provided by Windows.</value></data>
   <data name="Applications.Installed.Action" xml:space="preserve"><value>Open Windows app controls</value></data>
@@ -125,7 +125,7 @@
   <data name="Applications.Inventory.ReadOnly" xml:space="preserve"><value>This inventory is read-only. Ralven does not execute uninstall commands or change third-party startup entries.</value></data>
   <data name="Applications.Inventory.InstalledTab" xml:space="preserve"><value>Installed</value></data>
   <data name="Applications.Inventory.StartupTab" xml:space="preserve"><value>Startup</value></data>
-  <data name="Applications.Inventory.Search" xml:space="preserve"><value>Search this inventory</value></data>
+  <data name="Applications.Inventory.Search" xml:space="preserve"><value>Search applications</value></data>
   <data name="Applications.Inventory.Refresh" xml:space="preserve"><value>Refresh</value></data>
   <data name="Applications.Inventory.InstalledCount" xml:space="preserve"><value>installed applications</value></data>
   <data name="Applications.Inventory.StartupCount" xml:space="preserve"><value>startup entries</value></data>
@@ -148,8 +148,32 @@
   <data name="Applications.Inventory.Incomplete.Startup" xml:space="preserve"><value>Startup entries could not be listed completely. Refresh to try again.</value></data>
   <data name="Applications.Inventory.Unavailable.Installed" xml:space="preserve"><value>Installed applications are unavailable right now. Refresh to try again.</value></data>
   <data name="Applications.Inventory.Unavailable.Startup" xml:space="preserve"><value>Startup entries are unavailable right now. Refresh to try again.</value></data>
+  <data name="Applications.Updates.Count" xml:space="preserve"><value>updates available</value></data>
+  <data name="Applications.Updates.Tab" xml:space="preserve"><value>Updates</value></data>
+  <data name="Applications.Updates.Status.Checking" xml:space="preserve"><value>Checking the WinGet catalog for application updates…</value></data>
+  <data name="Applications.Updates.Status.Available" xml:space="preserve"><value>WinGet found updates. Review each version before installing it.</value></data>
+  <data name="Applications.Updates.Status.Current" xml:space="preserve"><value>WinGet did not find updates for the supported applications.</value></data>
+  <data name="Applications.Updates.Status.WinGetUnavailable" xml:space="preserve"><value>WinGet is not available for this Windows user. Nothing was changed.</value></data>
+  <data name="Applications.Updates.Status.Unavailable" xml:space="preserve"><value>Ralven could not check the WinGet catalog. Nothing was changed.</value></data>
+  <data name="Applications.Updates.Status.Updating" xml:space="preserve"><value>WinGet is updating {0}. The publisher's installer may request attention.</value></data>
+  <data name="Applications.Updates.Status.Succeeded" xml:space="preserve"><value>{0} was updated successfully.</value></data>
+  <data name="Applications.Updates.Status.NoLongerAvailable" xml:space="preserve"><value>{0} no longer has an applicable update.</value></data>
+  <data name="Applications.Updates.Status.Failed" xml:space="preserve"><value>{0} could not be updated. WinGet returned {1}.</value></data>
+  <data name="Applications.Updates.Empty.Unavailable" xml:space="preserve"><value>Application updates are unavailable right now. Refresh to try again.</value></data>
+  <data name="Applications.Updates.Empty.WinGetUnavailable" xml:space="preserve"><value>Install or enable App Installer in Windows to use WinGet updates.</value></data>
+  <data name="Applications.Updates.Empty.NoMatches" xml:space="preserve"><value>No available update matches this search.</value></data>
+  <data name="Applications.Updates.Empty.Current" xml:space="preserve"><value>No supported application updates were found.</value></data>
+  <data name="Applications.Updates.Column.Id" xml:space="preserve"><value>Package ID</value></data>
+  <data name="Applications.Updates.Column.Installed" xml:space="preserve"><value>Installed</value></data>
+  <data name="Applications.Updates.Column.Available" xml:space="preserve"><value>Available</value></data>
+  <data name="Applications.Updates.Action" xml:space="preserve"><value>Update</value></data>
+  <data name="Applications.Updates.ActionFor" xml:space="preserve"><value>Update {0}</value></data>
+  <data name="Applications.Updates.Confirm.Title" xml:space="preserve"><value>Update this application?</value></data>
+  <data name="Applications.Updates.Confirm.Message" xml:space="preserve"><value>Ralven will ask WinGet to update {0} from {1} to {2}, using source {3}. The publisher's installer may open and Windows may request administrator permission. This action is controlled by that installer and cannot be rolled back by Ralven. By continuing, you accept the package and source terms.</value></data>
+  <data name="Applications.Updates.Confirm.Cancel" xml:space="preserve"><value>Not now</value></data>
+  <data name="Applications.Updates.Confirm.Action" xml:space="preserve"><value>Update application</value></data>
   <data name="Applications.Platform.Title" xml:space="preserve"><value>Windows-owned actions</value></data>
-  <data name="Applications.Platform.Description" xml:space="preserve"><value>Uninstalling, changing defaults and accepting Store updates remain on trusted Windows surfaces while Ralven's internal management expands.</value></data>
+  <data name="Applications.Platform.Description" xml:space="preserve"><value>Uninstalling, changing defaults and Microsoft Store library updates remain on trusted Windows surfaces.</value></data>
   <data name="Greeting.Morning.WithName" xml:space="preserve"><value>Good morning, {0}. What shall we do today?</value></data>
   <data name="Greeting.Morning.NoName" xml:space="preserve"><value>Good morning. What shall we do today?</value></data>
   <data name="Greeting.Afternoon.WithName" xml:space="preserve"><value>Good afternoon, {0}. What shall we do today?</value></data>

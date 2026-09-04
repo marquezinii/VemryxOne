@@ -16,21 +16,25 @@ public partial class ApplicationsPage : UserControl, IDisposable
     private bool disposed;
 
     public ApplicationsPage()
-        : this(new WindowsApplicationInventoryInspector())
+        : this(
+            new WindowsApplicationInventoryInspector(),
+            new WinGetApplicationUpdateService())
     {
     }
 
-    internal ApplicationsPage(IWindowsApplicationInventoryInspector inspector)
+    internal ApplicationsPage(
+        IWindowsApplicationInventoryInspector inspector,
+        IWindowsApplicationUpdateService updateService)
     {
         InitializeComponent();
-        viewModel = new ApplicationsPageViewModel(inspector);
+        viewModel = new ApplicationsPageViewModel(inspector, updateService);
         DataContext = viewModel;
 
         // Setting IsChecked in XAML fires Checked while named siblings are
         // still being created. Select the initial surface after the document
         // has been initialized instead.
-        InstalledTab.IsChecked = true;
-        ShowInventory(InstalledApplicationsPanel);
+        UpdatesTab.IsChecked = true;
+        ShowInventory(ApplicationUpdatesPanel);
     }
 
     private async void ApplicationsPage_Loaded(object sender, RoutedEventArgs e)
@@ -41,24 +45,28 @@ public partial class ApplicationsPage : UserControl, IDisposable
         }
 
         initialRefreshStarted = true;
-        await viewModel.RefreshAsync(lifetimeCancellation.Token);
+        await RefreshAllAsync();
     }
 
     private async void RefreshInventory_Click(object sender, RoutedEventArgs e)
     {
-        await viewModel.RefreshAsync(lifetimeCancellation.Token);
+        await RefreshAllAsync();
     }
 
     private void InventoryTab_Checked(object sender, RoutedEventArgs e)
     {
-        if (InstalledApplicationsPanel is null || StartupApplicationsPanel is null)
+        if (InstalledApplicationsPanel is null
+            || StartupApplicationsPanel is null
+            || ApplicationUpdatesPanel is null)
         {
             return;
         }
 
         ShowInventory(ReferenceEquals(sender, StartupTab)
             ? StartupApplicationsPanel
-            : InstalledApplicationsPanel);
+            : ReferenceEquals(sender, UpdatesTab)
+                ? ApplicationUpdatesPanel
+                : InstalledApplicationsPanel);
     }
 
     private void ShowInventory(UIElement selected)
@@ -73,6 +81,50 @@ public partial class ApplicationsPage : UserControl, IDisposable
             StartupApplicationsPanel)
             ? Visibility.Visible
             : Visibility.Collapsed;
+        ApplicationUpdatesPanel.Visibility = ReferenceEquals(
+            selected,
+            ApplicationUpdatesPanel)
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+    }
+
+    private async Task RefreshAllAsync()
+    {
+        await Task.WhenAll(
+            viewModel.RefreshAsync(lifetimeCancellation.Token),
+            viewModel.CheckApplicationUpdatesAsync(lifetimeCancellation.Token));
+    }
+
+    private async void UpdateApplication_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not System.Windows.Controls.Button
+            {
+                Tag: ApplicationUpdateDisplayItem item
+            })
+        {
+            return;
+        }
+
+        var localization = LocalizationService.Current;
+        var dialog = new OptimizationConfirmationWindow(
+            localization.GetString("Applications.Updates.Confirm.Title"),
+            localization.Format(
+                "Applications.Updates.Confirm.Message",
+                item.Name,
+                item.InstalledVersion,
+                item.AvailableVersion,
+                item.Source),
+            localization.GetString("Applications.Updates.Confirm.Cancel"),
+            localization.GetString("Applications.Updates.Confirm.Action"))
+        {
+            Owner = Window.GetWindow(this)
+        };
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        await viewModel.UpdateApplicationAsync(item, lifetimeCancellation.Token);
     }
 
     private void OpenInstalledApps_Click(object sender, RoutedEventArgs e) =>

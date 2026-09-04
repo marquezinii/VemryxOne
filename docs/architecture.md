@@ -23,11 +23,13 @@ Jogos abre o catálogo de títulos e configura o mesmo motor no escopo
 configuração ou gráficos do FiveM/GTA V Legacy. GTAV Enhanced bloqueia o escopo
 especializado, mas nunca bloqueia uma análise geral do Windows.
 
-Aplicativos apresenta dentro do Ralven um inventário local somente
-leitura dos programas desktop registrados e dos itens de inicialização em
-`Run`, `RunOnce` e pastas Startup. Busca, contagens e resultados parciais ficam
-na própria página; as superfícies do Windows e da Microsoft Store permanecem
-como ações secundárias para alterações que o Ralven não executa. Jogos abre um
+Aplicativos apresenta dentro do Ralven um inventário local somente leitura dos
+programas desktop registrados e dos itens de inicialização em `Run`, `RunOnce`
+e pastas Startup. A mesma página consulta atualizações compatíveis na fonte
+comunitária do WinGet e permite atualizar um pacote por vez após confirmação
+explícita. Busca, contagens e resultados parciais ficam na própria página; as
+superfícies do Windows e da Microsoft Store permanecem como ações secundárias
+para alterações que o Ralven não executa. Jogos abre um
 catálogo interno que hoje contém somente FiveM sobre GTAV Legacy; o card leva ao
 otimizador especializado existente e mantém Jogos como a categoria ativa. Sistema apresenta internamente o diagnóstico de
 hardware já coletado pelo aplicativo e consulta, somente para leitura, a saúde
@@ -61,10 +63,16 @@ usuário padrão e devolve um snapshot normalizado com completude separada por
 área. Ele não lê nem executa `UninstallString`, não lê nem escreve
 `StartupApproved`, não altera o registro e não atravessa o broker.
 
-Integração com catálogos de pacotes, como WinGet, ainda não faz parte desta
-fundação. Quando existir, cada operação deverá usar contratos tipados, origem
-identificada e confirmação explícita; o broker não pode virar um executor de
-linha de comando genérico.
+`WinGetApplicationUpdateService`, também em `Ralven.Windows`, localiza somente o
+alias oficial `winget.exe` do usuário e executa listas fixas de argumentos pelo
+`ProcessCommandRunner`. A consulta usa `list --upgrade-available` limitada à
+fonte `winget`; a atualização recebe apenas um ID validado que veio do snapshot,
+usa correspondência exata e mantém as verificações de integridade do WinGet.
+Texto descoberto nunca vira argumento, não há shell, `--ignore-security-hash`,
+`--allow-reboot`, broker ou elevação permanente do Ralven. O instalador do
+fabricante ainda pode abrir ou solicitar UAC. Esse fluxo é separado do motor
+transacional de otimizações e do atualizador assinado do próprio Ralven porque
+o instalador de terceiros controla a alteração e o Ralven não oferece rollback.
 
 ## Componentes
 

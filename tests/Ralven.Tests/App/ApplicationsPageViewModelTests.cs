@@ -153,6 +153,41 @@ public sealed class ApplicationsPageViewModelTests
             viewModel.InstalledEmptyMessage);
     }
 
+    [Fact]
+    public async Task ApplicationUpdates_AreFilteredAndRemovedAfterSuccessfulUpdate()
+    {
+        var localization = new LocalizationService(CultureInfo.GetCultureInfo("pt-BR"));
+        var updates = new StubUpdateService(new WindowsApplicationUpdateSnapshot(
+            [
+                new("OBSProject.OBSStudio", "OBS Studio", "31.0", "32.1", "winget"),
+                new("VideoLAN.VLC", "VLC media player", "3.0.21", "3.0.22", "winget")
+            ],
+            DateTimeOffset.UtcNow,
+            IsWinGetAvailable: true));
+        using var viewModel = new ApplicationsPageViewModel(
+            new StubInventoryInspector(_ => Task.FromResult(new WindowsApplicationInventorySnapshot(
+                [],
+                [],
+                DateTimeOffset.UtcNow,
+                InstalledApplicationsComplete: true,
+                StartupItemsComplete: true))),
+            updates,
+            localization);
+
+        await viewModel.CheckApplicationUpdatesAsync(TestContext.Current.CancellationToken);
+        viewModel.SearchText = "OBS";
+        var item = Assert.Single(viewModel.ApplicationUpdates);
+        await viewModel.UpdateApplicationAsync(item, TestContext.Current.CancellationToken);
+
+        Assert.Equal("OBSProject.OBSStudio", updates.UpdatedPackageId);
+        Assert.Equal(1, viewModel.ApplicationUpdateCount);
+        Assert.Empty(viewModel.ApplicationUpdates);
+        Assert.Equal(
+            localization.Format("Applications.Updates.Status.Succeeded", "OBS Studio"),
+            viewModel.ApplicationUpdateStatusMessage);
+        Assert.True(viewModel.CanUpdateApplications);
+    }
+
     private sealed class StubInventoryInspector(
         Func<CancellationToken, Task<WindowsApplicationInventorySnapshot>> inspect)
         : IWindowsApplicationInventoryInspector
@@ -162,5 +197,24 @@ public sealed class ApplicationsPageViewModelTests
 
         public Task<WindowsApplicationInventorySnapshot> InspectStartupAsync(
             CancellationToken cancellationToken = default) => inspect(cancellationToken);
+    }
+
+    private sealed class StubUpdateService(WindowsApplicationUpdateSnapshot snapshot)
+        : IWindowsApplicationUpdateService
+    {
+        public string? UpdatedPackageId { get; private set; }
+
+        public Task<WindowsApplicationUpdateSnapshot> CheckAsync(
+            CancellationToken cancellationToken = default) => Task.FromResult(snapshot);
+
+        public Task<WindowsApplicationUpdateResult> UpdateAsync(
+            WindowsApplicationUpdate update,
+            CancellationToken cancellationToken = default)
+        {
+            UpdatedPackageId = update.PackageId;
+            return Task.FromResult(new WindowsApplicationUpdateResult(
+                WindowsApplicationUpdateOutcome.Succeeded,
+                ExitCode: 0));
+        }
     }
 }

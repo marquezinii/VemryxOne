@@ -36,8 +36,9 @@
         <Border Grid.Row="1" Style="{StaticResource PanelSurface}" Padding="0" Margin="0,0,0,16">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.8*" />
-                    <ColumnDefinition Width="0.8*" />
+                    <ColumnDefinition Width="0.7*" />
+                    <ColumnDefinition Width="0.7*" />
+                    <ColumnDefinition Width="0.7*" />
                     <ColumnDefinition Width="1.8*" />
                 </Grid.ColumnDefinitions>
 
@@ -56,6 +57,13 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="2" Style="{StaticResource InstrumentCellStyle}">
+                    <TextBlock Text="{Binding ApplicationUpdateCount}" Style="{StaticResource MetricSmallText}" />
+                    <TextBlock Text="{Binding [Applications.Updates.Count], Source={StaticResource LocalizedStrings}}"
+                               Style="{StaticResource CaptionText}"
+                               Margin="0,4,0,0" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="3" Style="{StaticResource InstrumentCellStyle}">
                     <TextBlock Text="{Binding [Applications.Inventory.Status.Title], Source={StaticResource LocalizedStrings}}"
                                Style="{StaticResource OverlineText}" />
                     <TextBlock Text="{Binding InventoryStatusMessage}"
@@ -90,6 +98,11 @@
                                  Style="{StaticResource SegmentedOptionStyle}"
                                  Content="{Binding [Applications.Inventory.StartupTab], Source={StaticResource LocalizedStrings}}"
                                  Checked="InventoryTab_Checked" />
+                    <RadioButton x:Name="UpdatesTab"
+                                 GroupName="ApplicationInventoryTab"
+                                 Style="{StaticResource SegmentedOptionStyle}"
+                                 Content="{Binding [Applications.Updates.Tab], Source={StaticResource LocalizedStrings}}"
+                                 Checked="InventoryTab_Checked" />
                 </StackPanel>
             </Border>
 
@@ -106,7 +119,7 @@
                     Content="{Binding [Applications.Inventory.Refresh], Source={StaticResource LocalizedStrings}}"
                     Style="{StaticResource SecondaryButtonStyle}"
                     VerticalAlignment="Bottom"
-                    IsEnabled="{Binding CanRefreshInventory}"
+                    IsEnabled="{Binding CanRefreshApplications}"
                     Click="RefreshInventory_Click" />
         </Grid>
 
@@ -249,6 +262,94 @@
                                    TextWrapping="Wrap"
                                    MaxWidth="460"
                                    Visibility="{Binding ShowStartupEmptyState, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    </Grid>
+                </Grid>
+
+                <Grid x:Name="ApplicationUpdatesPanel" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Margin="0,0,0,16">
+                        <TextBlock Text="{Binding ApplicationUpdateStatusMessage}"
+                                   Style="{StaticResource SecondaryText}"
+                                   TextWrapping="Wrap"
+                                   automation:AutomationProperties.LiveSetting="Polite" />
+                        <TextBlock Text="{Binding ApplicationUpdatesObservedAtLabel}"
+                                   Style="{StaticResource CaptionText}"
+                                   Margin="0,4,0,0"
+                                   Visibility="{Binding ApplicationUpdatesObservedAtLabel, Converter={StaticResource StringToVisibilityConverter}}" />
+                    </StackPanel>
+
+                    <Border Grid.Row="1" Style="{StaticResource TableHeaderRowStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.6*" />
+                                <ColumnDefinition Width="1.4*" />
+                                <ColumnDefinition Width="0.75*" />
+                                <ColumnDefinition Width="0.75*" />
+                                <ColumnDefinition Width="0.6*" />
+                                <ColumnDefinition Width="Auto" MinWidth="110" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding [Applications.Inventory.Column.Application], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
+                            <TextBlock Grid.Column="1" Text="{Binding [Applications.Updates.Column.Id], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
+                            <TextBlock Grid.Column="2" Text="{Binding [Applications.Updates.Column.Installed], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
+                            <TextBlock Grid.Column="3" Text="{Binding [Applications.Updates.Column.Available], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
+                            <TextBlock Grid.Column="4" Text="{Binding [Applications.Inventory.Column.Source], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
+                        </Grid>
+                    </Border>
+
+                    <Grid Grid.Row="2">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <ItemsControl ItemsSource="{Binding ApplicationUpdates}"
+                                          Visibility="{Binding HasApplicationUpdates, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <ItemsControl.ItemContainerStyle>
+                                    <Style TargetType="ContentPresenter">
+                                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                    </Style>
+                                </ItemsControl.ItemContainerStyle>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource TableRowStyle}"
+                                                automation:AutomationProperties.Name="{Binding Name}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="1.6*" />
+                                                    <ColumnDefinition Width="1.4*" />
+                                                    <ColumnDefinition Width="0.75*" />
+                                                    <ColumnDefinition Width="0.75*" />
+                                                    <ColumnDefinition Width="0.6*" />
+                                                    <ColumnDefinition Width="Auto" MinWidth="110" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="{Binding Name}" Style="{StaticResource BodyStrongText}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}" Margin="0,0,12,0" />
+                                                <TextBlock Grid.Column="1" Text="{Binding PackageId}" Style="{StaticResource SecondaryText}" TextTrimming="CharacterEllipsis" ToolTip="{Binding PackageId}" Margin="0,0,12,0" />
+                                                <TextBlock Grid.Column="2" Text="{Binding InstalledVersion}" Style="{StaticResource SecondaryText}" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" />
+                                                <TextBlock Grid.Column="3" Text="{Binding AvailableVersion}" Style="{StaticResource SecondaryText}" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" />
+                                                <TextBlock Grid.Column="4" Text="{Binding Source}" Style="{StaticResource SecondaryText}" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" />
+                                                <Button Grid.Column="5"
+                                                        Content="{Binding [Applications.Updates.Action], Source={StaticResource LocalizedStrings}}"
+                                                        Style="{StaticResource SecondaryButtonStyle}"
+                                                        IsEnabled="{Binding DataContext.CanUpdateApplications, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        automation:AutomationProperties.Name="{Binding ActionAutomationName}"
+                                                        Tag="{Binding}"
+                                                        Click="UpdateApplication_Click" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+
+                        <TextBlock Text="{Binding ApplicationUpdatesEmptyMessage}"
+                                   Style="{StaticResource SecondaryText}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   TextAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="520"
+                                   Visibility="{Binding ShowApplicationUpdatesEmptyState, Converter={StaticResource BooleanToVisibilityConverter}}" />
                     </Grid>
                 </Grid>
             </Grid>
