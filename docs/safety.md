@@ -136,9 +136,10 @@ O painel nunca aceita caminho, hive, nome de valor, ação ou comando fornecido
 pela UI. Qualquer novo ajuste geral do Windows exige ação própria, evidência,
 detecção, confirmação, validação, reversibilidade e testes independentes.
 
-## Inventário de aplicativos e inicialização
+## Inventário e atualização de aplicativos
 
-A página **Aplicativos** faz somente descoberta local como usuário padrão:
+O inventário da página **Aplicativos** faz somente descoberta local como
+usuário padrão:
 
 - lê os registros de desinstalação em HKCU/HKLM nas visões de 32 e 64 bits para
   nome, versão, fabricante e tamanho estimado;
@@ -148,13 +149,38 @@ A página **Aplicativos** faz somente descoberta local como usuário padrão:
   `StartupApproved`;
 - trata acesso negado e fontes indisponíveis como resultado parcial explícito,
   sem transformar ausência de dados em sucesso completo;
-- não instala, atualiza, desinstala, habilita ou desabilita software e não usa o
-  broker.
+- não instala, desinstala, habilita ou desabilita software e não usa o broker.
 
-As ações secundárias continuam abrindo superfícies confiáveis do Windows para
-qualquer alteração. Uma futura operação de pacote ou inicialização exige
-contrato tipado, confirmação, verificação e rollback próprios; texto descoberto
-no registro nunca pode ser promovido a comando executável.
+O centro de pacotes é uma superfície separada, limitada ao Windows Package
+Manager:
+
+- o Ralven consulta somente as origens padrão confiáveis `winget` e `msstore`;
+  fontes personalizadas, Windows Update e drivers ficam fora do escopo;
+- consultas não aceitam termos silenciosamente. Instalação e atualização só
+  aceitam termos depois da confirmação que os apresenta ao usuário;
+- somente IDs de pacote que passaram pela validação local e vieram do snapshot
+  atual podem ser enviados a instalação, atualização ou desinstalação;
+- o comando usa argumentos fixos, `--id` com correspondência exata e a origem
+  validada na allowlist; nenhum texto, caminho ou argumento livre fornecido
+  pela UI é executado;
+- o usuário confirma nome, ID, origem, possível UAC e ausência de rollback antes
+  de cada instalação/desinstalação ou do lote selecionado de atualizações;
+- o lote é sequencial, para em pontos seguros no cancelamento e nunca transforma
+  sucesso parcial em sucesso total;
+- o Ralven não usa `--force`, `--ignore-security-hash`, `--allow-reboot`, scripts,
+  shell ou broker. As verificações do WinGet permanecem ativas;
+- o processo principal continua sem elevação. O instalador do fabricante pode
+  abrir e o Windows pode solicitar UAC diretamente quando necessário;
+- sucesso e falha vêm do código de saída do WinGet. Uma falha nunca é mostrada
+  como atualização concluída.
+
+Instalar, atualizar ou desinstalar software de terceiros não entra no motor
+transacional de otimizações: o instalador de cada fabricante controla arquivos,
+processos e eventual recuperação, portanto o Ralven não promete rollback.
+Atualizações ignoradas são apenas uma preferência local `origem|id`, não alteram
+o pacote e podem ser restauradas na própria página. Alterações de inicialização
+continuam nas superfícies confiáveis do Windows. Texto descoberto no registro
+nunca pode ser promovido a comando executável.
 
 ## Escopo de edição gráfica
 
