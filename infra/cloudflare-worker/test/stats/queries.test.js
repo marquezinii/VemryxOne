@@ -8,6 +8,7 @@ import {
   successRate,
   errorsByVersion,
   errorCategoryBreakdown,
+  bugCodeBreakdown,
   recentFailures,
   topCpuModels,
   topGpuModels,
@@ -103,10 +104,21 @@ test('errorCategoryBreakdown counts failed runs grouped only by category, across
   assert.doesNotMatch(sql, /app_version/);
 });
 
+test('bugCodeBreakdown groups exact allowlisted codes for incident recognition', () => {
+  const { sql } = bugCodeBreakdown();
+
+  assert.match(sql, /event_name = 'optimization-failed'/);
+  assert.match(sql, /bug_code IS NOT NULL/);
+  assert.match(sql, /GROUP BY bug_code/);
+});
+
 test('recentFailures orders by received_at descending and applies a limit', () => {
   const { sql, params } = recentFailures({}, 15);
 
   assert.match(sql, /event_name = 'optimization-failed'/);
+  assert.match(sql, /event_id/);
+  assert.match(sql, /bug_code/);
+  assert.match(sql, /GROUP_CONCAT\(action_id/);
   assert.match(sql, /ORDER BY received_at DESC/);
   assert.equal(params.at(-1), 15);
 });

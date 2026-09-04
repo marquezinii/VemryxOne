@@ -170,6 +170,19 @@ export function errorCategoryBreakdown(filters) {
   };
 }
 
+/** Exact allowlisted failure codes, suitable for grouping concrete incidents. */
+export function bugCodeBreakdown(filters) {
+  const { whereSql, params } = buildFilters(filters);
+  return {
+    sql: `SELECT bug_code, COUNT(*) AS occurrences
+          FROM telemetry_events
+          WHERE ${whereSql} AND event_name = 'optimization-failed' AND bug_code IS NOT NULL
+          GROUP BY bug_code
+          ORDER BY occurrences DESC`,
+    params,
+  };
+}
+
 /**
  * A raw feed of the most recent failed runs (not aggregated) -- the
  * fastest way to see exactly what environment a fresh bug is showing up in
@@ -179,8 +192,12 @@ export function errorCategoryBreakdown(filters) {
 export function recentFailures(filters, limit = 20) {
   const { whereSql, params } = buildFilters(filters);
   return {
-    sql: `SELECT received_at, app_version, error_category, environment,
-                 os_version, system_architecture, cpu_model, gpu_model, profile
+    sql: `SELECT event_id, received_at, app_version, error_category, bug_code, environment,
+                 execution_time_ms, os_version, system_architecture, cpu_model, gpu_model,
+                 profile, optimization_target_count,
+                 (SELECT GROUP_CONCAT(action_id, ',')
+                    FROM telemetry_event_actions
+                   WHERE telemetry_event_id = telemetry_events.id) AS action_ids
           FROM telemetry_events
           WHERE ${whereSql} AND event_name = 'optimization-failed'
           ORDER BY received_at DESC

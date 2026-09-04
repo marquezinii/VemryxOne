@@ -13,12 +13,15 @@ attachment/screenshot, no R2) — see `infra/cloudflare-worker/README.md`.
   whether a session cookie is currently valid), branded with the Ralven
   logo, and organized into four sections: **Adoção** (usage/version/profile
   charts), **Hardware** (CPU/GPU/RAM breakdowns), **Diagnóstico de bugs**
-  (error categories, actions most associated with failures, errors by
-  version, and a raw "últimos erros" table for spotting a fresh bug without
-  waiting for it to show up in an aggregate), and **Bugs reportados** (the
+  (error categories, exact allowlisted failure codes, errors by version, and
+  a recent incident feed with occurrence metadata and planned action IDs),
+  and **Bugs reportados** (the
   "Reportar um bug" submissions from `/api/bugs` — category, summary,
   version, profile, environment, optional email, and whether a log excerpt
-  was included; no attachment/screenshot, that feature was dropped).
+  was included; no attachment/screenshot, that feature was dropped). Recent
+  errors and reports open a native detail dialog so long descriptions,
+  technical context and log excerpts remain readable without widening the
+  tables.
 - `assets/img/logo.png` — the app's own icon, reused as-is (same asset as
   `assets/brand/export/app-icon/ralven-app-icon-512.png`).
 - `assets/api.js` — pure URL-building and response-shaping for the Worker's
@@ -27,10 +30,10 @@ attachment/screenshot, no R2) — see `infra/cloudflare-worker/README.md`.
   chart-ready series, formatting durations/percentages/timestamps, mapping a
   `recentFailures` row into the raw-feed table's columns). Unit tested
   (`test/charts.test.js`).
-- `assets/rendering.js` — canvas drawing (bar/line charts). Touches the DOM
-  directly, so unlike the two files above it is **not** covered by an
-  automated test (no headless-canvas dependency was introduced for that) —
-  verify visually once deployed.
+- `assets/rendering.js` — responsive, high-DPI canvas drawing (bar/line/donut
+  charts), with pointer tooltips, keyboard exploration and resize handling.
+  Pure hit-testing and tooltip formatting are unit tested without adding a
+  headless-canvas dependency; final rendering still requires browser QA.
 - `assets/app.js` — DOM wiring: login/logout, filters (date range, version,
   environment), fetching every stat, drawing every chart, rendering the
   recent-failures table, and the CSV export links. Thin glue over the tested
@@ -71,7 +74,8 @@ it as "usuários online" the way an early sketch of this dashboard did.
 ## Re-deploying
 
 ```bash
-npx wrangler pages deploy . --project-name=fivemcleaner-dashboard --branch=production
+npx wrangler pages project create ralven-dashboard --production-branch=production # one-time cutover only
+npx wrangler pages deploy . --project-name=ralven-dashboard --branch=production
 ```
 
 `assets/app.js` hardcodes the Worker's `workers.dev` URL as the default API
@@ -79,6 +83,8 @@ base (no custom domain connects the two, so `location.origin` would point
 at the dashboard's own, wrong origin) — update that constant first if the
 Worker is ever redeployed under a different URL. The Pages project name and
 Worker hostname are retained external infrastructure identifiers, not public
-brand names. The public dashboard address is `https://dashboard.vemryx.com`;
-the old `*.pages.dev` address remains in the Worker CORS allowlist for
-compatibility with existing bookmarks.
+brand names. The Ralven-only dashboard's target address is
+`https://ralven-dashboard.pages.dev`. During the cutover, the previous
+`dashboard.vemryx.com` and `fivemcleaner-dashboard.pages.dev` origins remain in
+the Worker CORS allowlist so existing sessions and bookmarks do not break before
+the new Pages project is deployed and verified.

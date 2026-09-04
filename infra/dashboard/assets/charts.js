@@ -150,13 +150,11 @@ export function formatTimestamp(isoString) {
 export function toRecentFailureRow(row) {
   return [
     formatTimestamp(row.received_at),
+    fallback(row.bug_code),
     fallback(row.error_category),
     formatAppVersion(row.app_version),
-    fallback(row.environment),
-    fallback(row.os_version),
-    fallback(row.cpu_model),
-    fallback(row.gpu_model),
     fallback(row.profile),
+    fallback(row.environment),
   ];
 }
 
@@ -180,15 +178,16 @@ export function truncate(text, maxLength) {
 export function toBugReportRow(row) {
   return [
     formatTimestamp(row.received_at),
-    fallback(row.category),
     bugCodeWithCategory(row.bug_code),
     truncate(row.summary, 60),
+    fallback(row.category),
     formatAppVersion(row.app_version),
-    fallback(row.profile),
-    fallback(row.environment),
-    fallback(row.email),
-    row.log_text ? 'sim' : 'não',
   ];
+}
+
+export function formatActionIds(value) {
+  if (!value) return [];
+  return String(value).split(',').map((item) => item.trim()).filter(Boolean);
 }
 
 export function toUpdaterEventRow(row) {
