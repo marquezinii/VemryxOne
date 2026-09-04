@@ -23,10 +23,13 @@ public partial class MainWindow
         IWindowsApplicationInventoryInspector inspector = demoMode
             ? new SyntheticWindowsApplicationInventoryInspector()
             : new WindowsApplicationInventoryInspector();
-        IWindowsApplicationUpdateService updateService = demoMode
-            ? new SyntheticWindowsApplicationUpdateService()
-            : new WinGetApplicationUpdateService();
-        var page = new ApplicationsPage(inspector, updateService)
+        IWindowsApplicationPackageService packageService = demoMode
+            ? new SyntheticWindowsApplicationPackageService()
+            : new WinGetApplicationPackageService();
+        IApplicationUpdateIgnoreStore ignoreStore = demoMode
+            ? new InMemoryApplicationUpdateIgnoreStore()
+            : new JsonApplicationUpdateIgnoreStore();
+        var page = new ApplicationsPage(inspector, packageService, ignoreStore)
         {
             Visibility = Visibility.Collapsed
         };

@@ -36,9 +36,10 @@
         <Border Grid.Row="1" Style="{StaticResource PanelSurface}" Padding="0" Margin="0,0,0,16">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.7*" />
-                    <ColumnDefinition Width="0.7*" />
-                    <ColumnDefinition Width="0.7*" />
+                    <ColumnDefinition Width="0.6*" />
+                    <ColumnDefinition Width="0.6*" />
+                    <ColumnDefinition Width="0.6*" />
+                    <ColumnDefinition Width="0.6*" />
                     <ColumnDefinition Width="1.8*" />
                 </Grid.ColumnDefinitions>
 
@@ -46,24 +47,35 @@
                     <TextBlock Text="{Binding InstalledApplicationCount}" Style="{StaticResource MetricSmallText}" />
                     <TextBlock Text="{Binding [Applications.Inventory.InstalledCount], Source={StaticResource LocalizedStrings}}"
                                Style="{StaticResource CaptionText}"
+                               TextWrapping="Wrap"
                                Margin="0,4,0,0" />
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Style="{StaticResource InstrumentCellStyle}">
-                    <TextBlock Text="{Binding StartupItemCount}" Style="{StaticResource MetricSmallText}" />
-                    <TextBlock Text="{Binding [Applications.Inventory.StartupCount], Source={StaticResource LocalizedStrings}}"
+                    <TextBlock Text="{Binding ManagedPackageCount}" Style="{StaticResource MetricSmallText}" />
+                    <TextBlock Text="{Binding [Applications.Packages.Count], Source={StaticResource LocalizedStrings}}"
                                Style="{StaticResource CaptionText}"
+                               TextWrapping="Wrap"
                                Margin="0,4,0,0" />
                 </StackPanel>
 
                 <StackPanel Grid.Column="2" Style="{StaticResource InstrumentCellStyle}">
-                    <TextBlock Text="{Binding ApplicationUpdateCount}" Style="{StaticResource MetricSmallText}" />
-                    <TextBlock Text="{Binding [Applications.Updates.Count], Source={StaticResource LocalizedStrings}}"
+                    <TextBlock Text="{Binding StartupItemCount}" Style="{StaticResource MetricSmallText}" />
+                    <TextBlock Text="{Binding [Applications.Inventory.StartupCount], Source={StaticResource LocalizedStrings}}"
                                Style="{StaticResource CaptionText}"
+                               TextWrapping="Wrap"
                                Margin="0,4,0,0" />
                 </StackPanel>
 
                 <StackPanel Grid.Column="3" Style="{StaticResource InstrumentCellStyle}">
+                    <TextBlock Text="{Binding ApplicationUpdateCount}" Style="{StaticResource MetricSmallText}" />
+                    <TextBlock Text="{Binding [Applications.Updates.Count], Source={StaticResource LocalizedStrings}}"
+                               Style="{StaticResource CaptionText}"
+                               TextWrapping="Wrap"
+                               Margin="0,4,0,0" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="4" Style="{StaticResource InstrumentCellStyle}">
                     <TextBlock Text="{Binding [Applications.Inventory.Status.Title], Source={StaticResource LocalizedStrings}}"
                                Style="{StaticResource OverlineText}" />
                     <TextBlock Text="{Binding InventoryStatusMessage}"
@@ -88,6 +100,21 @@
 
             <Border Grid.Column="0" Style="{StaticResource SegmentedHostStyle}" VerticalAlignment="Bottom">
                 <StackPanel Orientation="Horizontal">
+                    <RadioButton x:Name="DiscoverTab"
+                                 GroupName="ApplicationInventoryTab"
+                                 Style="{StaticResource SegmentedOptionStyle}"
+                                 Content="{Binding [Applications.Discover.Tab], Source={StaticResource LocalizedStrings}}"
+                                 Checked="InventoryTab_Checked" />
+                    <RadioButton x:Name="UpdatesTab"
+                                 GroupName="ApplicationInventoryTab"
+                                 Style="{StaticResource SegmentedOptionStyle}"
+                                 Content="{Binding [Applications.Updates.Tab], Source={StaticResource LocalizedStrings}}"
+                                 Checked="InventoryTab_Checked" />
+                    <RadioButton x:Name="ManagedTab"
+                                 GroupName="ApplicationInventoryTab"
+                                 Style="{StaticResource SegmentedOptionStyle}"
+                                 Content="{Binding [Applications.Packages.Tab], Source={StaticResource LocalizedStrings}}"
+                                 Checked="InventoryTab_Checked" />
                     <RadioButton x:Name="InstalledTab"
                                  GroupName="ApplicationInventoryTab"
                                  Style="{StaticResource SegmentedOptionStyle}"
@@ -98,15 +125,10 @@
                                  Style="{StaticResource SegmentedOptionStyle}"
                                  Content="{Binding [Applications.Inventory.StartupTab], Source={StaticResource LocalizedStrings}}"
                                  Checked="InventoryTab_Checked" />
-                    <RadioButton x:Name="UpdatesTab"
-                                 GroupName="ApplicationInventoryTab"
-                                 Style="{StaticResource SegmentedOptionStyle}"
-                                 Content="{Binding [Applications.Updates.Tab], Source={StaticResource LocalizedStrings}}"
-                                 Checked="InventoryTab_Checked" />
                 </StackPanel>
             </Border>
 
-            <StackPanel Grid.Column="1" Margin="18,0" MaxWidth="520">
+            <StackPanel x:Name="CatalogFilterPanel" Grid.Column="1" Margin="18,0" MaxWidth="520">
                 <TextBlock Text="{Binding [Applications.Inventory.Search], Source={StaticResource LocalizedStrings}}"
                            Style="{StaticResource CaptionText}"
                            Margin="2,0,0,5" />
@@ -125,7 +147,185 @@
 
         <Border Grid.Row="3" Style="{StaticResource PanelSurface}" Padding="24" MinHeight="260">
             <Grid>
-                <Grid x:Name="InstalledApplicationsPanel">
+                <Grid x:Name="DiscoverPackagesPanel" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0"
+                                 Text="{Binding DiscoverQuery, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource FormTextBoxStyle}"
+                                 MinWidth="300"
+                                 KeyDown="DiscoverQuery_KeyDown"
+                                 automation:AutomationProperties.Name="{Binding [Applications.Discover.Search], Source={StaticResource LocalizedStrings}}" />
+                        <Button Grid.Column="1"
+                                Content="{Binding [Applications.Discover.SearchAction], Source={StaticResource LocalizedStrings}}"
+                                Style="{StaticResource PrimaryButtonStyle}"
+                                Margin="12,0,0,0"
+                                IsEnabled="{Binding CanSearchPackages}"
+                                Click="SearchPackages_Click" />
+                    </Grid>
+
+                    <TextBlock Grid.Row="1"
+                               Text="{Binding DiscoverStatusMessage}"
+                               Style="{StaticResource SecondaryText}"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,16"
+                               automation:AutomationProperties.LiveSetting="Polite" />
+
+                    <Border Grid.Row="2" Style="{StaticResource TableHeaderRowStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.7*" />
+                                <ColumnDefinition Width="1.5*" />
+                                <ColumnDefinition Width="0.8*" />
+                                <ColumnDefinition Width="0.9*" />
+                                <ColumnDefinition Width="Auto" MinWidth="110" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding [Applications.Inventory.Column.Application], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
+                            <TextBlock Grid.Column="1" Text="{Binding [Applications.Updates.Column.Id], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
+                            <TextBlock Grid.Column="2" Text="{Binding [Applications.Inventory.Column.Version], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
+                            <TextBlock Grid.Column="3" Text="{Binding [Applications.Inventory.Column.Source], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
+                        </Grid>
+                    </Border>
+
+                    <Grid Grid.Row="3">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <ItemsControl ItemsSource="{Binding DiscoveredPackages}"
+                                          Visibility="{Binding HasDiscoveredPackages, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <ItemsControl.ItemContainerStyle>
+                                    <Style TargetType="ContentPresenter">
+                                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                    </Style>
+                                </ItemsControl.ItemContainerStyle>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource TableRowStyle}" automation:AutomationProperties.Name="{Binding Name}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="1.7*" />
+                                                    <ColumnDefinition Width="1.5*" />
+                                                    <ColumnDefinition Width="0.8*" />
+                                                    <ColumnDefinition Width="0.9*" />
+                                                    <ColumnDefinition Width="Auto" MinWidth="110" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="{Binding Name}" Style="{StaticResource BodyStrongText}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}" Margin="0,0,12,0" />
+                                                <TextBlock Grid.Column="1" Text="{Binding PackageId}" Style="{StaticResource SecondaryText}" TextTrimming="CharacterEllipsis" ToolTip="{Binding PackageId}" Margin="0,0,12,0" />
+                                                <TextBlock Grid.Column="2" Text="{Binding Version}" Style="{StaticResource SecondaryText}" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" />
+                                                <TextBlock Grid.Column="3" Text="{Binding Source}" Style="{StaticResource SecondaryText}" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" />
+                                                <Button Grid.Column="4"
+                                                        Content="{Binding [Applications.Packages.Install.Action], Source={StaticResource LocalizedStrings}}"
+                                                        Style="{StaticResource SecondaryButtonStyle}"
+                                                        IsEnabled="{Binding DataContext.CanRunPackageOperation, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        automation:AutomationProperties.Name="{Binding ActionAutomationName}"
+                                                        Tag="{Binding}"
+                                                        Click="InstallPackage_Click" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+
+                        <TextBlock Text="{Binding DiscoveredPackagesEmptyMessage}"
+                                   Style="{StaticResource SecondaryText}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   TextAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="520"
+                                   Visibility="{Binding ShowDiscoveredPackagesEmptyState, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    </Grid>
+                </Grid>
+
+                <Grid x:Name="ManagedPackagesPanel" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0"
+                               Text="{Binding ManagedPackagesStatusMessage}"
+                               Style="{StaticResource SecondaryText}"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,16"
+                               automation:AutomationProperties.LiveSetting="Polite" />
+
+                    <Border Grid.Row="1" Style="{StaticResource TableHeaderRowStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.7*" />
+                                <ColumnDefinition Width="1.5*" />
+                                <ColumnDefinition Width="0.8*" />
+                                <ColumnDefinition Width="0.9*" />
+                                <ColumnDefinition Width="Auto" MinWidth="110" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding [Applications.Inventory.Column.Application], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
+                            <TextBlock Grid.Column="1" Text="{Binding [Applications.Updates.Column.Id], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
+                            <TextBlock Grid.Column="2" Text="{Binding [Applications.Inventory.Column.Version], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
+                            <TextBlock Grid.Column="3" Text="{Binding [Applications.Inventory.Column.Source], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
+                        </Grid>
+                    </Border>
+
+                    <Grid Grid.Row="2">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <ItemsControl ItemsSource="{Binding ManagedPackages}"
+                                          Visibility="{Binding HasManagedPackages, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <ItemsControl.ItemContainerStyle>
+                                    <Style TargetType="ContentPresenter">
+                                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                    </Style>
+                                </ItemsControl.ItemContainerStyle>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource TableRowStyle}" automation:AutomationProperties.Name="{Binding Name}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="1.7*" />
+                                                    <ColumnDefinition Width="1.5*" />
+                                                    <ColumnDefinition Width="0.8*" />
+                                                    <ColumnDefinition Width="0.9*" />
+                                                    <ColumnDefinition Width="Auto" MinWidth="110" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="{Binding Name}" Style="{StaticResource BodyStrongText}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}" Margin="0,0,12,0" />
+                                                <TextBlock Grid.Column="1" Text="{Binding PackageId}" Style="{StaticResource SecondaryText}" TextTrimming="CharacterEllipsis" ToolTip="{Binding PackageId}" Margin="0,0,12,0" />
+                                                <TextBlock Grid.Column="2" Text="{Binding Version}" Style="{StaticResource SecondaryText}" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" />
+                                                <TextBlock Grid.Column="3" Text="{Binding Source}" Style="{StaticResource SecondaryText}" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" />
+                                                <Button Grid.Column="4"
+                                                        Content="{Binding [Applications.Packages.Uninstall.Action], Source={StaticResource LocalizedStrings}}"
+                                                        Style="{StaticResource SecondaryButtonStyle}"
+                                                        IsEnabled="{Binding DataContext.CanRunPackageOperation, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        automation:AutomationProperties.Name="{Binding ActionAutomationName}"
+                                                        Tag="{Binding}"
+                                                        Click="UninstallPackage_Click" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+
+                        <TextBlock Text="{Binding ManagedPackagesEmptyMessage}"
+                                   Style="{StaticResource SecondaryText}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   TextAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="520"
+                                   Visibility="{Binding ShowManagedPackagesEmptyState, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    </Grid>
+                </Grid>
+
+                <Grid x:Name="InstalledApplicationsPanel" Visibility="Collapsed">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -272,32 +472,61 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <StackPanel Grid.Row="0" Margin="0,0,0,16">
-                        <TextBlock Text="{Binding ApplicationUpdateStatusMessage}"
-                                   Style="{StaticResource SecondaryText}"
-                                   TextWrapping="Wrap"
-                                   automation:AutomationProperties.LiveSetting="Polite" />
-                        <TextBlock Text="{Binding ApplicationUpdatesObservedAtLabel}"
-                                   Style="{StaticResource CaptionText}"
-                                   Margin="0,4,0,0"
-                                   Visibility="{Binding ApplicationUpdatesObservedAtLabel, Converter={StaticResource StringToVisibilityConverter}}" />
-                    </StackPanel>
+                    <Grid Grid.Row="0" Margin="0,0,0,16">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox Grid.Column="0"
+                                      Content="{Binding [Applications.Updates.SelectAll], Source={StaticResource LocalizedStrings}}"
+                                      IsChecked="{Binding IsAllVisibleUpdatesSelected, Mode=TwoWay}"
+                                      VerticalAlignment="Center" />
+                            <Button Grid.Column="1"
+                                    Content="{Binding [Applications.Updates.UpdateSelected], Source={StaticResource LocalizedStrings}}"
+                                    Style="{StaticResource PrimaryButtonStyle}"
+                                    Margin="12,0,0,0"
+                                    IsEnabled="{Binding CanUpdateSelected}"
+                                    Click="UpdateSelectedApplications_Click" />
+                            <CheckBox Grid.Column="3"
+                                      Content="{Binding [Applications.Updates.ShowIgnored], Source={StaticResource LocalizedStrings}}"
+                                      IsChecked="{Binding ShowIgnoredUpdates, Mode=TwoWay}"
+                                      VerticalAlignment="Center" />
+                        </Grid>
+                        <StackPanel Grid.Row="1">
+                            <TextBlock Text="{Binding ApplicationUpdateStatusMessage}"
+                                       Style="{StaticResource SecondaryText}"
+                                       TextWrapping="Wrap"
+                                       automation:AutomationProperties.LiveSetting="Polite" />
+                            <TextBlock Text="{Binding ApplicationUpdatesObservedAtLabel}"
+                                       Style="{StaticResource CaptionText}"
+                                       Margin="0,4,0,0"
+                                       Visibility="{Binding ApplicationUpdatesObservedAtLabel, Converter={StaticResource StringToVisibilityConverter}}" />
+                        </StackPanel>
+                    </Grid>
 
                     <Border Grid.Row="1" Style="{StaticResource TableHeaderRowStyle}">
                         <Grid>
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="48" />
                                 <ColumnDefinition Width="1.6*" />
                                 <ColumnDefinition Width="1.4*" />
                                 <ColumnDefinition Width="0.75*" />
                                 <ColumnDefinition Width="0.75*" />
                                 <ColumnDefinition Width="0.6*" />
-                                <ColumnDefinition Width="Auto" MinWidth="110" />
+                                <ColumnDefinition Width="Auto" MinWidth="220" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{Binding [Applications.Inventory.Column.Application], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
-                            <TextBlock Grid.Column="1" Text="{Binding [Applications.Updates.Column.Id], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
-                            <TextBlock Grid.Column="2" Text="{Binding [Applications.Updates.Column.Installed], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
-                            <TextBlock Grid.Column="3" Text="{Binding [Applications.Updates.Column.Available], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
-                            <TextBlock Grid.Column="4" Text="{Binding [Applications.Inventory.Column.Source], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
+                            <TextBlock Grid.Column="1" Text="{Binding [Applications.Inventory.Column.Application], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
+                            <TextBlock Grid.Column="2" Text="{Binding [Applications.Updates.Column.Id], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
+                            <TextBlock Grid.Column="3" Text="{Binding [Applications.Updates.Column.Installed], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
+                            <TextBlock Grid.Column="4" Text="{Binding [Applications.Updates.Column.Available], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
+                            <TextBlock Grid.Column="5" Text="{Binding [Applications.Inventory.Column.Source], Source={StaticResource LocalizedStrings}}" Style="{StaticResource TableHeaderCellText}" Margin="12,0" />
                         </Grid>
                     </Border>
 
@@ -316,25 +545,49 @@
                                                 automation:AutomationProperties.Name="{Binding Name}">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="48" />
                                                     <ColumnDefinition Width="1.6*" />
                                                     <ColumnDefinition Width="1.4*" />
                                                     <ColumnDefinition Width="0.75*" />
                                                     <ColumnDefinition Width="0.75*" />
                                                     <ColumnDefinition Width="0.6*" />
-                                                    <ColumnDefinition Width="Auto" MinWidth="110" />
+                                                    <ColumnDefinition Width="Auto" MinWidth="220" />
                                                 </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="{Binding Name}" Style="{StaticResource BodyStrongText}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}" Margin="0,0,12,0" />
-                                                <TextBlock Grid.Column="1" Text="{Binding PackageId}" Style="{StaticResource SecondaryText}" TextTrimming="CharacterEllipsis" ToolTip="{Binding PackageId}" Margin="0,0,12,0" />
-                                                <TextBlock Grid.Column="2" Text="{Binding InstalledVersion}" Style="{StaticResource SecondaryText}" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" />
-                                                <TextBlock Grid.Column="3" Text="{Binding AvailableVersion}" Style="{StaticResource SecondaryText}" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" />
-                                                <TextBlock Grid.Column="4" Text="{Binding Source}" Style="{StaticResource SecondaryText}" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" />
-                                                <Button Grid.Column="5"
-                                                        Content="{Binding [Applications.Updates.Action], Source={StaticResource LocalizedStrings}}"
-                                                        Style="{StaticResource SecondaryButtonStyle}"
-                                                        IsEnabled="{Binding DataContext.CanUpdateApplications, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                        automation:AutomationProperties.Name="{Binding ActionAutomationName}"
-                                                        Tag="{Binding}"
-                                                        Click="UpdateApplication_Click" />
+                                                <CheckBox Grid.Column="0"
+                                                          IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                          IsEnabled="{Binding CanSelect}"
+                                                          HorizontalAlignment="Center"
+                                                          VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="1" Text="{Binding Name}" Style="{StaticResource BodyStrongText}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}" Margin="0,0,12,0" />
+                                                <TextBlock Grid.Column="2" Text="{Binding PackageId}" Style="{StaticResource SecondaryText}" TextTrimming="CharacterEllipsis" ToolTip="{Binding PackageId}" Margin="0,0,12,0" />
+                                                <TextBlock Grid.Column="3" Text="{Binding InstalledVersion}" Style="{StaticResource SecondaryText}" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" />
+                                                <TextBlock Grid.Column="4" Text="{Binding AvailableVersion}" Style="{StaticResource SecondaryText}" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" />
+                                                <TextBlock Grid.Column="5" Text="{Binding Source}" Style="{StaticResource SecondaryText}" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" />
+                                                <StackPanel Grid.Column="6" Orientation="Horizontal" HorizontalAlignment="Right">
+                                                    <Button Content="{Binding [Applications.Updates.Action], Source={StaticResource LocalizedStrings}}"
+                                                            IsEnabled="{Binding DataContext.CanRunPackageOperation, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                            automation:AutomationProperties.Name="{Binding UpdateAutomationName}"
+                                                            Tag="{Binding}"
+                                                            Click="UpdateApplication_Click">
+                                                        <Button.Style>
+                                                            <Style TargetType="Button" BasedOn="{StaticResource SecondaryButtonStyle}">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsIgnored}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Button.Style>
+                                                    </Button>
+                                                    <Button Content="{Binding IgnoreActionLabel}"
+                                                            Style="{StaticResource SecondaryButtonStyle}"
+                                                            Margin="8,0,0,0"
+                                                            IsEnabled="{Binding DataContext.CanRunPackageOperation, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                            automation:AutomationProperties.Name="{Binding IgnoreAutomationName}"
+                                                            Tag="{Binding}"
+                                                            Click="ToggleIgnoredUpdate_Click" />
+                                                </StackPanel>
                                             </Grid>
                                         </Border>
                                     </DataTemplate>

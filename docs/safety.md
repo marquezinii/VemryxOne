@@ -151,30 +151,36 @@ usuário padrão:
   sem transformar ausência de dados em sucesso completo;
 - não instala, desinstala, habilita ou desabilita software e não usa o broker.
 
-Atualizações são uma superfície separada, limitada ao Windows Package Manager:
+O centro de pacotes é uma superfície separada, limitada ao Windows Package
+Manager:
 
-- o Ralven consulta somente pacotes com atualização disponível na fonte
-  comunitária `winget`; Microsoft Store, Windows Update e drivers continuam nas
-  superfícies próprias do Windows;
-- somente IDs de pacote que passaram pela validação local e vieram da consulta
-  atual podem ser enviados à operação de atualização;
-- o comando usa argumentos fixos, `--id` com correspondência exata e a fonte
-  fixa `winget`; nenhum texto, caminho ou argumento livre fornecido pela UI é
-  executado;
-- o usuário confirma individualmente nome, versão atual, versão disponível,
-  fonte, termos e ausência de rollback antes de iniciar;
-- o Ralven não usa `--ignore-security-hash`, `--allow-reboot`, scripts, shell ou
-  broker. As verificações do WinGet permanecem ativas;
+- o Ralven consulta somente as origens padrão confiáveis `winget` e `msstore`;
+  fontes personalizadas, Windows Update e drivers ficam fora do escopo;
+- consultas não aceitam termos silenciosamente. Instalação e atualização só
+  aceitam termos depois da confirmação que os apresenta ao usuário;
+- somente IDs de pacote que passaram pela validação local e vieram do snapshot
+  atual podem ser enviados a instalação, atualização ou desinstalação;
+- o comando usa argumentos fixos, `--id` com correspondência exata e a origem
+  validada na allowlist; nenhum texto, caminho ou argumento livre fornecido
+  pela UI é executado;
+- o usuário confirma nome, ID, origem, possível UAC e ausência de rollback antes
+  de cada instalação/desinstalação ou do lote selecionado de atualizações;
+- o lote é sequencial, para em pontos seguros no cancelamento e nunca transforma
+  sucesso parcial em sucesso total;
+- o Ralven não usa `--force`, `--ignore-security-hash`, `--allow-reboot`, scripts,
+  shell ou broker. As verificações do WinGet permanecem ativas;
 - o processo principal continua sem elevação. O instalador do fabricante pode
   abrir e o Windows pode solicitar UAC diretamente quando necessário;
 - sucesso e falha vêm do código de saída do WinGet. Uma falha nunca é mostrada
   como atualização concluída.
 
-Atualizar software de terceiros não entra no motor transacional de otimizações:
-o instalador de cada fabricante controla arquivos, processos e eventual
-recuperação, portanto o Ralven não promete rollback. Desinstalação e alteração
-de inicialização continuam nas superfícies confiáveis do Windows. Texto
-descoberto no registro nunca pode ser promovido a comando executável.
+Instalar, atualizar ou desinstalar software de terceiros não entra no motor
+transacional de otimizações: o instalador de cada fabricante controla arquivos,
+processos e eventual recuperação, portanto o Ralven não promete rollback.
+Atualizações ignoradas são apenas uma preferência local `origem|id`, não alteram
+o pacote e podem ser restauradas na própria página. Alterações de inicialização
+continuam nas superfícies confiáveis do Windows. Texto descoberto no registro
+nunca pode ser promovido a comando executável.
 
 ## Escopo de edição gráfica
 

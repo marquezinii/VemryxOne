@@ -96,7 +96,35 @@ poderá virar ação futura após existir detecção de filesystem/volume, privi
 tipado, verificação e uma apresentação explícita de que ReTrim não possui
 rollback.
 
-## Atualizações de aplicativos pelo WinGet
+## Centro de aplicativos inspirado no UniGetUI
+
+**Fato.** O UniGetUI oficial organiza sua experiência em catálogos de pacotes
+disponíveis, instalados, atualizáveis e bundles. Gerenciadores implementam um
+contrato comum com capacidades próprias; loaders preenchem as listas, enquanto
+a camada de operações mantém fila e histórico. A interface oferece busca,
+filtros, operações em lote, versões ignoradas, atualização automática,
+agendamento, fontes, importação/exportação e opções por pacote. No Windows, o
+projeto suporta atualmente WinGet, Scoop, Chocolatey, PowerShell, npm, Bun,
+pip, Cargo, .NET Tool e vcpkg.
+
+Fontes:
+
+- [Repositório e recursos oficiais do UniGetUI](https://github.com/Devolutions/UniGetUI)
+- [Arquitetura oficial do UniGetUI](https://github.com/Devolutions/UniGetUI/blob/main/AGENTS.md)
+- [Referência da CLI do UniGetUI](https://github.com/Devolutions/UniGetUI/blob/main/docs/CLI.md)
+
+**Decisão personalizada.** O Ralven replica a base de navegação e operação que
+é útil ao seu propósito — Descobrir, Atualizações, Gerenciados, seleção em lote
+e lista persistente de ignorados — sem copiar a amplitude ou os riscos de um
+gerenciador universal. A primeira base usa um único executor nativo, WinGet,
+para as origens padrão confiáveis `winget` e `msstore`. Scoop exigiria executar
+scripts PowerShell do usuário; Chocolatey normalmente executa scripts de pacote
+com elevação. Nenhum deles será encaixado no broker como comando ou rede
+genéricos. Atualização automática, agendador, fontes arbitrárias, bundles e
+importação/exportação também ficam de fora até terem política de consentimento,
+proveniência, recuperação e testes próprios.
+
+## Operações de aplicativos pelo WinGet
 
 **Fato.** O Windows Package Manager oferece os comandos `list` e `upgrade` no
 Windows 10 e 11. `list --upgrade-available` limita o resultado aos aplicativos
@@ -110,12 +138,19 @@ Fontes:
 - [Comando upgrade do WinGet](https://learn.microsoft.com/windows/package-manager/winget/upgrade)
 - [Códigos de retorno do WinGet](https://github.com/microsoft/winget-cli/blob/master/doc/windows/package-manager/winget/returnCodes.md)
 
-**Decisão.** A primeira integração consulta somente a fonte comunitária
-`winget`, atualiza um aplicativo por confirmação e não inclui atualização
-automática, Store, drivers, Windows Update, outros gerenciadores ou argumentos
-livres. O Ralven não tenta reconstruir rollback de um instalador de terceiros;
-ele informa essa limitação antes da execução e reporta o código de retorno sem
-mascarar falhas.
+As origens padrão documentadas incluem `winget` e `msstore`. Busca e listagem
+usam `search`/`list` com origem fixa e sem aceitar termos automaticamente.
+Instalação, atualização e desinstalação usam `--id`, `--exact` e `--source`; as
+duas primeiras aceitam termos somente após a confirmação explícita do Ralven.
+As operações não usam `--force`, não ignoram hash e não autorizam reinício. O
+Ralven não tenta reconstruir rollback de um instalador de terceiros; ele informa
+essa limitação antes da execução e reporta o código de retorno sem mascarar
+falhas.
+
+Fonte adicional:
+
+- [Gerenciamento de origens do WinGet](https://learn.microsoft.com/windows/package-manager/winget/source)
+- [Comando install do WinGet](https://learn.microsoft.com/windows/package-manager/winget/install)
 
 ### Proteções do Windows e aceleração do ponteiro
 
