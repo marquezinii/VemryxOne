@@ -1,4 +1,4 @@
-using Ralven.App.ViewModels;
+using Ralven.App.Services;
 using Ralven.Contracts;
 using Xunit;
 

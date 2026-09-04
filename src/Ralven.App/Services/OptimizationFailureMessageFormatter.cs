@@ -1,6 +1,6 @@
 using Ralven.Contracts;
 
-namespace Ralven.App.ViewModels;
+namespace Ralven.App.Services;
 
 /// <summary>
 /// Appends "— {localized error code text}" to an existing message when a
