@@ -1,5 +1,6 @@
 using System.IO;
 using Ralven.App.Services;
+using Ralven.Contracts;
 using Xunit;
 
 namespace Ralven.Tests.App;
@@ -28,6 +29,15 @@ public sealed class TelemetryErrorClassifierTests
     public void ClassifyException_OperationCanceled_MapsToCancelled()
     {
         Assert.Equal("cancelled", TelemetryErrorClassifier.ClassifyException(new OperationCanceledException()));
+    }
+
+    [Fact]
+    public void ClassifyException_BrokerIntegrityFailure_UsesUnderlyingFixedCategory()
+    {
+        Assert.Equal(
+            "invalid-data",
+            TelemetryErrorClassifier.ClassifyException(
+                new BrokerIntegrityException(new InvalidDataException())));
     }
 }
 

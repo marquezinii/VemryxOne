@@ -19,6 +19,8 @@ internal sealed record ElevatedBrokerResult
 
     public string? State { get; init; }
 
+    public string? ErrorCode { get; init; }
+
     public IReadOnlyList<string> AppliedActionIds { get; init; } = [];
 }
 
@@ -202,6 +204,7 @@ internal sealed class ElevatedBrokerClient
                 WasCancelled = false,
                 Message = terminal?.Message ?? DescribeMissingTerminalEvent(process.ExitCode),
                 State = terminal?.State,
+                ErrorCode = terminal?.ErrorCode,
                 AppliedActionIds = terminal?.AppliedActionIds ?? []
             };
         }

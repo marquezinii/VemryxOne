@@ -119,15 +119,17 @@ public sealed class WindowsVisualEffectsController : IVisualEffectsController
 
     private static void SetBoolean(uint action, bool value)
     {
-        if (!SystemParametersInfoBoolean(
+        if (!SystemParametersInfoPointer(
             action,
             0,
-            ref value,
+            BooleanParameter(value),
             SpifUpdateIniFile | SpifSendChange))
         {
             throw new Win32Exception(Marshal.GetLastWin32Error());
         }
     }
+
+    internal static IntPtr BooleanParameter(bool value) => value ? new IntPtr(1) : IntPtr.Zero;
 
     [StructLayout(LayoutKind.Sequential)]
     private struct AnimationInfo

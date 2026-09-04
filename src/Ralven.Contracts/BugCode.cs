@@ -198,6 +198,9 @@ public enum BugCode
     /// <summary>Broker process crashed or exited unexpectedly.</summary>
     BRK_PROCESS_CRASH = 610,
 
+    /// <summary>Broker files or signed integrity metadata failed pre-elevation validation.</summary>
+    BRK_INTEGRITY_VALIDATION = 611,
+
     // ========== NETWORK (NET_) ==========
 
     /// <summary>API request failed (HTTP error, timeout).</summary>

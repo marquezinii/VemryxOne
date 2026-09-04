@@ -126,12 +126,11 @@ public sealed record AppOptimizationResult
     /// <summary>Before/after resource comparison, when one could be captured.</summary>
     public OptimizationComparisonResult? Comparison { get; init; }
 
-    /// <summary>
-    /// Classification of a broker/elevation-phase failure that happened
-    /// before any action reached the journal (so no report line can carry
-    /// it). Null on success or when the failure has a per-action code instead.
-    /// </summary>
-    public BugCode? BugCode { get; init; }
+    /// <summary>Allowlisted run-level cause, when the service observed one directly.</summary>
+    public BugCode? FailureBugCode { get; init; }
+
+    /// <summary>Allowlisted run-level category, without exception text.</summary>
+    public string? FailureErrorCategory { get; init; }
 }
 
 /// <summary>

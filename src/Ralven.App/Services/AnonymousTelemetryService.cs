@@ -126,6 +126,7 @@ public static class TelemetryErrorClassifier
         ArgumentNullException.ThrowIfNull(exception);
         return exception switch
         {
+            BrokerIntegrityException { InnerException: { } innerException } => ClassifyException(innerException),
             OperationCanceledException => "cancelled",
             TimeoutException => "timeout",
             UnauthorizedAccessException => "access-denied",

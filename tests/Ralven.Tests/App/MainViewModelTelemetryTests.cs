@@ -40,110 +40,54 @@ public sealed class MainViewModelTelemetryTests
             TimeSpan.FromSeconds(5),
             TestContext.Current.CancellationToken);
         Assert.Equal(TelemetryEventValidator.MaxActionIds, sent.ActionIds?.Count);
+        Assert.Equal(service.LastTransactionId, sent.EventId);
         TelemetryEventValidator.Validate(sent);
     }
 
-    /// <summary>
-    /// A broker/elevation-phase failure happens before any action reaches the
-    /// journal, so there is no report line to read a BugCode from -- the run
-    /// must fall back to <see cref="AppOptimizationResult.BugCode"/> instead
-    /// of silently showing/telemetering no code at all.
-    /// </summary>
     [Fact]
-    public async Task StartOptimizationAsync_BrokerFailureWithNoReportLines_FallsBackToResultBugCode()
+    public async Task StartOptimizationAsync_ServiceFailurePreservesSpecificCauseAndCategory()
     {
-        var service = new BrokerFailureAppOptimizationService();
+        var service = new SucceedingAppOptimizationService(succeeds: false);
         var telemetry = new CapturingTelemetryService();
-        var viewModel = new MainViewModel(service, telemetry: telemetry);
+        using var viewModel = new MainViewModel(service, telemetry: telemetry);
         await viewModel.InitializeAsync();
-        viewModel.SetOptimizationScope(OptimizationScope.FiveMLegacy);
 
         await viewModel.StartOptimizationAsync();
 
         var sent = await telemetry.WaitForEventAsync().WaitAsync(
             TimeSpan.FromSeconds(5),
             TestContext.Current.CancellationToken);
-        Assert.Equal(BugCode.BRK_ACTION_EXECUTION, sent.BugCode);
-        Assert.Contains("BRK_ACTION_EXECUTION", viewModel.ProgressHeadline);
+        Assert.Equal(service.LastTransactionId, sent.EventId);
+        Assert.Equal("invalid-data", sent.ErrorCategory);
+        Assert.Equal(BugCode.BRK_INTEGRITY_VALIDATION, sent.BugCode);
     }
 
-    /// <summary>Fails before any action runs (no journal/report), carrying
-    /// only a run-level BugCode -- exactly the broker-phase failure shape.</summary>
-    private sealed class BrokerFailureAppOptimizationService : IAppOptimizationService
+    [Fact]
+    public async Task StartOptimizationAsync_CancelledResultUsesCancellationTelemetry()
     {
-        public string LogsDirectory => throw new NotSupportedException();
+        var service = new SucceedingAppOptimizationService(succeeds: false, wasCancelled: true);
+        var telemetry = new CapturingTelemetryService();
+        using var viewModel = new MainViewModel(service, telemetry: telemetry);
+        await viewModel.InitializeAsync();
 
-        public bool SettingsFileExists() => true;
+        await viewModel.StartOptimizationAsync();
 
-        public Task<AppSettings> LoadSettingsAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(new AppSettings
-            {
-                ShareAnonymousTelemetry = true,
-                ShareCrashReports = true,
-                PrivacyConsentVersion = PrivacyConsentPolicy.CurrentVersion
-            });
-
-        public Task SaveSettingsAsync(AppSettings settings, CancellationToken cancellationToken = default) =>
-            Task.CompletedTask;
-
-        public Task<AppDiagnostic> DiagnoseAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(new AppDiagnostic
-            {
-                Edition = FiveMEdition.Legacy,
-                IsFiveMRunning = false,
-                GtaVDetected = false,
-                GtaVIsRunning = false,
-                GtaVGraphicsSettingsPath = string.Empty,
-                CpuName = "Test CPU",
-                GpuName = "Test GPU",
-                TotalMemoryGiB = 16,
-                AvailableMemoryGiB = 8,
-                LogicalProcessorCount = 8,
-                FreeDiskGiB = 100,
-                LegacyCacheBytes = 0,
-                OsLabel = "Windows 11",
-                ReadinessScore = 80,
-                RecommendedProfile = OptimizationProfile.Balanced,
-                PerformancePressure = PerformancePressureLevel.Low,
-                StreamingSoftware = new StreamingSoftwareSnapshot([], DateTimeOffset.UtcNow, true, true)
-            });
-
-        public Task<IReadOnlyList<AppHistoryRecord>> LoadHistoryAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<AppHistoryRecord>>([]);
-
-        public Task<AppOptimizationResult> ExecuteAsync(
-            OptimizationPlanDto plan,
-            IProgress<AppProgressUpdate> progress,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(new AppOptimizationResult
-            {
-                TransactionId = Guid.NewGuid(),
-                Succeeded = false,
-                WasCancelled = false,
-                Summary = "O componente administrativo não confirmou o resultado.",
-                CompletedActions = 0,
-                BytesFreed = 0,
-                Report = null,
-                BugCode = BugCode.BRK_ACTION_EXECUTION
-            });
-
-        public Task<bool> RollbackAsync(
-            Guid transactionId,
-            IProgress<AppProgressUpdate> progress,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<AppGtaVBenchmarkResult> RunGtaVBenchmarkAsync(
-            int iterations,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
+        var sent = await telemetry.WaitForEventAsync().WaitAsync(
+            TimeSpan.FromSeconds(5),
+            TestContext.Current.CancellationToken);
+        Assert.Equal("optimization-cancelled", sent.EventName);
+        Assert.Equal("cancelled", sent.ErrorCategory);
+        Assert.Equal(BugCode.APP_OPT_CANCELLED, sent.BugCode);
     }
 
     /// <summary>Runs a plan to successful completion instead of throwing, so
     /// the whole <see cref="MainViewModel.StartOptimizationAsync"/> telemetry
     /// path (including the <c>finally</c> block) is exercised.</summary>
-    private sealed class SucceedingAppOptimizationService : IAppOptimizationService
+    private sealed class SucceedingAppOptimizationService(bool succeeds = true, bool wasCancelled = false)
+        : IAppOptimizationService
     {
+        public Guid LastTransactionId { get; private set; }
+
         public string LogsDirectory => throw new NotSupportedException();
 
         public bool SettingsFileExists() => true;
@@ -184,19 +128,30 @@ public sealed class MainViewModelTelemetryTests
         public Task<IReadOnlyList<AppHistoryRecord>> LoadHistoryAsync(CancellationToken cancellationToken = default) =>
             Task.FromResult<IReadOnlyList<AppHistoryRecord>>([]);
 
+        public Task<OptimizationReportDto?> LoadReportAsync(
+            Guid transactionId,
+            CancellationToken cancellationToken = default) => throw new NotSupportedException();
+
         public Task<AppOptimizationResult> ExecuteAsync(
             OptimizationPlanDto plan,
             IProgress<AppProgressUpdate> progress,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(new AppOptimizationResult
+            CancellationToken cancellationToken = default)
+        {
+            LastTransactionId = plan.PlanId;
+            return Task.FromResult(new AppOptimizationResult
             {
-                TransactionId = Guid.NewGuid(),
-                Succeeded = true,
-                WasCancelled = false,
-                Summary = "done",
-                CompletedActions = plan.Actions.Count,
-                BytesFreed = 0
+                TransactionId = plan.PlanId,
+                Succeeded = succeeds,
+                WasCancelled = wasCancelled,
+                Summary = succeeds ? "done" : "failed",
+                CompletedActions = succeeds ? plan.Actions.Count : 0,
+                BytesFreed = 0,
+                FailureBugCode = succeeds
+                    ? null
+                    : wasCancelled ? BugCode.APP_OPT_CANCELLED : BugCode.BRK_INTEGRITY_VALIDATION,
+                FailureErrorCategory = succeeds ? null : wasCancelled ? "cancelled" : "invalid-data"
             });
+        }
 
         public Task<bool> RollbackAsync(
             Guid transactionId,

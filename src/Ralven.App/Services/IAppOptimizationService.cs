@@ -28,6 +28,10 @@ public interface IAppOptimizationService
     Task<IReadOnlyList<AppHistoryRecord>> LoadHistoryAsync(
         CancellationToken cancellationToken = default);
 
+    Task<OptimizationReportDto?> LoadReportAsync(
+        Guid transactionId,
+        CancellationToken cancellationToken = default);
+
     Task<bool> RollbackAsync(
         Guid transactionId,
         IProgress<AppProgressUpdate> progress,

@@ -75,4 +75,26 @@ public partial class HistoryPage : UserControl
             await vm.RollbackAsync(item);
         }
     }
+
+    private async void OpenHistoryReport_Click(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel is not { } vm
+            || sender is not FrameworkElement { Tag: HistoryDisplayItem item })
+        {
+            return;
+        }
+
+        if (await vm.OpenHistoryReportAsync(item)
+            && Window.GetWindow(this) is MainWindow shell)
+        {
+            shell.RequestNavigateToOptimizerReport();
+            return;
+        }
+
+        System.Windows.MessageBox.Show(
+            LocalizationService.Current.GetString("History.ReportUnavailable.Message"),
+            LocalizationService.Current.GetString("History.ReportUnavailable.Title"),
+            MessageBoxButton.OK,
+            MessageBoxImage.Information);
+    }
 }

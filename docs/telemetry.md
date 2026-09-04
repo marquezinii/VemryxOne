@@ -29,14 +29,14 @@ ver `PrivacyConsentPolicy`):
 
 | Campos | Finalidade | Obrigatório | Retenção | Destinatários |
 | --- | --- | --- | --- | --- |
-| ID do evento | Garantir entrega idempotente sem identificar máquina ou usuário. | Sim, diagnóstico essencial. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
+| ID do evento | Correlacionar a execução com seu relatório local e garantir entrega idempotente sem identificar máquina ou usuário. Em otimizações, é o UUID aleatório da transação. | Sim, diagnóstico essencial. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
 | Tipo do evento, tempo de execução e versão do app | Distinguir conclusão, falha ou cancelamento; detectar operações anormalmente longas e correlacioná-las à versão. | Sim, diagnóstico essencial. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, banco D1 e painel administrativo autenticado com métricas agregadas. |
 | Categoria de erro allowlisted (`cancelled`, `timeout`, `access-denied`, `io`, `invalid-data`, `unexpected`) | Classificar falhas sem enviar mensagem, stack trace, arquivo ou caminho. | Sim em falhas, diagnóstico essencial. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
 | Código técnico de bug allowlisted (`BugCode`) | Agrupar a causa técnica da falha sem texto livre. | Sim quando a causa é conhecida, diagnóstico essencial. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
 | Versão do Windows e arquitetura | Compatibilidade agregada do sistema operacional. | Sim, diagnóstico essencial. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
 | Build do Windows | Identificar incompatibilidades específicas de uma build. | Não. Só com **Relatórios opcionais** ativos. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
 | Modelo de CPU e GPU; faixa de RAM | Estatísticas agregadas do hardware mais comum. A RAM é arredondada para uma faixa fixa. | Não. Só com **Relatórios opcionais** ativos. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
-| Perfil escolhido e IDs allowlisted das ações aplicadas | Medir uso agregado de perfis e funcionalidades. | Não. Só com **Relatórios opcionais** ativos. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
+| Perfil escolhido e amostra de até 30 IDs allowlisted das ações planejadas | Medir uso agregado de perfis e funcionalidades. A contagem de alvos informa o total quando a lista é parcial. | Não. Só com **Relatórios opcionais** ativos. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
 | FiveM detectado; edição do GTA V; contagem de alvos | Verificar instalação sem caminho, edição suportada e escopo da execução. | Sim, diagnóstico essencial. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
 | Tipo de disco; faixa de espaço livre | Contextualizar I/O e falta de espaço sem enviar valor exato fora das faixas permitidas. | Não. Só com **Relatórios opcionais** ativos. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
 | Timestamp da execução; dias desde a última execução em faixa | Calcular padrões agregados de horário e frequência. | Não. Só com **Relatórios opcionais** ativos. | Fila local: até 14 dias. D1: não há expiração automática definida no contrato atual. | Worker Cloudflare, D1 e painel administrativo autenticado. |
@@ -68,7 +68,8 @@ código nem configuração que envie telemetria de uso para ele.
   tabela acima;
 - texto livre, mensagens de erro brutas, stack traces ou caminhos.
 
-A fila preserva o UUID aleatório de cada evento em todos os retries. Ao
+A fila preserva o UUID aleatório de cada evento — o mesmo UUID da transação nas
+otimizações — em todos os retries. Ao
 desativar **Relatórios opcionais**, campos opcionais também são removidos dos
 eventos que já estavam pendentes antes de qualquer novo envio. O Worker
 grava um lote em uma única transação D1; repetir o mesmo lote com UUID do

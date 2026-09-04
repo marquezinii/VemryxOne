@@ -101,6 +101,7 @@ test('validateEvent rejects an unknown error category', () => {
 
 test('validateEvent accepts an allowlisted bug code and rejects arbitrary text', () => {
   assert.equal(validateEvent(validEvent()).bugCode, 'APP_OPT_ACTION_EXECUTION');
+  assert.equal(validateEvent(validEvent({ bugCode: 'BRK_INTEGRITY_VALIDATION' })).bugCode, 'BRK_INTEGRITY_VALIDATION');
   assert.equal(validateEvent(validEvent({ bugCode: 'user supplied reason' })), null);
 });
 

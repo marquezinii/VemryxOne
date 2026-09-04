@@ -404,6 +404,33 @@ public sealed class AppOptimizationService : IAppOptimizationService
         return records;
     }
 
+    public async Task<OptimizationReportDto?> LoadReportAsync(
+        Guid transactionId,
+        CancellationToken cancellationToken = default)
+    {
+        if (demoMode || transactionId == Guid.Empty)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return null;
+        }
+
+        try
+        {
+            var journal = await LoadJournalAsync(transactionId, cancellationToken).ConfigureAwait(false);
+            return journal?.TransactionId == transactionId
+                ? OptimizationReportBuilder.Build(journal, journal.Profile ?? InferProfile(journal))
+                : null;
+        }
+        catch (Exception exception) when (exception is JsonException
+            or NotSupportedException
+            or IOException
+            or UnauthorizedAccessException
+            or SecurityException)
+        {
+            return null;
+        }
+    }
+
     private static bool HasAdministratorReceipt(Guid transactionId)
     {
         try
@@ -700,7 +727,9 @@ public sealed class AppOptimizationService : IAppOptimizationService
                 succeeded: false,
                 wasCancelled: true,
                 localization.GetString("Runtime.UacCancelledPreserved"),
-                CancellationToken.None).ConfigureAwait(false);
+                CancellationToken.None,
+                failureBugCode: BugCode.APP_OPT_CANCELLED,
+                failureErrorCategory: "cancelled").ConfigureAwait(false);
         }
         catch (Exception exception) when (exception is not (
             OutOfMemoryException or StackOverflowException or AccessViolationException))
@@ -719,7 +748,8 @@ public sealed class AppOptimizationService : IAppOptimizationService
                 wasCancelled: false,
                 localization.Format("Runtime.AdminPhaseFailedPreserved", reason),
                 CancellationToken.None,
-                BugCodeClassifier.ClassifyBrokerException(exception)).ConfigureAwait(false);
+                failureBugCode: BugCodeClassifier.ClassifyBrokerException(exception),
+                failureErrorCategory: TelemetryErrorClassifier.ClassifyException(exception)).ConfigureAwait(false);
         }
 
         if (!elevated.Succeeded)
@@ -745,11 +775,10 @@ public sealed class AppOptimizationService : IAppOptimizationService
                 wasCancelled: elevated.WasCancelled,
                 summary,
                 CancellationToken.None,
-                // No live exception here (the broker reported failure through
-                // its own result, not a throw) -- a cancellation isn't a bug,
-                // but a genuine broker failure gets a fixed classification
-                // since there's nothing to inspect beyond that fact.
-                elevated.WasCancelled ? null : BugCode.BRK_ACTION_EXECUTION).ConfigureAwait(false);
+                failureBugCode: BugCodeClassifier.ClassifyBrokerFailure(
+                    elevated.ErrorCode,
+                    elevated.WasCancelled),
+                failureErrorCategory: elevated.WasCancelled ? "cancelled" : "unexpected").ConfigureAwait(false);
         }
 
         return null;
@@ -998,7 +1027,8 @@ public sealed class AppOptimizationService : IAppOptimizationService
         bool wasCancelled,
         string summary,
         CancellationToken cancellationToken,
-        BugCode? bugCode = null)
+        BugCode? failureBugCode = null,
+        string? failureErrorCategory = null)
     {
         var journal = await LoadJournalAsync(transactionId, cancellationToken).ConfigureAwait(false);
         return new AppOptimizationResult
@@ -1011,7 +1041,8 @@ public sealed class AppOptimizationService : IAppOptimizationService
                 action.State == ActionJournalState.Committed) ?? 0,
             BytesFreed = journal is null ? 0 : SumCommittedCleanupBytes(journal),
             Report = journal is null ? null : OptimizationReportBuilder.Build(journal, profile),
-            BugCode = bugCode
+            FailureBugCode = failureBugCode,
+            FailureErrorCategory = failureErrorCategory
         };
     }
 

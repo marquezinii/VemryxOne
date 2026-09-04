@@ -6,9 +6,9 @@ using System.Globalization;
 using System.Windows.Threading;
 using Ralven.App.Services;
 using Ralven.Contracts;
+using Ralven.Windows.Diagnostics;
 using Ralven.Core.Catalog;
 using Ralven.Core.Planning;
-using Ralven.Windows.Diagnostics;
 
 namespace Ralven.App.ViewModels;
 
@@ -218,14 +218,26 @@ public sealed partial class MainViewModel
             // só retorna true quando CanStart é true (e CanStart exige plano).
             var result = await service.ExecuteAsync(currentPlan!, progress, operationCancellation.Token);
             completedSuccessfully = result.Succeeded;
-            telemetryEventName = result.Succeeded ? "optimization-completed" : "optimization-failed";
+            telemetryEventName = result.WasCancelled
+                ? "optimization-cancelled"
+                : result.Succeeded ? "optimization-completed" : "optimization-failed";
             if (!result.Succeeded)
             {
-                telemetryBugCode = result.Report?.Lines
-                    .Where(l => l.Outcome is ActionExecutionOutcome.Failed or ActionExecutionOutcome.RollbackFailed)
-                    .Select(l => l.BugCode)
-                    .FirstOrDefault(code => code is not null and not BugCode.Unknown)
-                    ?? result.BugCode;
+                telemetryErrorCategory = result.FailureErrorCategory ?? "unexpected";
+                telemetryBugCode = result.FailureBugCode;
+                if (telemetryBugCode is null && result.Report is not null)
+                {
+                    var failures = result.Report.Lines
+                        .Where(line => line.Outcome is ActionExecutionOutcome.Failed or ActionExecutionOutcome.RollbackFailed)
+                        .ToArray();
+                    telemetryBugCode = failures.Length > 1
+                        ? BugCode.APP_OPT_PARTIAL_FAILURE
+                        : failures.Length == 1
+                            ? BugCodeClassifier.ClassifyOptimizationException(
+                                new InvalidOperationException(),
+                                failures[0].ActionId)
+                            : BugCode.APP_OPT_ACTION_EXECUTION;
+                }
             }
             await HandleOptimizationResultAsync(result);
         }
@@ -280,17 +292,7 @@ public sealed partial class MainViewModel
         ProgressPercent = result.Succeeded ? 100 : ProgressPercent;
         FinalizeHeadline(result.Succeeded
             ? localization.GetString("Status.OptimizationCompleted")
-            // AppendCode's signature is string? to also serve callers with an
-            // optional message, but result.Summary is a required non-null
-            // string, so the result here can never actually be null.
-            : OptimizationFailureMessageFormatter.AppendCode(
-                result.Summary,
-                result.Report?.Lines
-                    .Where(l => l.Outcome is ActionExecutionOutcome.Failed or ActionExecutionOutcome.RollbackFailed)
-                    .Select(l => l.BugCode)
-                    .FirstOrDefault(code => code is not null and not BugCode.Unknown)
-                    ?? result.BugCode,
-                code => localization.Format("Report.ErrorCodeSuffix", code))!);
+            : result.Summary);
         ApplyReport(result.Report);
         lastTransactionId = result.TransactionId;
         ApplyComparison(result.Comparison);

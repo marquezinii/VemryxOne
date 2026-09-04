@@ -31,25 +31,40 @@
                     <TextBlock Grid.Column="0" Text="{Binding DateLabel}" Style="{StaticResource TickLabelText}" VerticalAlignment="Center" Margin="0,0,18,0" TextWrapping="Wrap" />
                     <TextBlock Grid.Column="1" Text="{Binding Title}" Style="{StaticResource BodyStrongText}" VerticalAlignment="Center" Margin="0,0,18,0" TextWrapping="Wrap" />
                     <TextBlock Grid.Column="2" Text="{Binding Summary}" Style="{StaticResource SecondaryText}" VerticalAlignment="Center" Margin="0,0,18,0" TextWrapping="Wrap" />
-                    <Button Grid.Column="3"
-                            Content="{Binding [History.Undo], Source={StaticResource LocalizedStrings}}"
-                            Height="34" Padding="16,0" VerticalAlignment="Center"
-                            Tag="{Binding}" Click="RollbackHistory_Click">
-                        <Button.Style>
-                            <Style TargetType="Button" BasedOn="{StaticResource SecondaryButtonStyle}">
-                                <Setter Property="IsEnabled" Value="False" />
-                                <Style.Triggers>
-                                    <MultiDataTrigger>
-                                        <MultiDataTrigger.Conditions>
-                                            <Condition Binding="{Binding CanRollback}" Value="True" />
-                                            <Condition Binding="{Binding DataContext.IsBusy, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" Value="False" />
-                                        </MultiDataTrigger.Conditions>
-                                        <Setter Property="IsEnabled" Value="True" />
-                                    </MultiDataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
+                    <StackPanel Grid.Column="3" Orientation="Horizontal">
+                        <Button Content="{Binding [History.ViewReport], Source={StaticResource LocalizedStrings}}"
+                                Height="34" Padding="16,0" VerticalAlignment="Center" Margin="0,0,8,0"
+                                Tag="{Binding}" Click="OpenHistoryReport_Click">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource SecondaryButtonStyle}">
+                                    <Setter Property="IsEnabled" Value="False" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DataContext.IsBusy, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" Value="False">
+                                            <Setter Property="IsEnabled" Value="True" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <Button Content="{Binding [History.Undo], Source={StaticResource LocalizedStrings}}"
+                                Height="34" Padding="16,0" VerticalAlignment="Center"
+                                Tag="{Binding}" Click="RollbackHistory_Click">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource SecondaryButtonStyle}">
+                                    <Setter Property="IsEnabled" Value="False" />
+                                    <Style.Triggers>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding CanRollback}" Value="True" />
+                                                <Condition Binding="{Binding DataContext.IsBusy, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" Value="False" />
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="IsEnabled" Value="True" />
+                                        </MultiDataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
                 </Grid>
             </Border>
         </DataTemplate>
