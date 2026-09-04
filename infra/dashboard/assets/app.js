@@ -13,8 +13,9 @@ import {
   toRecentFailureRow,
   toBugReportRow,
   toUpdaterEventRow,
+  formatActionIds,
 } from './charts.js';
-import { drawBarChart, drawDonutChart, drawLineChart, DONUT_COLORS } from './rendering.js';
+import { drawBarChart, drawDonutChart, drawLineChart, DONUT_COLORS, CHART_COLORS } from './rendering.js';
 
 // The dashboard (Cloudflare Pages) and the Worker are deliberately two
 // separate origins -- no custom domain/routing was set up to make them
@@ -33,20 +34,24 @@ const DEFAULT_API_BASE = 'https://fivemcleaner-telemetry.felipemarquesini10.work
 const API_BASE = resolveApiBase(DEFAULT_API_BASE, location.hostname, new URLSearchParams(location.search));
 
 const CHART_DEFINITIONS = [
-  { name: 'runs-per-day', title: 'Otimizações por dia', type: 'line', xKey: 'day', yKey: 'runs' },
-  { name: 'os-versions', type: 'donut', labelKey: 'os_version', valueKey: 'runs', legendId: 'legend-os-versions' },
-  { name: 'app-versions', type: 'donut', labelKey: 'app_version', valueKey: 'runs', labelFormatter: formatAppVersion, legendId: 'legend-app-versions' },
-  { name: 'top-cpu', type: 'bar', labelKey: 'cpu_model', valueKey: 'runs', horizontal: true },
-  { name: 'top-gpu', type: 'bar', labelKey: 'gpu_model', valueKey: 'runs', horizontal: true },
-  { name: 'ram-buckets', type: 'bar', labelKey: 'ram_bucket_gib', valueKey: 'runs', horizontal: true },
-  { name: 'error-categories', type: 'donut', labelKey: 'error_category', valueKey: 'occurrences', legendId: 'legend-error-categories' },
+  { name: 'runs-per-day', type: 'line', xKey: 'day', yKey: 'runs', valueLabel: 'execuções', showPercent: false, color: CHART_COLORS[0] },
+  { name: 'os-versions', type: 'donut', labelKey: 'os_version', valueKey: 'runs', valueLabel: 'eventos', legendId: 'legend-os-versions' },
+  { name: 'app-versions', type: 'donut', labelKey: 'app_version', valueKey: 'runs', valueLabel: 'eventos', labelFormatter: formatAppVersion, legendId: 'legend-app-versions' },
+  { name: 'top-cpu', type: 'bar', labelKey: 'cpu_model', valueKey: 'runs', valueLabel: 'eventos', horizontal: true, limit: 5, color: CHART_COLORS[1] },
+  { name: 'top-gpu', type: 'bar', labelKey: 'gpu_model', valueKey: 'runs', valueLabel: 'eventos', horizontal: true, limit: 5, color: CHART_COLORS[0] },
+  { name: 'ram-buckets', type: 'bar', labelKey: 'ram_bucket_gib', valueKey: 'runs', valueLabel: 'eventos', horizontal: true, limit: 5, color: CHART_COLORS[2] },
+  { name: 'error-categories', type: 'donut', labelKey: 'error_category', valueKey: 'occurrences', valueLabel: 'falhas', legendId: 'legend-error-categories' },
   {
     name: 'errors-by-version',
-    title: 'Erros por versão',
     type: 'bar',
     combinedKeys: ['app_version', 'error_category'],
     valueKey: 'occurrences',
+    valueLabel: 'falhas',
+    horizontal: true,
+    limit: 8,
+    color: CHART_COLORS[4],
   },
+  { name: 'bug-codes', type: 'bar', labelKey: 'bug_code', valueKey: 'occurrences', valueLabel: 'falhas', horizontal: true, limit: 8, color: CHART_COLORS[3] },
 ];
 
 async function main() {
@@ -69,6 +74,13 @@ async function main() {
   const liveAlertStatus = document.getElementById('live-alert-status');
   const liveAlertError = document.getElementById('live-alert-error');
   const liveAlertDeactivate = document.getElementById('live-alert-deactivate');
+  const detailDialog = document.getElementById('detail-dialog');
+  const detailDialogKind = document.getElementById('detail-dialog-kind');
+  const detailDialogTitle = document.getElementById('detail-dialog-title');
+  const detailDialogMeta = document.getElementById('detail-dialog-meta');
+  const detailDialogContent = document.getElementById('detail-dialog-content');
+  const detailDialogCopy = document.getElementById('detail-dialog-copy');
+  let detailClipboardText = '';
 
   function showLogin() {
     loginView.classList.remove('hidden');
@@ -167,7 +179,7 @@ async function main() {
     }
 
     const { message, active, id } = result.data;
-    liveAlertMessage.value = message || '';
+    liveAlertMessage.value = active ? message || '' : '';
     updateLiveAlertCounter();
     liveAlertStatus.textContent = formatLiveAlertStatus(active, id);
     liveAlertStatus.classList.toggle('live-alert-status-active', active);
@@ -193,13 +205,28 @@ async function main() {
 
   liveAlertDeactivate.addEventListener('click', async () => {
     liveAlertError.textContent = '';
-    const result = await setLiveAlert(API_BASE, { active: false }, csrfToken);
+    const result = await setLiveAlert(API_BASE, { message: '', active: false }, csrfToken);
     if (result.error || result.unauthorized) {
       liveAlertError.textContent = 'Erro ao desativar o aviso.';
       return;
     }
 
     await loadLiveAlertStatus();
+  });
+
+  document.getElementById('detail-dialog-close').addEventListener('click', () => detailDialog.close());
+  document.getElementById('detail-dialog-dismiss').addEventListener('click', () => detailDialog.close());
+  detailDialog.addEventListener('click', (event) => {
+    if (event.target === detailDialog) detailDialog.close();
+  });
+  detailDialogCopy.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(detailClipboardText);
+      detailDialogCopy.textContent = 'Copiado';
+    } catch {
+      detailDialogCopy.textContent = 'Falha ao copiar';
+    }
+    setTimeout(() => { detailDialogCopy.textContent = 'Copiar detalhes'; }, 1500);
   });
 
   function currentFilters() {
@@ -235,17 +262,148 @@ async function main() {
     }
   }
 
+  function renderDetailedTable(tbody, rows, mapRow, colspan, openDetails, cellClass) {
+    tbody.replaceChildren();
+    if (!rows?.length) {
+      const cell = document.createElement('td');
+      cell.colSpan = colspan;
+      cell.className = 'empty-row';
+      cell.textContent = 'Sem dados ainda';
+      const row = document.createElement('tr');
+      row.appendChild(cell);
+      tbody.appendChild(row);
+      return;
+    }
+
+    rows.forEach((source, rowIndex) => {
+      const row = document.createElement('tr');
+      mapRow(source).forEach((value, cellIndex) => {
+        const cell = document.createElement('td');
+        cell.textContent = value;
+        if (cellClass) cell.className = cellClass(cellIndex);
+        row.appendChild(cell);
+      });
+      const actionCell = document.createElement('td');
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'details-button';
+      button.textContent = 'Ver';
+      button.setAttribute('aria-label', `Ver detalhes da linha ${rowIndex + 1}`);
+      button.addEventListener('click', () => openDetails(source));
+      actionCell.appendChild(button);
+      row.appendChild(actionCell);
+      tbody.appendChild(row);
+    });
+  }
+
   function renderRecentFailures(rows) {
-    renderTableBody(recentFailuresBody, rows, toRecentFailureRow, 8,
-      (i) => i === 1 ? 'error-category' : '');
+    renderDetailedTable(recentFailuresBody, rows, toRecentFailureRow, 7, openFailureDetails,
+      (index) => index === 1 ? 'failure-code' : '');
   }
 
   function renderBugReports(rows) {
-    renderTableBody(bugReportsBody, rows, toBugReportRow, 9);
+    renderDetailedTable(bugReportsBody, rows, toBugReportRow, 6, openBugReportDetails,
+      (index) => index === 1 ? 'failure-code' : index === 2 ? 'summary-cell' : '');
   }
 
   function renderUpdaterEvents(rows) {
     renderTableBody(updaterEventsBody, rows, toUpdaterEventRow, 7);
+  }
+
+  function openFailureDetails(row) {
+    const actions = formatActionIds(row.action_ids);
+    showDetails({
+      kind: 'Detalhes do erro',
+      title: row.bug_code || 'Falha sem código específico',
+      meta: [
+        ['Ocorrência', displayValue(row.event_id)],
+        ['Recebido em', toRecentFailureRow(row)[0]],
+        ['Versão', formatAppVersion(row.app_version)],
+        ['Ambiente', displayValue(row.environment)],
+        ['Perfil', displayValue(row.profile)],
+      ],
+      sections: [
+        ['Código da falha', displayValue(row.bug_code)],
+        ['Categoria', displayValue(row.error_category)],
+        ['Tempo de execução', formatDuration(row.execution_time_ms)],
+        ['Contexto técnico', [
+          `Windows: ${displayValue(row.os_version)}`,
+          `Arquitetura: ${displayValue(row.system_architecture)}`,
+          `CPU: ${displayValue(row.cpu_model)}`,
+          `GPU: ${displayValue(row.gpu_model)}`,
+          `Ações no plano: ${displayValue(row.optimization_target_count)}`,
+        ].join('\n')],
+        ['IDs das ações no plano', actions.length ? actions : ['Não informado pela telemetria opcional.']],
+      ],
+    });
+  }
+
+  function openBugReportDetails(row) {
+    showDetails({
+      kind: 'Detalhes do relato',
+      title: row.bug_code || 'Relato sem código específico',
+      meta: [
+        ['Ocorrência', displayValue(row.report_id)],
+        ['Recebido em', toBugReportRow(row)[0]],
+        ['Versão', formatAppVersion(row.app_version)],
+        ['Ambiente', displayValue(row.environment)],
+        ['Perfil', displayValue(row.profile)],
+      ],
+      sections: [
+        ['Resumo', displayValue(row.summary)],
+        ['Descrição', displayValue(row.description)],
+        ['Contexto técnico', displayValue(row.technical_summary)],
+        ['E-mail', displayValue(row.email)],
+        ['Trecho de log', row.log_text || 'Nenhum trecho de log enviado.', 'code'],
+      ],
+    });
+  }
+
+  function showDetails({ kind, title, meta, sections }) {
+    detailDialogKind.textContent = kind;
+    detailDialogTitle.textContent = title;
+    detailDialogMeta.replaceChildren(...meta.map(([label, value]) => {
+      const item = document.createElement('div');
+      const term = document.createElement('dt');
+      term.textContent = label;
+      const description = document.createElement('dd');
+      description.textContent = value;
+      description.title = value;
+      item.append(term, description);
+      return item;
+    }));
+
+    detailDialogContent.replaceChildren(...sections.map(([heading, value, style]) => {
+      const section = document.createElement('section');
+      section.className = 'detail-section';
+      const titleElement = document.createElement('h3');
+      titleElement.textContent = heading;
+      let content;
+      if (Array.isArray(value)) {
+        content = document.createElement('ul');
+        content.append(...value.map((item) => {
+          const listItem = document.createElement('li');
+          listItem.textContent = item;
+          return listItem;
+        }));
+      } else {
+        content = document.createElement(style === 'code' ? 'pre' : 'p');
+        content.textContent = value;
+      }
+      section.append(titleElement, content);
+      return section;
+    }));
+
+    detailClipboardText = [
+      `${kind}: ${title}`,
+      ...meta.map(([label, value]) => `${label}: ${value}`),
+      ...sections.map(([heading, value]) => `${heading}:\n${Array.isArray(value) ? value.join('\n') : value}`),
+    ].join('\n\n');
+    detailDialog.showModal();
+  }
+
+  function displayValue(value) {
+    return value === null || value === undefined || value === '' ? '—' : String(value);
   }
 
   function renderLegend(id, series) {
@@ -263,7 +421,7 @@ async function main() {
       label.textContent = point.label;
       const value = document.createElement('span');
       value.className = 'legend-value';
-      value.textContent = `${Math.round(point.percent * 10) / 10}%`;
+      value.textContent = `${point.value} · ${Math.round(point.percent * 10) / 10}%`;
       row.append(swatch, label, value);
       return row;
     }));
@@ -310,30 +468,39 @@ async function main() {
       const result = chartResults[index];
       const canvas = document.getElementById(`chart-${definition.name}`);
       const csvLink = document.getElementById(`csv-${definition.name}`);
-      csvLink.href = buildCsvUrl(API_BASE, definition.name, filters);
+      if (csvLink) csvLink.href = buildCsvUrl(API_BASE, definition.name, filters);
 
-      if (!canvas || result.unauthorized || result.error) {
-        return;
-      }
+      if (!canvas || result.unauthorized) return;
+
+      const options = {
+        horizontal: definition.horizontal,
+        color: definition.color,
+        valueLabel: definition.valueLabel,
+        showPercent: definition.showPercent,
+      };
+      const data = result.error ? [] : result.data;
 
       if (definition.type === 'line') {
-        drawLineChart(canvas, toLineSeries(result.data, definition.xKey, definition.yKey));
+        drawLineChart(canvas, toLineSeries(data, definition.xKey, definition.yKey), options);
       } else if (definition.type === 'donut') {
-        const series = topN(toBarSeries(result.data, definition.labelKey, definition.valueKey), 5);
+        const series = topN(toBarSeries(data, definition.labelKey, definition.valueKey), 5);
         const formatted = definition.labelFormatter ? series.map((point) => ({ ...point, label: definition.labelFormatter(point.label) })) : series;
-        drawDonutChart(canvas, formatted);
+        drawDonutChart(canvas, formatted, options);
         renderLegend(definition.legendId, formatted);
       } else if (definition.combinedKeys) {
         drawBarChart(
           canvas,
-          topN(toCombinedBarSeries(result.data.map((row) => ({ ...row, app_version: formatAppVersion(row.app_version) })), definition.combinedKeys, definition.valueKey), 10),
+          topN(toCombinedBarSeries(data.map((row) => ({ ...row, app_version: formatAppVersion(row.app_version) })), definition.combinedKeys, definition.valueKey), definition.limit ?? 10),
+          options,
         );
       } else {
-        const series = topN(toBarSeries(result.data, definition.labelKey, definition.valueKey), 10);
-        drawBarChart(canvas, definition.labelFormatter ? series.map((point) => ({ ...point, label: definition.labelFormatter(point.label) })) : series, { horizontal: definition.horizontal });
+        const series = topN(toBarSeries(data, definition.labelKey, definition.valueKey), definition.limit ?? 10);
+        drawBarChart(canvas, definition.labelFormatter ? series.map((point) => ({ ...point, label: definition.labelFormatter(point.label) })) : series, options);
       }
     });
-    refreshStatus.textContent = 'Dados atualizados';
+    const failedRequests = [runsPerDay, successRate, averageTime, errorCategories, recentFailures, bugReports, updaterEvents, ...chartResults]
+      .filter((result) => result.error).length;
+    refreshStatus.textContent = failedRequests ? `Atualizado com ${failedRequests} fonte(s) indisponível(is)` : 'Dados atualizados';
   }
 
   // Probe whether a session already exists (e.g. the page was reloaded)
@@ -367,5 +534,5 @@ async function main() {
 main().catch((error) => {
   console.error('Dashboard initialization failed:', error);
   const loginError = document.getElementById('login-error');
-  if (loginError) loginError.textContent = 'Erro ao iniciar o dashboard. Recarregue a pagina.';
+  if (loginError) loginError.textContent = 'Erro ao iniciar o dashboard. Recarregue a página.';
 });

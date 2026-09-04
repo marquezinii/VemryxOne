@@ -24,6 +24,6 @@ test('toLiveAlertResponse treats a missing row as inactive', () => {
 });
 
 test('toLiveAlertResponse treats active:0 as false', () => {
-  const response = toLiveAlertResponse({ message: '', active: 0, updated_at: '2026-08-17T12:00:00.000Z' });
-  assert.equal(response.active, false);
+  const response = toLiveAlertResponse({ message: 'aviso antigo', active: 0, updated_at: '2026-08-17T12:00:00.000Z' });
+  assert.deepEqual(response, { id: '2026-08-17T12:00:00.000Z', message: '', active: false });
 });
