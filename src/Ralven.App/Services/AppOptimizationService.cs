@@ -10,6 +10,7 @@ using Ralven.Contracts;
 using Ralven.Core.Catalog;
 using Ralven.Windows;
 using Ralven.Windows.Actions;
+using Ralven.Windows.Diagnostics;
 using Ralven.Windows.Engine;
 using Ralven.Windows.Infrastructure;
 using Microsoft.Win32;
@@ -717,7 +718,8 @@ public sealed class AppOptimizationService : IAppOptimizationService
                 succeeded: false,
                 wasCancelled: false,
                 localization.Format("Runtime.AdminPhaseFailedPreserved", reason),
-                CancellationToken.None).ConfigureAwait(false);
+                CancellationToken.None,
+                BugCodeClassifier.ClassifyBrokerException(exception)).ConfigureAwait(false);
         }
 
         if (!elevated.Succeeded)
@@ -742,7 +744,12 @@ public sealed class AppOptimizationService : IAppOptimizationService
                 succeeded: false,
                 wasCancelled: elevated.WasCancelled,
                 summary,
-                CancellationToken.None).ConfigureAwait(false);
+                CancellationToken.None,
+                // No live exception here (the broker reported failure through
+                // its own result, not a throw) -- a cancellation isn't a bug,
+                // but a genuine broker failure gets a fixed classification
+                // since there's nothing to inspect beyond that fact.
+                elevated.WasCancelled ? null : BugCode.BRK_ACTION_EXECUTION).ConfigureAwait(false);
         }
 
         return null;
@@ -990,7 +997,8 @@ public sealed class AppOptimizationService : IAppOptimizationService
         bool succeeded,
         bool wasCancelled,
         string summary,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        BugCode? bugCode = null)
     {
         var journal = await LoadJournalAsync(transactionId, cancellationToken).ConfigureAwait(false);
         return new AppOptimizationResult
@@ -1002,7 +1010,8 @@ public sealed class AppOptimizationService : IAppOptimizationService
             CompletedActions = journal?.Actions.Count(action =>
                 action.State == ActionJournalState.Committed) ?? 0,
             BytesFreed = journal is null ? 0 : SumCommittedCleanupBytes(journal),
-            Report = journal is null ? null : OptimizationReportBuilder.Build(journal, profile)
+            Report = journal is null ? null : OptimizationReportBuilder.Build(journal, profile),
+            BugCode = bugCode
         };
     }
 

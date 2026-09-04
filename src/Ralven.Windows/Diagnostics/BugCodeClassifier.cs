@@ -2,7 +2,7 @@ using System.IO;
 using System.Net.Http;
 using Ralven.Contracts;
 
-namespace Ralven.App.Services;
+namespace Ralven.Windows.Diagnostics;
 
 /// <summary>
 /// Maps exceptions and failure contexts to stable <see cref="BugCode"/> values.
@@ -43,8 +43,21 @@ public static class BugCodeClassifier
             // Memory
             OutOfMemoryException => BugCode.SYS_MEMORY,
 
-            // Generic fallthrough
-            _ => BugCode.APP_OPT_ACTION_EXECUTION
+            // Generic fallthrough: only assume "optimization" when nothing
+            // more specific matched and the caller actually said so; an
+            // unrecognized context must not silently look like an
+            // optimization failure.
+            _ => context switch
+            {
+                "optimization" => BugCode.APP_OPT_ACTION_EXECUTION,
+                "fivem-action" => BugCode.APP_OPT_ACTION_EXECUTION,
+                "gtav-action" => BugCode.APP_OPT_ACTION_EXECUTION,
+                "windows-action" => BugCode.APP_OPT_ACTION_EXECUTION,
+                "app-inventory" => BugCode.APP_INV_SCAN,
+                "security-health" => BugCode.SEC_HEALTH_QUERY,
+                "settings" => BugCode.APP_SETTINGS_PERSISTENCE,
+                _ => BugCode.Unknown
+            }
         };
     }
 
@@ -193,6 +206,8 @@ public static class BugCodeClassifier
             "registry" => BugCode.WIN_REGISTRY,
             "service" => BugCode.WIN_SERVICE,
             "power" => BugCode.WIN_POWER_PLAN,
+            "app-inventory" => BugCode.APP_INV_SCAN,
+            "settings" => BugCode.APP_SETTINGS_PERSISTENCE,
             _ => BugCode.WIN_PRIVILEGE
         };
     }

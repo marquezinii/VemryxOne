@@ -63,7 +63,7 @@ public sealed class MainViewModelSystemHealthTests
 
         Assert.Equal("Unavailable", viewModel.WindowsAntivirusHealthLabel);
         Assert.Equal(
-            "Windows Security Center could not provide this health information.",
+            "Windows Security Center could not provide this health information. — Error code: SEC_HEALTH_QUERY",
             viewModel.WindowsSystemHealthStatusMessage);
         Assert.True(viewModel.CanRefreshWindowsSystemHealth);
     }

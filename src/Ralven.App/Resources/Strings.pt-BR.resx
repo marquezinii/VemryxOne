@@ -538,7 +538,7 @@
   <data name="BugReport.Reason.Windows" xml:space="preserve"><value>Problema de permissão do Windows ou UAC</value></data>
   <data name="BugReport.Reason.Crash" xml:space="preserve"><value>O Ralven fechou ou parou inesperadamente</value></data>
   <data name="BugReport.Validation.BugCode" xml:space="preserve"><value>Selecione um código de bug.</value></data>
-  <data name="BugReport.Clipboard.BugCode" xml:space="preserve"><value>Código do bug: {0}</value></data>
+  <data name="BugReport.Clipboard.BugCode" xml:space="preserve"><value>Código do bug: {0} ({1})</value></data>
   <data name="Streaming.Readiness.Protected.Title" xml:space="preserve"><value>Proteção para transmissão ativa</value></data>
   <data name="Streaming.Readiness.Protected.Detail" xml:space="preserve"><value>Um aplicativo de transmissão está aberto. O Ralven o preserva; confirme o estado da sua live antes de otimizar.</value></data>
   <data name="Streaming.Readiness.Attention.Title" xml:space="preserve"><value>Faça um teste antes de entrar ao vivo</value></data>
@@ -1065,6 +1065,18 @@
   <data name="Report.SummaryFormat" xml:space="preserve"><value>Verificadas {0} · Alteradas {1} · Ignoradas {2} · Avisos {3} · Falharam {4}</value></data>
   <data name="Report.RestartNeeded" xml:space="preserve"><value>Recomendamos reiniciar o Windows para aplicar totalmente as alterações.</value></data>
   <data name="Report.RestartNotNeeded" xml:space="preserve"><value>Não é necessário reiniciar.</value></data>
+  <data name="BugCode.Category.App" xml:space="preserve"><value>Aplicativo</value></data>
+  <data name="BugCode.Category.Updater" xml:space="preserve"><value>Atualização</value></data>
+  <data name="BugCode.Category.Broker" xml:space="preserve"><value>Privilégios administrativos</value></data>
+  <data name="BugCode.Category.Network" xml:space="preserve"><value>Rede</value></data>
+  <data name="BugCode.Category.FiveM" xml:space="preserve"><value>FiveM</value></data>
+  <data name="BugCode.Category.GtaV" xml:space="preserve"><value>GTA V</value></data>
+  <data name="BugCode.Category.Windows" xml:space="preserve"><value>Windows</value></data>
+  <data name="BugCode.Category.Config" xml:space="preserve"><value>Configuração</value></data>
+  <data name="BugCode.Category.System" xml:space="preserve"><value>Sistema</value></data>
+  <data name="BugCode.Category.Security" xml:space="preserve"><value>Segurança</value></data>
+  <data name="BugCode.Category.Unknown" xml:space="preserve"><value>Não classificado</value></data>
+  <data name="Report.ErrorCodeSuffix" xml:space="preserve"><value>Código do erro: {0}</value></data>
   <data name="Report.CopyButton" xml:space="preserve"><value>Copiar relatório técnico</value></data>
   <data name="Comparison.Reason.NewThermalSignal" xml:space="preserve"><value>Um novo sinal de temperatura elevada apareceu, que não existia antes.</value></data>
   <data name="Comparison.Reason.MemoryDropped" xml:space="preserve"><value>A memória disponível caiu bastante em relação a antes.</value></data>
