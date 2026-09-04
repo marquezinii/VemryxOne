@@ -1,4 +1,5 @@
 using Ralven.App.Services;
+using Ralven.Windows.Diagnostics;
 using Ralven.Contracts;
 using Xunit;
 

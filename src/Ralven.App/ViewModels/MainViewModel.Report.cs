@@ -135,12 +135,16 @@ public sealed partial class MainViewModel
         foreach (var line in report.Lines)
         {
             var (label, glyph, brushKey) = DescribeOutcome(line.Outcome);
+            var reasonWithCode = OptimizationFailureMessageFormatter.AppendCode(
+                line.Reason,
+                line.BugCode,
+                code => localization.Format("Report.ErrorCodeSuffix", code));
             ReportLines.Add(new ReportLineDisplayItem(
                 GetLocalizedActionName(line.ActionId, line.ActionName),
                 label,
                 glyph,
                 brushKey,
-                line.Reason));
+                reasonWithCode));
         }
     }
 

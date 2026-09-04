@@ -12,6 +12,7 @@ using System.Text.Json.Serialization;
 using Ralven.App.Services;
 using Ralven.Contracts;
 using Ralven.UpdateRuntime;
+using Ralven.Windows.Diagnostics;
 
 namespace Ralven.App.Services;
 

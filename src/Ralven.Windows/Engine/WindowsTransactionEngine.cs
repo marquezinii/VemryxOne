@@ -1,5 +1,6 @@
 using Ralven.Contracts;
 using Ralven.Windows.Actions;
+using Ralven.Windows.Diagnostics;
 
 namespace Ralven.Windows.Engine;
 
@@ -1135,6 +1136,8 @@ public sealed class WindowsTransactionEngine
             item.Entry.State = ActionJournalState.Failed;
             item.Entry.Outcome = ActionExecutionOutcome.Failed;
             item.Entry.OutcomeReason = exception.Message;
+            item.Entry.BugCode = BugCodeClassifier.ClassifyOptimizationException(
+                exception, item.Action.Metadata.Id);
             item.Entry.CompletedAtUtc = DateTimeOffset.UtcNow;
             var recoveryErrors = new List<Exception>();
             try

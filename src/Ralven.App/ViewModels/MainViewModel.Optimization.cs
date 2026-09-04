@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Windows.Threading;
 using Ralven.App.Services;
 using Ralven.Contracts;
+using Ralven.Windows.Diagnostics;
 using Ralven.Core.Catalog;
 using Ralven.Core.Planning;
 

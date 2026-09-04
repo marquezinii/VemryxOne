@@ -10,6 +10,7 @@ using Ralven.Contracts;
 using Ralven.Core.Catalog;
 using Ralven.Windows;
 using Ralven.Windows.Actions;
+using Ralven.Windows.Diagnostics;
 using Ralven.Windows.Engine;
 using Ralven.Windows.Infrastructure;
 using Microsoft.Win32;
@@ -747,7 +748,9 @@ public sealed class AppOptimizationService : IAppOptimizationService
                 wasCancelled: false,
                 localization.Format("Runtime.AdminPhaseFailedPreserved", reason),
                 CancellationToken.None,
-                failureBugCode: BugCodeClassifier.ClassifyBrokerException(exception),
+                failureBugCode: exception is BrokerIntegrityException
+                    ? BugCode.BRK_INTEGRITY_VALIDATION
+                    : BugCodeClassifier.ClassifyBrokerException(exception),
                 failureErrorCategory: TelemetryErrorClassifier.ClassifyException(exception)).ConfigureAwait(false);
         }
 
