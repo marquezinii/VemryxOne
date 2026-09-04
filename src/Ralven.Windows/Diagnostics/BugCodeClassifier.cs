@@ -133,6 +133,7 @@ public static class BugCodeClassifier
 
         return exception switch
         {
+            BrokerIntegrityException => BugCode.BRK_INTEGRITY_VALIDATION,
             FileNotFoundException => BugCode.BRK_LAUNCH,
             System.ComponentModel.Win32Exception win32Ex when win32Ex.NativeErrorCode == 1223 => BugCode.BRK_UAC_CANCELLED, // ERROR_CANCELLED
             System.ComponentModel.Win32Exception => BugCode.BRK_IPC_COMMUNICATION,

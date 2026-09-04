@@ -2,6 +2,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using Ralven.Contracts;
 using Ralven.UpdateRuntime;
 
 namespace Ralven.App.Services;
@@ -248,8 +249,6 @@ internal static class BrokerIntegrityVerifier
     }
 }
 
-internal sealed class BrokerIntegrityException(Exception innerException)
-    : Exception("Broker integrity verification failed.", innerException);
 
 internal static class CharacterSpanExtensions
 {

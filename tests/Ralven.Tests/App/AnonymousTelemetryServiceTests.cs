@@ -1,5 +1,6 @@
 using System.IO;
 using Ralven.App.Services;
+using Ralven.Contracts;
 using Xunit;
 
 namespace Ralven.Tests.App;

@@ -748,9 +748,7 @@ public sealed class AppOptimizationService : IAppOptimizationService
                 wasCancelled: false,
                 localization.Format("Runtime.AdminPhaseFailedPreserved", reason),
                 CancellationToken.None,
-                failureBugCode: exception is BrokerIntegrityException
-                    ? BugCode.BRK_INTEGRITY_VALIDATION
-                    : BugCodeClassifier.ClassifyBrokerException(exception),
+                failureBugCode: BugCodeClassifier.ClassifyBrokerException(exception),
                 failureErrorCategory: TelemetryErrorClassifier.ClassifyException(exception)).ConfigureAwait(false);
         }
 
