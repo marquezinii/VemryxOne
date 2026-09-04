@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.RegularExpressions;
+using Ralven.App.ViewModels;
 using Ralven.Contracts;
 
 namespace Ralven.App.Services;
@@ -94,8 +95,12 @@ public static class TechnicalReportBuilder
 
         foreach (var line in report.Lines)
         {
+            var reasonWithCode = OptimizationFailureMessageFormatter.AppendCode(
+                line.Reason,
+                line.BugCode,
+                code => localization.Format("Report.ErrorCodeSuffix", code));
             builder.AppendLine($"[{OutcomeLabel(localization, line.Outcome)}] {line.ActionName} ({line.ActionId})"
-                + (string.IsNullOrWhiteSpace(line.Reason) ? string.Empty : $" — {line.Reason}"));
+                + (string.IsNullOrWhiteSpace(reasonWithCode) ? string.Empty : $" — {reasonWithCode}"));
         }
 
         return ReportSanitizer.Sanitize(builder.ToString().TrimEnd());

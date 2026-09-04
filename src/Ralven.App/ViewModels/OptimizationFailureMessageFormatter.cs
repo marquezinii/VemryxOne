@@ -18,7 +18,7 @@ public static class OptimizationFailureMessageFormatter
     /// </param>
     public static string? AppendCode(string? message, BugCode? code, Func<string, string> formatCodeSuffix)
     {
-        if (code is null)
+        if (code is null or BugCode.Unknown)
         {
             return message;
         }

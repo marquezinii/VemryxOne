@@ -38,4 +38,15 @@ public sealed class OptimizationFailureMessageFormatterTests
 
         Assert.Equal("Código do erro: WIN_PRIVILEGE", result);
     }
+
+    [Fact]
+    public void AppendCode_UnknownCode_ReturnsMessageUnchanged()
+    {
+        var result = OptimizationFailureMessageFormatter.AppendCode(
+            "Access denied",
+            BugCode.Unknown,
+            code => $"Código do erro: {code}");
+
+        Assert.Equal("Access denied", result);
+    }
 }

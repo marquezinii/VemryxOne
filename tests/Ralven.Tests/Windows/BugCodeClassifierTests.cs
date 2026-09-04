@@ -37,4 +37,14 @@ public sealed class BugCodeClassifierTests
 
         Assert.Equal(BugCode.SEC_HEALTH_QUERY, result);
     }
+
+    [Fact]
+    public void ClassifyOptimizationException_FiveMActionWithUnmatchedKeywordAndUntypedException_DoesNotReturnUnknown()
+    {
+        var result = BugCodeClassifier.ClassifyOptimizationException(
+            new ArgumentException("boom"), "fivem.legacy.graphics.light.apply");
+
+        Assert.Equal(BugCode.APP_OPT_ACTION_EXECUTION, result);
+        Assert.NotEqual(BugCode.Unknown, result);
+    }
 }

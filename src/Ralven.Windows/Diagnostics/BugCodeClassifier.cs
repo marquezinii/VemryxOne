@@ -50,6 +50,9 @@ public static class BugCodeClassifier
             _ => context switch
             {
                 "optimization" => BugCode.APP_OPT_ACTION_EXECUTION,
+                "fivem-action" => BugCode.APP_OPT_ACTION_EXECUTION,
+                "gtav-action" => BugCode.APP_OPT_ACTION_EXECUTION,
+                "windows-action" => BugCode.APP_OPT_ACTION_EXECUTION,
                 "app-inventory" => BugCode.APP_INV_SCAN,
                 "security-health" => BugCode.SEC_HEALTH_QUERY,
                 _ => BugCode.Unknown

@@ -224,7 +224,7 @@ public sealed partial class MainViewModel
                 telemetryBugCode = result.Report.Lines
                     .Where(l => l.Outcome is ActionExecutionOutcome.Failed or ActionExecutionOutcome.RollbackFailed)
                     .Select(l => l.BugCode)
-                    .FirstOrDefault(code => code is not null);
+                    .FirstOrDefault(code => code is not null and not BugCode.Unknown);
             }
             await HandleOptimizationResultAsync(result);
         }
@@ -287,7 +287,7 @@ public sealed partial class MainViewModel
                 result.Report?.Lines
                     .Where(l => l.Outcome is ActionExecutionOutcome.Failed or ActionExecutionOutcome.RollbackFailed)
                     .Select(l => l.BugCode)
-                    .FirstOrDefault(code => code is not null),
+                    .FirstOrDefault(code => code is not null and not BugCode.Unknown),
                 code => localization.Format("Report.ErrorCodeSuffix", code))!);
         ApplyReport(result.Report);
         lastTransactionId = result.TransactionId;
