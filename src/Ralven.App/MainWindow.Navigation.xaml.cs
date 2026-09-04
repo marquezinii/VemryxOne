@@ -113,6 +113,12 @@ public partial class MainWindow
         Navigate(OptimizerPage);
     }
 
+    internal void RequestNavigateToOptimizerReport()
+    {
+        ActivateNavItem(viewModel.OptimizationScope == OptimizationScope.FiveMLegacy ? GamesNav : OptimizerNav);
+        Navigate(OptimizerPage);
+    }
+
     internal void RequestNavigateToHistory()
     {
         ActivateNavItem(HistoryNav);

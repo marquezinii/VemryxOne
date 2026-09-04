@@ -217,17 +217,25 @@ public sealed partial class MainViewModel
             // só retorna true quando CanStart é true (e CanStart exige plano).
             var result = await service.ExecuteAsync(currentPlan!, progress, operationCancellation.Token);
             completedSuccessfully = result.Succeeded;
-            telemetryEventName = result.Succeeded ? "optimization-completed" : "optimization-failed";
-            if (!result.Succeeded && result.Report is not null)
+            telemetryEventName = result.WasCancelled
+                ? "optimization-cancelled"
+                : result.Succeeded ? "optimization-completed" : "optimization-failed";
+            if (!result.Succeeded)
             {
-                // Use the first failed action's ID for bug classification
-                var failedActionId = result.Report.Lines
-                    .Where(l => l.Outcome is ActionExecutionOutcome.Failed or ActionExecutionOutcome.RollbackFailed)
-                    .Select(l => l.ActionId)
-                    .FirstOrDefault();
-                if (!string.IsNullOrWhiteSpace(failedActionId))
+                telemetryErrorCategory = result.FailureErrorCategory ?? "unexpected";
+                telemetryBugCode = result.FailureBugCode;
+                if (telemetryBugCode is null && result.Report is not null)
                 {
-                    telemetryBugCode = BugCodeClassifier.ClassifyOptimizationException(new InvalidOperationException(), failedActionId);
+                    var failures = result.Report.Lines
+                        .Where(line => line.Outcome is ActionExecutionOutcome.Failed or ActionExecutionOutcome.RollbackFailed)
+                        .ToArray();
+                    telemetryBugCode = failures.Length > 1
+                        ? BugCode.APP_OPT_PARTIAL_FAILURE
+                        : failures.Length == 1
+                            ? BugCodeClassifier.ClassifyOptimizationException(
+                                new InvalidOperationException(),
+                                failures[0].ActionId)
+                            : BugCode.APP_OPT_ACTION_EXECUTION;
                 }
             }
             await HandleOptimizationResultAsync(result);

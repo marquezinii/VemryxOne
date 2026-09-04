@@ -29,6 +29,15 @@ public sealed class TelemetryErrorClassifierTests
     {
         Assert.Equal("cancelled", TelemetryErrorClassifier.ClassifyException(new OperationCanceledException()));
     }
+
+    [Fact]
+    public void ClassifyException_BrokerIntegrityFailure_UsesUnderlyingFixedCategory()
+    {
+        Assert.Equal(
+            "invalid-data",
+            TelemetryErrorClassifier.ClassifyException(
+                new BrokerIntegrityException(new InvalidDataException())));
+    }
 }
 
 public sealed class DisabledAnonymousTelemetryServiceTests

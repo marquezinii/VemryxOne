@@ -236,10 +236,13 @@
   <data name="History.OpenLogs" xml:space="preserve"><value>Abrir carpeta de registros</value></data>
   <data name="History.LocalRuns" xml:space="preserve"><value>Ejecuciones locales</value></data>
   <data name="History.Undo" xml:space="preserve"><value>Deshacer</value></data>
+  <data name="History.ViewReport" xml:space="preserve"><value>Ver informe</value></data>
+  <data name="History.ReportUnavailable.Title" xml:space="preserve"><value>Informe no disponible</value></data>
+  <data name="History.ReportUnavailable.Message" xml:space="preserve"><value>No se pudo leer el informe local de esta ejecución. No se cambió ninguna configuración del sistema.</value></data>
   <data name="History.Table.Date" xml:space="preserve"><value>FECHA</value></data>
   <data name="History.Table.Run" xml:space="preserve"><value>EJECUCIÓN</value></data>
   <data name="History.Table.Summary" xml:space="preserve"><value>RESULTADO</value></data>
-  <data name="History.Table.Action" xml:space="preserve"><value>ROLLBACK</value></data>
+  <data name="History.Table.Action" xml:space="preserve"><value>ACCIONES</value></data>
   <data name="History.Notes.Title" xml:space="preserve"><value>Qué registra cada ejecución</value></data>
   <data name="History.Notes.Recorded" xml:space="preserve"><value>Las acciones aplicadas, el resultado tipado de cada una y el snapshot necesario para deshacer.</value></data>
   <data name="History.Notes.Rollback" xml:space="preserve"><value>El rollback restaura solo lo que esa ejecución cambió y conserva lo que modificaste después.</value></data>

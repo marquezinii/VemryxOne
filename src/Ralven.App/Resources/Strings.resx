@@ -236,10 +236,13 @@
   <data name="History.OpenLogs" xml:space="preserve"><value>Open logs folder</value></data>
   <data name="History.LocalRuns" xml:space="preserve"><value>Local runs</value></data>
   <data name="History.Undo" xml:space="preserve"><value>Undo</value></data>
+  <data name="History.ViewReport" xml:space="preserve"><value>View report</value></data>
+  <data name="History.ReportUnavailable.Title" xml:space="preserve"><value>Report unavailable</value></data>
+  <data name="History.ReportUnavailable.Message" xml:space="preserve"><value>This run's local report could not be read. No system setting was changed.</value></data>
   <data name="History.Table.Date" xml:space="preserve"><value>DATE</value></data>
   <data name="History.Table.Run" xml:space="preserve"><value>RUN</value></data>
   <data name="History.Table.Summary" xml:space="preserve"><value>RESULT</value></data>
-  <data name="History.Table.Action" xml:space="preserve"><value>ROLLBACK</value></data>
+  <data name="History.Table.Action" xml:space="preserve"><value>ACTIONS</value></data>
   <data name="History.Notes.Title" xml:space="preserve"><value>What each run records</value></data>
   <data name="History.Notes.Recorded" xml:space="preserve"><value>Applied actions, typed result of each one, and the snapshot needed to undo it.</value></data>
   <data name="History.Notes.Rollback" xml:space="preserve"><value>Rollback restores only what this run changed and preserves anything you changed afterwards.</value></data>

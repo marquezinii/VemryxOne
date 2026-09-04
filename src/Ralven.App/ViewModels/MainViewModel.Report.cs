@@ -169,6 +169,27 @@ public sealed partial class MainViewModel
 
     public bool CanShareReport => lastReport is not null;
 
+    public async Task<bool> OpenHistoryReportAsync(HistoryDisplayItem item)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        if (IsBusy)
+        {
+            return false;
+        }
+
+        var report = await service.LoadReportAsync(item.TransactionId).ConfigureAwait(true);
+        if (report is null)
+        {
+            return false;
+        }
+
+        ApplyReport(report);
+        ApplyComparison(null);
+        lastTransactionId = report.TransactionId;
+        StepLedger.Clear();
+        return true;
+    }
+
     public string SuggestedReportFileName => lastReport is null
         ? "Ralven-Report.txt"
         : $"Ralven-Report-{lastReport.TransactionId:N}.txt";

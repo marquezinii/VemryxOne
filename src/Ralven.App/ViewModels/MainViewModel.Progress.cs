@@ -110,6 +110,11 @@ public sealed partial class MainViewModel
             BackupRestored: null, // será preenchido pelo resultado da otimização quando disponível
             ElevationUsed: null, // será preenchido pelo resultado da otimização quando disponível
             ProcessCountAtStart: ShareOptionalReports ? GetProcessCountBucket() : null);
+        if (currentPlan?.PlanId is { } transactionId && transactionId != Guid.Empty)
+        {
+            telemetryEvent = telemetryEvent with { EventId = transactionId };
+        }
+
         _ = TrackOptimizationTelemetryAsync(telemetryEvent);
     }
 

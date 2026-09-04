@@ -125,6 +125,12 @@ public sealed record AppOptimizationResult
 
     /// <summary>Before/after resource comparison, when one could be captured.</summary>
     public OptimizationComparisonResult? Comparison { get; init; }
+
+    /// <summary>Allowlisted run-level cause, when the service observed one directly.</summary>
+    public BugCode? FailureBugCode { get; init; }
+
+    /// <summary>Allowlisted run-level category, without exception text.</summary>
+    public string? FailureErrorCategory { get; init; }
 }
 
 /// <summary>

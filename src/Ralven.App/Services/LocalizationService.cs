@@ -115,6 +115,7 @@ public sealed class LocalizationService : ILocalizationService
             HttpRequestException => "Error.Network",
             TimeoutException => "Error.Timeout",
             UnauthorizedAccessException or SecurityException => "Error.AccessDenied",
+            BrokerIntegrityException => "Error.SecurityCheck",
             IOException => "Error.FileUnavailable",
             UpdateSecurityException or CryptographicException => "Error.SecurityCheck",
             InvalidDataException => "Error.InvalidData",

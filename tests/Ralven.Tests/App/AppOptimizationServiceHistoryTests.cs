@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.Json;
 using Ralven.App.Services;
+using Ralven.App.ViewModels;
 using Ralven.Contracts;
 using Ralven.Core.Catalog;
 using Ralven.Windows.Engine;
@@ -48,6 +49,83 @@ public sealed class AppOptimizationServiceHistoryTests
             .LoadHistoryAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(OptimizationProfile.Aggressive, Assert.Single(history).Profile);
+    }
+
+    [Fact]
+    public async Task LoadReport_RebuildsPersistedFailureAfterServiceRestart()
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+        var definition = ActionCatalog.Current.GetRequired(
+            OptimizationActionIds.ReduceWindowsVisualEffects);
+        var journal = Journal(definition, TransactionState.CommittedWithErrors);
+        journal.Actions[0] = journal.Actions[0] with
+        {
+            State = ActionJournalState.Failed,
+            Outcome = ActionExecutionOutcome.Failed,
+            Changed = false,
+            SnapshotJson = null,
+            OutcomeReason = "Windows did not apply the requested visual effects settings."
+        };
+        await WriteJournalAsync(temporaryDirectory.Path, journal);
+
+        var report = await new AppOptimizationService(temporaryDirectory.Path)
+            .LoadReportAsync(journal.TransactionId, TestContext.Current.CancellationToken);
+
+        Assert.NotNull(report);
+        Assert.Equal(journal.TransactionId, report.TransactionId);
+        Assert.Equal(OptimizationProfile.Balanced, report.Profile);
+        Assert.Equal(ActionExecutionOutcome.Failed, Assert.Single(report.Lines).Outcome);
+        Assert.Equal(journal.Actions[0].OutcomeReason, Assert.Single(report.Lines).Reason);
+    }
+
+    [Fact]
+    public async Task OpenHistoryReport_LoadsTheSelectedRunIntoTheResultView()
+    {
+        var transactionId = Guid.NewGuid();
+        var report = new OptimizationReportDto
+        {
+            TransactionId = transactionId,
+            Profile = OptimizationProfile.Aggressive,
+            CreatedAtUtc = DateTimeOffset.UtcNow,
+            VerifiedCount = 1,
+            ChangedCount = 0,
+            SkippedCount = 0,
+            WarningCount = 0,
+            FailedCount = 0,
+            RollbackFailedCount = 0,
+            NotRunCount = 0,
+            RequiresRestart = false,
+            RestorePossible = false,
+            Succeeded = true,
+            Lines =
+            [
+                new OptimizationReportLineDto
+                {
+                    Sequence = 1,
+                    ActionId = OptimizationActionIds.DiagnoseBottleneck,
+                    ActionName = "Bottleneck",
+                    Category = ActionCategory.Safety,
+                    Outcome = ActionExecutionOutcome.Verified
+                }
+            ]
+        };
+        using var viewModel = new MainViewModel(new FakeAppOptimizationService(
+            new AppSettings(),
+            settingsFileExists: false,
+            report: report));
+        await viewModel.InitializeAsync();
+
+        var opened = await viewModel.OpenHistoryReportAsync(new HistoryDisplayItem(
+            transactionId,
+            "Aggressive",
+            "today",
+            "success",
+            CanRollback: false));
+
+        Assert.True(opened);
+        Assert.True(viewModel.IsReportAvailable);
+        Assert.Single(viewModel.ReportLines);
+        Assert.Equal($"Ralven-Report-{transactionId:N}.txt", viewModel.SuggestedReportFileName);
     }
 
     [Fact]

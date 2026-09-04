@@ -8,7 +8,6 @@ namespace Ralven.App.Services;
 
 internal static class BrokerIntegrityVerifier
 {
-    private const int MaximumManifestBytes = 16 * 1024;
     private const int MaximumBrokerFiles = 512;
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -17,18 +16,26 @@ internal static class BrokerIntegrityVerifier
 
     public static IDisposable VerifyBeforeElevation(string baseDirectory, string brokerPath)
     {
-        var requireSignedManifest = IsVersionedRuntimeLayout(baseDirectory);
-        using var resource = typeof(BrokerIntegrityVerifier).Assembly.GetManifestResourceStream(
-            "Ralven.App.Assets.broker-integrity-public-key.pem")
-            ?? throw new InvalidOperationException("A chave pública de integridade do broker não foi incorporada ao aplicativo.");
-        using var reader = new StreamReader(resource, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
-        using var verifier = ECDsa.Create();
-        verifier.ImportFromPem(reader.ReadToEnd());
-        return Verify(
-            baseDirectory,
-            brokerPath,
-            verifier.ExportSubjectPublicKeyInfo(),
-            requireSignedManifest);
+        try
+        {
+            var requireSignedManifest = IsVersionedRuntimeLayout(baseDirectory);
+            using var resource = typeof(BrokerIntegrityVerifier).Assembly.GetManifestResourceStream(
+                "Ralven.App.Assets.broker-integrity-public-key.pem")
+                ?? throw new InvalidOperationException("A chave pública de integridade do broker não foi incorporada ao aplicativo.");
+            using var reader = new StreamReader(resource, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
+            using var verifier = ECDsa.Create();
+            verifier.ImportFromPem(reader.ReadToEnd());
+            return Verify(
+                baseDirectory,
+                brokerPath,
+                verifier.ExportSubjectPublicKeyInfo(),
+                requireSignedManifest);
+        }
+        catch (Exception exception) when (exception is not (
+            OutOfMemoryException or StackOverflowException or AccessViolationException))
+        {
+            throw new BrokerIntegrityException(exception);
+        }
     }
 
     internal static IDisposable Verify(
@@ -63,7 +70,7 @@ internal static class BrokerIntegrityVerifier
             EnsurePlainPath(root, Path.Combine(root, "broker"));
             var signedManifestStream = OpenLockedRead(signedManifestPath);
             leases.Add(signedManifestStream);
-            if (signedManifestStream.Length is <= 0 or > MaximumManifestBytes)
+            if (signedManifestStream.Length is <= 0 or > BrokerTrustPolicy.MaximumSignedManifestBytes)
             {
                 throw new InvalidDataException("Manifesto assinado do componente administrativo inválido.");
             }
@@ -78,7 +85,7 @@ internal static class BrokerIntegrityVerifier
             var fileManifestPath = ResolveContainedPath(root, signedManifest.FileManifestRelativePath);
             var fileManifestStream = OpenLockedRead(fileManifestPath);
             leases.Add(fileManifestStream);
-            if (fileManifestStream.Length is <= 0 or > MaximumManifestBytes)
+            if (fileManifestStream.Length is <= 0 or > BrokerTrustPolicy.MaximumFileManifestBytes)
             {
                 throw new InvalidDataException("Manifesto de arquivos do componente administrativo inválido.");
             }
@@ -240,6 +247,9 @@ internal static class BrokerIntegrityVerifier
         }
     }
 }
+
+internal sealed class BrokerIntegrityException(Exception innerException)
+    : Exception("Broker integrity verification failed.", innerException);
 
 internal static class CharacterSpanExtensions
 {
