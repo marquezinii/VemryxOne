@@ -68,7 +68,9 @@ public sealed class MainViewModelSettingsTests
 
         await viewModel.RetrySaveSettingsAsync();
 
-        Assert.Equal(localization.GetString("Settings.SaveFailed"), viewModel.SettingsSaveErrorMessage);
+        Assert.Equal(
+            $"{localization.GetString("Settings.SaveFailed")} — {localization.Format("Report.ErrorCodeSuffix", Ralven.Contracts.BugCode.APP_SETTINGS_PERSISTENCE)}",
+            viewModel.SettingsSaveErrorMessage);
 
         service.SettingsSaveException = null;
         await viewModel.RetrySaveSettingsAsync();

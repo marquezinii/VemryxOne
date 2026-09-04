@@ -33,7 +33,8 @@ public static class OptimizationReportBuilder
                 ActionName = definition?.Name ?? entry.ActionId,
                 Category = definition?.Category ?? ActionCategory.Safety,
                 Outcome = outcome,
-                Reason = entry.OutcomeReason
+                Reason = entry.OutcomeReason,
+                BugCode = entry.BugCode
             });
 
             if (outcome == ActionExecutionOutcome.Applied)

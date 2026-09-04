@@ -14,6 +14,9 @@ public sealed record OptimizationReportLineDto
     public required ActionExecutionOutcome Outcome { get; init; }
 
     public string? Reason { get; init; }
+
+    /// <summary>Stable classification of the failure, when one was caught.</summary>
+    public BugCode? BugCode { get; init; }
 }
 
 /// <summary>

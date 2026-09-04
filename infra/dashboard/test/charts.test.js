@@ -246,7 +246,7 @@ test('toBugReportRow maps a row into the bug report table\'s column order', () =
   // Other cells should match exactly
   assert.deepEqual(cells.slice(1), [
     'Falha na otimização',
-    'APP_OPT_ACTION_EXECUTION',
+    'APP_OPT_ACTION_EXECUTION — Aplicativo',
     'O preset não terminou',
     '1.0.4',
     'Médio',
