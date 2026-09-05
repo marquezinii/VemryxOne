@@ -324,8 +324,25 @@
                                                         Option2Label="{Binding [Profiles.Aggressive.Name], Source={StaticResource LocalizedStrings}}"
                                                         RecommendedLabel="{Binding [Profiles.RecommendedBadge], Source={StaticResource LocalizedStrings}}"
                                                         SelectionChanged="ProfileSpectrum_SelectionChanged" />
-                            <TextBlock Text="{Binding SelectedProfileName}" Style="{StaticResource PageTitleText}" Margin="0,24,0,0" />
+                            <Button Style="{StaticResource SecondaryButtonStyle}" Margin="0,16,0,0" Padding="16,0" Height="44"
+                                    Foreground="{DynamicResource ProAccentBrush}" BorderBrush="{DynamicResource ProAccentBrush}"
+                                    Click="SelectUltra_Click" IsEnabled="{Binding CanEditPersonalPreferences}"
+                                    Visibility="{Binding IsGeneralWindowsOptimization, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <TextBlock Text="{Binding [Ultra.Entry], Source={StaticResource LocalizedStrings}}" Foreground="{DynamicResource ProAccentBrush}" />
+                            </Button>
+                            <TextBlock Text="{Binding SelectedProfileName}" Margin="0,24,0,0">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource PageTitleText}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsUltraSelected}" Value="True">
+                                                <Setter Property="Foreground" Value="{DynamicResource ProAccentBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                             <TextBlock Text="{Binding ProfilePresentationBenefits}" Style="{StaticResource SecondaryText}" Margin="0,10,0,0" TextWrapping="Wrap" />
+                            <controls:UltraPanel x:Name="UltraWorkspace" Margin="0,18,0,0" Visibility="{Binding IsUltraSelected, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
                             <Border Style="{StaticResource HairlineDivider}" Margin="0,24" />
 
@@ -493,13 +510,8 @@
                     </Grid.RowDefinitions>
 
                     <StackPanel Grid.Row="0" Margin="0,0,0,18">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding [Optimizer.PlanTitle], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SectionText}" VerticalAlignment="Center" />
-                            <TextBlock Grid.Column="1" Text="{Binding ProfilePresentationCategories}" Style="{StaticResource CaptionText}" VerticalAlignment="Center" Margin="20,0,0,0" TextTrimming="CharacterEllipsis" />
-                        </Grid>
+                        <TextBlock Text="{Binding [Optimizer.PlanTitle], Source={StaticResource LocalizedStrings}}" Style="{StaticResource SectionText}" />
+                        <TextBlock Text="{Binding ProfilePresentationCategories}" Style="{StaticResource CaptionText}" Margin="0,6,0,0" TextWrapping="Wrap" />
                         <TextBlock Text="{Binding PlanSummary}" Style="{StaticResource SecondaryText}" Margin="0,7,0,0" TextWrapping="Wrap" />
                         <!-- Sem tinta de alerta: são ressalvas do plano, não
                              erros. Três linhas em amarelo no topo da tabela

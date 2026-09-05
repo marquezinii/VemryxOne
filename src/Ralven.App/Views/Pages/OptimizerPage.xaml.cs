@@ -50,6 +50,7 @@ public partial class OptimizerPage : UserControl
         switch (e.PropertyName)
         {
             case nameof(MainViewModel.IsLightSelected):
+            case nameof(MainViewModel.IsUltraSelected):
             case nameof(MainViewModel.IsBalancedSelected):
             case nameof(MainViewModel.IsAggressiveSelected):
             case nameof(MainViewModel.IsLightRecommended):
@@ -65,8 +66,8 @@ public partial class OptimizerPage : UserControl
         syncingProfileSelection = true;
         try
         {
-            ProfileSpectrum.SelectedIndex = vm.IsAggressiveSelected ? 2 : vm.IsBalancedSelected ? 1 : 0;
-            ProfileSpectrum.RecommendedIndex = vm.IsAggressiveRecommended
+            ProfileSpectrum.SelectedIndex = vm.IsUltraSelected ? -1 : vm.IsAggressiveSelected ? 2 : vm.IsBalancedSelected ? 1 : 0;
+            ProfileSpectrum.RecommendedIndex = vm.IsUltraSelected ? -1 : vm.IsAggressiveRecommended
                 ? 2
                 : vm.IsBalancedRecommended
                     ? 1
@@ -102,6 +103,8 @@ public partial class OptimizerPage : UserControl
             await shell.RequestStartOptimizationAsync();
         }
     }
+
+    private void SelectUltra_Click(object sender, RoutedEventArgs e) => ViewModel?.SelectUltra();
 
     private void CancelOptimization_Click(object sender, RoutedEventArgs e)
     {

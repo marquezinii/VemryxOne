@@ -614,6 +614,7 @@ public sealed class WindowsOptimizationActionFactory
             PlanBuilder.CanonicalRequestFor(plan),
             PlanBuildContext.For(plan));
         if (!canonical.IsExecutable
+            || canonical.Options != plan.Options
             || canonical.Scope != plan.Scope
             || canonical.Actions.Count != plan.Actions.Count
             || canonical.RequiresElevation != plan.RequiresElevation
@@ -799,7 +800,7 @@ public sealed class WindowsOptimizationRuntime
     {
         return Engine.ExecuteAsync(
             ResolveActions(plan),
-            context with { Profile = plan.Profile },
+            context with { Profile = plan.Profile, PersonalUsage = plan.PersonalPreferences?.Usage },
             options,
             cancellationToken);
     }

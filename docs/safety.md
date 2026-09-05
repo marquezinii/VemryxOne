@@ -537,3 +537,12 @@ A cópia é sempre uma ação explícita do usuário; nada é enviado pela rede.
 ## Comunicação de vulnerabilidades
 
 Não publique exploits ou bypasses em issues. Siga [SECURITY.md](../SECURITY.md).
+
+## Ultra e acesso Pro
+
+O [Ultra](ultra.md) compõe apenas ações já suportadas no Windows geral. Preferências
+pessoais não ampliam privilégios, catálogo ou escopo. Runtime e broker recompõem
+o plano e rejeitam opções divergentes. Limpeza permanece opt-in; ASPM não entra
+no perfil pessoal. Acompanhamento e medições somente leem o PC e não reaplicam
+ajustes. Pro é revalidado antes de novas operações, preservando transações em
+andamento, registros locais e rollback após expiração.

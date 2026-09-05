@@ -161,4 +161,5 @@
     <DropShadowEffect x:Key="Elevation1Shadow" Color="#0A0A0B" Opacity="0.40" BlurRadius="14" ShadowDepth="2" Direction="270" />
     <DropShadowEffect x:Key="Elevation2Shadow" Color="#0A0A0B" Opacity="0.52" BlurRadius="28" ShadowDepth="6" Direction="270" />
     <DropShadowEffect x:Key="Elevation3Shadow" Color="#0A0A0B" Opacity="0.68" BlurRadius="52" ShadowDepth="14" Direction="270" />
+    <SolidColorBrush x:Key="ProAccentBrush" Color="#C4AAFF" />
 </ResourceDictionary>

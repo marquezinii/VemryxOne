@@ -136,6 +136,8 @@ public partial class SpectrumSelector : UserControl
 
     private void UpdateThumbPosition(bool animate)
     {
+        SelectionIndicator.Visibility = SelectedIndex is >= 0 and <= 2 ? Visibility.Visible : Visibility.Collapsed;
+        if (SelectedIndex is < 0 or > 2) return;
         if (TrackHost.ActualWidth <= 0)
         {
             return;

@@ -32,6 +32,7 @@ public sealed partial class LocalizedInterfaceContractTests
         var sources = new[]
         {
             Path.Combine(root, "src", "Ralven.App", "MainWindow.xaml"),
+            Path.Combine(root, "src", "Ralven.App", "Controls", "UltraPanel.xaml"),
             Path.Combine(root, "src", "Ralven.App", "Views", "BugReportWindow.xaml"),
             Path.Combine(root, "src", "Ralven.App", "Views", "PrivacyConsentWindow.xaml"),
             Path.Combine(root, "src", "Ralven.App", "Views", "ReleaseNotesWindow.xaml"),
