@@ -2,7 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <StackPanel>
-        <TextBlock Text="{Binding UltraAccessLabel}" Foreground="{DynamicResource ProAccentBrush}" TextWrapping="Wrap" Margin="0,0,0,12" />
+        <TextBlock Text="{Binding [Ultra.Exclusive], Source={StaticResource LocalizedStrings}}" Style="{StaticResource OverlineText}"
+                   Foreground="{DynamicResource ProAccentGradientBrush}" Margin="0,0,0,12" />
         <Expander x:Name="RoutineExpander" Header="{Binding [Ultra.Profiles], Source={StaticResource LocalizedStrings}}">
             <StackPanel Margin="0,10,0,16" IsEnabled="{Binding CanEditPersonalPreferences}">
                 <ComboBox ItemsSource="{Binding PersonalUsageLabels}" SelectedIndex="{Binding PersonalUsageIndex, Mode=TwoWay}"

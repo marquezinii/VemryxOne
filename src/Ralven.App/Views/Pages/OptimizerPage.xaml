@@ -322,14 +322,10 @@
                                                         Option0Label="{Binding [Profiles.Light.Name], Source={StaticResource LocalizedStrings}}"
                                                         Option1Label="{Binding [Profiles.Balanced.Name], Source={StaticResource LocalizedStrings}}"
                                                         Option2Label="{Binding [Profiles.Aggressive.Name], Source={StaticResource LocalizedStrings}}"
+                                                        Option3Label="{Binding [Ultra.Name], Source={StaticResource LocalizedStrings}}"
+                                                        ShowOption3="{Binding IsGeneralWindowsOptimization}"
                                                         RecommendedLabel="{Binding [Profiles.RecommendedBadge], Source={StaticResource LocalizedStrings}}"
                                                         SelectionChanged="ProfileSpectrum_SelectionChanged" />
-                            <Button Style="{StaticResource SecondaryButtonStyle}" Margin="0,16,0,0" Padding="16,0" Height="44"
-                                    Foreground="{DynamicResource ProAccentBrush}" BorderBrush="{DynamicResource ProAccentBrush}"
-                                    Click="SelectUltra_Click" IsEnabled="{Binding CanEditPersonalPreferences}"
-                                    Visibility="{Binding IsGeneralWindowsOptimization, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                <TextBlock Text="{Binding [Ultra.Entry], Source={StaticResource LocalizedStrings}}" Foreground="{DynamicResource ProAccentBrush}" />
-                            </Button>
                             <TextBlock Text="{Binding SelectedProfileName}" Margin="0,24,0,0">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock" BasedOn="{StaticResource PageTitleText}">

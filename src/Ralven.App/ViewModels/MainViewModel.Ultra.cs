@@ -28,7 +28,6 @@ public sealed partial class MainViewModel
     public bool CanUsePersonalTools => CanSavePersonalProfile && !isInitializing && diagnostic is not null && !diagnosticFailed;
     public bool CanCheckPersonalTracking => CanUsePersonalTools && personalWorkspace.TrackingEnabled;
     public bool CanStopPersonalTracking => personalWorkspace.TrackingEnabled && CanEditPersonalPreferences;
-    public string UltraAccessLabel => localization.GetString(hasProAccess ? "Ultra.Access.Active" : "Ultra.Access.Preview");
     public string UltraStatus { get => ultraStatus; private set => SetProperty(ref ultraStatus, value); }
     public string PersonalUsageDetail => localization.GetString($"Ultra.Usage.{personalPreferences.Usage}.Detail");
     public string MeasurementContext { get => measurementContext; set => SetProperty(ref measurementContext, value); }
@@ -229,7 +228,7 @@ public sealed partial class MainViewModel
         foreach (var property in new[]
         {
             nameof(IsUltraSelected), nameof(HasProAccess), nameof(IsPersonalBusy), nameof(CanEditPersonalPreferences),
-            nameof(CanSavePersonalProfile), nameof(CanUsePersonalTools), nameof(CanCheckPersonalTracking), nameof(CanStopPersonalTracking), nameof(UltraAccessLabel),
+            nameof(CanSavePersonalProfile), nameof(CanUsePersonalTools), nameof(CanCheckPersonalTracking), nameof(CanStopPersonalTracking),
             nameof(PersonalUsageLabels), nameof(PersonalUsageIndex), nameof(PersonalUsageDetail), nameof(PersonalPreserveAppearance),
             nameof(PersonalPreserveCapture), nameof(PersonalAllowPerformancePower), nameof(PersonalCleanTemporaryFiles),
             nameof(PersonalTrackingSummary), nameof(PersonalComparisonSummary), nameof(SelectedProfileName),

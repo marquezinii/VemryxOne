@@ -1558,11 +1558,9 @@
   <data name="ActionResults.MenuShowDelay.AlreadyOptimized" xml:space="preserve"><value>Windows menu opening delay was already optimized.</value></data>
   <data name="ActionResults.MenuShowDelay.Applied" xml:space="preserve"><value>Windows menu opening responsiveness was adjusted.</value></data>
   <data name="Ultra.Name" xml:space="preserve"><value>Ultra</value></data>
-  <data name="Ultra.Entry" xml:space="preserve"><value>Ultra · Pro   —   Your personal plan</value></data>
+  <data name="Ultra.Exclusive" xml:space="preserve"><value>Exclusive to Pro users</value></data>
   <data name="Ultra.Description" xml:space="preserve"><value>A Windows plan shaped by your routine and preferences, with local change tracking and guided comparisons.</value></data>
-  <data name="Ultra.Access.Active" xml:space="preserve"><value>Ralven Pro · Personal tools available</value></data>
-  <data name="Ultra.Access.Preview" xml:space="preserve"><value>Preview your personal plan. Saving, applying and new readings require Pro. Your three free modes remain complete. Check your plan in Settings &gt; Account.</value></data>
-  <data name="Ultra.AccessRequired" xml:space="preserve"><value>An active Pro plan could not be confirmed. Refresh your plan in Settings &gt; Account. Free modes and restore remain available.</value></data>
+  <data name="Ultra.AccessRequired" xml:space="preserve"><value>Ultra is exclusive to Pro users. Check your plan in Settings &gt; Account.</value></data>
   <data name="Ultra.Profiles" xml:space="preserve"><value>Your saved routines</value></data>
   <data name="Ultra.Usage.Label" xml:space="preserve"><value>Choose a routine</value></data>
   <data name="Ultra.Usage.Everyday" xml:space="preserve"><value>Everyday</value></data>

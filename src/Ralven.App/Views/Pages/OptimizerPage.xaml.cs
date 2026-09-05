@@ -66,7 +66,7 @@ public partial class OptimizerPage : UserControl
         syncingProfileSelection = true;
         try
         {
-            ProfileSpectrum.SelectedIndex = vm.IsUltraSelected ? -1 : vm.IsAggressiveSelected ? 2 : vm.IsBalancedSelected ? 1 : 0;
+            ProfileSpectrum.SelectedIndex = vm.IsUltraSelected ? 3 : vm.IsAggressiveSelected ? 2 : vm.IsBalancedSelected ? 1 : 0;
             ProfileSpectrum.RecommendedIndex = vm.IsUltraSelected ? -1 : vm.IsAggressiveRecommended
                 ? 2
                 : vm.IsBalancedRecommended
@@ -88,6 +88,12 @@ public partial class OptimizerPage : UserControl
             return;
         }
 
+        if (ProfileSpectrum.SelectedIndex == 3)
+        {
+            vm.SelectUltra();
+            return;
+        }
+
         vm.SelectProfile(ProfileSpectrum.SelectedIndex switch
         {
             2 => OptimizationProfile.Aggressive,
@@ -103,8 +109,6 @@ public partial class OptimizerPage : UserControl
             await shell.RequestStartOptimizationAsync();
         }
     }
-
-    private void SelectUltra_Click(object sender, RoutedEventArgs e) => ViewModel?.SelectUltra();
 
     private void CancelOptimization_Click(object sender, RoutedEventArgs e)
     {
